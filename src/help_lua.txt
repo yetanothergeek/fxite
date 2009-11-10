@@ -1,0 +1,902 @@
+###  Macro Reference###
+
+%%%Document functions%%%
+@@@open@@@ -- Open a file.
+@@@save@@@ -- Save a file.
+@@@close@@@ -- Close a document.
+@@@documents@@@ -- List all open documents.
+@@@activate@@@ -- Activate a document tab.
+@@@filename@@@ -- Return the filename of a document.
+@@@ndocs@@@ -- Return the number of open documents.
+
+
+%%%Cursor functions%%%
+@@@caret@@@ -- Set or query the current caret position.
+@@@go@@@ -- Move caret and/or select text.
+@@@rowcol@@@ -- Translate coordinates to/from position.
+@@@select@@@ -- Select a portion of text.
+@@@scrollpos@@@ -- Set or query scrollbar positions.
+
+
+%%%Editing functions%%%
+@@@batch@@@ -- Group actions into a single undo operation.
+@@@readonly@@@ -- Set the document's read-only status.
+@@@cut@@@ -- Cut selected text.
+@@@copy@@@ -- Copy selected text.
+@@@paste@@@ -- Paste clipboard contents,
+@@@delete@@@ -- Delete text.
+@@@indent@@@ -- Shift selected text left ot right.
+@@@lowercase@@@ -- Convert selection to lowercase.
+@@@uppercase@@@ -- Convert selection to uppercase.
+@@@seltext@@@ -- Get the contents of the current selection.
+@@@insert@@@ -- Insert some text into the document.
+@@@text@@@ -- Query or set the entire document's contents.
+
+
+%%%Text retrieval functions%%%
+@@@lines@@@ -- Itrate through the lines of the document.
+@@@nlines@@@ -- Count the lines in the document.
+@@@nchars@@@ -- Count the characters in the document.
+@@@word@@@ -- Return the word at the cursor.
+@@@byte@@@ -- Return the ASCII value of a document character.
+@@@xsel@@@ -- Query or set the primary X-selection.
+
+
+%%%Search functions%%%
+@@@find@@@ -- Search for text within the document.
+@@@match@@@ -- Find a matching bracket, brace, or parenthesis.
+
+
+%%%Runtime functions%%%
+@@@sleep@@@ -- Pause execution of the script.
+@@@yield@@@ -- Allow the GUI to refresh itself.
+@@@optimize@@@ -- Disable some debugging features.
+@@@keep@@@ -- Preserve variables between scripts
+
+
+%%%Filesystem functions%%%
+@@@basename@@@ -- Return the filename portion of a path.
+@@@dirname@@@ -- Return the directory portion of a path.
+@@@fullpath@@@ -- Return the complete path of a filename.
+@@@stat@@@ -- Return system information about a file.
+@@@dirlist@@@ -- Iterate the items in a directory.
+@@@dirsep@@@ -- default directory separator, '/' or '\'
+@@@wkdir@@@ -- Get or set the working directory.
+@@@mkdir@@@ -- Create a new directory.
+
+
+%%%Application functions%%%
+@@@quit@@@ -- Terminate the application.
+@@@script@@@ -- filename of the running script.
+@@@scintilla@@@ -- Low-level access to the editor widget.
+
+%%%Dialog functions%%%
+@@@choose@@@ -- Choose from a list of items.
+@@@confirm@@@ -- Ask a yes-or-no question.
+@@@input@@@ -- Prompt for some text.
+@@@message@@@ -- Display a message.
+@@@pickfile@@@ -- Prompt user to select a file.
+@@@dialog@@@ --- Create complex dialogs.
+
+%%%Menu command functions%%%
+///These behave just like the equivalent menu commands:///
+===file_new()
+file_open()
+file_reload()
+file_save()
+file_save_as()
+file_save_all()
+file_save_copy()
+file_export("pdf"|"html" [, filename])
+file_close()
+file_close_all()
+file_insert_file()
+file_load_tags_file([tagfile])
+file_unload_tags_file(tagfile)
+edit_undo()
+edit_redo()
+edit_preferences()
+edit_indent("space"|"tab", "left"|"right")
+edit_format("dos"|"mac"|"unix")
+search_find()
+search_find_next()
+search_find_prev()
+search_find_selected("next"|"prev")
+search_replace()
+search_go_to()
+search_go_to_selected()
+search_find_definition()
+tools_rebuild_menu()
+documents_next()
+documents_prev()
+documents_move("first"|"last"|"up"|"down")
+documents_output_pane()
+view_status()
+view_line_numbers()
+view_white_space()
+view_output_pane()
+view_toolbar()
+view_zoom(-10 .. +20)
+view_zoom("in"|"out"|"default"|"closest"|"furthest")
+view_tabs("position", "top"|"bottom"|"left"|"right")
+view_tabs("width", "uniform"|"packed")
+view_language(name)
+view_clear_ouptput()
+===
+The ===file_load_tags_file=== and ===file_export=== functions will display their usual dialogs if \
+a filename is not specified. \
+The ===view_language=== function requires a valid language name as its argument. \
+The ===view_zoom=== function takes a numeric value, or a string similar to the corresponding sub-menu names. \
+The ===view_tabs=== function also takes arguments similar to its sub-menu names. \
+The ===view_clear_output=== function takes no arguments. \
+The other ===view_*=== functions take an ///optional/// boolean argument, without it, they toggle the current value.
+(All menu functions must be prefixed with the  ===__MOD__.===  namespace.)
+
+
+
+###open###
+===__MOD__.open(filename [,line[:column] [,readonly]])
+===
+Opens the specified %%%filename%%% in the editor, or activates its tab if it is already open. \
+If the optional %%%line%%% or %%%line:column%%% argument is present (e.g "128:15"), the caret \
+is set to that position. If the optional %%%readonly%%% argument is %%%true%%%, the file is \
+opened in read-only mode.
+
+
+###save###
+===__MOD__.save([filename [,overwrite]])
+===
+Saves the active document to the specified filename, or to its current name if \
+the %%%filename%%% argument is absent. If the %%%overwrite%%% argument is %%%true%%%, \
+any existing file by that name will be silently overwritten, otherwise, the user will \
+be asked before overwriting.
+
+
+###close###
+===__MOD__.close(["prompt"|"save"|"nosave"])
+===
+Closes the active document. Unsaved changes are handled according to the optional argument:
+  ==="prompt"  === -- Ask the user to discard or save changes (default).
+  ==="save"    === -- Always save any changes.
+  ==="nosave"  === -- Always discard any changes.
+
+
+###documents###
+===__MOD__.documents([id])
+===
+When called with a numeric %%%id%%%, returns the ///filename/// of the open document at that ///index///.  \
+When called with a filename for %%%id%%%, returns the ///index/// of the open document with that ///filename///. \
+(Either of these calls may return %%%nil%%% if the specified %%%id%%% is invalid.)
+
+When called with no arguments, returns an iterator function that returns the \
+filename of each open document:
+===
+   for name in __MOD__.documents() do
+     __MOD__.message(name)
+   end
+===
+
+
+###activate###
+===__MOD__.activate(id)
+===
+When called with a numeric %%%id%%%, activates the document tab at that ///index///. \
+When called with a filename for %%%id%%%, activates the document tab with that ///filename///. \
+Returns %%%true%%% if the document was activated, or %%%false%%% if the specified %%%id%%% was invalid.
+
+
+###filename###
+===__MOD__.filename()
+===
+Returns the full path and filename of the active document.
+
+
+###ndocs###
+===__MOD__.ndocs()
+===
+Returns the total number of open documents.
+
+
+###caret###
+===__MOD__.caret([position]|[line,column])
+===
+When called with no arguments, returns the current position of the caret in the active document.
+
+When called with a single %%%position%%% argument, it moves the caret to that position. Any existing \
+selection is lost.
+
+When called with both %%%line%%% and %%%column%%% arguments, it moves the caret to that line \
+number and column offset. Any existing selection is lost.
+
+
+
+###go###
+===__MOD__.go(mode, count [,extend [,rect]])
+===
+Moves the caret incrementally.
+
+The  %%%mode%%%  argument must be one of the following strings:
+  ==="char"=== -- Move by characters.
+  ==="part"=== -- Move by segments in MixedCase or under_scored names.
+  ==="word"=== -- Move by words.
+  ==="edge"=== -- Move to beginning or end of current line.
+  ==="line"=== -- Move up or down by lines.
+  ==="para"=== -- Move up or down by paragraphs.
+  ==="page"=== -- Move up or down by pages (screens).
+  ==="body"=== -- Move to the beginning or end of the entire document.
+
+If the numeric %%%count%%% argument is positive, the caret is moved ///forward/// or ///down/// by that many steps. \
+If it is negative, the caret is moved ///backward/// or ///up/// by that many steps. \
+( If it is ///zero/// there is not much point in using this function. )
+There is also no point in using a magnitude greater than ///one/// for the ==="edge"=== or ==="body"=== modes.
+
+If the optional boolean %%%extend%%% argument is true, the selection is expanded or contracted to \
+the new caret position, similar to holding down the  %%%[Shift]%%%  key when navigating with the keyboard.
+
+If the optional boolean %%%rect%%% argument is also true, the selection is treated as rectangular rather than linear. \
+( Rectangular selection is only supported for char, edge, line, or page modes. )
+
+
+###rowcol###
+===__MOD__.rowcol([line,column]|[position])
+===
+Translates between rectangular (row,column) coordinates and linear (stream offset) position.
+
+When called with two arguments, returns the linear position of the specified line and column:
+===  position = __MOD__.rowcol(line, column)===
+
+When called with a single argument, returns ///both/// the line and column of that position, in the form:
+===  line, column = __MOD__.rowcol(position)===
+( Note that in Lua a single function call like the one above returns both values! )
+
+When called with no arguments, returns the line and column coordinates of the current caret position. \
+
+
+
+###select###
+===__MOD__.select([start,stop[,rect]])
+===
+When called with no arguments, returns the beginning and ending points and rectangular \
+mode of the current selection, in the form:
+===  start, stop, rect = __MOD__.select()===
+( Remember, functions in Lua can return more than one value. )
+
+If this function is called with two arguments, it creates a new selection in the current document. \
+The selection is anchored at the %%%start%%% position, and extended to the %%%stop%%% position.
+
+If the third %%%rect%%% argument is %%%true%%%, the selection is created in ///rectangular/// mode.
+
+Note that in all cases, the value of %%%stop%%% is considered to be the end of the selection where \
+the caret is located.
+
+So, if %%%stop%%% is less than %%%start%%%, the caret is postioned at the beginning of the selection, \
+similar to a selection created by dragging the mouse backwards in the document.
+
+Hint: To select the entire document, you can use:
+  ===__MOD__.select(0, __MOD__.nchars())===
+
+If called with one argument, the caret is moved to that position, but no selection is created, \
+and any existing selection is lost.
+
+
+###scrollpos###
+===__MOD__.scrollpos([horizontal,vertical])
+===
+When called with no arguments, returns the current postions of ///both/// the horizontal \
+and vertical scrollbars of the active document in the form:
+  ===horizontal,vertical=__MOD__.scrollpos()===
+
+When called with two arguments, the active document's horizontal and vertical scrollbars \
+are scrolled to the respective values.
+
+Note that the values for this function are in pixel coordinates rather than character coordinates, \
+and are calculated as the offset between the "virtual" top left corner of the document \
+and the top left corner of the current "viewport".
+
+
+
+###batch###
+===__MOD__.batch(enabled)
+===
+This function marks the beginning or ending of a group of operations \
+that you want the user to be able to undo in a single step.
+
+If the %%%enabled%%% argument is ///true///, it marks the ///start/// of a group of operations.
+
+If the %%%enabled%%% argument is ///false///, it marks the ///end/// of a group of operations.
+
+
+###readonly###
+===__MOD__.readonly([ro])
+===
+When called with no arguments, returns the read-only status of the active document.
+When called with a single boolean argument, sets the read-only status of the active document.
+
+
+###cut###
+===__MOD__.cut()
+===
+Cuts the currently selected text to the clipboard.
+
+
+###copy###
+===__MOD__.copy([text],[start,stop])
+===
+When called with no arguments, copies the currently selected text to the clipboard.
+When called with a single (string) argument, places that %%%text%%% on the clipboard.
+When called with two arguments, copies the text between the %%%start%%% and %%%stop%%% positions \
+of the active document to the clipboard.
+
+
+###paste###
+===__MOD__.paste()
+===
+Inserts the contents of the clipboard into the active document at the caret position. \
+Any currently selected text will be replaced.
+
+###delete###
+===__MOD__.delete([count])
+===
+When called with a ///positive/// value for %%%count%%%, deletes that many characters to the ///right/// of the \
+caret or selection.
+When called with a ///negative/// value for %%%count%%%, deletes that many characters to the ///left/// of the \
+caret or selection.
+If any text is currently selected, it is also removed as part of the initial deletion.
+
+Calling this function with no arguments is the same as ===__MOD__.delete(1)===.
+Raises an error if the value of %%%count%%% is zero.
+
+
+
+###indent###
+===__MOD__.indent([count])
+===
+When called with a ///positive/// value for %%%count%%%, shifts the current selection to the ///right/// \
+by that many tab stops.
+
+When called with a ///negative/// value for %%%count%%%, shifts the current selection to the ///left/// \
+by that many tab stops, or as far as the left margin will allow.
+
+Calling the function with no arguments is the same as ===__MOD__.indent(1)===.
+Raises an error if the value of %%%count%%% is zero.
+
+
+
+###lowercase###
+===__MOD__.lowercase()
+===
+Converts the current selection to lowercase.
+
+
+###uppercase###
+===__MOD__.uppercase()
+===
+Converts the current selection to uppercase.
+
+
+###seltext###
+===__MOD__.seltext()
+===
+Returns the contents of the current selection as a string.
+
+
+###insert###
+===__MOD__.insert(text)
+===
+Inserts the string %%%text%%% into the active document at the current caret position.
+If any text is currently selected, it is replaced.
+
+
+###text###
+===__MOD__.text([text])
+===
+When called with no arguments, returns the entire contents of the active document as a string.
+When called with a single argument, the entire content of the active document is replaced with that string.
+
+
+
+###lines###
+===__MOD__.lines([index])
+===
+When called with one argument, returns the contents of the line at %%%index%%% of the active document.
+
+When called with no arguments, returns an iterator function to list the index and contents of \
+each line in the active document:
+===
+  for i,line in __MOD__.lines() do
+    print(i, line);
+  end
+===
+
+###nlines###
+===__MOD__.nlines()
+===
+Returns the total number of lines in the active document.
+
+
+###nchars###
+===__MOD__.nchars()
+===
+Returns the total number of characters (bytes) in the active document.
+
+
+###word###
+===__MOD__.word([position])
+===
+When called with no arguments, returns the word at the current caret position of the active document.
+When called with one argument, returns the word at that %%%position%%% in the active document.
+
+
+###byte###
+===__MOD__.byte([position])
+===
+When called with no arguments, returns the byte value of the character at the current \
+caret position of the active document.
+When called with one argument, returns the byte value of the character at \
+that %%%position%%% in the active document.
+
+
+###xsel###
+===__MOD__.xsel([text])
+===
+When called with no arguments, returns the text of the X11 primary selection.
+When called with one argument, places that %%%text%%% into the X11 primary selection.
+
+
+
+###find###
+===__MOD__.find(phrase, start, stop, {options})
+===
+Searches within the active document for the string %%%phrase%%%, beginning at \
+the numeric %%%start%%% position and ending at the %%%stop%%% position.
+( To search backwards, specify a %%%start%%% value greater than %%%stop%%% . )
+
+The %%%options%%% argument is a table, each element may be one of the following strings:
+   ==="matchcase"===  -- Case-sensitive search.
+   ==="wholeword"===  -- Match only on whole-word boundaries.
+   ==="regexp"   ===  -- Treat search phrase as a regular expression.
+
+( The empty set ==={}=== may also be specified, to search using the default options. )
+
+If a match is found, the function returns the starting and ending positions of the match,
+otherwise it returns %%%nil%%%.
+
+For example, to select the first case-sensitive whole-word match of the string  ==='foobar'===  \
+you could use something like this:
+===
+ a,b=__MOD__.find("foobar",0,__MOD__.nchars(),{"wholeword","matchcase"})
+ if (a) then
+   __MOD__.select(a,b)
+ else
+   __MOD__.message("Search phrase not found.")
+ end
+===
+
+
+
+###match###
+===__MOD__.match([position])
+===
+Attempts to find a corresponding matching brace from the given %%%position%%% of one brace. \
+( If the %%%position%%% argument is omitted, the current caret position is assumed. )
+
+The brace characters handled are:   ===() [] {} <>===
+
+The search is ///forwards/// from an ///opening/// brace and ///backwards/// from a ///closing/// brace. \
+If the character at %%%position%%% is not a brace character, or if a matching brace cannot be found, \
+the return value is ===-1===. Otherwise, the return value is the position of the matching brace.
+
+
+
+###sleep###
+===__MOD__.sleep(millisecs)
+===
+Pauses execution of the script.
+
+Note that although the resolution is specified in milliseconds, \
+the actual time spent sleeping may vary considerably.
+
+
+###yield###
+===__MOD__.yield()
+===
+Allows the application to empty its GUI event queue, so that the program doesn't \
+appear to be "frozen" during long, CPU-intensive scripts. (Probably you will never \
+need this, since the scripting engine makes some attempt to refresh the GUI anyway.)
+
+###optimize###
+===__MOD__.optimize()
+===
+Disables the Lua interpreter's "debug hook", the thing that allows it to track line number \
+information in the currently executing script.
+
+The advantage of calling ===optimize()=== is that a lengthy, CPU-intensive script can sometimes run much faster. \
+The disadvantage is that you lose the line number information that may help in debugging your script, \
+and you also lose the ability to cancel an errant script in case of an endless loop, etc. \
+For this reason you should only use this function if you really need it, and only when you are \
+reasonably sure that your script doesn't contain any errors.
+
+For best results this function should be called at the very beginning of the script.
+
+
+###keep###
+===__MOD__.keep={}===
+Not really a function, ===__MOD__.keep=== is a table that you can use to preserve the value of certain \
+types of variables between scripts. The script interpreter actually creates a fresh new Lua "state machine" \
+for each script that is executed. This means you always get a clean interpreter, with no residual corruption, \
+even if the previous script encountered some errors. The obvious drawback to this approach is that any \
+variables you declared are lost when each script completes. To help work around this limitation, \
+you can save variables and their values as fields in the ===__MOD__.keep=== table, where they will be accessible for \
+subsequent scripts.
+
+There are however some limitations, the types of saved data ///must/// be \
+a ===string===,  ===number===, or ===boolean===.
+
+You should save the data in the form of:
+  ===  __MOD__.keep.MyKey = MyValue===
+(Other ways of table indexing will generally not be saved.)
+
+Note that the data is only stored in external memory ///after/// the script executes successfully. \
+If a script encounters errors, the table is left in the same state it was before the script was run. \
+Also note that the data is not saved to disk when the program exits (but of course you are free
+to save any data to disk manually).
+
+To clear the table completely, you can use:
+  ===  __MOD__.keep={}===
+or:
+  ===  __MOD__.keep=nil===
+
+If you assign another type of data to the table itself, e.g.
+  ===  __MOD__.keep=15===
+the table will not be saved ///or/// cleared.
+
+As an example, to keep track of how many times a script has been run:
+===
+if not tonumber(__MOD__.keep.count) then
+  __MOD__.keep.count=1
+else
+  __MOD__.keep.count=__MOD__.keep.count+1
+end
+__MOD__.message(
+  "Script has run " .. __MOD__.keep.count .. " times." )
+===
+
+
+###basename###
+===__MOD__.basename(filepath)
+===
+Returns the filename portion of the given path.
+
+
+###dirname###
+===__MOD__.dirname(filepath)
+===
+Returns the directory portion of the given path.
+
+
+###fullpath###
+===__MOD__.fullpath([dirname,] filename)
+===
+Returns the absolute path of %%%filename%%%.
+If %%%dirname%%% is omitted, the current working directory is assumed.
+
+Note that the path and filename are not necessarily required to exist.
+
+
+###stat###
+===__MOD__.stat(filename [, lstat])
+===
+Returns a table providing some information about the specified file.
+If the information could not be obtained, the function returns %%%nil%%% plus a \
+string describing the reason for failure.
+
+If the file is a symbolic link, and the optional  %%%lstat%%%  argument is ///true///, \
+the information is returned about the link itself, otherwise the table provides \
+information about the file that the link points to.
+
+The returned table contains the following fields:
+  ===size === -- The size of the file, in bytes.
+  ===time === -- Modification time, in seconds from the epoch.
+  ===type === -- A string denoting the file type (see below)
+  ===read === -- %%%true%%% if the effective user can read from the file.
+  ===write=== -- %%%true%%% if the effective user can modify the file.
+  ===exec === -- %%%true%%% if the effective user can execute the file.
+
+
+The ===type=== field contains one of the following values:
+  ==="b"===   -- a block-oriented device.
+  ==="c"===   -- a character-special device.
+  ==="d"===   -- a directory.
+  ==="p"===   -- a FIFO or named pipe.
+  ==="l"===   -- a symbolic link.
+  ==="f"===   -- a regular file.
+  ==="s"===   -- a socket.
+
+Note that this function does not support symbolic links or ACL permissions on MS-Windows.
+
+
+
+###dirlist###
+===__MOD__.dirlist([path])
+===
+Returns an iterator function that will be called once for each entry (file or subdirectory) in \
+the specified directory. If the %%%path%%% argument is omitted, the current working directory is assumed. \
+The iterator produces only the base filename of each entry, and in no particular order.
+
+This function raises an error if the specified directory does not exist or cannot be accessed.
+
+###dirsep###
+===__MOD__.dirsep()
+===
+Returns the default directory separator, that is ==="/"=== for unix-style systems and ==="\"=== for MS-Windows.
+
+
+###wkdir###
+===__MOD__.wkdir([path])
+===
+When called with no arguments, returns the full path to the current working directory.
+
+When called with one argument, it sets the current working directory to that %%%path%%% and \
+returns ///true/// if successful, else it returns ///false/// plus an error message. \
+( This should be used with caution, since it affects the entire application and \
+persists even after the script exits! )
+
+
+###mkdir###
+===__MOD__.mkdir(path [, parented])
+===
+Attempts to create the directory specified by %%%path%%%.
+
+If the optional %%%parented%%% argument is ///true///, it will also attempt to create \
+any non-existing elements contained in %%%path%%%.
+
+Returns %%%true%%% if the operation was successful, otherwise, it returns %%%false%%% plus an error message. \
+(Attempting to create an already-existing directory is considered an error, \
+except when %%%parented%%% is %%%true%%%.)
+
+###quit###
+===__MOD__.quit()
+===
+Terminates the application.
+
+This is somewhat safer than calling ===os.exit()=== since it will only succeed when \
+there is only a single, untitled and un-modified open document.
+
+###script###
+===__MOD__.script()
+===
+Returns the full path and filename of the currently executing script.
+(Note that this only refers to the top-level script, not scripts called by ===dofile()=== etc.)
+
+
+###scintilla###
+===__MOD__.scintilla(msg_id, wparam, lparam)
+===
+///Power users only!///
+
+Sends a  %%%SCI_*%%%  message directly to the Scintilla widget of the active document.
+
+The ===msg_id=== can be a numeric value, or a case-insensitive string (with or without the SCI_ prefix) \
+such as ==="SCI_POSITIONFROMPOINT"===, ==="POSITIONFROMPOINT"===, or ==="PositionFromPoint"===.
+
+The ===wparam===, ===lparam===, and return types depend on the particular message, based on the interface described in \
+the  "Scintilla.iface"  file from the Scintilla sources.
+
+For API calls which expect a pre-allocated char buffer for the lparam, the allocation is automatically \
+managed by the function (your lparam is ignored) and the return value is a Lua string.  \
+In cases where the length is specified in the wparam, the null terminator is not counted - \
+if you ask for 3 chars, you get 3 chars.
+
+Currently only string, numeric, and boolean types are supported, any API call that expects \
+or returns complex types will result in an error.  This function makes some effort to protect \
+itself from garbage being passed to Scintilla, but ultimately %%%you%%% are expected to know what you're doing!
+
+
+
+###choose###
+===__MOD__.choose([title,] message, {items})
+===
+Displays a dialog box to allow the user to choose from a list of items.
+
+The optional %%%title%%% argument string sets the window caption of the dialog, otherwise the \
+default application name is used.
+
+The %%%message%%% argument string will display a message above the list box to explain the request.
+
+The %%%items%%% argument is a Lua table, each element of the table must be a string.
+
+The function returns the selected item as a string:
+    * If the %%%OK%%% button is clicked,
+    * If the %%%[Enter]%%% key is pressed while the item list is active.
+    * If the user double-clicks an item in the list.
+
+If the %%%Cancel%%% button is clicked, or if the dialog is is dismissed by some other means, \
+e.g. by pressing the %%%[Esc]%%% key, the function will return %%%nil%%%.
+
+
+
+###confirm###
+===__MOD__.confirm(title, question, default)
+===
+Displays a simple yes-or-no style dialog box to ask the specified %%%question%%%.
+
+Returns ///true/// if the %%%Yes%%% button is clicked, or ///false/// if the %%%No%%% button is clicked.
+
+If the dialog is dismissed by some other means, e.g. by pressing the %%%[Esc]%%% key, \
+the function will return the boolean value specified by the default argument.
+
+All three arguments are required, but you can pass %%%nil%%% as the first argument to use the default window caption.
+
+
+
+###input###
+===__MOD__.input([title,] prompt [,default [,style]])
+===
+Displays an input dialog to prompt the user for some text.
+
+The optional %%%title%%% argument string sets the window caption of the dialog, otherwise the \
+default application name is used.
+
+The %%%prompt%%% argument string will display a message above the entry box to explain what input is requested.
+
+The %%%default%%% argument string, if present, will add some pre-selected text into the entry area.
+
+The optional %%%style%%% argument can contain one the following values:
+  ==="S"=== -- Accepts any string value (default).
+  ==="I"=== -- Accepts only integers.
+  ==="R"=== -- Accepts only real numbers.
+  ==="P"=== -- Displays a masked password-style entry field.
+
+If the %%%OK%%% button is clicked, or if the %%%[Enter]%%% key is pressed while the entry field is active, \
+the function will return the contents of the entry field as a string.
+
+If the %%%Cancel%%% button is clicked, or if the dialog is is dismissed by some other means, \
+e.g. by pressing the %%%[Esc]%%% key, the function returns %%%nil%%%.
+
+
+
+###message###
+===__MOD__.message([title,] message [,type])
+===
+Displays a simple dialog box containing the specified %%%message%%% string.
+
+The optional %%%title%%% argument string sets the window caption of the dialog, otherwise the \
+default application name is used.
+
+The optional %%%type%%% argument sets the dialog's icon, and may contain one the following values:
+  ==="I"=== -- Informational icon (default).
+  ==="W"=== -- Warning icon.
+  ==="E"=== -- Error icon.
+
+
+
+###pickfile###
+===__MOD__.pickfile(mode[[,path][,filter]])
+===
+Displays a dialog to allow the user to select a file or folder.
+
+The %%%mode%%% argument must contain one the following values:
+  ==="open"=== -- Request a filename to be opened.
+  ==="save"=== -- Request a filename to be saved.
+  ==="dir" === -- Request a directory name.
+
+In ==="open"=== mode, the selected file must exist; in ==="save"=== mode,  an overwite \
+prompt will be issued if the file exists. In either case, the file's permissions are not actually tested.
+
+The optional %%%path%%% argument sets the working directory for the dialog, otherwise the current \
+working directory is assumed.
+
+The optional %%%filter%%% argument is a newline-delimited list of wildcard filters, for example:
+==="Image files (*.jpg,*.png,*.gif)\nAll Files (*)"===
+
+
+Note that this function does not actually open or save anything, it merely returns the full path and \
+filename of the selected file, or %%%nil%%% if the user cancels the dialog.
+
+
+
+###dialog###
+
+The ===dialog=== module provides a relatively simple way to create some fairly complex dialog \
+boxes for user interaction.  The general idea is very loosely based on HTML forms, in the sense that \
+you describe the interface, present it to the user, and get back a list of key-value pairs. \
+The functions are described below. The  ===dlg===  argument expects a ///dialog object///, most other \
+arguments are strings, unless otherwise noted. \
+Note that you can also use these functions in object-oriented style -
+For instance:
+  ===  dialog.label(dlg, "hello")===
+can also be written as:
+  ===  dlg:label("hello")===
+
+________________________________
+===dialog.new ( title, buttons )===
+Creates a new dialog object. The ===title=== string assigns the window's title bar text for \
+the dialog.   The  ===buttons===  argument is a table of strings, each string will create a \
+button in the bottom row of the dialog. If the string contains an ampersand (===&===), \
+the letter after it will be seen as an underlined accelerator for the button.
+________________________________
+===dialog.run ( dlg )===
+Displays the dialog to the user and waits for submission. \
+This function returns two values:  the one-based index of the the clicked button, and a \
+///results table/// containing key-value pairs collected from the dialog's elements.
+If the user cancels the dialog e.g. by pressing the %%%[Esc]%%% key, the index will be ///zero///, \
+and the results table will be ===nil===.
+________________________________
+===dialog.label ( dlg, text )===
+Adds some informative text to the dialog. (Note that you can also expand the \
+width of the dialog by padding a label with spaces.)
+________________________________
+===dialog.hr ( dlg )===
+Draws a horizontal separator across the dialog.
+________________________________
+===dialog.heading ( dlg, text )===
+Adds a horizontal separator with some informative text below it. \
+This function is the same as calling the ===hr()=== and ===label()=== functions individually.
+________________________________
+===dialog.text ( dlg, key, default, prompt )===
+Creates a single-line text entry widget. \
+The value of the ===key=== field in the results table will be set to the contents of the entry box. \
+If the ===default=== string is non-nil, that text will initially be displayed in the entry box. \
+The ===prompt=== string displays a label in front of the entry box to describe the requested input.
+________________________________
+===dialog.password ( dlg, key, default, prompt )===
+Identical to the ===text()=== function, except that the contents of the entry box are "masked", \
+the typed characters are displayed as asterisks.
+________________________________
+===dialog.textarea ( dlg, key, default, caption )===
+Creates a multi-line text entry widget. \
+The value of the ===key=== field in the results table will be set to the contents of the text area. \
+If the ===default=== string is non-nil, that text will initially be displayed in the text area. \
+The ===caption=== string displays a label above the text area to describe the requested input.
+________________________________
+===dialog.checkbox ( dlg, key, default, caption )===
+Creates an on/off toggle button. \
+If the boolean ===default=== argument is ///true///, the button will initially be shown in a "checked" \
+state.  The ===caption=== argument is the human-readable text to be displayed next to the button.
+Note that although the default argument is boolean, the ===key=== value returned in the results \
+table will be a string, either  ==="1"===  for checked or  ==="0"===  for unchecked.
+________________________________
+===dialog.select ( dlg, key, default, caption )===
+Creates an empty drop-down list box. \
+The contents of the ===key=== field in the results table will be set to the value of the selected \
+item.  If the ===default=== string is non-nil, the item with that value will initially be selected \
+in the list.  The ===caption=== string displays a label in front of the list box to describe the \
+requested input.
+________________________________
+===dialog.option ( dlg, key, value, label )===
+Adds an item to the drop-down list identified by ===key===. \
+The returned value of ===key=== will be set to this ===value=== in the results table if this item \
+is selected.  The ===label=== argument is the human-readable text to be displayed in the list.
+________________________________
+===dialog.group ( dlg, key, default, caption )===
+Creates an empty group for radio buttons. \
+The contents of the ===key=== field in the results table will be set to the value of the selected \
+radio button.  If the ===default=== string is non-nil, the button with that value will initially \
+be selected in the group.  The ===caption=== string displays a label above of the group to describe \
+the requested input.
+________________________________
+===dialog.radio ( dlg, key, value, label )===
+Adds a button to the radio group identified by ===key===. \
+The returned value of ===key=== will be set to this ===value=== in the results table if this button is \
+selected.  The ===label=== argument is the human-readable text to be displayed next to this button.
+________________________________
+===dialog.file ( dlg, key, default, caption )===
+Creates a single-line text entry widget, along with a "browse" button that invokes a separate \
+file-selection dialog.  If the user selects a filename in the file dialog, the text in the \
+entry widget will be set to the selected filename. \
+The value of the ===key=== field in the results table will be set to the contents of the entry box.
+________________________________
+===dialog.color ( dlg, key, default, caption )===
+Creates a single-line text entry widget, along with a "choose" button that invokes a separate \
+color-selection dialog.  If the user selects a color from the dialog, the text in the entry \
+widget will be set to the selected color name in  ===#RRGGBB=== format. \
+The value of the ===key=== field in the results table will be set to the contents of the entry box.
+________________________________
+===dialog.font ( dlg, key, default, caption )===
+Creates a single-line text entry widget, along with a "select" button that invokes a separate \
+font-selection dialog.  If the user selects a font from the dialog, the text in the entry \
+widget will be set to the font name. \
+The value of the ===key=== field in the results table will be set to the contents of the entry box.
+________________________________
+
+

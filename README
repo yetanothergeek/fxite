@@ -1,0 +1,54 @@
+FXiTe, the Free eXtensIble Text Editor, is an advanced text
+editor designed to have a feature set similar to the classic
+Nirvana Text Editor, aka NEdit. Although NEdit has been around
+for years, it still provides some useful features that are
+lacking in some newer GUI editors, such as scripting, macro
+record/playback, rudimentary ctags and calltip support, and
+multi-line regular expressions. FXiTe is an attempt to provide
+much of NEdit's utility, while presenting a more modern user
+interface. FXiTe also provides some additional features like
+syntax-highlighted exporting to PDF or HTML, drag-and-drop tab
+reordering, and a built-in "message window" to capture the output
+of external commands.
+
+Despite these extra bells-and-whistles, there are still
+some important NEdit features currently missing from FXiTe:
+multiple-document search-and-replace, word wrap, paragraph
+reformatting, and multiple bookmarks, to name a few.
+
+Another design goal of this project was to create a single,
+standalone executable program that can be statically linked to
+the underlying widget toolkit without the need for additional
+libraries and support files. FXiTe uses the Fox GUI toolkit,
+the FXScintilla text widget, and the Lua embedded scripting
+engine, all of which can be statically linked, but it is also
+possible to build FXiTe using dynamic shared libraries for 
+these items, in order to produce a smaller compiled binary.
+
+========================= BUILDING ==============================
+
+Building FXiTe on Linux should be fairly straightforward,
+provided you meet a few prerequisites -
+
+1. The GNU toolchain (gcc, g++, make, binutils, etc...)
+2. A standard Xorg and FreeType installation.
+3. The Fox GUI toolkit (minimum 1.6, but 1.7 or later is better)
+
+And of course, you'll need the development headers and libraries
+for the items above. Xorg and Freetype are standard on most
+modern Linux distributions, and a pre-built Fox toolkit package
+is also available for many popular distros.
+
+If you can't find the Fox toolkit in your distro's repositories,
+you can download the sources here:
+  http://fox-toolkit.org/
+
+
+Once you have the required libraries available, building FXiTe
+should be as simple as:
+
+  ./configure [options]
+  make
+  make install
+
+Enjoy!

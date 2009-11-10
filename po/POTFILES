@@ -1,0 +1,24 @@
+     ../src/appmain.cpp \
+     ../src/appwin_ev.cpp \
+     ../src/appwin_fn.cpp \
+     ../src/appwin_mk.cpp \
+     ../src/appwin_mnu.cpp \
+     ../src/backup.cpp \
+     ../src/doctabs.cpp \
+     ../src/filer.cpp \
+     ../src/fxasq.cpp \
+     ../src/fxasq_lua.c \
+     ../src/help.cpp \
+     ../src/luacmds.cpp \
+     ../src/luafuncs.cpp \
+     ../src/macro.cpp \
+     ../src/prefdlg.cpp \
+     ../src/prefs.cpp \
+     ../src/readtags.c \
+     ../src/recorder.cpp \
+     ../src/runcmd.cpp \
+     ../src/scidoc.cpp \
+     ../src/scisrch.cpp \
+     ../src/search.cpp \
+     ../src/tagread.cpp \
+     ../src/toolmgr.cpp

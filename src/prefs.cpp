@@ -1,0 +1,769 @@
+/*
+  FXiTe - The Free eXtensIble Text Editor
+  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License version 3 as
+  published by the Free Software Foundation.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
+#include <cctype>
+#include <cerrno>
+#include <fx.h>
+#include <Scintilla.h>
+#include <FXScintilla.h>
+
+#include "compat.h"
+#include "appmain.h"
+#include "scidoc.h"
+#include "lang.h"
+#include "search.h"
+#include "appwin.h"
+#include "menuspec.h"
+
+
+#include "intl.h"
+#include "prefs.h"
+
+
+#ifdef WIN32
+# define DEFAULT_EOL_FORMAT   SC_EOL_CRLF
+# define STYLE_FILE "styles.ini"
+#else
+# define STYLE_FILE "styles"
+# define  DEFAULT_EOL_FORMAT   SC_EOL_LF
+#endif
+
+
+FXDEFMAP(Settings) SettingsMap[]={
+  FXMAPFUNCS(SEL_COMMAND,Settings::ID_TOGGLE_SMART_HOME,Settings::ID_SET_SEARCH_OPTS, Settings::onChangeSetting)
+};
+
+FXIMPLEMENT(Settings, FXObject, SettingsMap, ARRAYNUMBER(SettingsMap));
+
+#define LIMIT_RANGE(n,lo,hi) if (n<lo) { n=lo; } else { if (n>hi) { n=hi; } }
+
+#define SHELL_COMMAND "/bin/sh -c"
+
+#define FILE_FILTERS _("\
+All Files (*)|\
+C/C++ files (*.[ch],*.[ch]pp,*.[ch]xx,*.[CH],*.cc,*.hh)|\
+Script files (*.sh,*.lua,*.rb,*.pl,*.py)|\
+Config files (config*,*cfg,*conf,*.ini,*rc,.*)|\
+Makefiles ([Mm]akefile*,*.mk,CMake*,*.cmake*,Jam*)|\
+Web files (*html,*.htm,*.php*)|\
+Text files (*.txt)|\
+")
+
+
+long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
+{
+  switch FXSELID(sel)
+  {
+    case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
+    case ID_TOGGLE_USE_TABS:    { UseTabs = !UseTabs; break; }
+    case ID_TOGGLE_AUTO_INDENT: { AutoIndent = !AutoIndent; break; }
+    case ID_TOGGLE_BRACE_MATCH: { BraceMatch = !BraceMatch; break; }
+    case ID_TOGGLE_ASK_CLOSE_MULTI_MENU: { PromptCloseMultiMenu = !PromptCloseMultiMenu; break; }
+    case ID_TOGGLE_ASK_CLOSE_MULTI_EXIT: { PromptCloseMultiExit = !PromptCloseMultiExit; break; }
+    case ID_TOGGLE_WATCH_EXTERN:    { WatchExternChanges = !WatchExternChanges; break; }
+    case ID_TOGGLE_SMOOTH_SCROLL:   { SmoothScroll  = !SmoothScroll;  break; }
+    case ID_TOGGLE_SEARCH_VERBOSE:  { SearchVerbose = !SearchVerbose; break; }
+    case ID_TOGGLE_CARET_PAST_EOL:  { CaretPastEOL  = !CaretPastEOL;  break; }
+    case ID_TOGGLE_VIEW_WHITESPACE_EOL: { WhitespaceShowsEOL = !WhitespaceShowsEOL; break; }
+    case ID_TOGGLE_WRAP_TOOLBAR: { 
+      WrapToolbar = !WrapToolbar;
+      FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
+      *changed|=ToolbarChangedWrap;
+      break;
+    }
+    case ID_TOGGLE_AUTOSAVE:        {
+      FXWindow*w=(FXWindow*)o;
+      w=(FXWindow*)w->getUserData();
+      Autosave = !Autosave;
+      if (Autosave) { w->enable(); } else { w->disable(); }
+      break;
+    }
+    case ID_SAVE_ON_FILTER_SEL: { SaveBeforeFilterSel = !SaveBeforeFilterSel; break; }
+    case ID_SAVE_ON_INS_CMD:    { SaveBeforeInsCmd    = !SaveBeforeInsCmd;    break; }
+    case ID_SAVE_ON_EXEC_CMD:   { SaveBeforeExecCmd   = !SaveBeforeExecCmd;   break; }
+    case ID_CHOOSE_FONT: {
+      FXFontDialog dlg(((FXWindow*)o)->getShell(), _("Select Font"), 0);
+      SetDialogFromFont(dlg,fontdesc);
+      if (dlg.execute(PLACEMENT_SCREEN)) {
+        SetFontFromDialog(fontdesc,dlg);
+        FontName=(FXchar*)(fontdesc.face);
+        FontSize=fontdesc.size;
+      }
+      break;
+    }
+    case ID_SET_MAX_FILES: {
+      FXTextField*tf=(FXTextField*)o;
+      MaxFiles=FXIntVal(tf->getText(),10);
+      LIMIT_RANGE(MaxFiles,1,999);
+      char maxfiles[8]="\0\0\0\0\0\0\0";
+      snprintf(maxfiles, sizeof(maxfiles)-1, "%d", MaxFiles);
+      tf->setText(maxfiles);
+      break;
+    }
+    case ID_SET_TAB_WIDTH: {
+      FXSpinner*spin=(FXSpinner*)o;
+      TabWidth=spin->getValue();
+      LIMIT_RANGE(TabWidth,1,16);
+      break;
+    }
+    case ID_SET_CARET_WIDTH: {
+      FXSpinner*spin=(FXSpinner*)o;
+      CaretWidth=spin->getValue();
+      LIMIT_RANGE(CaretWidth,1,3);
+      break;
+    }
+    case ID_SET_WHEEL_LINES: {
+      FXSpinner*spin=(FXSpinner*)o;
+      WheelLines=spin->getValue();
+      LIMIT_RANGE(WheelLines,1,32);
+      break;
+    }
+    case ID_SET_SEARCH_WRAP: {
+      SearchWrap=(FXint)p;
+      LIMIT_RANGE(SearchWrap,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
+      break;
+    }
+    case ID_SET_SPLIT_VIEW: {
+      SplitView=(FXint)p;
+      LIMIT_RANGE(SplitView,SPLIT_NONE,SPLIT_BESIDE);
+      break;
+    }
+    case ID_SET_RIGHT_EDGE: {
+      FXSpinner*spin=(FXSpinner*)o;
+      RightEdgeColumn=spin->getValue();
+      LIMIT_RANGE(RightEdgeColumn,1,1024);
+      break;
+    }
+    case ID_SET_SHELL_CMD: {
+      FXTextField*tf=(FXTextField*)o;
+      ShellCommand=tf->getText().text();
+      break;
+    }
+    case ID_SET_AUTOSAVE_INT: {
+      FXSpinner*spin=(FXSpinner*)o;
+      AutosaveInterval=spin->getValue();
+      LIMIT_RANGE(AutosaveInterval,15,900);
+      break;
+    }
+    case ID_SET_SEARCH_OPTS: {
+      SearchOptions=(FXint)p;
+      break;
+    }
+    case ID_SET_FILETYPES: {
+      FXTextField*tf=(FXTextField*)o;
+      LangStyle* ls=(LangStyle*)tf->getUserData();
+      if (ls) {
+        if (ls->mask) {
+          if (strcmp(ls->mask,tf->getText().text())==0) { break; }
+          if ( ls->mallocs & (1<<30) ) { free(ls->mask); }
+        }
+        ls->mask=strdup(tf->getText().text());
+      }
+      break;
+    }
+    case ID_SET_SHABANGS: {
+      FXTextField*tf=(FXTextField*)o;
+      LangStyle* ls=(LangStyle*)tf->getUserData();
+      if (ls) {
+        if (ls->apps) {
+          if (strcmp(ls->apps,tf->getText().text())==0) { break; }
+          if ( ls->mallocs & (1<<29) ) { free(ls->apps); }
+        }
+        ls->apps=strdup(tf->getText().text());
+      }
+      break;
+    }
+    case ID_SET_FILE_FORMAT: {
+      DefaultFileFormat=(FXint)p;
+      LIMIT_RANGE(DefaultFileFormat,0,2);
+      break;
+    }
+    case ID_SET_TOOLBAR_BTN_SIZE: {
+      ToolbarButtonSize=(FXint)p;
+      LIMIT_RANGE(ToolbarButtonSize,0,2);
+      FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
+      *changed|=ToolbarChangedFont;
+      break;
+    }
+  }
+  return 1;
+}
+
+
+
+
+static StyleDef GlobalStyle[] = {
+  { "default",     STYLE_DEFAULT,     "#000000", "#ffffff", Normal },
+  { "linenumber",  STYLE_LINENUMBER,  "#0000c0", "#d0d0d0", Normal },
+  { "bracelight",  STYLE_BRACELIGHT,  "#ffff00", "#00d000", Bold  },
+  { "bracebad",    STYLE_BRACEBAD,    "#ffff00", "#ff0000", Bold  },
+  { "controlchar", STYLE_CONTROLCHAR, "#0000c0", "#d0d0d0", Normal },
+  { "indentguide", STYLE_INDENTGUIDE, "#0000c0", "#d0d0d0", Normal },
+  { "calltip",     STYLE_CALLTIP,     "#808000", "#e0e0d0", Normal },
+  { NULL,          0,                        "",        "", Normal }
+};
+
+
+static StyleDef WhiteSpaceStyle =  { "whitespace",  0,     "#000000", "#ffffdd", Normal };
+static StyleDef CaretLineStyle =   { "caretline",   0,     "#000000", "#f8f8f8", Normal };
+static StyleDef RightMarginStyle = { "rightmargin", 0,     "#000000", "#ff0000", Normal };
+static StyleDef SelectionStyle =   { "selection",   0,     "#c0c0c0", "#c0c0c0", Normal };
+static StyleDef CaretStyle =       { "caret",       0,     "#000000", "#000000", Normal };
+
+
+
+
+FXbool IsColor(const char*clr)
+{
+  const char*p;
+  if ( (clr) && (clr[0]=='#') && (strlen(clr)==7) ) {
+    for (p=clr+1; *p; p++) { if (!isxdigit(*p)) { return false; } }
+    return true;
+  } else { return false; }
+}
+
+
+
+static void SaveStyle(FXSettings*reg, const char*section, StyleDef *style)
+{
+  FXString tmp="";
+  tmp.format("%s,%s", style->fg[0]?style->fg:"default",style->bg[0]?style->bg:"default");
+  if (style->style==Normal) {
+    tmp.append(",Normal");
+  } else {
+    if (style->style & Bold) {
+      tmp.append(",Bold");
+    }
+    if (style->style & Italic) {
+      tmp.append(",Italic");
+    }
+    if (style->style & Underline) {
+      tmp.append(",Underline");
+    }
+    if (style->style & EOLFill) {
+      tmp.append(",EOLFill");
+    }
+  }
+  reg->writeStringEntry(section,style->key,tmp.text());
+}
+
+
+
+static void SaveStyles(FXSettings*reg, const char*section, StyleDef *style)
+{
+  int i;
+  for (i=0; style[i].key; i++) {
+    SaveStyle(reg,section,&style[i]);
+  }
+}
+
+
+
+static void ParseStyle(FXSettings*reg, const char*section, StyleDef *style)
+{
+  if (style->key) {
+    FXString tmp=reg->readStringEntry(section, style->key, "");
+    tmp.lower();
+    tmp.substitute('\t', ' ', true);
+    tmp.trim();
+    tmp.simplify();
+    tmp.substitute(" ", "", true);
+    if (!tmp.empty()) {
+      char buf[256];
+      char *fg=buf;
+      char *bg=NULL;
+      char *fs=NULL;
+      int flags=Normal;
+      strncpy(buf, tmp.text(), sizeof(buf)-1);
+      bg=strchr(buf,',');
+      if (bg) {
+        *bg='\0';
+        bg++;
+        fs=strchr(bg,',');
+        if (fs) {
+          *fs='\0';
+          fs++;
+          if (strstr(fs,"italic")) { flags|=Italic; }
+          if (strstr(fs,"bold")) { flags|=Bold; }
+          if (strstr(fs,"underline")) { flags|=Underline; }
+          if (strstr(fs,"eolfill")) { flags|=EOLFill; }
+        }
+        if (IsColor(bg)) { strncpy(style->bg, bg, 7); }
+      }
+      if (IsColor(fg)) { strncpy(style->fg, fg, 7); }
+      style->style=(SciDocFontStyle)(flags);
+    }
+  }
+}
+
+
+
+static void ParseStyles(FXSettings*reg, const char*section, StyleDef *style)
+{
+  int i;
+  for (i=0; style[i].key; i++) {
+    ParseStyle(reg,section,&style[i]);
+  }
+}
+
+
+static Settings*global_settings_instance=NULL;
+
+
+Settings* Settings::instance()         { return global_settings_instance; }
+StyleDef* Settings::globalStyle()      { return GlobalStyle; }
+StyleDef* Settings::whitespaceStyle()  { return &WhiteSpaceStyle; }
+StyleDef* Settings::caretlineStyle()   { return &CaretLineStyle; }
+StyleDef* Settings::rightmarginStyle() { return &RightMarginStyle; }
+StyleDef* Settings::selectionStyle()   { return &SelectionStyle; }
+StyleDef* Settings::caretStyle()       { return &CaretStyle; }
+
+
+
+// List of possible font names - we check if any system
+// font name *begins* with any of these phrases...
+static const char* tryfonts[] = {
+  "Liberation Mono ",
+  "DejaVu Sans Mono ",
+  "FreeMono ",
+  "Courier New ",
+  "Nimbus Mono ",
+  "Courier ",
+  "LucidaTypewriter ",
+  "Fixed ",
+  "Terminal ",
+  "Clean ",
+  "Anonymous ",
+  NULL
+};
+
+
+// Try to guess at a suitable font - we only do this when
+// there is no "FontName" entry in the registry.
+void FindFont(FXString &FontName) {
+  FXFontDesc*fonts=NULL;
+  FXuint numfonts=0;
+  if (FXFont::listFonts(fonts,numfonts,FXString::null)) {
+    // First, try each of the items in our "tryfonts" list...
+    for (const char**tryfont=tryfonts; *tryfont; tryfont++) {
+      for (FXuint i=0; i<numfonts; i++) {
+        FXFontDesc fd=fonts[i];
+        if (strstr(fd.face, *tryfont)==fd.face) {
+           FontName=fd.face;
+           freeElms(fonts);
+           return;
+        }
+      }
+    } // keep looking...
+    // Try to grab the first thing that is fixed-width and scalable.
+    for (FXuint i=0; i<numfonts; i++) {
+      FXFontDesc fd=fonts[i];
+      if ((fd.flags&FXFont::Fixed) && (fd.flags&FXFont::Scalable)) {
+        FontName=fd.face;
+        freeElms(fonts);
+        return;
+      }
+    } // keep looking...
+    // Try to grab the first thing that is fixed-width and reasonably sized.
+    for (FXuint i=0; i<numfonts; i++) {
+      FXFontDesc fd=fonts[i];
+      if ((fd.flags&FXFont::Fixed)&&(fd.size>=100)&&(fd.size<200)) {
+        FontName=fd.face;
+        freeElms(fonts);
+        return;
+      }
+    }
+    freeElms(fonts);
+  }
+  FontName="fixed"; // I give up!
+}
+
+
+/*
+  Break some of the preference settings up into to categories, each category represents a 
+  separate section header in the config file. Note that in order for the Read/Write macros
+  to work correctly, these strings must *exactly* match their respective variable names!
+*/
+
+static const char* view_keys[] = {
+  "ShowStatusBar",
+  "ShowLineNumbers",
+  "ShowToolbar",
+  "ShowWhiteSpace",
+  "ShowOutputPane",
+  "InvertColors",
+  "ShowRightEdge",
+  "ShowIndentGuides",
+  "DocTabsPacked",
+  "ZoomFactor",
+  "DocTabPosition",
+  NULL
+};
+
+static const char* edit_keys[] = {
+  "SmartHome",
+  "AutoIndent",
+  "BraceMatch",
+  "UseTabs",
+  "CaretPastEOL",
+  "WhitespaceShowsEOL",
+  "SearchWrap",
+  "SearchVerbose",
+  "SearchOptions",
+  "TabWidth",
+  "CaretWidth",
+  "SmoothScroll",
+  "WheelLines",
+  "FontName",
+  "FontSize",
+  "fontdesc",
+  NULL
+};
+
+static const char* geom_keys[] = {
+  "Maximize",
+  "Left",
+  "Top",
+  "Width",
+  "Height",
+  "OutputPaneHeight",
+  "placement",
+  NULL
+};
+
+static const char* main_keys[] = {
+  "PromptCloseMultiMenu",
+  "PromptCloseMultiExit",
+  "WatchExternChanges",
+  "Autosave",
+  "SaveBeforeFilterSel",
+  "SaveBeforeInsCmd",
+  "SaveBeforeExecCmd",
+  "SplitView",
+  "FileFilters",
+  "RightEdgeColumn",
+  "ShellCommand",
+  "MaxFiles",
+  "AutosaveInterval",
+  "DefaultFileFormat",
+  NULL
+};
+
+static const char* tbar_keys[] = {
+  "WrapToolbar",
+  "ToolbarButtonSize",
+  NULL
+};
+
+
+static const char* global_sect="GlobalStyle";
+
+static const char* main_sect = "Settings";
+static const char* geom_sect = "Geometry";
+static const char* edit_sect = "Editor";
+static const char* view_sect = "ViewMenu";
+static const char* tbar_sect = "Toolbar";
+static const char* keys_sect = "Keybindings";
+
+
+static const char*  sectnames[] = {  main_sect,  geom_sect,  edit_sect,  view_sect,  tbar_sect,  NULL};
+static const char** keynames[] =  {  main_keys,  geom_keys,  edit_keys,  view_keys,  tbar_keys,  NULL};
+
+
+
+static const char *GetSectForKey(const char*key)
+{
+  for (FXint i=0; keynames[i]; i++) {
+    for (FXint j=0; keynames[i][j]; j++) {
+      if (strcmp(keynames[i][j],key)==0) { return sectnames[i]; }
+    }
+  }
+  fxerror("FATAL: Section for key \"%s\" not found.\n", key);
+  FXASSERT(!key);
+  return NULL;
+}
+
+
+
+static FXint ReadRegInt(FXRegistry *reg, const char*key, FXint def, FXint min=0, FXint max=0)
+{
+  FXint rv=reg->readIntEntry(GetSectForKey(key),key,def);
+  if (min||max) {
+    if (rv<min) { rv=min; } else if (rv>max) { rv=max; }
+  }
+  return rv;
+}
+
+
+#define ReadIntRng(k,df,mn,mx) { k=ReadRegInt(reg,""#k,df,mn,mx); }
+#define ReadInt(k,df) { k=ReadRegInt(reg,""#k,df); }
+#define WriteInt(k) {reg->writeIntEntry(GetSectForKey(""#k),""#k,k); }
+
+
+#define ReadStr(k,df) { k=reg->readStringEntry(GetSectForKey(""#k),""#k,df); }
+#define WriteStr(k) {reg->writeStringEntry(GetSectForKey(""#k),""#k,k.text()); }
+
+
+Settings::Settings(FXMainWindow*w)
+{
+  FXASSERT(!global_settings_instance);
+  global_settings_instance=this;
+  FXString tmp;
+  reg=&(w->getApp()->reg());
+  style_reg=new FXSettings();
+  app=w->getApp();
+  style_file=((AppClass*)app)->ConfigDir()+STYLE_FILE;
+
+#ifdef FOX_1_6
+  // Fox-1.6 will choke reading string entries > 2000 chars, so rewrite
+  // the styles file, in case it was written by a newer version of Fox.
+  if (FXStat::exists(style_file)) {
+    FXFile style_fh(style_file,FXIO::Reading);
+    if (style_fh.isOpen()) {
+      FXString style_data;
+      style_data.length(style_fh.size()+1);
+      style_fh.readBlock((char*)style_data.text(), style_fh.size());
+      style_fh.close();
+      FXint n=style_data.contains(ENDLINE);
+      bool toolong=false;
+      for (FXint i=0; i<=n; i++) {
+        if (style_data.section(ENDLINE,i).length()>1952) {
+          toolong=true;
+          break;
+        }
+      }
+      if (toolong && style_fh.open(style_file,FXIO::Writing)) {
+        FXint eoln=strlen(ENDLINE);
+        for (FXint i=0; i<=n; i++) {
+          FXString line=style_data.section(ENDLINE,i);
+          line.trunc(1952);
+          if (strlen(line.text())) { style_fh.writeBlock(line.text(),line.length()); }
+          style_fh.writeBlock(ENDLINE,eoln);
+        }
+        style_fh.close();
+      }
+    }
+  }
+#endif
+
+  if ( (FXStat::exists(style_file)) && (!style_reg->parseFile(style_file, true))) {
+    FXMessageBox::error(app,MBOX_OK,
+      _("Configuration error"), "%s \n%s\n%s", _("Failed to read settings from"),
+      style_file.text(), strerror(errno)
+    );
+  }
+  ReadInt(ShowStatusBar,true);
+  ReadInt(ShowLineNumbers,true);
+  ReadInt(ShowToolbar,true);
+  ReadInt(ShowWhiteSpace,false);
+  ReadInt(ShowOutputPane,false);
+  ReadInt(InvertColors,false);
+  ReadIntRng(SplitView,0,SPLIT_NONE,SPLIT_BESIDE);
+  ReadInt(OutputPaneHeight,64);
+  ReadInt(SmartHome,false);
+  ReadInt(AutoIndent,false);
+  ReadInt(BraceMatch,true);
+  ReadInt(UseTabs,true);
+  ReadInt(CaretPastEOL,false);
+  ReadIntRng(TabWidth,4,1,16);
+  ReadIntRng(CaretWidth,1,1,3);
+  ReadIntRng(RightEdgeColumn,80,1,1024);
+  ReadInt(ShowRightEdge,false);
+  ReadInt(ShowIndentGuides,false);
+  ReadInt(SmoothScroll,true);
+  ReadIntRng(WheelLines,3,1,32);
+  ReadIntRng(SearchWrap,SEARCH_WRAP_ASK,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
+  ReadInt(SearchVerbose,true);
+  ReadInt(SearchOptions,0);
+  ReadInt(ZoomFactor,0);
+  ReadInt(DocTabsPacked,true);
+  ReadIntRng(MaxFiles,128,1,999);
+  ReadInt(PromptCloseMultiMenu,true);
+  ReadInt(PromptCloseMultiExit,true);
+  ReadInt(WatchExternChanges,true);
+  ReadInt(Autosave,false);
+  ReadIntRng(AutosaveInterval,60,15,900);
+  ReadInt(SaveBeforeFilterSel,false);
+  ReadInt(SaveBeforeInsCmd,false);
+  ReadInt(SaveBeforeExecCmd,true);
+  ReadInt(WhitespaceShowsEOL,true);
+  ReadIntRng(DefaultFileFormat,DEFAULT_EOL_FORMAT,0,2);
+  ReadInt(WrapToolbar,true);
+  ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
+
+  placement=reg->existingEntry(geom_sect,"Top")?PLACEMENT_DEFAULT:PLACEMENT_SCREEN;
+  ReadInt(Left,0);
+  ReadInt(Top,0);
+  ReadInt(Width,600);
+  ReadInt(Height,400);
+
+  LIMIT_RANGE(Left,0,Left);
+  LIMIT_RANGE(Top,0,Top);
+  LIMIT_RANGE(Width,160,Width);
+  LIMIT_RANGE(Height,120,Height);
+  ReadInt(Maximize,false);
+  ReadInt(FontSize,120);
+
+  if (reg->existingEntry(edit_sect,"FontName")) {
+    ReadStr(FontName,"Fixed [Misc]");
+  } else {
+    FindFont(FontName);
+  }
+
+
+  tmp=reg->readStringEntry(view_sect,"DocTabPosition","T");
+  if (tmp.empty() || !strchr("TBLR",tmp.text()[0])) {
+    DocTabPosition='T';
+  } else {
+    DocTabPosition=tmp.text()[0];
+  }
+
+  ReadStr(FileFilters,FILE_FILTERS);
+  FileFilters.substitute("|", "\n", true);
+  ReadStr(ShellCommand,SHELL_COMMAND);
+
+  ParseStyles(style_reg, global_sect, GlobalStyle);
+  ParseStyle(style_reg, global_sect, &WhiteSpaceStyle);
+  ParseStyle(style_reg, global_sect, &CaretLineStyle);
+  ParseStyle(style_reg, global_sect, &RightMarginStyle);
+  for (LangStyle*ls=languages; ls->name; ls++) {
+    if (ls->words) {
+      int i;
+      for (i=0; ls->words[i]; i++) {
+        char buf[256];
+        snprintf(buf,sizeof(buf)-1, "words_%d", i+1);
+        tmp=style_reg->readStringEntry(ls->name,buf,ls->words[i]);
+        SetKeywordList(ls,i,tmp);
+      }
+    }
+    ParseStyles(style_reg, ls->name, ls->styles);
+    tmp=style_reg->readStringEntry(ls->name,"FileMask",ls->mask?ls->mask:"");
+    if ( (ls->mask && (strcmp(ls->mask,tmp.text())!=0))||((ls->mask==NULL)&&(!tmp.empty())) ) {
+      ls->mask=strdup(tmp.text());
+      ls->mallocs |= LANGSTYLE_MASK_ALLOCD;
+    }
+    tmp=style_reg->readStringEntry(ls->name,"ShebangApps",ls->apps?ls->apps:"");
+    if ( (ls->apps && (strcmp(ls->apps,tmp.text())!=0))||((ls->apps==NULL)&&(!tmp.empty())) ){
+      ls->apps=strdup(tmp.text());
+      ls->mallocs |= LANGSTYLE_APPS_ALLOCD;
+    }
+    ls->tabs=(TabPolicy)(style_reg->readIntEntry(ls->name,"TabPolicy", ls->tabs));
+  }
+  styles=GlobalStyle;
+  MenuMgr::ReadMenuSpecs(reg,keys_sect);
+  MenuMgr::ReadToolbarButtons(reg,tbar_sect);
+}
+
+
+
+Settings::~Settings()
+{
+  LangStyle*ls;
+  for (ls=languages; ls->name; ls++) {
+    int i;
+    SaveStyles(style_reg, ls->name, ls->styles);
+    style_reg->writeStringEntry(ls->name,"FileMask",ls->mask?ls->mask:"");
+    style_reg->writeStringEntry(ls->name,"ShebangApps",ls->apps?ls->apps:"");
+    style_reg->writeIntEntry(ls->name,"TabPolicy", ls->tabs);
+    for (i=0; ls->words[i]; i++) {
+      char key[32];
+      snprintf(key, sizeof(key)-1, "words_%d", i+1);
+#ifdef FOX_1_6
+    // fox 1.6 will choke reading string entries > 2000 chars
+    char buf[1952];
+    memset(buf,0,sizeof(buf));
+    strncpy(buf, ls->words[i], sizeof(buf)-1);
+    style_reg->writeStringEntry(ls->name,key,buf);
+#else
+    style_reg->writeStringEntry(ls->name,key,ls->words[i]);
+#endif
+    }
+  }
+  SaveStyles(style_reg, global_sect, GlobalStyle);
+  SaveStyle(style_reg, global_sect,&WhiteSpaceStyle);
+  SaveStyle(style_reg, global_sect,&CaretLineStyle);
+  SaveStyle(style_reg, global_sect,&RightMarginStyle);
+
+  WriteInt(ShowStatusBar);
+  WriteInt(ShowWhiteSpace);
+  WriteInt(ShowOutputPane);
+  WriteInt(InvertColors);
+  WriteInt(SplitView);
+  WriteInt(OutputPaneHeight);
+  WriteInt(ShowLineNumbers);
+  WriteInt(ShowToolbar);
+  WriteInt(SmartHome);
+  WriteInt(AutoIndent);
+  WriteInt(BraceMatch);
+  WriteInt(UseTabs);
+  WriteInt(CaretPastEOL);
+  WriteInt(TabWidth);
+  WriteInt(CaretWidth);
+  WriteInt(RightEdgeColumn);
+  WriteInt(ShowRightEdge);
+  WriteInt(ShowIndentGuides);
+  WriteInt(SmoothScroll);
+  WriteInt(WheelLines);
+  WriteInt(SearchWrap);
+  WriteInt(SearchVerbose);
+  WriteInt(SearchOptions);
+  WriteInt(ZoomFactor);
+  WriteInt(DocTabsPacked);
+  WriteInt(MaxFiles);
+  WriteInt(PromptCloseMultiMenu);
+  WriteInt(PromptCloseMultiExit);
+  WriteInt(WatchExternChanges);
+  WriteInt(Autosave);
+  WriteInt(AutosaveInterval);
+  WriteInt(SaveBeforeFilterSel);
+  WriteInt(SaveBeforeInsCmd);
+  WriteInt(SaveBeforeExecCmd);
+  WriteInt(WhitespaceShowsEOL);
+  WriteInt(DefaultFileFormat);
+  WriteInt(WrapToolbar);
+  WriteInt(ToolbarButtonSize);
+  WriteInt(Left);
+  WriteInt(Top);
+  WriteInt(Width);
+  WriteInt(Height);
+  WriteInt(Maximize);
+  WriteInt(FontSize);
+
+  if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
+  char dtp[2]={DocTabPosition,'\0'};
+  reg->writeStringEntry(view_sect,"DocTabPosition",dtp);
+  WriteStr(FontName);
+  WriteStr(FileFilters);
+  WriteStr(ShellCommand);
+
+  FreeAllKeywordLists();
+
+  MenuMgr::WriteMenuSpecs(reg,keys_sect);
+  MenuMgr::WriteToolbarButtons(reg,tbar_sect);
+
+  if (!style_reg->unparseFile(style_file)) {
+    FXMessageBox::error(app,MBOX_OK,
+      _("Configuration error"), "%s \n%s\n%s", _("Failed to save settings to"),
+      style_file.text(), strerror(errno)
+    );
+  }
+  delete style_reg;
+  global_settings_instance=NULL;
+}
+

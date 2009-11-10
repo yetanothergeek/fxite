@@ -1,0 +1,283 @@
+/*
+  FXiTe - The Free eXtensIble Text Editor
+  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+
+  This program is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License version 3 as
+  published by the Free Software Foundation.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#ifdef WIN32
+
+#include <io.h>
+#include <process.h>
+#include <windows.h>
+
+#include <fx.h>
+
+#include "compat.h"
+#include "appmain.h"
+#include "appwin.h"
+
+#include "intl.h"
+#include "runcmd.h"
+
+#define SafeClose(f) { \
+  if ( (f) && (f!=INVALID_HANDLE_VALUE) ) { \
+    CloseHandle(f); \
+    f=NULL; \
+  } \
+}
+
+
+// Display a Windows system error message in a dalog box.
+void WinErrMsg(const char*msg, int code) {
+  LPVOID lpMsgBuf;
+  FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+                 NULL, code, MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+  for (char*p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
+  FXMessageBox::error(FXApp::instance(), MBOX_OK, "Command error", "Error %s:\n%s", msg, (char*)lpMsgBuf);
+  LocalFree(lpMsgBuf);
+}
+
+
+#define CleanupAndReturn(s,b) \
+  if (!b) { WinErrMsg(s,GetLastError()); } \
+  SafeClose(StdIN_Rd); \
+  SafeClose(StdOUT_Wr); \
+  SafeClose(StdERR_Wr); \
+  SafeClose(stdinFD); \
+  SafeClose(stdoutFD); \
+  SafeClose(stderrFD); \
+  if (cmd) { \
+    free(cmd); \
+    cmd=NULL; \
+  } \
+  return b;
+
+
+
+
+// Launch external application
+bool CreateChildProcess(char* cmdline, HANDLE StdIN_Rd, HANDLE StdOUT_Wr, HANDLE StdERR_Wr, PROCESS_INFORMATION *pi)
+{
+  STARTUPINFO si;
+  ZeroMemory( pi, sizeof(PROCESS_INFORMATION) );
+  ZeroMemory( &si, sizeof(STARTUPINFO) );
+  si.cb = sizeof(STARTUPINFO);
+  si.hStdError = StdERR_Wr;
+  si.hStdOutput = StdOUT_Wr;
+  si.hStdInput = StdIN_Rd;
+  si.dwFlags |= STARTF_USESTDHANDLES;
+  si.dwFlags |=STARTF_USESHOWWINDOW;
+  DWORD flags=CREATE_NO_WINDOW;
+  return CreateProcess(NULL,cmdline,NULL,NULL,TRUE,flags,NULL,NULL,&si,pi);
+}
+
+
+
+// Set up a file handle for a child process: 
+//   DuplicateHandle() for Win9x; SetHandleInformation() for WinNT
+static bool SetupHandle(HANDLE &FD)
+{
+  if (IsWin9x()) {
+    HANDLE CurrProc=GetCurrentProcess();
+    HANDLE tmpFD=NULL;
+    if (DuplicateHandle(CurrProc,FD,CurrProc,&tmpFD,DUPLICATE_SAME_ACCESS,FALSE,DUPLICATE_SAME_ACCESS)) {
+      CloseHandle(FD);
+      FD=tmpFD;
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return SetHandleInformation(FD, HANDLE_FLAG_INHERIT, 0);
+  }
+}
+
+
+
+// Launch an external command - note that this windows implementation
+// uses blocking I/O - the "canceler" is ignored!
+bool CmdIO::run(const char *command, bool*canceler)
+{
+  stdinFD = stdoutFD = stderrFD = StdIN_Rd = StdOUT_Wr = StdERR_Wr = NULL;  
+  RecvString = ErrString = "";
+  PROCESS_INFORMATION pi;
+  SECURITY_ATTRIBUTES sa;
+  char*cmd=NULL;
+  static const ssize_t bufsize=1024;
+  char buf[bufsize];
+  char TempOut[MAX_PATH];
+  char TempErr[MAX_PATH];
+  ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
+  sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
+  sa.bInheritHandle = TRUE; 
+  sa.lpSecurityDescriptor = NULL; 
+  DWORD exitcode=0;
+  ZeroMemory(TempOut,MAX_PATH);
+  ZeroMemory(TempErr,MAX_PATH);
+  if (SendString.empty()&&!IsWin9x()) {   // Output pipe only, no need for input...
+    if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
+    if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
+    if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
+    if (!SetHandleInformation(stderrFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stderr",false); }
+    StdIN_Rd=NULL;
+    cmd=strdup(command);
+    if (CreateChildProcess(cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
+      SafeClose(StdOUT_Wr);
+      SafeClose(StdERR_Wr);
+      SafeClose(StdIN_Rd);
+      while (1) {
+        app->runWhileEvents();
+        FXuval rcvd=0;
+        BOOL ok = ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
+        if (rcvd>0) {
+          ErrString.append(buf,rcvd);
+          appendLine(ErrString);
+        } else { 
+          if (!ErrString.empty()) {
+            ErrString.append('\n');
+            appendLine(ErrString);
+          }
+          break;
+        }
+        if (!ok) { break; }
+      }
+      while (1) {
+        app->runWhileEvents();
+        FXuval rcvd=0;
+        ZeroMemory(buf,bufsize);
+        BOOL ok = ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
+        if (rcvd>0) {
+          RecvString.append(buf,rcvd);
+          appendLine(RecvString);
+        } else { 
+          if (!RecvString.empty()) {
+            RecvString.append('\n');
+            appendLine(RecvString);
+          }
+          break;
+        }
+        if (!ok) { break; }
+      }
+    } else {
+      CleanupAndReturn("creating process", false);
+    }
+  } else {   // Create only input pipe, use temp files for stdout and stderr...
+    if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
+    if (!SetupHandle(stdinFD)) { CleanupAndReturn("setting up stdin", false); }
+    const char*cfgdir=(const char*)((AppClass*)app)->ConfigDir().text();
+    if (!GetTempFileName(cfgdir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
+    if (!GetTempFileName(cfgdir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }
+    StdOUT_Wr=CreateFile(TempOut,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    if (StdOUT_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stdout temp file", false); }
+    StdERR_Wr=CreateFile(TempErr,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    if (StdERR_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stderr temp file", false); }
+    cmd=strdup(command);
+    if (CreateChildProcess(cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
+      SafeClose(StdIN_Rd);
+      SafeClose(StdOUT_Wr);
+      SafeClose(StdERR_Wr);
+      while (remaining>0) {
+        FXuval sent=0;
+        BOOL ok=WriteFile(stdinFD,SendString.text()+(SendString.length()-remaining),remaining,&sent,NULL);
+        remaining -= sent;
+        if ((sent==0)&&(!ok)) { break; }
+      }
+      SafeClose(stdinFD);
+      SafeClose(stdoutFD);
+      SafeClose(stderrFD);
+    } else {     
+      CleanupAndReturn("creating process", false);
+    }
+  }
+  do {
+    app->runWhileEvents();
+  } while (WaitForSingleObject(pi.hProcess,1000)==WAIT_TIMEOUT);
+  // Wait up to 10 seconds for a valid exit code from child process...
+  FXint timeout=10;
+  do {
+    app->runWhileEvents();
+    GetExitCodeProcess(pi.hProcess,&exitcode);
+    if (exitcode==STILL_ACTIVE) {
+      Sleep(1000);
+      timeout--;
+      if (timeout==0) { break; } // Give up, maybe a rogue process exited with STILL_ACTIVE
+    } else { break; }
+  } while (1);
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+  SafeClose(stdinFD);
+  SafeClose(stdoutFD);
+  SafeClose(stderrFD);
+  SafeClose(StdIN_Rd);
+  SafeClose(StdOUT_Wr);
+  SafeClose(StdERR_Wr);
+  if (TempOut[0]) {   // Read 'stdout' output text from temp file...
+    stdoutFD=CreateFile(TempOut,GENERIC_READ,0,&sa,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    if (stdoutFD!=INVALID_HANDLE_VALUE) {
+      FXuval rcvd;
+      do {
+        ZeroMemory(buf,bufsize);
+        BOOL ok=ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
+        if (rcvd>0) {
+          RecvString.append(buf,rcvd);
+          appendLine(RecvString);
+        } else { 
+          if (!RecvString.empty()) {
+            RecvString.append('\n');
+            appendLine(RecvString);
+          }
+          break;
+        }
+        if (!ok) { break; }
+      } while (1);
+      SafeClose(stdoutFD);
+      RecvString.substitute("\r", "", true);
+    } else {
+      WinErrMsg("opening output log", GetLastError());
+    }
+    DeleteFile(TempOut);
+  }
+  if (TempErr[0]) {   // Read 'stderr' error text from temp file...
+    stderrFD=CreateFile(TempErr,GENERIC_READ,0,&sa,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    if (stderrFD!=INVALID_HANDLE_VALUE) {
+      FXuval rcvd;
+      do {
+        ZeroMemory(buf,bufsize);
+        BOOL ok=ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
+        if (rcvd>0) {
+          ErrString.append(buf,rcvd);
+          appendLine(ErrString);
+        } else {
+          if (!ErrString.empty()) {
+            ErrString.append('\n');
+            appendLine(ErrString);
+          }
+          break;
+        }
+        if (!ok) { break; }
+      } while (1);
+      SafeClose(stderrFD);
+      ErrString.substitute('\r', ' ', true);
+    } else {
+      WinErrMsg("opening error log", GetLastError());
+    }
+    DeleteFile(TempErr);
+  }
+  CleanupAndReturn("", (exitcode==0));
+}
+
+
+#endif
+

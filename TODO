@@ -1,0 +1,23 @@
+Run command sometimes returns success even when command fails.
+
+UTF-8 support has not been tested, and probably needs some work.
+
+More comments in source code.
+
+Tooltips? (I think the interface is easy enough, but... I'm the one who made it.)
+
+Search/Replace in multiple documents? (Why? It can already be done easily from a Lua script.)
+
+Printing? (It's already somewhat possible with pdf export + lpr + Lua.)
+
+Customizable pattern recognition for output pane. (Why not just reformat output via a shell script?)
+
+Configurable key bindings for scintilla?
+
+Maybe add config settings for:
+  SCI_SETWORDCHARS, SCI_SETWHITESPACECHARS, SCI_SETBUFFEREDDRAW, SCI_SETTWOPHASEDRAW
+
+
+Windows port:
+  * Needs heavy testing!!!
+

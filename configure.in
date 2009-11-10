@@ -1,0 +1,117 @@
+AC_INIT([fxite],0.0.1, [yetanothergeek@gmail.com])
+
+PACKAGE="fxite"
+VERSION=0.1
+
+AC_SUBST([VERSION])
+AC_SUBST([PACKAGE])
+
+AM_INIT_AUTOMAKE([${PACKAGE}], ${VERSION} )
+# AM_PROG_LIBTOOL
+AM_GNU_GETTEXT([external])
+
+AC_PROG_CC
+AC_PROG_CXX
+AC_LANG_C
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+AC_HEADER_STDC
+
+
+PKG_CHECK_MODULES([FOX], [fox >= 1.7], [AC_DEFINE(FOX_1_7)], [AC_DEFINE(FOX_1_6)])
+PKG_CHECK_MODULES([FOX], [fox >= 1.6])
+
+
+AC_ARG_WITH([system-lua],
+  AC_HELP_STRING([--with-system-lua],[use installed Lua library]),
+  [
+    AC_ARG_WITH([lua-pkg],
+     AC_HELP_STRING([--with-lua-pkg=ARG],[name of Lua pkg-config script [[default=lua5.1]]]),
+     if test "x${withval}" = "xyes"
+     then
+       AC_MSG_ERROR([--with-lua-pkg requires an argument.])
+     fi
+     [LUA_PKG_NAME=${withval%.pc}],
+    [
+    LUA_PKG_NAME=lua5.1
+    for L in lua5.1 lua51 lua-5.1 lua
+    do
+      AC_MSG_CHECKING([for $L.pc])
+      if ${PKG_CONFIG} --exists ${L}
+      then
+        AC_MSG_RESULT([yes])
+        LUA_PKG_NAME=${L}
+        break
+      else
+        AC_MSG_RESULT([no])
+      fi
+    done
+    ]
+    )
+    PKG_CHECK_MODULES([LUA], [${LUA_PKG_NAME} >= 5.1.2])
+  ]
+  ,
+  [
+    dnl Use local copy of Lua
+    case "${srcdir}" in 
+      */*)
+        LUA_CFLAGS="-I${srcdir}/lua"
+      ;;
+      *)
+        LUA_CFLAGS="-I${srcdir}/../lua"
+      ;;
+    esac
+    LUA_LIBS="-Wl,-E -L`pwd`/lua -llua -lm"
+  ]
+)
+
+
+AC_CANONICAL_HOST
+case $host_os in
+  *linux* )
+    dnl #Tell Lua sources if we are on Linux
+    AC_DEFINE(LUA_USE_LINUX)
+  ;;
+  *mingw*)
+    dnl #tell mingw where to find stuff
+    FOX_LIBS="${srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -mwindows"
+  ;;
+esac
+
+
+
+dnl #Make sure all Lua functions get linked in.
+case "${LUA_LIBS}" in
+  *-Wl,-E*) ;;
+  *) LUA_LIBS="-Wl,-E ${LUA_LIBS}"
+esac
+
+
+case "${srcdir}" in
+  */*)
+    FXSCINTILLA_CFLAGS="-I${srcdir}/fxscintilla"
+  ;;
+  *)
+    FXSCINTILLA_CFLAGS="-I${srcdir}/../fxscintilla"
+  ;;
+esac
+
+
+FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
+
+
+AC_SUBST(FOX_CFLAGS)
+AC_SUBST(FOX_LIBS)
+
+AC_SUBST(LUA_CFLAGS)
+AC_SUBST(LUA_LIBS)
+
+AC_SUBST(FXSCINTILLA_CFLAGS)
+AC_SUBST(FXSCINTILLA_LIBS)
+
+
+AC_OUTPUT( Makefile fxscintilla/Makefile lua/Makefile src/Makefile  po/Makefile.in )
+
+
+
+

@@ -1,0 +1,86 @@
+2009-08-27 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Changed pkg-config --modversion to show package release, 
+    instead of library numbering scheme.
+
+2009-08-22 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Updated to Scintilla 2.01
+  * Reworked selection code to work with new Scintilla multiple selections.
+  * Fixed a bug where DND was not properly releasing mouse grab after drop.
+  * Fixed a null-pointer crash in onSelectionRequest()
+
+2009-08-13 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Updated to Scintilla 1.79
+
+2009-06-10 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+	* Migrated my local copy into Savannah CVS, see FXSCINTILLA-1_78 branch.
+	* Removed many non-essential and/or unmaintained files from source tree.
+
+2009-05-15 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+	* Updated to Scintilla 1.78
+	* Install also headers from ./scintilla/include/*.h
+	* Implemented calltips, see ScintillaFOX::CreateCallTipWindow()
+	* Added support for Fox 1.7
+	* Dropped support for Fox 1.5.x and earlier.
+	* Removed custom m4 macros, use pkg-config instead.
+	* Reworked  ReceivedSelection() for better middle-click pasting.
+	* Fixed a null-pointer crash in onDNDRequest()
+	* Added GetMonitorRect() function for newer Scintilla. (not tested!)
+
+2006-10-19  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.71
+
+	* Added Fox 1.6 support
+	* Dropped support for Fox-1.0
+
+2005-04-22  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.63
+
+	* Added Fox 1.4 support
+
+2004-11-20  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.62
+
+	* Scrollbar bug fixed
+	
+	* Default Fox version set to 1.2
+	
+2004-06-24  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.61
+
+	* Added support for Fox-1.2.x
+	* Dropped support for Fox-1.1
+
+2004-05-10  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.60
+	
+2004-04-18  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.59
+	
+	* Fixed scroll bugs #8198 and #8505
+	
+	* Started Dev-C++ compatibility
+	
+2004-02-11  Gilles Filippini <pini@free.fr>
+
+	* Fox-1.1 branch: sync'ed with version 1.1.46
+	
+	* Added ChangeLog
+
+2004-02-09  Gilles Filippini <pini@free.fr>
+
+	* Fox-1.1 branch: sync'ed with version 1.1.45
+	* configure: option --with-fox-1-1 to force or disable Fox 1.1 usage
+	
+	* FXScintilla is now compatible with Xft when enabled in Fox 1.1
+	  (thanks to Rafael de Pelegrini Soares)
+
+2004-01-26  Gilles Filippini <pini@free.fr>
+
+	* Merged with Scintilla 1.58
+
