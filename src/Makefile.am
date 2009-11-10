@@ -19,7 +19,7 @@ noinst_HEADERS=\
   fxasq_lua.h luasci.h intl.h compat.h menuspec.h
 
 
-EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt help_lua.txt languages
+EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt help_lua.txt
 
 
 $(srcdir)/help.cpp: $(srcdir)/helptext.h $(srcdir)/help_lua.h

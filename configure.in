@@ -110,7 +110,7 @@ AC_SUBST(FXSCINTILLA_CFLAGS)
 AC_SUBST(FXSCINTILLA_LIBS)
 
 
-AC_OUTPUT( Makefile fxscintilla/Makefile lua/Makefile src/Makefile  po/Makefile.in )
+AC_OUTPUT( Makefile fxscintilla/Makefile lua/Makefile src/Makefile src/languages/Makefile po/Makefile.in )
 
 
 

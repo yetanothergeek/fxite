@@ -1,4 +1,4 @@
-SUBDIRS= po fxscintilla lua src
+SUBDIRS= po fxscintilla lua src src/languages
 
 ACLOCAL_AMFLAGS = -I m4
 
