@@ -1,0 +1,25 @@
+--- ../fox-1.7.20.orig/lib/FXFile.cpp	2009-06-24 23:39:57.000000000 -0500
++++ ./lib/FXFile.cpp	2009-10-14 10:51:55.000000000 -0500
+@@ -389,14 +389,19 @@
+ FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
+   if(srcfile!=dstfile){
+ #ifdef WIN32
+-#ifdef UNICODE
++# ifdef __MINGW32__
++    ::unlink(dstfile.text());
++    return ::rename(srcfile.text(),dstfile.text())==0;
++# else
++#  ifdef UNICODE
+     FXnchar oldname[MAXPATHLEN],newname[MAXPATHLEN];
+     utf2ncs(oldname,MAXPATHLEN,srcfile.text(),srcfile.length()+1);
+     utf2ncs(newname,MAXPATHLEN,dstfile.text(),dstfile.length()+1);
+     return ::MoveFileExW(oldname,newname,MOVEFILE_REPLACE_EXISTING)!=0;
+-#else
++#  else
+     return ::MoveFileExA(srcfile.text(),dstfile.text(),MOVEFILE_REPLACE_EXISTING)!=0;
+-#endif
++#  endif
++# endif
+ #else
+     return ::rename(srcfile.text(),dstfile.text())==0;
+ #endif

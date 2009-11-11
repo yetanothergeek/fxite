@@ -1,0 +1,3 @@
+These patches are intended to help the file-handling functions
+in Fox-1.7 work a little better on Win9x. They should not be
+necessary for other platforms.

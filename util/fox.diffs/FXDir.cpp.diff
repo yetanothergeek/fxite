@@ -1,0 +1,21 @@
+--- ../fox-1.7.20.orig/lib/FXDir.cpp	2009-06-24 23:39:57.000000000 -0500
++++ ./lib/FXDir.cpp	2009-10-13 18:47:26.000000000 -0500
+@@ -173,12 +173,16 @@
+ FXbool FXDir::create(const FXString& path,FXuint perm){
+   if(!path.empty()){
+ #ifdef WIN32
+-#ifdef UNICODE
++# ifdef __MINGW32__
++    return ::mkdir(path.text())==0;
++# else
++#  ifdef UNICODE
+     FXnchar buffer[MAXPATHLEN];
+     utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+     return CreateDirectoryW(buffer,NULL)!=0;
+-#else
++#  else
+     return CreateDirectoryA(path.text(),NULL)!=0;
++# endif
+ #endif
+ #else
+     return ::mkdir(path.text(),perm)==0;
