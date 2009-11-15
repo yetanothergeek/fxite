@@ -230,7 +230,7 @@ long SciReplDlg::onSrchHist(FXObject*o, FXSelector sel, void*p)
   if (FXSELID(sel)!=ID_SRCH_HIST) { return 0; }
   switch (FXSELTYPE(sel)) {
     case SEL_CHANGED: {
-      sciflags=(FXuint)p;
+      sciflags=(FXuint)((FXival)p);
       opts->SetSciFlags(sciflags);
       return 1;
     }
@@ -252,7 +252,7 @@ long SciReplDlg::onSrchHist(FXObject*o, FXSelector sel, void*p)
 
 long SciReplDlg::onSciOpts(FXObject*o, FXSelector sel, void*p)
 {
-  sciflags=(FXuint)p;
+  sciflags=(FXuint)((FXival)p);
   return 1;
 }
 

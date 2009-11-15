@@ -1182,7 +1182,7 @@ long TopWindow::onFindSelected(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
 {
-  int z;
+  FXival z;
   SciDoc*sci=FocusedDoc();
   if (sel) {
     switch (FXSELID(sel)) {
@@ -1209,7 +1209,7 @@ long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
     }
     tabbook->ForEachTab(ZoomStepCB, &z);
   } else {
-    z=(int)p;
+    z=(FXival)p;
    tabbook->ForEachTab(ZoomSpecCB, &z);
   }
   if (sci) { prefs->ZoomFactor=sci->sendMessage(SCI_GETZOOM, 0, 0); }

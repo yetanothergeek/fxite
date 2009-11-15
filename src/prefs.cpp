@@ -135,12 +135,12 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_SET_SEARCH_WRAP: {
-      SearchWrap=(FXint)p;
+      SearchWrap=(FXival)p;
       LIMIT_RANGE(SearchWrap,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
       break;
     }
     case ID_SET_SPLIT_VIEW: {
-      SplitView=(FXint)p;
+      SplitView=(FXival)p;
       LIMIT_RANGE(SplitView,SPLIT_NONE,SPLIT_BESIDE);
       break;
     }
@@ -162,7 +162,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_SET_SEARCH_OPTS: {
-      SearchOptions=(FXint)p;
+      SearchOptions=(FXival)p;
       break;
     }
     case ID_SET_FILETYPES: {
@@ -190,12 +190,12 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_SET_FILE_FORMAT: {
-      DefaultFileFormat=(FXint)p;
+      DefaultFileFormat=(FXival)p;
       LIMIT_RANGE(DefaultFileFormat,0,2);
       break;
     }
     case ID_SET_TOOLBAR_BTN_SIZE: {
-      ToolbarButtonSize=(FXint)p;
+      ToolbarButtonSize=(FXival)p;
       LIMIT_RANGE(ToolbarButtonSize,0,2);
       FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
       *changed|=ToolbarChangedFont;

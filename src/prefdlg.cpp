@@ -52,7 +52,7 @@ static const char* hint_list[] = {
   NULL
 };
 
-static int whichtab=0;
+static FXival whichtab=0;
 static int whichlang=0;
 
 FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
@@ -145,7 +145,7 @@ FXIMPLEMENT(StyleEdit,FXHorizontalFrame,StyleEditMap,ARRAYNUMBER(StyleEditMap));
 
 long StyleEdit::onStyleBtn(FXObject*o,FXSelector sel,void*p)
 {
-  FXint state=(FXint)p;
+  FXival state=(FXival)p;
   if (o==bold_btn) {
     if (state==STATE_DOWN) {
       fontdesc.weight=FXFont::Bold;
@@ -503,7 +503,7 @@ class Accessor;
 long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
 {
   FXListBox* list=(FXListBox*)o;
-  FXint index=(FXint)p;
+  FXival index=(FXival)p;
   whichlang=index;
   StyleDef*sd0,*sdN;
   wordlist->clearItems();
@@ -1123,7 +1123,7 @@ FXTabItem* PrefsDialog::MakeEditorTab()
 
 long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 {
-  whichtab=(int)p;
+  whichtab=(FXival)p;
   hint_lab->setText(hint_list[whichtab]);
   return 0;
 }
