@@ -147,6 +147,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
   _lasterror="";
   errno=0;
   bool rv=true;
+  bool isbin=false;
   FXFile fh(filename, FXFile::Reading);
   if (fh.isOpen()) {
   //// 
@@ -158,7 +159,6 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
         return false;
       }
       sendMessage(SCI_SETREADONLY,0,0);
-      
     }
     static const int BUFSIZE=1025;
     char buf[BUFSIZE];
@@ -178,6 +178,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
              _("Are you sure you want to open it?"))
            == MBOX_CLICKED_YES)
         {
+          isbin=true;
           break;
         } else {
           fh.close();
@@ -216,7 +217,6 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       } else {
         sendString(SCI_APPENDTEXT,n,buf);
       }
-
     } while (!fh.eof());
     fh.close();
     if (rv) {
@@ -239,6 +239,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     rv=false;
   }
   _loading=false;
+  sendMessage(SCI_SETCODEPAGE,isbin?0:SC_CP_UTF8,0);
   return rv;
 }
 

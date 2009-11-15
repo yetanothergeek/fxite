@@ -273,7 +273,9 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   FXuchar *data=NULL;
 	FXuint len=0;
   if (pdoc->IsReadOnly()) { return; }
-  if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
+	if(!_fxsc.getDNDData(origin, FXWindow::utf8Type, data, len)) {
+		if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
+	}
   FXRESIZE(&data,FXuchar,len+1);
 	data[len]='\0';
 	bool isRectangular;
@@ -746,6 +748,7 @@ void FXScintilla::create()
   FXScrollArea::create();
   _scint->wMain.SetCursor(Window::cursorArrow);
   if(!textType){textType=getApp()->registerDragType(textTypeName);}
+  if(!utf8Type){utf8Type=getApp()->registerDragType(utf8TypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
 	dropEnable();
 }
@@ -1040,26 +1043,28 @@ long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
 long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
   FXuchar *data;
+	FXDragType types[]={utf8Type,stringType,0};
 
   // Try handling it in base class first
   if(FXScrollArea::onClipboardRequest(sender,sel,ptr)) return 1;
 
-  // Requested data from clipboard
-  if(event->target==stringType){
-		// <FIXME>
-		// Framework taken from FXTextField.cpp
-		// Should have a look to FXText.cpp too
-    size_t len=strlen(_scint->copyText.s);
-    FXCALLOC(&data,FXuchar,len+1);
-    memcpy(data,_scint->copyText.s,len);
-#ifndef WIN32
-    setDNDData(FROM_CLIPBOARD,stringType,data,len);
-#else
-    setDNDData(FROM_CLIPBOARD,stringType,data,len+1);
-#endif
-		// </FIXME>
-    return 1;
-	}
+  for (FXDragType *dt=types; *dt; dt++) {
+    if(event->target==*dt){
+      // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
+      size_t len=strlen(_scint->copyText.s);
+      FXCALLOC(&data,FXuchar,len+1);
+      memcpy(data,_scint->copyText.s,len);
+  #ifndef WIN32
+      setDNDData(FROM_CLIPBOARD,*dt,data,len);
+  #else
+      setDNDData(FROM_CLIPBOARD,*dt,data,len+1);
+  #endif
+      // </FIXME>
+      return 1;
+    }
+  }
+
+
 
   return 0;
 }
@@ -1070,7 +1075,6 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 // Start a drag operation
 long FXScintilla::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
-  FXEvent*ev=(FXEvent*)ptr;
   _scint->SetMouseCapture(true);
   if (FXScrollArea::onBeginDrag(sender,sel,ptr)) return 1;
   beginDrag(&textType,1);
@@ -1277,21 +1281,22 @@ long FXScintilla::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
 // Somebody wants our selection
 long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
-
+	FXDragType types[]={utf8Type,stringType,0};
   // Perhaps the target wants to supply its own data for the selection
   if (FXScrollArea::onSelectionRequest(sender,sel,ptr)) { return 1; }
 
-  // Return text of the selection
-  if (event->target==stringType) {
-		if (_scint->primary.s == NULL) {
-			_scint->CopySelectionRange(&_scint->primary);
-		}
-		if (_scint->primary.s) {
-			setDNDData(FROM_SELECTION,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
-			return 1;
+  for (FXDragType *dt=types; *dt; dt++) {
+	  // Return text of the selection
+	  if (event->target==*dt) {
+			if (_scint->primary.s == NULL) {
+				_scint->CopySelectionRange(&_scint->primary);
+			}
+			if (_scint->primary.s) {
+				setDNDData(FROM_SELECTION,*dt,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+				return 1;
+			}
 		}
 	}
-
 	return 0;
 }
 

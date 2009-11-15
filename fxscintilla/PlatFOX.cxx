@@ -656,13 +656,37 @@ void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, con
 void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positions) {
 	if (font_.GetID()) {
 		int totalWidth = 0;
-		for (int i=0;i<len;i++) {
-			int width = font_.GetID()->getTextWidth(s + i, 1);
-			totalWidth += width;
-			positions[i] = totalWidth;
-		}
-	}
-	else {
+		if (unicodeMode) {
+			const char*p=s;
+			for (FXint i=0; i<len; i++) {
+				int cw=1; // number of bytes in this utf8 character
+				FXuchar c=*p;
+				if (c>127) { // no check for invalid bytes here, there's not much we could do about it anyway.
+					if ((c>=194) && (c<=223)) {
+						cw=2;
+					} else if (c<=239) {
+						cw=3;				
+					} else if (c<=244) {
+						cw=4;
+					}
+				}
+				int width = font_.GetID()->getTextWidth(p, cw);
+				totalWidth += width;
+				positions[i] = totalWidth;
+				p+=cw; // this many bytes consumed
+				for (FXint j=1; j<cw; j++) { // assign the same position to each byte for multibyte chars
+					positions[i+1]=positions[i];
+					i++;
+				}
+			}
+		} else {
+			for (int i=0;i<len;i++) {
+				int width = font_.GetID()->getTextWidth(s + i, 1);
+				totalWidth += width;
+				positions[i] = totalWidth;
+			}
+		}	
+	} else {
 		for (int i=0;i<len;i++) {
 			positions[i] = i + 1;
 		}
