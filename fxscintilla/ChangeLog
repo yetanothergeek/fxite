@@ -1,3 +1,6 @@
+2009-11-15
+  * Improved handling of UTF-8 text 
+
 2009-08-27 Jeff Pohlmeyer <yetanothergeek@gmail.com>
   * Changed pkg-config --modversion to show package release, 
     instead of library numbering scheme.

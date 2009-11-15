@@ -1,0 +1,7 @@
+2009-11-15
+  * Improved handling of UTF-8 text 
+  * Fix to compile on x86_64
+  * Bump version to 0.2
+
+2009-11-11
+  * Initial release
