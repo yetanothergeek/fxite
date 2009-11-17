@@ -127,6 +127,7 @@ public:
   void AppendHist(const FXString& search,const FXString& replace,FXuint mode);
 
   virtual FXuint execute(bool first_time);
+  virtual void create();
 
   enum {
     ID_SCI_OPTS=FXDialogBox::ID_LAST,
@@ -300,9 +301,19 @@ void SciReplDlg::setSearchMode(FXuint mode)
 }
 
 
+
+void SciReplDlg::create()
+{
+  FXDialogBox::create();
+  srch_hist->setFocus();
+}
+
+
+
 FXuint SciReplDlg::execute(bool first_time)
 {
   if (first_time) { setSearchText(""); }
+  create();
   if ( (!bwd_btn->hasFocus())&&!fwd_btn->hasFocus() ) { srch_hist->setFocus(); }
   srch_hist->start();
   repl_hist->start();
@@ -353,7 +364,6 @@ SciReplDlg::SciReplDlg(FXWindow*p, bool find_only):FXDialogBox(p,find_only?_("Fi
   } else {
     srch_hist->enslave(repl_hist);
   }
-  srch_hist->setFocus();
   setSearchText("");
 }
 
