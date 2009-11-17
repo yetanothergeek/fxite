@@ -66,6 +66,7 @@ Text files (*.txt)|\
 ")
 
 
+
 long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 {
   switch FXSELID(sel)
@@ -99,12 +100,19 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_SAVE_ON_EXEC_CMD:   { SaveBeforeExecCmd   = !SaveBeforeExecCmd;   break; }
     case ID_CHOOSE_FONT: {
       FXFontDialog dlg(((FXWindow*)o)->getShell(), _("Select Font"), 0);
+#ifdef WIN32 // Windows font dialog is empty, unless setwidth is zero.
+      FXushort setwidth=fontdesc.setwidth;
+      fontdesc.setwidth=0;
+#endif
       SetDialogFromFont(dlg,fontdesc);
       if (dlg.execute(PLACEMENT_SCREEN)) {
         SetFontFromDialog(fontdesc,dlg);
         FontName=(FXchar*)(fontdesc.face);
         FontSize=fontdesc.size;
       }
+#ifdef WIN32
+      else { fontdesc.setwidth=setwidth; }
+#endif
       break;
     }
     case ID_SET_MAX_FILES: {
