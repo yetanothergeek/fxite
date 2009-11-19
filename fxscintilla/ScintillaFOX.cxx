@@ -52,7 +52,7 @@
 # endif
 # include <fx.h>
 # include <fxkeys.h>
-#endif	// !defined(WIN32) || defined(__CYGWIN__)
+#endif  // !defined(WIN32) || defined(__CYGWIN__)
 
 #include "Platform.h"
 
@@ -109,161 +109,161 @@
 // ScintillaFOX
 // ====================================================================
 class ScintillaFOX : public ScintillaBase {
-	friend class FXScintilla;
+  friend class FXScintilla;
 protected:
-	FXScintilla & _fxsc;
-	bool tryDrag;
-	bool dragWasDropped;
-	Point ptMouseLastBeforeDND;
+  FXScintilla & _fxsc;
+  bool tryDrag;
+  bool dragWasDropped;
+  Point ptMouseLastBeforeDND;
 
-	// Because clipboard access is asynchronous, copyText is created by Copy
-	SelectionText copyText;
-	SelectionText primary;
-	
-	// Vertical scrollbar handling
-	int vsbMax;
-	int vsbPage;
-	
-	// Flag to prevent infinite loop with moveContents
-	bool inMoveContents;
+  // Because clipboard access is asynchronous, copyText is created by Copy
+  SelectionText copyText;
+  SelectionText primary;
+  
+  // Vertical scrollbar handling
+  int vsbMax;
+  int vsbPage;
+  
+  // Flag to prevent infinite loop with moveContents
+  bool inMoveContents;
 public:
-	ScintillaFOX(FXScintilla & fxsc);
-	virtual ~ScintillaFOX();
-	virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+  ScintillaFOX(FXScintilla & fxsc);
+  virtual ~ScintillaFOX();
+  virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 private:
-	int TargetAsUTF8(char *text);
-	int EncodedFromUTF8(char *utf8, char *encoded);
-	// Virtual methods from ScintillaBase
-	virtual void Initialise();
-	virtual void Finalise();
-	virtual void DisplayCursor(Window::Cursor c);
-	virtual void SetVerticalScrollPos();
-	virtual void SetHorizontalScrollPos();
-	virtual void CopyToClipboard(const SelectionText &selectedText);
-	virtual void Copy();
-	virtual void Paste();
-	virtual void ClaimSelection();
-	virtual void NotifyChange();
-	virtual void NotifyParent(SCNotification scn);
-	virtual void SetTicking(bool on);
-	virtual bool SetIdle(bool on);
-	virtual void SetMouseCapture(bool on);
-	virtual bool HaveMouseCapture();
-	virtual bool PaintContains(PRectangle rc);
-	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
-	virtual void CreateCallTipWindow(PRectangle rc);
-	virtual void AddToPopUp(const char * label, int cmd = 0, bool enabled = true);
-	virtual void StartDrag();
-	virtual bool ValidCodePage(int codePage) const;
-	//
-	static sptr_t DirectFunction(ScintillaFOX *sciThis, 
-		unsigned int iMessage, uptr_t wParam, sptr_t lParam);
-	// Paint
-	void SyncPaint(PRectangle rc);
-	void FullPaint();
-	void UnclaimSelection();
-	void ReceivedSelection(FXDNDOrigin origin, int atPos);
-	void NotifyKey(int key, int modifiers);
-	void NotifyURIDropped(const char *list);
-	
-	// From ScintillaBase
-	virtual bool ModifyScrollBars(int nMax, int nPage);
-	virtual void ReconfigureScrollBars();
-	virtual PRectangle GetClientRectangle();
-	virtual int KeyDefault(int key, int modifiers);
+  int TargetAsUTF8(char *text);
+  int EncodedFromUTF8(char *utf8, char *encoded);
+  // Virtual methods from ScintillaBase
+  virtual void Initialise();
+  virtual void Finalise();
+  virtual void DisplayCursor(Window::Cursor c);
+  virtual void SetVerticalScrollPos();
+  virtual void SetHorizontalScrollPos();
+  virtual void CopyToClipboard(const SelectionText &selectedText);
+  virtual void Copy();
+  virtual void Paste();
+  virtual void ClaimSelection();
+  virtual void NotifyChange();
+  virtual void NotifyParent(SCNotification scn);
+  virtual void SetTicking(bool on);
+  virtual bool SetIdle(bool on);
+  virtual void SetMouseCapture(bool on);
+  virtual bool HaveMouseCapture();
+  virtual bool PaintContains(PRectangle rc);
+  virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+  virtual void CreateCallTipWindow(PRectangle rc);
+  virtual void AddToPopUp(const char * label, int cmd = 0, bool enabled = true);
+  virtual void StartDrag();
+  virtual bool ValidCodePage(int codePage) const;
+  //
+  static sptr_t DirectFunction(ScintillaFOX *sciThis, 
+    unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+  // Paint
+  void SyncPaint(PRectangle rc);
+  void FullPaint();
+  void UnclaimSelection();
+  void ReceivedSelection(FXDNDOrigin origin, int atPos);
+  void NotifyKey(int key, int modifiers);
+  void NotifyURIDropped(const char *list);
+  
+  // From ScintillaBase
+  virtual bool ModifyScrollBars(int nMax, int nPage);
+  virtual void ReconfigureScrollBars();
+  virtual PRectangle GetClientRectangle();
+  virtual int KeyDefault(int key, int modifiers);
 
-	// Popup flag
-	bool getDisplayPopupMenu() const { return displayPopupMenu; }
+  // Popup flag
+  bool getDisplayPopupMenu() const { return displayPopupMenu; }
 };
 
 ScintillaFOX::ScintillaFOX(FXScintilla & fxsc) :
-	_fxsc(fxsc),
-	tryDrag(false),
-	dragWasDropped(false),
-	vsbMax(0),
-	vsbPage(0),
-	inMoveContents(false)
+  _fxsc(fxsc),
+  tryDrag(false),
+  dragWasDropped(false),
+  vsbMax(0),
+  vsbPage(0),
+  inMoveContents(false)
 {
-	wMain = &_fxsc;
-	Initialise();
+  wMain = &_fxsc;
+  Initialise();
 }
 
 ScintillaFOX::~ScintillaFOX()
 {
-	Finalise();
+  Finalise();
 }
 
 int ScintillaFOX::TargetAsUTF8(char *text) {
-	// TODO
-	// Fail
-	return 0;
+  // TODO
+  // Fail
+  return 0;
 }
 
 int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
-	// TODO
-	// Fail
-	return 0;
+  // TODO
+  // Fail
+  return 0;
 }
 
 bool ScintillaFOX::ValidCodePage(int codePage) const {
-	return codePage == 0 || codePage == SC_CP_UTF8 || codePage == SC_CP_DBCS;
+  return codePage == 0 || codePage == SC_CP_UTF8 || codePage == SC_CP_DBCS;
 }
 
 sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	switch (iMessage) {
+  switch (iMessage) {
 
-	case SCI_GRABFOCUS:
-		_fxsc.setFocus();
-		break;
+  case SCI_GRABFOCUS:
+    _fxsc.setFocus();
+    break;
 
-	case SCI_GETDIRECTFUNCTION:
-		return reinterpret_cast<sptr_t>(DirectFunction);
-	
-	case SCI_GETDIRECTPOINTER:
-		return reinterpret_cast<sptr_t>(this);
+  case SCI_GETDIRECTFUNCTION:
+    return reinterpret_cast<sptr_t>(DirectFunction);
+  
+  case SCI_GETDIRECTPOINTER:
+    return reinterpret_cast<sptr_t>(this);
 
 #ifdef SCI_LEXER
-	case SCI_LOADLEXERLIBRARY:
-		LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
-		break;
+  case SCI_LOADLEXERLIBRARY:
+    LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
+    break;
 #endif
-	case SCI_TARGETASUTF8:
-		return TargetAsUTF8(reinterpret_cast<char*>(lParam));
+  case SCI_TARGETASUTF8:
+    return TargetAsUTF8(reinterpret_cast<char*>(lParam));
 
-	case SCI_ENCODEDFROMUTF8:
-		return EncodedFromUTF8(reinterpret_cast<char*>(wParam), 
-			reinterpret_cast<char*>(lParam));
+  case SCI_ENCODEDFROMUTF8:
+    return EncodedFromUTF8(reinterpret_cast<char*>(wParam), 
+      reinterpret_cast<char*>(lParam));
 
-	default:
-		return ScintillaBase::WndProc(iMessage,wParam,lParam);
-	}
-	return 0l;
+  default:
+    return ScintillaBase::WndProc(iMessage,wParam,lParam);
+  }
+  return 0l;
 }
 
 void ScintillaFOX::ClaimSelection()
 {
   // Acquire selection
 
-// JKP	1.79 if (currentPos != anchor) {
+// JKP  1.79 if (currentPos != anchor) {
 // JKP 2.00 ? if (SelectionStart().Position() != SelectionEnd().Position()) {
-	if (!sel.Empty()) { // <- JKP 2.00
+  if (!sel.Empty()) { // <- JKP 2.00
     _fxsc.acquireSelection(&FXWindow::stringType,1);
-		primarySelection = true;
-		primary.Free();
-	}
-	else {
-//	_fxsc.releaseSelection(); // JKP:  Does not work for 2.00 - Do we need somethong else?
-	}
+    primarySelection = true;
+    primary.Free();
+  }
+  else {
+//  _fxsc.releaseSelection(); // JKP:  Does not work for 2.00 - Do we need somethong else?
+  }
 }
 
 void ScintillaFOX::UnclaimSelection()
 {
-	//Platform::DebugPrintf("UnclaimPrimarySelection\n");
-	if (!_fxsc.hasSelection()) {
-		primary.Free();
-		primarySelection = false;
-		FullPaint();
-	}
+  //Platform::DebugPrintf("UnclaimPrimarySelection\n");
+  if (!_fxsc.hasSelection()) {
+    primary.Free();
+    primarySelection = false;
+    FullPaint();
+  }
 }
 
 // JKP: Heavily reworked to fix middle-click-paste when current document has the X-selection.
@@ -271,46 +271,46 @@ void ScintillaFOX::UnclaimSelection()
 void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 {
   FXuchar *data=NULL;
-	FXuint len=0;
+  FXuint len=0;
   if (pdoc->IsReadOnly()) { return; }
-	if(!_fxsc.getDNDData(origin, FXWindow::utf8Type, data, len)) {
-		if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
-	}
+  if(!_fxsc.getDNDData(origin, FXWindow::utf8Type, data, len)) {
+    if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
+  }
   FXRESIZE(&data,FXuchar,len+1);
-	data[len]='\0';
-	bool isRectangular;
-	SelectionText selText;
+  data[len]='\0';
+  bool isRectangular;
+  SelectionText selText;
 
 #ifdef WIN32
-	len=0;
-	while(data[len]) { len++; }
-	static CLIPFORMAT cfColumnSelect = 
-	  static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
-	isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
+  len=0;
+  while(data[len]) { len++; }
+  static CLIPFORMAT cfColumnSelect = 
+    static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
+  isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
 #else // !WIN32
-	isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
+  isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
 #endif // WIN32
 
-	selText.Copy((char*)data,len,CodePage(),0,isRectangular,false);
+  selText.Copy((char*)data,len,CodePage(),0,isRectangular,false);
   pdoc->BeginUndoAction();
 
   if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
 
   SelectionPosition selStart = SelectionStart();
 
-	if (selText.rectangular) {
-		PasteRectangular(selStart, selText.s, selText.len);
-	} else {
-		selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
-		if (pdoc->InsertString(atPos>0?atPos:selStart.Position(),selText.s, selText.len)) {
-			if (atPos<0) {
-				SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
-			} else {  
-				SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
-				FullPaint();
-			}
-		}
-	}
+  if (selText.rectangular) {
+    PasteRectangular(selStart, selText.s, selText.len);
+  } else {
+    selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
+    if (pdoc->InsertString(atPos>0?atPos:selStart.Position(),selText.s, selText.len)) {
+      if (atPos<0) {
+        SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
+      } else {  
+        SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
+        FullPaint();
+      }
+    }
+  }
   pdoc->EndUndoAction();
   EnsureCaretVisible();
 //  _fxsc.setDNDData(origin, FXWindow::stringType, data, len);
@@ -319,54 +319,54 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 
 
 void ScintillaFOX::NotifyKey(int key, int modifiers) {
-	SCNotification scn;
-	scn.nmhdr.code = SCN_KEY;
-	scn.ch = key;
-	scn.modifiers = modifiers;
+  SCNotification scn;
+  scn.nmhdr.code = SCN_KEY;
+  scn.ch = key;
+  scn.modifiers = modifiers;
 
-	NotifyParent(scn);
+  NotifyParent(scn);
 }
 
 void ScintillaFOX::NotifyURIDropped(const char *list) {
-	SCNotification scn;
-	scn.nmhdr.code = SCN_URIDROPPED;
-	scn.text = list;
+  SCNotification scn;
+  scn.nmhdr.code = SCN_URIDROPPED;
+  scn.text = list;
 
-	NotifyParent(scn);
+  NotifyParent(scn);
 }
 
 int ScintillaFOX::KeyDefault(int key, int modifiers) {
-	if (!(modifiers & SCI_CTRL) && !(modifiers & SCI_ALT) && (key < 256)) {
-		//NotifyKey(key, modifiers);
-		//return 0;
-		AddChar(key);
-		return 1;
-	} else {
-		// Pass up to container in case it is an accelerator
-		NotifyKey(key, modifiers);
-		return 0;
-	}
-	//Platform::DebugPrintf("SK-key: %d %x %x\n",key, modifiers);
+  if (!(modifiers & SCI_CTRL) && !(modifiers & SCI_ALT) && (key < 256)) {
+    //NotifyKey(key, modifiers);
+    //return 0;
+    AddChar(key);
+    return 1;
+  } else {
+    // Pass up to container in case it is an accelerator
+    NotifyKey(key, modifiers);
+    return 0;
+  }
+  //Platform::DebugPrintf("SK-key: %d %x %x\n",key, modifiers);
 }
 
 // ********************************************************************
 
 void ScintillaFOX::Initialise()
 {
-	SetTicking(true);
+  SetTicking(true);
 }
 
 void ScintillaFOX::Finalise()
 {
-	SetTicking(false);
-	ScintillaBase::Finalise();
+  SetTicking(false);
+  ScintillaBase::Finalise();
 }
 
 void ScintillaFOX::DisplayCursor(Window::Cursor c) {
-	if (cursorMode == SC_CURSORNORMAL)
-		wMain.SetCursor(c);
-	else
-		wMain.SetCursor(static_cast<Window::Cursor>(cursorMode));
+  if (cursorMode == SC_CURSORNORMAL)
+    wMain.SetCursor(c);
+  else
+    wMain.SetCursor(static_cast<Window::Cursor>(cursorMode));
 }
 
 void ScintillaFOX::SetVerticalScrollPos()
@@ -404,286 +404,286 @@ void ScintillaFOX::SetHorizontalScrollPos()
 }
 
 void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
-	if (_fxsc.acquireClipboard(&FXWindow::stringType, 1)) {
-		copyText.Copy(selectedText);
-	}
+  if (_fxsc.acquireClipboard(&FXWindow::stringType, 1)) {
+    copyText.Copy(selectedText);
+  }
 }
 
 void ScintillaFOX::Copy()
 {
   if (_fxsc.hasSelection()) {
     if (_fxsc.acquireClipboard(&FXWindow::stringType, 1)) {
-			CopySelectionRange(&copyText);
+      CopySelectionRange(&copyText);
     }
-	}
-	else {
+  }
+  else {
     _fxsc.releaseClipboard();
-	}
+  }
 }
 
 void ScintillaFOX::Paste()
 {
-	ReceivedSelection(FROM_CLIPBOARD, -1);
+  ReceivedSelection(FROM_CLIPBOARD, -1);
 }
 
 void ScintillaFOX::NotifyChange()
 {
-	_fxsc.handle(&_fxsc, MKUINT(0, SEL_CHANGED), NULL);
+  _fxsc.handle(&_fxsc, MKUINT(0, SEL_CHANGED), NULL);
 }
 
 void ScintillaFOX::NotifyParent(SCNotification scn)
 {
-	scn.nmhdr.hwndFrom = wMain.GetID();
-	scn.nmhdr.idFrom = GetCtrlID();
-	_fxsc.handle(&_fxsc, MKUINT(0, SEL_COMMAND), &scn);
+  scn.nmhdr.hwndFrom = wMain.GetID();
+  scn.nmhdr.idFrom = GetCtrlID();
+  _fxsc.handle(&_fxsc, MKUINT(0, SEL_COMMAND), &scn);
 }
 
 void ScintillaFOX::SetTicking(bool on)
 {
-	if (timer.ticking != on) {
-		timer.ticking = on;
-		if (timer.ticking) {
-			FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
-		} else {
-			FXApp::instance()->removeTimeout(&_fxsc, _fxsc.ID_TICK);
-		}
-	}
-	timer.ticksToWait = caret.period;
+  if (timer.ticking != on) {
+    timer.ticking = on;
+    if (timer.ticking) {
+      FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
+    } else {
+      FXApp::instance()->removeTimeout(&_fxsc, _fxsc.ID_TICK);
+    }
+  }
+  timer.ticksToWait = caret.period;
 }
 
 bool ScintillaFOX::SetIdle(bool on) {
-	if (on) {
-		// Start idler, if it's not running.
-		if (idler.state == false) {
-			idler.state = true;
-			FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
-		}
-	} else {
-		// Stop idler, if it's running
-		if (idler.state == true) {
-			idler.state = false;
-			FXApp::instance()->removeChore(&_fxsc, FXScintilla::ID_IDLE);
-		}
-	}
-	return true;
+  if (on) {
+    // Start idler, if it's not running.
+    if (idler.state == false) {
+      idler.state = true;
+      FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
+    }
+  } else {
+    // Stop idler, if it's running
+    if (idler.state == true) {
+      idler.state = false;
+      FXApp::instance()->removeChore(&_fxsc, FXScintilla::ID_IDLE);
+    }
+  }
+  return true;
 }
 
 void ScintillaFOX::SetMouseCapture(bool on)
 {
-	if (mouseDownCaptures) {
-		if (on) {
-			_fxsc.grab();
-		} else {
-			_fxsc.ungrab();
-		}
-	}
+  if (mouseDownCaptures) {
+    if (on) {
+      _fxsc.grab();
+    } else {
+      _fxsc.ungrab();
+    }
+  }
 }
 
 bool ScintillaFOX::HaveMouseCapture()
 {
-	return _fxsc.grabbed();
+  return _fxsc.grabbed();
 }
 
 bool ScintillaFOX::PaintContains(PRectangle rc) {
-	bool contains = true;
-	if (paintState == painting) {
-		if (!rcPaint.Contains(rc)) {
-			contains = false;
-		}
-	}
-	return contains;
+  bool contains = true;
+  if (paintState == painting) {
+    if (!rcPaint.Contains(rc)) {
+      contains = false;
+    }
+  }
+  return contains;
 }
 
 void ScintillaFOX::StartDrag()
 {
-	tryDrag = true;
-	dragWasDropped = false;
+  tryDrag = true;
+  dragWasDropped = false;
 }
 
 sptr_t ScintillaFOX::DefWndProc(unsigned int, uptr_t, sptr_t)
 {
-	return 0;
+  return 0;
 }
 
 
 // JKP: A new class, overrides the onPaint() method to 
 // let a CallTip object take over the painting.
 class CallTipWindow:public FXFrame {
-	FXDECLARE(CallTipWindow)
-	CallTipWindow(){}
+  FXDECLARE(CallTipWindow)
+  CallTipWindow(){}
 protected:
-	CallTip*ct;
+  CallTip*ct;
 public:
-	long onPaint(FXObject*o, FXSelector sel, void*p);
-	CallTipWindow( FXComposite *p, CallTip*_ct):FXFrame(p,FRAME_NONE|LAYOUT_FILL),ct(_ct) {}
+  long onPaint(FXObject*o, FXSelector sel, void*p);
+  CallTipWindow( FXComposite *p, CallTip*_ct):FXFrame(p,FRAME_NONE|LAYOUT_FILL),ct(_ct) {}
 };
 
 FXDEFMAP(CallTipWindow) CallTipWindowMap[] = {
-	FXMAPFUNC(SEL_PAINT,0,CallTipWindow::onPaint)
+  FXMAPFUNC(SEL_PAINT,0,CallTipWindow::onPaint)
 };
 
 FXIMPLEMENT(CallTipWindow,FXFrame,CallTipWindowMap,ARRAYNUMBER(CallTipWindowMap));
 
 long CallTipWindow::onPaint(FXObject*o, FXSelector sel, void*p)
 {
-	long rv=FXFrame::onPaint(o,sel,p);	
-	Surface *surfaceWindow = Surface::Allocate();
-	if (surfaceWindow) {
-		surfaceWindow->Init(this, this);
-		surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == ct->codePage);
-		surfaceWindow->SetDBCSMode(ct->codePage);
-		ct->PaintCT(surfaceWindow);
-		surfaceWindow->Release();
-		delete surfaceWindow;
-	}
-	return rv;
+  long rv=FXFrame::onPaint(o,sel,p);  
+  Surface *surfaceWindow = Surface::Allocate();
+  if (surfaceWindow) {
+    surfaceWindow->Init(this, this);
+    surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == ct->codePage);
+    surfaceWindow->SetDBCSMode(ct->codePage);
+    ct->PaintCT(surfaceWindow);
+    surfaceWindow->Release();
+    delete surfaceWindow;
+  }
+  return rv;
 }
 
 
 void ScintillaFOX::CreateCallTipWindow(PRectangle  rc )
 {
-	// Gilles says: <FIXME/>
-	// JKP says: OK, I'll try....
-	if (!ct.wCallTip.GetID()) {
-		FXHorizontalFrame*w=new FXHorizontalFrame(&_fxsc,FRAME_NONE,rc.left, rc.top, 
-			(rc.right-rc.left), (rc.bottom-rc.top),0,0,0,0,0,0);
-		CallTipWindow*c=new CallTipWindow(w, &ct);
-		w->create();
-		ct.wCallTip=w;
-		ct.wDraw=c;
-	}
+  // Gilles says: <FIXME/>
+  // JKP says: OK, I'll try....
+  if (!ct.wCallTip.GetID()) {
+    FXHorizontalFrame*w=new FXHorizontalFrame(&_fxsc,FRAME_NONE,rc.left, rc.top, 
+      (rc.right-rc.left), (rc.bottom-rc.top),0,0,0,0,0,0);
+    CallTipWindow*c=new CallTipWindow(w, &ct);
+    w->create();
+    ct.wCallTip=w;
+    ct.wDraw=c;
+  }
 }
 
 void ScintillaFOX::AddToPopUp(const char * label, int cmd, bool enabled)
 {
-	if (label[0]) {
-		FXMenuCommand * item = new FXMenuCommand(static_cast<FXComposite *>(popup.GetID()), label, NULL, &_fxsc, SCID(cmd));
-		if (!enabled)
-			item->disable();
-	}
-	else
-		new FXMenuSeparator(static_cast<FXComposite *>(popup.GetID()));
+  if (label[0]) {
+    FXMenuCommand * item = new FXMenuCommand(static_cast<FXComposite *>(popup.GetID()), label, NULL, &_fxsc, SCID(cmd));
+    if (!enabled)
+      item->disable();
+  }
+  else
+    new FXMenuSeparator(static_cast<FXComposite *>(popup.GetID()));
 }
 
 sptr_t ScintillaFOX::DirectFunction(
     ScintillaFOX *sciThis, unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	return sciThis->WndProc(iMessage, wParam, lParam);
+  return sciThis->WndProc(iMessage, wParam, lParam);
 }
 
 PRectangle ScintillaFOX::GetClientRectangle() {
-	// Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
-	// to prevent infinite loop
+  // Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
+  // to prevent infinite loop
 #ifdef FOX_1_6
-	PRectangle rc(0, 0, _fxsc.FXScrollArea::getViewportWidth(), _fxsc.FXScrollArea::getViewportHeight());
-	if (_fxsc.horizontalScrollBar()->shown())
-		rc.bottom -= _fxsc.horizontalScrollBar()->getDefaultHeight();
-	if (_fxsc.verticalScrollBar()->shown())
-		rc.right -= _fxsc.verticalScrollBar()->getDefaultWidth();
+  PRectangle rc(0, 0, _fxsc.FXScrollArea::getViewportWidth(), _fxsc.FXScrollArea::getViewportHeight());
+  if (_fxsc.horizontalScrollBar()->shown())
+    rc.bottom -= _fxsc.horizontalScrollBar()->getDefaultHeight();
+  if (_fxsc.verticalScrollBar()->shown())
+    rc.right -= _fxsc.verticalScrollBar()->getDefaultWidth();
 #else
-	PRectangle rc(0, 0, _fxsc.FXScrollArea::getVisibleWidth(), _fxsc.FXScrollArea::getVisibleHeight());
+  PRectangle rc(0, 0, _fxsc.FXScrollArea::getVisibleWidth(), _fxsc.FXScrollArea::getVisibleHeight());
 #endif
-	return rc;
+  return rc;
 }
 
 void ScintillaFOX::ReconfigureScrollBars()
 {
-	if (horizontalScrollBarVisible)
-		_fxsc.setScrollStyle(_fxsc.getScrollStyle() & ~HSCROLLER_NEVER);
-	else
-		_fxsc.setScrollStyle(_fxsc.getScrollStyle() | HSCROLLER_NEVER);
-	_fxsc.recalc();
+  if (horizontalScrollBarVisible)
+    _fxsc.setScrollStyle(_fxsc.getScrollStyle() & ~HSCROLLER_NEVER);
+  else
+    _fxsc.setScrollStyle(_fxsc.getScrollStyle() | HSCROLLER_NEVER);
+  _fxsc.recalc();
 }
 
 bool ScintillaFOX::ModifyScrollBars(int nMax, int nPage)
 {
-	bool modified = false;
-	// There was no vertical scrollbar if
-	//   !vsbMax || (vsbMax < vsbPage)
-	bool noVScroll = !vsbMax || (vsbMax < vsbPage);
-	// There won't be a vertical scrollbar if
-	//   !nMax || (nMax < nPage)
-	bool noVScrollNew = !nMax || (nMax < nPage);
-	if ((nMax != vsbMax) || (nPage != vsbPage)) {
-		vsbMax = nMax;
-		vsbPage = nPage;
-		// Layout if vertical scrollbar should appear or change
-		if (noVScroll != noVScrollNew || !noVScroll) {
-			_fxsc.layout();
-			if (noVScrollNew)
-				ChangeSize();	// Force scrollbar recalc
-			modified = true;
-		}
-	}
-	// Vertical scrollbar
-	int line = vs.lineHeight;
-	if (_fxsc.verticalScrollBar()->getLine() != line) {
-		_fxsc.verticalScrollBar()->setLine(line);
-		modified = true;
-	}
-	// Horizontal scrollbar
-	PRectangle rcText = GetTextRectangle();
-	unsigned int pageWidth = rcText.Width();
-	if ((_fxsc.horizontalScrollBar()->getPage() != int(pageWidth)) ||
-			(_fxsc.horizontalScrollBar()->getLine() != 10)) {
-		_fxsc.horizontalScrollBar()->setPage(pageWidth);
-		_fxsc.horizontalScrollBar()->setLine(10);
-		modified = true;
-	}
-	return modified;
+  bool modified = false;
+  // There was no vertical scrollbar if
+  //   !vsbMax || (vsbMax < vsbPage)
+  bool noVScroll = !vsbMax || (vsbMax < vsbPage);
+  // There won't be a vertical scrollbar if
+  //   !nMax || (nMax < nPage)
+  bool noVScrollNew = !nMax || (nMax < nPage);
+  if ((nMax != vsbMax) || (nPage != vsbPage)) {
+    vsbMax = nMax;
+    vsbPage = nPage;
+    // Layout if vertical scrollbar should appear or change
+    if (noVScroll != noVScrollNew || !noVScroll) {
+      _fxsc.layout();
+      if (noVScrollNew)
+        ChangeSize();  // Force scrollbar recalc
+      modified = true;
+    }
+  }
+  // Vertical scrollbar
+  int line = vs.lineHeight;
+  if (_fxsc.verticalScrollBar()->getLine() != line) {
+    _fxsc.verticalScrollBar()->setLine(line);
+    modified = true;
+  }
+  // Horizontal scrollbar
+  PRectangle rcText = GetTextRectangle();
+  unsigned int pageWidth = rcText.Width();
+  if ((_fxsc.horizontalScrollBar()->getPage() != int(pageWidth)) ||
+      (_fxsc.horizontalScrollBar()->getLine() != 10)) {
+    _fxsc.horizontalScrollBar()->setPage(pageWidth);
+    _fxsc.horizontalScrollBar()->setLine(10);
+    modified = true;
+  }
+  return modified;
 }
 
 // --------------------------------------------------------------------
 // Synchronously paint a rectangle of the window.
 void ScintillaFOX::SyncPaint(PRectangle rc) {
-	paintState = painting;
-	rcPaint = rc;
-	PRectangle rcClient = GetClientRectangle();
-	paintingAllText = rcPaint.Contains(rcClient);
-	//Platform::DebugPrintf("ScintillaGTK::SyncPaint %0d,%0d %0d,%0d\n",
-	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
-	Surface *sw = Surface::Allocate();
-	if (sw) {
-		sw->Init(wMain.GetID(), wMain.GetID());
-		Paint(sw, rcPaint);
-		sw->Release();
-		delete sw;
-	}
-	if (paintState == paintAbandoned) {
-		// Painting area was insufficient to cover new styling or brace highlight positions
-		FullPaint();
-	}
-	paintState = notPainting;
+  paintState = painting;
+  rcPaint = rc;
+  PRectangle rcClient = GetClientRectangle();
+  paintingAllText = rcPaint.Contains(rcClient);
+  //Platform::DebugPrintf("ScintillaGTK::SyncPaint %0d,%0d %0d,%0d\n",
+  //  rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
+  Surface *sw = Surface::Allocate();
+  if (sw) {
+    sw->Init(wMain.GetID(), wMain.GetID());
+    Paint(sw, rcPaint);
+    sw->Release();
+    delete sw;
+  }
+  if (paintState == paintAbandoned) {
+    // Painting area was insufficient to cover new styling or brace highlight positions
+    FullPaint();
+  }
+  paintState = notPainting;
 }
 
 // Redraw all of text area. This paint will not be abandoned.
 void ScintillaFOX::FullPaint() {
-	paintState = painting;
-	rcPaint = GetClientRectangle();
-	//Platform::DebugPrintf("ScintillaGTK::FullPaint %0d,%0d %0d,%0d\n",
-	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
-	paintingAllText = true;
-	if (wMain.GetID()) {
-		Surface *sw = Surface::Allocate();
-		if (sw) {
-			sw->Init(wMain.GetID(), wMain.GetID());
-			Paint(sw, rcPaint);
-			sw->Release();
-			delete sw;
-		}
-	}
-	paintState = notPainting;
+  paintState = painting;
+  rcPaint = GetClientRectangle();
+  //Platform::DebugPrintf("ScintillaGTK::FullPaint %0d,%0d %0d,%0d\n",
+  //  rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
+  paintingAllText = true;
+  if (wMain.GetID()) {
+    Surface *sw = Surface::Allocate();
+    if (sw) {
+      sw->Init(wMain.GetID(), wMain.GetID());
+      Paint(sw, rcPaint);
+      sw->Release();
+      delete sw;
+    }
+  }
+  paintState = notPainting;
 }
 
 // ====================================================================
 long Platform::SendScintilla(
-		WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
-	return static_cast<FXScintilla *>(w)->sendMessage(msg, wParam, lParam);
+    WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
+  return static_cast<FXScintilla *>(w)->sendMessage(msg, wParam, lParam);
 }
 
 long Platform::SendScintillaPointer(WindowID w, unsigned int msg,
-																		unsigned long wParam, void *lParam) {
-	return static_cast<FXScintilla *>(w)->
-		sendMessage(msg, wParam, reinterpret_cast<sptr_t>(lParam));
+                                    unsigned long wParam, void *lParam) {
+  return static_cast<FXScintilla *>(w)->
+    sendMessage(msg, wParam, reinterpret_cast<sptr_t>(lParam));
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -729,18 +729,18 @@ FXScintilla::FXScintilla()
 }
 
 FXScintilla::FXScintilla(FXComposite * p, FXObject * tgt, FXSelector sel,
-		FXuint opts, FXint x, FXint y, FXint w, FXint h) :
-	FXScrollArea(p, opts, x, y, w, h)
+    FXuint opts, FXint x, FXint y, FXint w, FXint h) :
+  FXScrollArea(p, opts, x, y, w, h)
 {
   flags|=FLAG_ENABLED;
-	target = tgt;
-	message = sel;
-	_scint = new ScintillaFOX(*this);
+  target = tgt;
+  message = sel;
+  _scint = new ScintillaFOX(*this);
 }
 
 FXScintilla::~FXScintilla()
 {
-	delete _scint;
+  delete _scint;
 }
 
 void FXScintilla::create()
@@ -750,162 +750,162 @@ void FXScintilla::create()
   if(!textType){textType=getApp()->registerDragType(textTypeName);}
   if(!utf8Type){utf8Type=getApp()->registerDragType(utf8TypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
-	dropEnable();
+  dropEnable();
 }
 
 
 bool FXScintilla::canFocus() const
 {
-	return true;
+  return true;
 }
 
 long FXScintilla::onScintillaCommand(FXObject *, FXSelector sel, void *)
 {
-	_scint->Command(FXSELID(sel)-SCID(0));
-	return 1;
+  _scint->Command(FXSELID(sel)-SCID(0));
+  return 1;
 }
 
 long FXScintilla::onCommand(FXObject *, FXSelector sel, void * ptr)
 {
-	if (target)
-		return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
-	return 0;
+  if (target)
+    return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
+  return 0;
 }
 
 long FXScintilla::onChanged(FXObject *, FXSelector sel, void * ptr)
 {
-	if (target)
-		return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
-	return 0;
+  if (target)
+    return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
+  return 0;
 }
 
 long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
 {
-	FXEvent   *ev=(FXEvent*)ptr;
-	PRectangle rcPaint(ev->rect.x, ev->rect.y, ev->rect.x + ev->rect.w - 1, ev->rect.y + ev->rect.h - 1);
-	_scint->SyncPaint(rcPaint);
-	return 1;
+  FXEvent   *ev=(FXEvent*)ptr;
+  PRectangle rcPaint(ev->rect.x, ev->rect.y, ev->rect.x + ev->rect.w - 1, ev->rect.y + ev->rect.h - 1);
+  _scint->SyncPaint(rcPaint);
+  return 1;
 }
 
 long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
 {
 #ifdef FOX_1_6
-	FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
+  FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
 #else
-	FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize*1000000);
+  FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize*1000000);
 #endif
-	_scint->Tick();
-	return 1;
+  _scint->Tick();
+  return 1;
 }
 
 long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
 {
-	// Idler will be automatically stoped, if there is nothing
-	// to do while idle.
-	bool ret = _scint->Idle();
-	if (ret == false) {
-		_scint->SetIdle(false);
-	}
-	return 1;
+  // Idler will be automatically stoped, if there is nothing
+  // to do while idle.
+  bool ret = _scint->Idle();
+  if (ret == false) {
+    _scint->SetIdle(false);
+  }
+  return 1;
 }
 
 long FXScintilla::onFocusIn(FXObject * sender, FXSelector sel, void * ptr)
 {
-	FXScrollArea::onFocusIn(sender, sel, ptr);
-	_scint->SetFocusState(true);
-	return 1;
+  FXScrollArea::onFocusIn(sender, sel, ptr);
+  _scint->SetFocusState(true);
+  return 1;
 }
 
 long FXScintilla::onFocusOut(FXObject * sender, FXSelector sel, void * ptr)
 {
-	FXScrollArea::onFocusOut(sender, sel, ptr);
-	_scint->SetFocusState(false);
-	return 1;
+  FXScrollArea::onFocusOut(sender, sel, ptr);
+  _scint->SetFocusState(false);
+  return 1;
 }
 
 long FXScintilla::onMotion(FXObject *, FXSelector, void * ptr)
 {
-	FXEvent * ev = static_cast<FXEvent *>(ptr);
-	if (_scint->tryDrag) {
-		_scint->tryDrag = false;
-		handle(this, MKUINT(0, SEL_BEGINDRAG), 0);
-	}
-	if (isDragging()) {
-		return handle(this, MKUINT(0, SEL_DRAGGED), ptr);
-	}
-	else {
-		Point pt(ev->win_x, ev->win_y);
-		_scint->ButtonMove(pt);
-	}
-	return 1;
+  FXEvent * ev = static_cast<FXEvent *>(ptr);
+  if (_scint->tryDrag) {
+    _scint->tryDrag = false;
+    handle(this, MKUINT(0, SEL_BEGINDRAG), 0);
+  }
+  if (isDragging()) {
+    return handle(this, MKUINT(0, SEL_DRAGGED), ptr);
+  }
+  else {
+    Point pt(ev->win_x, ev->win_y);
+    _scint->ButtonMove(pt);
+  }
+  return 1;
 }
 
 long FXScintilla::onLeftBtnPress(FXObject *, FXSelector, void * ptr)
 {
-//	if (FXScrollArea::onLeftBtnPress(sender, sel, ptr))
-//		return 1;
-	handle(this, MKUINT(0, SEL_FOCUS_SELF), ptr);
-	setFocus();
-	FXEvent * ev = static_cast<FXEvent *>(ptr);
-	Point pt;
-	pt.x = ev->win_x;
-	pt.y = ev->win_y;
-		//sciThis->ButtonDown(pt, event->time,
-		//	event->state & GDK_SHIFT_MASK,
-		//	event->state & GDK_CONTROL_MASK,
-		//	event->state & GDK_MOD1_MASK);
-		// Instead of sending literal modifiers use control instead of alt
-		// This is because all the window managers seem to grab alt + click for moving
-	_scint->ButtonDown(pt, ev->time,
-			ev->state & SHIFTMASK,
-			ev->state & CONTROLMASK,
-			ev->state & CONTROLMASK);
-	return 1;
+//  if (FXScrollArea::onLeftBtnPress(sender, sel, ptr))
+//    return 1;
+  handle(this, MKUINT(0, SEL_FOCUS_SELF), ptr);
+  setFocus();
+  FXEvent * ev = static_cast<FXEvent *>(ptr);
+  Point pt;
+  pt.x = ev->win_x;
+  pt.y = ev->win_y;
+    //sciThis->ButtonDown(pt, event->time,
+    //  event->state & GDK_SHIFT_MASK,
+    //  event->state & GDK_CONTROL_MASK,
+    //  event->state & GDK_MOD1_MASK);
+    // Instead of sending literal modifiers use control instead of alt
+    // This is because all the window managers seem to grab alt + click for moving
+  _scint->ButtonDown(pt, ev->time,
+      ev->state & SHIFTMASK,
+      ev->state & CONTROLMASK,
+      ev->state & CONTROLMASK);
+  return 1;
 }
 
 long FXScintilla::onLeftBtnRelease(FXObject *, FXSelector, void * ptr)
 {
-	if (isDragging())
-		return handle(this, MKUINT(0, SEL_ENDDRAG), ptr);
-	FXEvent * ev = static_cast<FXEvent *>(ptr);
-	Point pt(ev->win_x, ev->win_y);
-	if (!_scint->HaveMouseCapture()) {
-		if (_scint->tryDrag) {
-			_scint->tryDrag = false;
-			_scint->SetEmptySelection(_scint->PositionFromLocation(pt));
-			_scint->SetDragPosition(SelectionPosition(invalidPosition));
-		}
-		return 1;
-	}
-	_scint->ButtonUp(pt, ev->time, (ev->state & CONTROLMASK) != 0);
-	return 1;
+  if (isDragging())
+    return handle(this, MKUINT(0, SEL_ENDDRAG), ptr);
+  FXEvent * ev = static_cast<FXEvent *>(ptr);
+  Point pt(ev->win_x, ev->win_y);
+  if (!_scint->HaveMouseCapture()) {
+    if (_scint->tryDrag) {
+      _scint->tryDrag = false;
+      _scint->SetEmptySelection(_scint->PositionFromLocation(pt));
+      _scint->SetDragPosition(SelectionPosition(invalidPosition));
+    }
+    return 1;
+  }
+  _scint->ButtonUp(pt, ev->time, (ev->state & CONTROLMASK) != 0);
+  return 1;
 }
 
 long FXScintilla::onRightBtnPress(FXObject *, FXSelector sel, void * ptr)
 {
-//	if (FXScrollArea::onRightBtnPress(sender, sel, ptr))
-//		return 1;
-	if (target && target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr))
-		return 1;
-	if (!_scint->getDisplayPopupMenu())
-		return 0;
-	FXEvent * ev = static_cast<FXEvent *>(ptr);
-	_scint->ContextMenu(Point(ev->root_x, ev->root_y));
-	return 1;
+//  if (FXScrollArea::onRightBtnPress(sender, sel, ptr))
+//    return 1;
+  if (target && target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr))
+    return 1;
+  if (!_scint->getDisplayPopupMenu())
+    return 0;
+  FXEvent * ev = static_cast<FXEvent *>(ptr);
+  _scint->ContextMenu(Point(ev->root_x, ev->root_y));
+  return 1;
 }
 
 long FXScintilla::onMiddleBtnPress(FXObject *, FXSelector, void * ptr)
 {
-//	if (FXScrollArea::onMiddleBtnPress(sender, sel, ptr))
-//		return 1;
-	int pos;
-	Point pt;
-	pt.x = ((FXEvent *)ptr)->win_x;
-	pt.y = ((FXEvent *)ptr)->win_y;
-	pos=_scint->PositionFromLocation(pt);
-	_scint->ReceivedSelection(FROM_SELECTION, pos); 
-//	_scint->currentPos = pos; // JKP: Delay asignment of currentPos until AFTER ReceivedSelection()
-//	_scint->anchor = pos; // JKP
+//  if (FXScrollArea::onMiddleBtnPress(sender, sel, ptr))
+//    return 1;
+  int pos;
+  Point pt;
+  pt.x = ((FXEvent *)ptr)->win_x;
+  pt.y = ((FXEvent *)ptr)->win_y;
+  pos=_scint->PositionFromLocation(pt);
+  _scint->ReceivedSelection(FROM_SELECTION, pos); 
+//  _scint->currentPos = pos; // JKP: Delay asignment of currentPos until AFTER ReceivedSelection()
+//  _scint->anchor = pos; // JKP
   return 1;
 }
 
@@ -915,69 +915,69 @@ long FXScintilla::onMiddleBtnPress(FXObject *, FXSelector, void * ptr)
 
 // Map the keypad keys to their equivalent functions
 static int KeyTranslate(int keyIn) {
-	switch (keyIn) {
-		case KEY_ISO_Left_Tab:
-			return SCK_TAB;
-		case KEY_KP_Down:
-			return SCK_DOWN;
-		case KEY_KP_Up:
-			return SCK_UP;
-		case KEY_KP_Left:
-			return SCK_LEFT;
-		case KEY_KP_Right:
-			return SCK_RIGHT;
-		case KEY_KP_Home:
-			return SCK_HOME;
-		case KEY_KP_End:
-			return SCK_END;
-		case KEY_KP_Page_Up:
-			return SCK_PRIOR;
-		case KEY_KP_Page_Down:
-			return SCK_NEXT;
-		case KEY_KP_Delete:
-			return SCK_DELETE;
-		case KEY_KP_Insert:
-			return SCK_INSERT;
-		case KEY_KP_Enter:
-			return SCK_RETURN;
-			
-		case KEY_Down:
-			return SCK_DOWN;
-		case KEY_Up:
-			return SCK_UP;
-		case KEY_Left:
-			return SCK_LEFT;
-		case KEY_Right:
-			return SCK_RIGHT;
-		case KEY_Home:
-			return SCK_HOME;
-		case KEY_End:
-			return SCK_END;
-		case KEY_Page_Up:
-			return SCK_PRIOR;
-		case KEY_Page_Down:
-			return SCK_NEXT;
-		case KEY_Delete:
-			return SCK_DELETE;
-		case KEY_Insert:
-			return SCK_INSERT;
-		case KEY_Escape:
-			return SCK_ESCAPE;
-		case KEY_BackSpace:
-			return SCK_BACK;
-		case KEY_Tab:
-			return SCK_TAB;
-		case KEY_Return:
-			return SCK_RETURN;
-		case KEY_KP_Add:
-			return SCK_ADD;
-		case KEY_KP_Subtract:
-			return SCK_SUBTRACT;
-		case KEY_KP_Divide:
-			return SCK_DIVIDE;
-		default:
-			return keyIn;
-	}
+  switch (keyIn) {
+    case KEY_ISO_Left_Tab:
+      return SCK_TAB;
+    case KEY_KP_Down:
+      return SCK_DOWN;
+    case KEY_KP_Up:
+      return SCK_UP;
+    case KEY_KP_Left:
+      return SCK_LEFT;
+    case KEY_KP_Right:
+      return SCK_RIGHT;
+    case KEY_KP_Home:
+      return SCK_HOME;
+    case KEY_KP_End:
+      return SCK_END;
+    case KEY_KP_Page_Up:
+      return SCK_PRIOR;
+    case KEY_KP_Page_Down:
+      return SCK_NEXT;
+    case KEY_KP_Delete:
+      return SCK_DELETE;
+    case KEY_KP_Insert:
+      return SCK_INSERT;
+    case KEY_KP_Enter:
+      return SCK_RETURN;
+      
+    case KEY_Down:
+      return SCK_DOWN;
+    case KEY_Up:
+      return SCK_UP;
+    case KEY_Left:
+      return SCK_LEFT;
+    case KEY_Right:
+      return SCK_RIGHT;
+    case KEY_Home:
+      return SCK_HOME;
+    case KEY_End:
+      return SCK_END;
+    case KEY_Page_Up:
+      return SCK_PRIOR;
+    case KEY_Page_Down:
+      return SCK_NEXT;
+    case KEY_Delete:
+      return SCK_DELETE;
+    case KEY_Insert:
+      return SCK_INSERT;
+    case KEY_Escape:
+      return SCK_ESCAPE;
+    case KEY_BackSpace:
+      return SCK_BACK;
+    case KEY_Tab:
+      return SCK_TAB;
+    case KEY_Return:
+      return SCK_RETURN;
+    case KEY_KP_Add:
+      return SCK_ADD;
+    case KEY_KP_Subtract:
+      return SCK_SUBTRACT;
+    case KEY_KP_Divide:
+      return SCK_DIVIDE;
+    default:
+      return keyIn;
+  }
 }
 
 long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
@@ -986,44 +986,44 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
   if (FXScrollArea::onKeyPress(sender,sel,ptr)) return 1;
 
   FXEvent *event=(FXEvent*)ptr;
-	bool shift = (event->state & SHIFTMASK) != 0;
-	bool ctrl = (event->state & CONTROLMASK) != 0;
-	bool alt = (event->state & ALTMASK) != 0;
-	// <FIXME> Workaround for event->code doesn't hold the correct
+  bool shift = (event->state & SHIFTMASK) != 0;
+  bool ctrl = (event->state & CONTROLMASK) != 0;
+  bool alt = (event->state & ALTMASK) != 0;
+  // <FIXME> Workaround for event->code doesn't hold the correct
   // KEY_xxx under WIN32
 #ifndef WIN32
-	int key = (event->code) ? event->code : event->text[0];
+  int key = (event->code) ? event->code : event->text[0];
 #else
-	if (!event->text[0] && (event->code < 256))
-		return 1;
-	int key = (((unsigned int)(event->text[0]) >= 32) && !ctrl && !alt) ?
-		event->text[0] : event->code;
+  if (!event->text[0] && (event->code < 256))
+    return 1;
+  int key = (((unsigned int)(event->text[0]) >= 32) && !ctrl && !alt) ?
+    event->text[0] : event->code;
 #endif
-	// </FIXME>
-	if (ctrl && (key < 128))
-		key = toupper(key);
-	else if (!ctrl && (key >= KEY_KP_Multiply && key <= KEY_KP_9))
-		key &= 0x7F;
-	// Hack for keys over 256 and below command keys but makes Hungarian work.
-	// This will have to change for Unicode
-	else if ((key >= 0x100) && (key < 0x1000))
-		key &= 0xff;
-	else	
-		key = KeyTranslate(key);
+  // </FIXME>
+  if (ctrl && (key < 128))
+    key = toupper(key);
+  else if (!ctrl && (key >= KEY_KP_Multiply && key <= KEY_KP_9))
+    key &= 0x7F;
+  // Hack for keys over 256 and below command keys but makes Hungarian work.
+  // This will have to change for Unicode
+  else if ((key >= 0x100) && (key < 0x1000))
+    key &= 0xff;
+  else  
+    key = KeyTranslate(key);
 
-	bool consumed = false;
-	bool added = _scint->KeyDown(key, shift, ctrl, alt, &consumed) != 0;
-	if (!consumed)
-		consumed = added;
-	//Platform::DebugPrintf("SK-key: %d %x %x\n",event->code, event->state, consumed);
-	if (event->code == 0xffffff && event->text.length() > 0) {
-		_scint->ClearSelection();
-		if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
-			_scint->MovePositionTo(_scint->CurrentPosition() + event->text.length());
-		}
-		consumed = true;
-	}
-	return consumed ? 1 : 0;
+  bool consumed = false;
+  bool added = _scint->KeyDown(key, shift, ctrl, alt, &consumed) != 0;
+  if (!consumed)
+    consumed = added;
+  //Platform::DebugPrintf("SK-key: %d %x %x\n",event->code, event->state, consumed);
+  if (event->code == 0xffffff && event->text.length() > 0) {
+    _scint->ClearSelection();
+    if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
+      _scint->MovePositionTo(_scint->CurrentPosition() + event->text.length());
+    }
+    consumed = true;
+  }
+  return consumed ? 1 : 0;
 }
 
 // ********************************************************************
@@ -1033,8 +1033,8 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 // We lost the clipboard somehow
 long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXScrollArea::onClipboardLost(sender,sel,ptr);
-	//Platform::DebugPrintf("Clipboard lost\n");
-	_scint->copyText.Free();
+  //Platform::DebugPrintf("Clipboard lost\n");
+  _scint->copyText.Free();
 
   return 1;
 }
@@ -1043,7 +1043,7 @@ long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
 long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
   FXuchar *data;
-	FXDragType types[]={utf8Type,stringType,0};
+  FXDragType types[]={utf8Type,stringType,0};
 
   // Try handling it in base class first
   if(FXScrollArea::onClipboardRequest(sender,sel,ptr)) return 1;
@@ -1090,8 +1090,8 @@ long FXScintilla::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
   if (FXScrollArea::onEndDrag(sender,sel,ptr)) return 1;
   endDrag((didAccept()!=DRAG_REJECT));
   setDragCursor(getApp()->getDefaultCursor(DEF_TEXT_CURSOR));
-	_scint->SetDragPosition(SelectionPosition(invalidPosition));
-	return 1;
+  _scint->SetDragPosition(SelectionPosition(invalidPosition));
+  return 1;
 }
 
 
@@ -1101,7 +1101,7 @@ long FXScintilla::onDragged(FXObject* sender,FXSelector sel,void* ptr) {
   FXDragAction action;
   if(FXScrollArea::onDragged(sender,sel,ptr)) return 1;
   action=DRAG_COPY;
-	if (!_scint->pdoc->IsReadOnly()) {
+  if (!_scint->pdoc->IsReadOnly()) {
     if (isDropTarget()) action=DRAG_MOVE;
     if (event->state&CONTROLMASK) action=DRAG_COPY;
     if (event->state&SHIFTMASK) action=DRAG_MOVE;
@@ -1152,21 +1152,21 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   if (offeredDNDType(FROM_DRAGNDROP,textType) ){
 
     // Is target editable?
-		if (!_scint->pdoc->IsReadOnly()) {
+    if (!_scint->pdoc->IsReadOnly()) {
       action=inquireDNDAction();
       // Check for legal DND action
       if (action==DRAG_COPY || action==DRAG_MOVE) {
-				Point npt(ev->win_x, ev->win_y);
-				pos = _scint->PositionFromLocation(npt);
-				if (!_scint->inDragDrop) {
-					_scint->inDragDrop = _scint->ddDragging; /*** or ddInitial ??? ***/
-					_scint->ptMouseLastBeforeDND = _scint->ptMouseLast;
-				}
-				_scint->ptMouseLast = npt;
-				_scint->SetDragPosition(SelectionPosition(pos));
+        Point npt(ev->win_x, ev->win_y);
+        pos = _scint->PositionFromLocation(npt);
+        if (!_scint->inDragDrop) {
+          _scint->inDragDrop = _scint->ddDragging; /*** or ddInitial ??? ***/
+          _scint->ptMouseLastBeforeDND = _scint->ptMouseLast;
+        }
+        _scint->ptMouseLast = npt;
+        _scint->SetDragPosition(SelectionPosition(pos));
 
         // JKP: Changed the logic here...
-				if ( (!_scint->PositionInSelection(pos)) || (_scint->pdoc->Length()==0) ) {
+        if ( (!_scint->PositionInSelection(pos)) || (_scint->pdoc->Length()==0) ) {
           acceptDrop(DRAG_ACCEPT);
           setFocus();
         }
@@ -1192,33 +1192,33 @@ long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   if(FXScrollArea::onDNDDrop(sender,sel,ptr)) return 1;
 
   // Should really not have gotten this if non-editable
-	if (!_scint->pdoc->IsReadOnly()) {
+  if (!_scint->pdoc->IsReadOnly()) {
 
-	  // Try handle here
-	  if(getDNDData(FROM_DRAGNDROP,textType,data,len)){
-			_scint->dragWasDropped = true;
-	    FXRESIZE(&data,FXchar,len+1); data[len]='\0';
+    // Try handle here
+    if(getDNDData(FROM_DRAGNDROP,textType,data,len)){
+      _scint->dragWasDropped = true;
+      FXRESIZE(&data,FXchar,len+1); data[len]='\0';
 
-	    // Need to ask the source to delete his copy
-  	  if(inquireDNDAction()==DRAG_MOVE){
-    	  getDNDData(FROM_DRAGNDROP,deleteType,junk,dum);
-      	FXASSERT(!junk);
-	    }
+      // Need to ask the source to delete his copy
+      if(inquireDNDAction()==DRAG_MOVE){
+        getDNDData(FROM_DRAGNDROP,deleteType,junk,dum);
+        FXASSERT(!junk);
+      }
 
-	    // Insert the new text
-			bool isRectangular = ((len > 0) &&
-					(data[len] == 0 && data[len-1] == '\n'));
-			_scint->DropAt(_scint->posDrop, (const char *)(data), false, isRectangular);
-  	
-    	FXFREE(&data);
-	  }
-		else if (getDNDData(FROM_DRAGNDROP,urilistType,data,len)) {
-			_scint->dragWasDropped = true;
-	    FXRESIZE(&data,FXchar,len+1); data[len]='\0';
-			_scint->NotifyURIDropped((FXchar *)data);
-		}
-  	return 1;
-	}
+      // Insert the new text
+      bool isRectangular = ((len > 0) &&
+          (data[len] == 0 && data[len-1] == '\n'));
+      _scint->DropAt(_scint->posDrop, (const char *)(data), false, isRectangular);
+    
+      FXFREE(&data);
+    }
+    else if (getDNDData(FROM_DRAGNDROP,urilistType,data,len)) {
+      _scint->dragWasDropped = true;
+      FXRESIZE(&data,FXchar,len+1); data[len]='\0';
+      _scint->NotifyURIDropped((FXchar *)data);
+    }
+    return 1;
+  }
   return 0;
 }
 
@@ -1231,10 +1231,10 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr) {
 
   // Return dragged text
   if(event->target==textType){
-		if (_scint->primary.s == NULL) {
-			_scint->CopySelectionRange(&_scint->primary);
+    if (_scint->primary.s == NULL) {
+      _scint->CopySelectionRange(&_scint->primary);
 
-		}
+    }
         if (_scint->primary.s) { /* JKP: This will crash if _scint->primary.s is NULL, so we test it first !!! */
           setDNDData(FROM_DRAGNDROP,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
         } else { setDNDData(FROM_DRAGNDROP,stringType,NULL,0); }
@@ -1243,18 +1243,18 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr) {
 
   // Delete dragged text
   if(event->target==deleteType){
-		if (!_scint->pdoc->IsReadOnly()) {
-			if (isDragging()) {
-				int selStart = _scint->SelectionStart().Position();
-				int selEnd = _scint->SelectionEnd().Position();
-				if (_scint->posDrop.Position() > selStart) {
-					if (_scint->posDrop.Position() > selEnd)
-						_scint->posDrop.SetPosition(_scint->posDrop.Position() - (selEnd-selStart));
-					else
-						_scint->posDrop.SetPosition(selStart);
-					_scint->posDrop.SetPosition(_scint->pdoc->ClampPositionIntoDocument(_scint->posDrop.Position()));
-				}
-			}
+    if (!_scint->pdoc->IsReadOnly()) {
+      if (isDragging()) {
+        int selStart = _scint->SelectionStart().Position();
+        int selEnd = _scint->SelectionEnd().Position();
+        if (_scint->posDrop.Position() > selStart) {
+          if (_scint->posDrop.Position() > selEnd)
+            _scint->posDrop.SetPosition(_scint->posDrop.Position() - (selEnd-selStart));
+          else
+            _scint->posDrop.SetPosition(selStart);
+          _scint->posDrop.SetPosition(_scint->pdoc->ClampPositionIntoDocument(_scint->posDrop.Position()));
+        }
+      }
       _scint->ClearSelection();
       }
     return 1;
@@ -1272,8 +1272,8 @@ long FXScintilla::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
   FXbool hadselection=hasSelection();  
   FXScrollArea::onSelectionLost(sender,sel,ptr);
   if (hadselection) {
-		_scint->UnclaimSelection();
-	}
+    _scint->UnclaimSelection();
+  }
   return 1;
 }
 
@@ -1281,23 +1281,23 @@ long FXScintilla::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
 // Somebody wants our selection
 long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
-	FXDragType types[]={utf8Type,stringType,0};
+  FXDragType types[]={utf8Type,stringType,0};
   // Perhaps the target wants to supply its own data for the selection
   if (FXScrollArea::onSelectionRequest(sender,sel,ptr)) { return 1; }
 
   for (FXDragType *dt=types; *dt; dt++) {
-	  // Return text of the selection
-	  if (event->target==*dt) {
-			if (_scint->primary.s == NULL) {
-				_scint->CopySelectionRange(&_scint->primary);
-			}
-			if (_scint->primary.s) {
-				setDNDData(FROM_SELECTION,*dt,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
-				return 1;
-			}
-		}
-	}
-	return 0;
+    // Return text of the selection
+    if (event->target==*dt) {
+      if (_scint->primary.s == NULL) {
+        _scint->CopySelectionRange(&_scint->primary);
+      }
+      if (_scint->primary.s) {
+        setDNDData(FROM_SELECTION,*dt,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 // ********************************************************************
@@ -1306,79 +1306,79 @@ long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 FXint FXScintilla::getViewportWidth()
 {
-	return _scint->GetTextRectangle().Width();
-	//return FXScrollArea::getViewportWidth();
+  return _scint->GetTextRectangle().Width();
+  //return FXScrollArea::getViewportWidth();
 }
 
 FXint FXScintilla::getViewportHeight()
 {
-	//return (_scint) ? _scint->GetTextRectangle().Height() : FXScrollArea::getViewportHeight();
+  //return (_scint) ? _scint->GetTextRectangle().Height() : FXScrollArea::getViewportHeight();
 #ifdef FOX_1_6
-	return FXScrollArea::getViewportHeight();
+  return FXScrollArea::getViewportHeight();
 #else
-	return FXScrollArea::getVisibleHeight();
+  return FXScrollArea::getVisibleHeight();
 #endif
 }
 
 FXint FXScintilla::getContentWidth()
 {
-	return FXMAX(_scint->scrollWidth, 0);
+  return FXMAX(_scint->scrollWidth, 0);
 }
 
 FXint FXScintilla::getContentHeight()
 {
-	return
-		_scint->cs.LinesDisplayed() * _scint->vs.lineHeight +
-		// This part is a kind of magic, to have the correct scrollbar
-		// behavior regarding the last line of the text
-		(getViewportHeight() + _scint->vs.maxDescent) % _scint->vs.lineHeight;
+  return
+    _scint->cs.LinesDisplayed() * _scint->vs.lineHeight +
+    // This part is a kind of magic, to have the correct scrollbar
+    // behavior regarding the last line of the text
+    (getViewportHeight() + _scint->vs.maxDescent) % _scint->vs.lineHeight;
 }
 
 void FXScintilla::moveContents(FXint x,FXint y)
 {
   _scint->inMoveContents = true;
-	bool moved = false;
-	int line = (-y + _scint->vs.lineHeight / 2) / _scint->vs.lineHeight;
+  bool moved = false;
+  int line = (-y + _scint->vs.lineHeight / 2) / _scint->vs.lineHeight;
 
 #ifdef FOX_1_6
     if (line != getYPosition()/_scint->vs.lineHeight)
     {
-		moved = true;
-		_scint->ScrollTo(line);
-	}
+    moved = true;
+    _scint->ScrollTo(line);
+  }
     if (x != getXPosition())
     {
-		moved = true;
-		_scint->HorizontalScrollTo(-x);
-	}
+    moved = true;
+    _scint->HorizontalScrollTo(-x);
+  }
 #else
-	FXint gpx,gpy;
-	getPosition(gpx,gpy);
-	if (line != gpy/_scint->vs.lineHeight) 
+  FXint gpx,gpy;
+  getPosition(gpx,gpy);
+  if (line != gpy/_scint->vs.lineHeight) 
     {
-		moved = true;
-		_scint->ScrollTo(line);
-	}
-	getPosition(gpx,gpy);
-	if (x != gpx) 
+    moved = true;
+    _scint->ScrollTo(line);
+  }
+  getPosition(gpx,gpy);
+  if (x != gpx) 
     {
-		moved = true;
-		_scint->HorizontalScrollTo(-x);
-	}
+    moved = true;
+    _scint->HorizontalScrollTo(-x);
+  }
 
 #endif
 
-	if (moved) {
-		FXScrollArea::moveContents(x, -line * _scint->vs.lineHeight);
-	}
-	_scint->inMoveContents = false;
+  if (moved) {
+    FXScrollArea::moveContents(x, -line * _scint->vs.lineHeight);
+  }
+  _scint->inMoveContents = false;
 }
 
 long FXScintilla::onConfigure(FXObject *sender, FXSelector sel, void * ptr)
 {
-	long ret = FXScrollArea::onConfigure(sender, sel, ptr);
-	_scint->ChangeSize();
-	return ret;
+  long ret = FXScrollArea::onConfigure(sender, sel, ptr);
+  _scint->ChangeSize();
+  return ret;
 }
 
 // ********************************************************************
@@ -1387,11 +1387,11 @@ long FXScintilla::onConfigure(FXObject *sender, FXSelector sel, void * ptr)
 
 void FXScintilla::setScintillaID(int id)
 {
-	_scint->ctrlID = id;
+  _scint->ctrlID = id;
 }
 
 sptr_t FXScintilla::sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	return _scint->WndProc(iMessage, wParam, lParam);
+  return _scint->WndProc(iMessage, wParam, lParam);
 }
 
 

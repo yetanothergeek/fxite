@@ -32,71 +32,71 @@ class ScintillaFOX;
 
 class FXAPI FXScintilla : public FXScrollArea
 {
-	friend class ScintillaFOX;
+  friend class ScintillaFOX;
   FXDECLARE(FXScintilla)
 protected:
-	ScintillaFOX * _scint;
+  ScintillaFOX * _scint;
 protected:
-	FXScintilla();
+  FXScintilla();
 public:
-	enum {
-		idLast = SCID(100),
-		ID_TICK,
-		ID_IDLE,
-		ID_LAST
-	};
+  enum {
+    idLast = SCID(100),
+    ID_TICK,
+    ID_IDLE,
+    ID_LAST
+  };
 public:
-	static FXString version();
-	long onScintillaCommand(FXObject *, FXSelector, void*);
-	long onCommand(FXObject *, FXSelector, void*);
-	long onChanged(FXObject *, FXSelector, void*);
-	long onPaint(FXObject *, FXSelector, void *);
-	long onConfigure(FXObject *, FXSelector, void *);
-	long onTimeoutTicking(FXObject *, FXSelector, void *);
-	long onChoreIdle(FXObject *, FXSelector, void *);
-	long onFocusIn(FXObject *, FXSelector, void *);
-	long onFocusOut(FXObject *, FXSelector, void *);
-	long onMotion(FXObject *, FXSelector, void *);
-	long onLeftBtnPress(FXObject *, FXSelector, void *);
-	long onLeftBtnRelease(FXObject *, FXSelector, void *);
-	long onRightBtnPress(FXObject *, FXSelector, void *);
-	long onMiddleBtnPress(FXObject *, FXSelector, void *);
-	long onBeginDrag(FXObject *, FXSelector, void *);
-	long onDragged(FXObject *, FXSelector, void *);
-	long onEndDrag(FXObject *, FXSelector, void *);
-	long onDNDEnter(FXObject *, FXSelector, void *);
-	long onDNDLeave(FXObject *, FXSelector, void *);
-	long onDNDMotion(FXObject *, FXSelector, void *);
-	long onDNDDrop(FXObject *, FXSelector, void *);
-	long onDNDRequest(FXObject *, FXSelector, void *);
-	long onSelectionLost(FXObject *, FXSelector, void *);
-	long onSelectionRequest(FXObject *, FXSelector, void *);
-	long onClipboardLost(FXObject *, FXSelector, void *);
-	long onClipboardRequest(FXObject *, FXSelector, void *);
-	long onKeyPress(FXObject *, FXSelector, void *);
-//	long onSelectionGained(FXObject *, FXSelector, void *); // JKP
-//	long onClipboardGained(FXObject *, FXSelector, void *); // JKP
+  static FXString version();
+  long onScintillaCommand(FXObject *, FXSelector, void*);
+  long onCommand(FXObject *, FXSelector, void*);
+  long onChanged(FXObject *, FXSelector, void*);
+  long onPaint(FXObject *, FXSelector, void *);
+  long onConfigure(FXObject *, FXSelector, void *);
+  long onTimeoutTicking(FXObject *, FXSelector, void *);
+  long onChoreIdle(FXObject *, FXSelector, void *);
+  long onFocusIn(FXObject *, FXSelector, void *);
+  long onFocusOut(FXObject *, FXSelector, void *);
+  long onMotion(FXObject *, FXSelector, void *);
+  long onLeftBtnPress(FXObject *, FXSelector, void *);
+  long onLeftBtnRelease(FXObject *, FXSelector, void *);
+  long onRightBtnPress(FXObject *, FXSelector, void *);
+  long onMiddleBtnPress(FXObject *, FXSelector, void *);
+  long onBeginDrag(FXObject *, FXSelector, void *);
+  long onDragged(FXObject *, FXSelector, void *);
+  long onEndDrag(FXObject *, FXSelector, void *);
+  long onDNDEnter(FXObject *, FXSelector, void *);
+  long onDNDLeave(FXObject *, FXSelector, void *);
+  long onDNDMotion(FXObject *, FXSelector, void *);
+  long onDNDDrop(FXObject *, FXSelector, void *);
+  long onDNDRequest(FXObject *, FXSelector, void *);
+  long onSelectionLost(FXObject *, FXSelector, void *);
+  long onSelectionRequest(FXObject *, FXSelector, void *);
+  long onClipboardLost(FXObject *, FXSelector, void *);
+  long onClipboardRequest(FXObject *, FXSelector, void *);
+  long onKeyPress(FXObject *, FXSelector, void *);
+//  long onSelectionGained(FXObject *, FXSelector, void *); // JKP
+//  long onClipboardGained(FXObject *, FXSelector, void *); // JKP
 public:
   /// Constructor
   FXScintilla(FXComposite * p, FXObject * tgt = NULL, FXSelector sel = 0,
-		FXuint opts = 0, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
+    FXuint opts = 0, FXint x = 0, FXint y = 0, FXint w = 0, FXint h = 0);
 
-	// From FXScrollArea
-	virtual void create();
-	virtual bool canFocus() const;
+  // From FXScrollArea
+  virtual void create();
+  virtual bool canFocus() const;
 
-	virtual FXint getViewportWidth();
-	virtual FXint getViewportHeight();
-	virtual FXint getContentWidth();
-	virtual FXint getContentHeight();
+  virtual FXint getViewportWidth();
+  virtual FXint getViewportHeight();
+  virtual FXint getContentWidth();
+  virtual FXint getContentHeight();
   virtual void moveContents(FXint x,FXint y);
 
-	/// Scintilla messaging
-	void setScintillaID(int id);
-	sptr_t sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+  /// Scintilla messaging
+  void setScintillaID(int id);
+  sptr_t sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 
-	/// Destructor
-	~FXScintilla();
+  /// Destructor
+  ~FXScintilla();
 };
 
 #endif // FXScintilla_H
