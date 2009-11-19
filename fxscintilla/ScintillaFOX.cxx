@@ -103,6 +103,8 @@
 #pragma warning(disable: 4127)
 #endif
 
+#include <FX88591Codec.h>
+
 #include "version.h"
 
 // ====================================================================
@@ -266,6 +268,9 @@ void ScintillaFOX::UnclaimSelection()
   }
 }
 
+
+#define InUTF8Mode(sf) (sf->CodePage()==SC_CP_UTF8)
+
 // JKP: Heavily reworked to fix middle-click-paste when current document has the X-selection.
 // JKP: Still more reworking for 2.00!
 void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
@@ -273,8 +278,27 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   FXuchar *data=NULL;
   FXuint len=0;
   if (pdoc->IsReadOnly()) { return; }
-  if(!_fxsc.getDNDData(origin, FXWindow::utf8Type, data, len)) {
-    if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
+  if (InUTF8Mode(this)&&_fxsc.getDNDData(origin, FXWindow::utf8Type, data, len)) {
+    /* If the data and the scintilla are both UTF-8, then no conversion is needed. */
+  } else {
+    if(_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) {
+      if (InUTF8Mode(this)) {
+        for (FXuint i=0; i<len; i++) {
+          if ((FXuchar)(data[i])>126) { // We are in UTF-8 mode, but the data is extended ASCII
+            FX88591Codec asciiCodec;
+            FXString codecBuffer;
+            codecBuffer.length(asciiCodec.mb2utflen((FXchar*)data,len));
+            asciiCodec.mb2utf(&(codecBuffer.at(0)),codecBuffer.length(),(FXchar*)data,len);
+            FXRESIZE(&data,FXuchar,codecBuffer.length());
+            memcpy(data, codecBuffer.text(),codecBuffer.length());
+            len=codecBuffer.length();
+            break;
+          }
+        }
+      } 
+    } else { // Type of DND data must be something we don't know how to deal with.
+      return;
+    }
   }
   FXRESIZE(&data,FXuchar,len+1);
   data[len]='\0';
@@ -1048,7 +1072,7 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   // Try handling it in base class first
   if(FXScrollArea::onClipboardRequest(sender,sel,ptr)) return 1;
 
-  for (FXDragType *dt=types; *dt; dt++) {
+  for (FXDragType *dt=InUTF8Mode(_scint)?types:types+1; *dt; dt++) {
     if(event->target==*dt){
       // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
       size_t len=strlen(_scint->copyText.s);
@@ -1282,7 +1306,7 @@ long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
   // Perhaps the target wants to supply its own data for the selection
   if (FXScrollArea::onSelectionRequest(sender,sel,ptr)) { return 1; }
 
-  for (FXDragType *dt=types; *dt; dt++) {
+  for (FXDragType *dt=InUTF8Mode(_scint)?types:types+1; *dt; dt++) {
     // Return text of the selection
     if (event->target==*dt) {
       if (_scint->primary.s == NULL) {
