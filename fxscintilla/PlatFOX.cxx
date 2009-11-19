@@ -52,9 +52,9 @@
 # include <fxkeys.h>
 #endif  // !defined(WIN32) || defined(__CYGWIN__)
 
+#include <FX88591Codec.h>
 
 #include "Platform.h"
-
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
@@ -246,6 +246,8 @@ class SurfaceImpl : public Surface {
   int y;
   bool inited;
   bool createdDC;
+  FX88591Codec asciiCodec;
+  FXString codecBuffer;
 public:
   SurfaceImpl();
   virtual ~SurfaceImpl();
@@ -565,16 +567,27 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
   }
 }
 
-void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                       ColourAllocated fore) {
+void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore)
+{
   if (dc()) {
     PenColour(fore);
     _dc->setFont(font_.GetID());
     const int segmentLength = 1000;
     int xbase = rc.left;
+    if (codecBuffer.length()) { codecBuffer=FXString::null; }
+    if (!unicodeMode) { // Fox uses UTF8 for text drawing, so we must convert any extended ASCII first.
+      for (int p=0; p<len; p++) {
+        if ((FXuchar)(s[p])>126) {
+          codecBuffer.length(asciiCodec.mb2utflen(s,len));
+          asciiCodec.mb2utf(&(codecBuffer.at(0)),codecBuffer.length(),s,len);
+          len=codecBuffer.length();
+          break;
+        }
+      }
+    }
     while ((len > 0) && (xbase < maxCoordinate)) {
       int lenDraw = Platform::Minimum(len, segmentLength);
-      _dc->drawText(xbase, ybase, s, lenDraw);
+      _dc->drawText(xbase, ybase, codecBuffer.length()?codecBuffer.text():s, lenDraw);
       len -= lenDraw;
       if (len > 0) {
         xbase += font_.GetID()->getTextWidth(s, lenDraw);
@@ -582,6 +595,7 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
       s += lenDraw;
     }
   }
+  if (codecBuffer.length()) { codecBuffer=FXString::null; }
 }
 
 void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
@@ -632,8 +646,13 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
       }
     } else {
       for (int i=0;i<len;i++) {
+        int default_width=font_.GetID()->getTextWidth("8", 1);
+#ifdef WIN32 // The width of chars > #239 are incorrect on Win32, so use default.
+        int width = ((FXuchar)(s[i])<=239) ? font_.GetID()->getTextWidth(s + i, 1) : default_width;
+#else
         int width = font_.GetID()->getTextWidth(s + i, 1);
-        totalWidth += width;
+#endif
+        totalWidth += width?width:default_width;
         positions[i] = totalWidth;
       }
     }  
