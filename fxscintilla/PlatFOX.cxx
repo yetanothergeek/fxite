@@ -135,55 +135,6 @@ Font::~Font() {}
 
 #ifndef WIN32
 
-static const char *CharacterSetName(int characterSet) {
-  switch (characterSet) {
-  case SC_CHARSET_ANSI:
-    return "iso8859-*";
-  case SC_CHARSET_DEFAULT:
-    return "iso8859-*";
-  case SC_CHARSET_BALTIC:
-    return "iso8859-13";
-  case SC_CHARSET_CHINESEBIG5:
-    return "*-*";
-  case SC_CHARSET_EASTEUROPE:
-    return "*-2";
-  case SC_CHARSET_GB2312:
-    return "gb2312.1980-*";
-  case SC_CHARSET_GREEK:
-    return "*-7";
-  case SC_CHARSET_HANGUL:
-    return "ksc5601.1987-*";
-  case SC_CHARSET_MAC:
-    return "*-*";
-  case SC_CHARSET_OEM:
-    return "*-*";
-  case SC_CHARSET_RUSSIAN:
-    return "*-r";
-  case SC_CHARSET_CYRILLIC:
-    return "*-cp1251";
-  case SC_CHARSET_SHIFTJIS:
-    return "jisx0208.1983-*";
-  case SC_CHARSET_SYMBOL:
-    return "*-*";
-  case SC_CHARSET_TURKISH:
-    return "*-9";
-  case SC_CHARSET_JOHAB:
-    return "*-*";
-  case SC_CHARSET_HEBREW:
-    return "*-8";
-  case SC_CHARSET_ARABIC:
-    return "*-6";
-  case SC_CHARSET_VIETNAMESE:
-    return "*-*";
-  case SC_CHARSET_THAI:
-    return "iso8859-11";
-  case SC_CHARSET_8859_15:
-    return "iso8859-15";
-  default:
-    return "*-*";
-  }
-}
-
 void Font::Create(const char *faceName, int characterSet,
   int size, bool bold, bool italic, int) {
   Release();
