@@ -92,7 +92,7 @@ public:
   virtual void moveContents(FXint x,FXint y);
 
   /// Scintilla messaging
-  void setScintillaID(int id);
+  void setScintillaID(int sid);
   sptr_t sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 
   /// Destructor

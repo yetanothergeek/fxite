@@ -1042,7 +1042,7 @@ long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
 // Somebody wants our clipboard
 long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
-  FXuchar *data;
+  FXuchar *cbdata;
   FXDragType types[]={utf8Type,stringType,0};
 
   // Try handling it in base class first
@@ -1052,20 +1052,17 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
     if(event->target==*dt){
       // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
       size_t len=strlen(_scint->copyText.s);
-      FXCALLOC(&data,FXuchar,len+1);
-      memcpy(data,_scint->copyText.s,len);
+      FXCALLOC(&cbdata,FXuchar,len+1);
+      memcpy(cbdata,_scint->copyText.s,len);
   #ifndef WIN32
-      setDNDData(FROM_CLIPBOARD,*dt,data,len);
+      setDNDData(FROM_CLIPBOARD,*dt,cbdata,len);
   #else
-      setDNDData(FROM_CLIPBOARD,*dt,data,len+1);
+      setDNDData(FROM_CLIPBOARD,*dt,cbdata,len+1);
   #endif
       // </FIXME>
       return 1;
     }
   }
-
-
-
   return 0;
 }
 
@@ -1182,7 +1179,7 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXuchar *data,*junk;
+  FXuchar *dnddata,*junk;
   FXuint len,dum;
 
   // Stop scrolling
@@ -1195,9 +1192,9 @@ long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
   if (!_scint->pdoc->IsReadOnly()) {
 
     // Try handle here
-    if(getDNDData(FROM_DRAGNDROP,textType,data,len)){
+    if(getDNDData(FROM_DRAGNDROP,textType,dnddata,len)){
       _scint->dragWasDropped = true;
-      FXRESIZE(&data,FXchar,len+1); data[len]='\0';
+      FXRESIZE(&dnddata,FXchar,len+1); dnddata[len]='\0';
 
       // Need to ask the source to delete his copy
       if(inquireDNDAction()==DRAG_MOVE){
@@ -1207,15 +1204,15 @@ long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
       // Insert the new text
       bool isRectangular = ((len > 0) &&
-          (data[len] == 0 && data[len-1] == '\n'));
-      _scint->DropAt(_scint->posDrop, (const char *)(data), false, isRectangular);
+          (dnddata[len] == 0 && dnddata[len-1] == '\n'));
+      _scint->DropAt(_scint->posDrop, (const char *)(dnddata), false, isRectangular);
     
-      FXFREE(&data);
+      FXFREE(&dnddata);
     }
-    else if (getDNDData(FROM_DRAGNDROP,urilistType,data,len)) {
+    else if (getDNDData(FROM_DRAGNDROP,urilistType,dnddata,len)) {
       _scint->dragWasDropped = true;
-      FXRESIZE(&data,FXchar,len+1); data[len]='\0';
-      _scint->NotifyURIDropped((FXchar *)data);
+      FXRESIZE(&dnddata,FXchar,len+1); dnddata[len]='\0';
+      _scint->NotifyURIDropped((FXchar *)dnddata);
     }
     return 1;
   }
@@ -1385,9 +1382,9 @@ long FXScintilla::onConfigure(FXObject *sender, FXSelector sel, void * ptr)
 // Messenging
 // ********************************************************************
 
-void FXScintilla::setScintillaID(int id)
+void FXScintilla::setScintillaID(int sid)
 {
-  _scint->ctrlID = id;
+  _scint->ctrlID = sid;
 }
 
 sptr_t FXScintilla::sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {

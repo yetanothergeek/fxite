@@ -567,22 +567,22 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated 
     FXColor valEmpty = 0;
     FXColor valFill = FXRGBA(GetRed(fill.AsLong()), GetGreen(fill.AsLong()), GetBlue(fill.AsLong()), alphaFill);
     FXColor valOutline = FXRGBA(GetRed(outline.AsLong()), GetGreen(outline.AsLong()), GetBlue(outline.AsLong()), alphaOutline);
-    for (int y=0; y<height; y++) {
-      for (int x=0; x<width; x++) {
-        if ((x==0) || (x==width-1) || (y == 0) || (y == height-1)) {
-          image->setPixel(x, y, valOutline);
+    for (int pY=0; pY<height; pY++) {
+      for (int pX=0; pX<width; pX++) {
+        if ((pX==0) || (pX==width-1) || (pY == 0) || (pY == height-1)) {
+          image->setPixel(pX, pY, valOutline);
         } else {
-          image->setPixel(x, y, valFill);
+          image->setPixel(pX, pY, valFill);
         }
       }
     }
     for (int c=0;c<cornerSize; c++) {
-      for (int x=0;x<c+1; x++) {
-        AllFour(image, width, height, x, c-x, valEmpty);
+      for (int pX=0;pX<c+1; pX++) {
+        AllFour(image, width, height, pX, c-pX, valEmpty);
       }
     }
-    for (int x=1;x<cornerSize; x++) {
-      AllFour(image, width, height, x, cornerSize-x, valOutline);
+    for (int pX=1;pX<cornerSize; pX++) {
+      AllFour(image, width, height, pX, cornerSize-pX, valOutline);
     }
 
     // Draw with alpha
@@ -620,13 +620,13 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
     PenColour(fore);
     _dc->setFont(font_.GetID());
     const int segmentLength = 1000;
-    int x = rc.left;
-    while ((len > 0) && (x < maxCoordinate)) {
+    int xbase = rc.left;
+    while ((len > 0) && (xbase < maxCoordinate)) {
       int lenDraw = Platform::Minimum(len, segmentLength);
-      _dc->drawText(x, ybase, s, lenDraw);
+      _dc->drawText(xbase, ybase, s, lenDraw);
       len -= lenDraw;
       if (len > 0) {
-        x += font_.GetID()->getTextWidth(s, lenDraw);
+        xbase += font_.GetID()->getTextWidth(s, lenDraw);
       }
       s += lenDraw;
     }
@@ -962,7 +962,7 @@ public:
   long onListKeyPress(FXObject *, FXSelector, void *);
   long onDoubleClicked(FXObject *, FXSelector, void *);
 public:
-  PopupListBox(FXComposite * parent, ListBoxFox * lb);
+  PopupListBox(FXComposite * p, ListBoxFox * lb);
   FXList * getList() { return list; }
   virtual void setFocus() {
     FXPopup::setFocus();
@@ -982,8 +982,7 @@ FXDEFMAP(PopupListBox) PopupListBoxMap[]={
 
 FXIMPLEMENT(PopupListBox,FXPopup,PopupListBoxMap,ARRAYNUMBER(PopupListBoxMap))
 
-PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
-  FXPopup(parent), listBox(lb)
+PopupListBox::PopupListBox(FXComposite * p, ListBoxFox * lb) :  FXPopup(p), listBox(lb)
 {
   list = new FXList(this,
     this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
@@ -1199,12 +1198,12 @@ void ListBoxFox::ClearRegisteredImages()
   }  
 }
 
-void ListBoxFox::SetList(const char* list, char separator, char typesep) {
+void ListBoxFox::SetList(const char* items, char separator, char typesep) {
   Clear();
-  int count = strlen(list) + 1;
+  int count = strlen(items) + 1;
   char *words = new char[count];
   if (words) {
-    memcpy(words, list, count);
+    memcpy(words, items, count);
     char *startword = words;
     char *numword = NULL;
     int i = 0;
