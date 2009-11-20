@@ -98,6 +98,12 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   docname->setBackColor(clr);
   docname->setEditable(false);
 
+  encname=new FXTextField(statusbar, 6, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
+  encname->setShadowColor(clr);
+  encname->setBackColor(clr);
+  encname->setEditable(false);
+
+
   general_info=new FXLabel(statusbar, FXString::null, NULL,JUSTIFY_LEFT|LAYOUT_FIX_Y);
   general_info->setUserData((void*)DontFreezeMe());
   general_info->setBackColor(HexToRGB("#FFFFCC"));
@@ -267,12 +273,21 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       delete tab;
       return false;
     }
-    if (FXPath::extension(fn)=="h") {
-      const char *content=(const char*)(sci->sendMessage(SCI_GETCHARACTERPOINTER,0,0));
-      if (FXRex("\\<class\\>").match(content)) {
+    if (FXPath::extension(fn)=="h") { // Is header C or C++ ?
+      FXString fnbase=FXPath::stripExtension(fn);
+      // Check for matching source file and set language accordingly if found...
+      if (FXStat::exists(fnbase+".c")) {
+        sci->setLanguage("c");
+      } else if (FXStat::exists(fnbase+".cpp")||FXStat::exists(fnbase+".cxx")||FXStat::exists(fnbase+".cc")) {
         sci->setLanguage("cpp");
       } else {
-        sci->setLanguage("c");
+        // Take a wild guess - if the file contains the word "class" it's probably  C++
+        const char *content=(const char*)(sci->sendMessage(SCI_GETCHARACTERPOINTER,0,0));
+        if (FXRex("\\<class\\>").match(content)) {
+          sci->setLanguage("cpp");
+        } else {
+          sci->setLanguage("c");
+        }
       }
     } else {
       if (!sci->setLanguageFromFileName(FXPath::name(fn).text())) {
@@ -280,6 +295,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       }
     }
   } else {
+    sci->sendMessage(SCI_SETCODEPAGE,prefs->DefaultToAscii?0:SC_CP_UTF8,0);
     sci->UpdateStyle();
   }
 
@@ -663,6 +679,7 @@ void TopWindow::UpdateTitle(long line, long col)
     SetMenuEnabled(fmt_mac_mnu,!readonlymenu->getCheck());
     SetMenuEnabled(fmt_unx_mnu,!readonlymenu->getCheck());
     docname->setText(sci->Filename().empty()?"":sci->Filename().text());
+    encname->setText(sci->sendMessage(SCI_GETCODEPAGE,0,0)==SC_CP_UTF8?"UTF-8":"ASCII");
     char rowcol[16];
     memset(rowcol,0,sizeof(rowcol));
     snprintf(rowcol,sizeof(rowcol)-1," %ld:%ld",line+1,col);

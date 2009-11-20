@@ -10,6 +10,7 @@
  @@@Language Modes@@@
  @@@Line Numbers@@@
  @@@Line Endings@@@
+ @@@Character Sets and Encodings@@@
  @@@Matching Parentheses@@@
  @@@Opening Included Files@@@
  @@@Tabs vs Spaces@@@
@@ -413,6 +414,27 @@ systems or ===CR/LF=== for MS-Windows) but you can change the default format for
 %%%Default file format%%% option on the %%%editor%%% tab of the %%%Preferences%%% dialog. You can also \
 transform the line endings in the current document into a different format from the %%%Edit->File Format%%% menu.
 
+
+###Character Sets and Encodings###
+
+When you open a file in __APP__, it first scans the file's contents to try and determine if the file \
+is encoded as UTF-8, and any file which does not look like valid UTF-8 will be treated as plain-text \
+(one byte per char) format. For new files, empty files, or files whose encoding is ambiguous \
+(i.e. files that contain only 7-bit character codes) the file may be treated as either UTF-8 or plain ASCII \
+depending on the setting of:
+  '%%%Edit->Preferences->editor->Treat plain-text files as UTF-8%%%'
+
+Note that __APP__ does not provide any sort of "on the fly" conversion between encodings, so if you want to \
+work with an extended ASCII file as if it were UTF-8 encoded, you will need to convert the file using an external
+tool such as the "===iconv===" program before opening it in __APP__. 
+
+If you paste plain-text data that contains character codes which are not valid UTF-8 into a UTF-8 encoded document, \
+__APP__ will try to convert the data to UTF-8 before inserting it into the document. But it will not attempt to \
+convert UTF-8 encoded data into plain text, so pasting operations between different encodings may produce unexpected \
+results when the current document is in ASCII mode. 
+
+Inserting text of mismatched encodings from the %%%File->Insert file%%% menu or the scripting engine's text functions \
+are also likely to produce undesirable results.
 
 
 ###Matching Parentheses###

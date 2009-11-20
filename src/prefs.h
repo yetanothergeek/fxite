@@ -79,6 +79,8 @@ public:
   FXulong SaveBeforeExecCmd:1;
   FXulong WrapToolbar:1;
 
+  FXulong DefaultToAscii:1;
+
   FXFontDesc fontdesc;
   FXint ToolbarButtonSize;
   FXint SplitView;
@@ -129,6 +131,7 @@ public:
     ID_TOGGLE_AUTOSAVE,
     ID_TOGGLE_VIEW_WHITESPACE_EOL,
     ID_TOGGLE_WRAP_TOOLBAR,
+    ID_TOGGLE_ASCII_DEFAULT,
     ID_SAVE_ON_FILTER_SEL,
     ID_SAVE_ON_INS_CMD,
     ID_SAVE_ON_EXEC_CMD,

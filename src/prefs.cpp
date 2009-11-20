@@ -82,6 +82,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_TOGGLE_SEARCH_VERBOSE:  { SearchVerbose = !SearchVerbose; break; }
     case ID_TOGGLE_CARET_PAST_EOL:  { CaretPastEOL  = !CaretPastEOL;  break; }
     case ID_TOGGLE_VIEW_WHITESPACE_EOL: { WhitespaceShowsEOL = !WhitespaceShowsEOL; break; }
+    case ID_TOGGLE_ASCII_DEFAULT: { DefaultToAscii = !DefaultToAscii; break; }
     case ID_TOGGLE_WRAP_TOOLBAR: { 
       WrapToolbar = !WrapToolbar;
       FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
@@ -470,6 +471,7 @@ static const char* main_keys[] = {
   "MaxFiles",
   "AutosaveInterval",
   "DefaultFileFormat",
+  "DefaultToAscii",
   NULL
 };
 
@@ -612,6 +614,7 @@ Settings::Settings(FXMainWindow*w)
   ReadInt(SaveBeforeExecCmd,true);
   ReadInt(WhitespaceShowsEOL,true);
   ReadIntRng(DefaultFileFormat,DEFAULT_EOL_FORMAT,0,2);
+  ReadInt(DefaultToAscii,!FXSystem::localeIsUTF8());
   ReadInt(WrapToolbar,true);
   ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
 
@@ -752,6 +755,7 @@ Settings::~Settings()
   WriteInt(Height);
   WriteInt(Maximize);
   WriteInt(FontSize);
+  WriteInt(DefaultToAscii);
 
   if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
   char dtp[2]={DocTabPosition,'\0'};

@@ -137,9 +137,19 @@ void SciDoc::SetEolModeFromContent()
   sendMessage(SCI_CONVERTEOLS,sendMessage(SCI_GETEOLMODE,0,0),0);
 }
 
-
+extern "C" {
+  char get_file_encoding(const char*filename);
+}
 
 const char* SciDoc::BinaryFileMessage() { return "Binary file detected."; }
+
+
+static bool ConfirmOpenBinary(SciDoc*sci, const char*filename)
+{
+  return FXMessageBox::warning(sci->getShell(), MBOX_YES_NO, _("Binary file"),
+           "%s\n%s\n\n%s", filename, _("does not appear to be a text file."),
+            _("Are you sure you want to open it?")) == MBOX_CLICKED_YES;
+}
 
 
 bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
@@ -147,46 +157,51 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
   _lasterror="";
   errno=0;
   bool rv=true;
-  bool isbin=false;
-  FXFile fh(filename, FXFile::Reading);
-  if (fh.isOpen()) {
-  //// 
-    bool ro=GetReadOnly();
-    if (ro) { 
-      if (insert) {
-        fh.close();
-        _lasterror=_("Document is marked read-only.");
+  bool ro=GetReadOnly();
+  if (ro&&insert) { 
+    _lasterror=_("Document is marked read-only.");
+    return false;
+  }
+  bool DefaultToAscii=Settings::instance()->DefaultToAscii;
+  switch (get_file_encoding(filename)) {
+    case 'B': { // Binary file
+      if ( !ConfirmOpenBinary(this,filename) ) {
+        _lasterror=BinaryFileMessage();
         return false;
       }
+      if (!insert) { sendMessage(SCI_SETCODEPAGE,0,0); }
+      break;
+    }
+    case 'T': { // Plain US-ASCII text file
+      if (!insert) { sendMessage(SCI_SETCODEPAGE,DefaultToAscii?0:SC_CP_UTF8,0); }
+      break;
+    }
+    case 'H': { // High (extended ASCII) text file. 
+      if (!insert) { sendMessage(SCI_SETCODEPAGE,0,0); }
+      break;
+    }
+    case 'U': { // UTF-8 encoded text file.
+      if (!insert) { sendMessage(SCI_SETCODEPAGE,SC_CP_UTF8,0); }
+      break;
+    }
+    case 'Z': { // Zero-length (empty) file.
+      if (!insert) { sendMessage(SCI_SETCODEPAGE,DefaultToAscii?0:SC_CP_UTF8,0); }
+      return true;
+    }
+    case 'F': { // Failure, could not read the file.
+      _lasterror=strerror(errno);
+      return false;
+      break;
+    }
+  }
+  FXFile fh(filename, FXFile::Reading);
+  if (fh.isOpen()) {
+    if (ro) { 
+      // This might happen e.g. if we are updating a document that has been modified externally
       sendMessage(SCI_SETREADONLY,0,0);
     }
     static const int BUFSIZE=1025;
     char buf[BUFSIZE];
-    do {
-      memset(buf,0,BUFSIZE);
-      FXival n=fh.readBlock(buf,BUFSIZE-1);
-      if (n<0) {
-        _lasterror=strerror(errno);
-        rv=false;
-        break;
-      }
-      if (((FXival)strlen(buf))!=n) {
-        if ( FXMessageBox::warning(getShell(), MBOX_YES_NO, _("Binary file"),
-             "%s\n%s\n\n%s",
-             filename,
-             _("does not appear to be a text file."),
-             _("Are you sure you want to open it?"))
-           == MBOX_CLICKED_YES)
-        {
-          isbin=true;
-          break;
-        } else {
-          fh.close();
-          _lasterror=BinaryFileMessage();
-          return false;
-        }
-      }
-    } while (!fh.eof());
     fh.position(0,FXIO::Begin);
     long p=0;
     _loading=!insert;
@@ -239,7 +254,6 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     rv=false;
   }
   _loading=false;
-  sendMessage(SCI_SETCODEPAGE,isbin?0:SC_CP_UTF8,0);
   return rv;
 }
 

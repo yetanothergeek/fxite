@@ -136,8 +136,9 @@ private:
   FXMenuCheck* readonlymenu;
   FXVerticalFrame* vbox;
   FXHorizontalFrame* statusbar;
-  FXTextField* docname;
   FXTextField* coords;
+  FXTextField* docname;
+  FXTextField* encname;
   FXLabel* general_info;
   DocTabs*    tabbook;
   FXGroupBox* outputpane;
