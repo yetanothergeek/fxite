@@ -295,7 +295,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       }
     }
   } else {
-    sci->sendMessage(SCI_SETCODEPAGE,prefs->DefaultToAscii?0:SC_CP_UTF8,0);
+    sci->SetUTF8(!prefs->DefaultToAscii);
     sci->UpdateStyle();
   }
 
@@ -679,7 +679,7 @@ void TopWindow::UpdateTitle(long line, long col)
     SetMenuEnabled(fmt_mac_mnu,!readonlymenu->getCheck());
     SetMenuEnabled(fmt_unx_mnu,!readonlymenu->getCheck());
     docname->setText(sci->Filename().empty()?"":sci->Filename().text());
-    encname->setText(sci->sendMessage(SCI_GETCODEPAGE,0,0)==SC_CP_UTF8?"UTF-8":"ASCII");
+    encname->setText(sci->GetUTF8()?"UTF-8":"ASCII");
     char rowcol[16];
     memset(rowcol,0,sizeof(rowcol));
     snprintf(rowcol,sizeof(rowcol)-1," %ld:%ld",line+1,col);

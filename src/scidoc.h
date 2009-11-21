@@ -56,7 +56,7 @@ private:
   unsigned char check_stale:1;
   unsigned char need_backup:1;
   unsigned char need_styled:1;
-
+  unsigned char _utf8:1;
 protected:
   SciDoc(){}
   inline bool IsBrace(long &pos);
@@ -171,6 +171,8 @@ public:
   FXint GetSplit() { return splitter_style; }
   static const char* BinaryFileMessage();
   void SetEolModeFromContent();
+  void SetUTF8(bool utf8);
+  bool GetUTF8() { return _utf8; }
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))

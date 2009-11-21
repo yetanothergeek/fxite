@@ -56,6 +56,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   _lasterror="";
   _loading=false;
   _dirty=false;
+  _utf8=false;
   need_styled=false;
   need_backup=false;
   _lang=NULL;
@@ -169,23 +170,23 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
         _lasterror=BinaryFileMessage();
         return false;
       }
-      if (!insert) { sendMessage(SCI_SETCODEPAGE,0,0); }
+      if (!insert) { SetUTF8(false); }
       break;
     }
     case 'T': { // Plain US-ASCII text file
-      if (!insert) { sendMessage(SCI_SETCODEPAGE,DefaultToAscii?0:SC_CP_UTF8,0); }
+      if (!insert) { SetUTF8(!DefaultToAscii); }
       break;
     }
     case 'H': { // High (extended ASCII) text file. 
-      if (!insert) { sendMessage(SCI_SETCODEPAGE,0,0); }
+      if (!insert) { SetUTF8(false); }
       break;
     }
     case 'U': { // UTF-8 encoded text file.
-      if (!insert) { sendMessage(SCI_SETCODEPAGE,SC_CP_UTF8,0); }
+      if (!insert) { SetUTF8(true); }
       break;
     }
     case 'Z': { // Zero-length (empty) file.
-      if (!insert) { sendMessage(SCI_SETCODEPAGE,DefaultToAscii?0:SC_CP_UTF8,0); }
+      if (!insert) { SetUTF8(!DefaultToAscii); }
       break; 
     }
     case 'F': { // Failure, could not read the file.
@@ -813,6 +814,12 @@ void SciDoc::ShowWhiteSpace(bool showit) {
   slave(ShowWhiteSpace,showit);
 }
 
+void SciDoc::SetUTF8(bool utf8)
+{
+  _utf8=utf8;
+  sendMessage(SCI_SETCODEPAGE, utf8 ? SC_CP_UTF8 : 0, 0);
+  slave(SetUTF8,utf8);
+}
 
 
 void SciDoc::GetSelection(CharacterRange &crange) {
