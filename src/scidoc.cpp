@@ -186,7 +186,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     }
     case 'Z': { // Zero-length (empty) file.
       if (!insert) { sendMessage(SCI_SETCODEPAGE,DefaultToAscii?0:SC_CP_UTF8,0); }
-      return true;
+      break; 
     }
     case 'F': { // Failure, could not read the file.
       _lasterror=strerror(errno);
