@@ -121,13 +121,17 @@ static unsigned long decodeutf8(unsigned char *buf, int nbytes)
 
 
 /*
- * Determine if the contents of an open file form a valid UTF8 byte stream.
- * Do this by collecting bytes for a character into a buffer and then
- * decode the bytes and re-encode them and compare that they are identical
- * to the original bytes. If any step fails, return 0 for error. If EOF
- * is reached, return 1 for OK.
+  Determine if the contents of an open file form a valid UTF8 byte stream.
+  Do this by collecting bytes for a character into a buffer and then decode
+  the bytes and re-encode them and compare that they are identical to the 
+  original bytes. If any step fails, return 'H' for "high" (extended ASCII).
+  If EOF is reached, return 'U' for UTF-8, or 'T' for text if the file might also be 
+  interpreted as seven-bit US-ASCII. At the same time, also check check for control
+  characters: we will accept carriage-returns, line-feeds, form-feeds, and horizontal
+  or vertical tabs - Any other characters with a value less than 32 would probably
+  indicate this is not a text file at all, so return 'B' for binary.
  */
-static int is_utf8_byte_stream(FILE *file) {
+static char get_stream_encoding(FILE *file) {
   enum { MAX_UTF8_BYTES = 6 };
   unsigned char buf[MAX_UTF8_BYTES];
   unsigned char buf2[MAX_UTF8_BYTES];
@@ -135,66 +139,42 @@ static int is_utf8_byte_stream(FILE *file) {
   int nbytes2;
   int c;
   unsigned long code;
+  char result='T';
   fseek(file,0,SEEK_SET);
   for (;;) {
     c = getc(file);
+    if (c != EOF){
+      if ( (c<32) && (!strchr("\n\t\r\f\v",c)) ) { 
+        /* Probably not a text file, so bail out now. */
+        return 'B';
+      }
+      if (c >= 0x80) { 
+        /* Can't be 7-bit, so it's either valid UTF-8, or "extended" ASCII */
+        result='U';
+      }
+    }
     if (c == EOF || c < 0x80 || (c & 0xC0) != 0x80) {
       /* New char starts, deal with previous one. */
       if (nbytes > 0) {
         code = decodeutf8(buf, nbytes);
-        if (code == INVALID_CHAR) { return 0; }
+        if (code == INVALID_CHAR) { return 'H'; }
         nbytes2 = encodeutf8(code, buf2, MAX_UTF8_BYTES);
-        if (nbytes != nbytes2 || memcmp(buf, buf2, nbytes) != 0) { return 0; }
+        if (nbytes != nbytes2 || memcmp(buf, buf2, nbytes) != 0) { return 'H'; }
       }
       nbytes = 0;
       /* If it's UTF8, start collecting again. */
       if (c != EOF && c >= 0x80) { buf[nbytes++] = c; }
     } else {
        /* This is a continuation byte, append to buffer. */
-       if (nbytes == MAX_UTF8_BYTES) { return 0; }
+       if (nbytes == MAX_UTF8_BYTES) { return 'H'; }
        buf[nbytes++] = c;
     }
     if (c == EOF) { break; }
   }
-  if (nbytes != 0) { return 0; }
-  return 1;
+  if (nbytes != 0) { return 'H'; }
+  return result;
 }
 
-/* The stuff below is mine...  -- JKP */
-
-
-/*
-  Check for control chars: we will accept carriage-returns, 
-  line-feeds, form-feeds, and horizontal or vertical tabs -
-  Any other characters with a value less than 32 would
-  probably indicate this is not a text file.
-*/
-static int is_binary_byte_stream(FILE*file)
-{
-  fseek(file,0,SEEK_SET);
-  for (;;) {
-    int c = getc(file);
-    if (c == EOF) { break; }
-    if ( (c<32) && (!strchr("\n\t\r\f\v",c)) ) { return 1; }
-  }
-  return 0;
-}
-
-
-/*
-  Assuming the is_binary_byte_stream() function failed,
-  this checks if the file is otherwise 7-bit (US-ASCII)
-*/
-static int is_plain_text_byte_stream(FILE*file)
-{
-  fseek(file,0,SEEK_SET);
-  for (;;) {
-    int c = getc(file);
-    if (c == EOF) { break; }
-    if (c>126) { return 0; }
-  }
-  return 1;
-}
 
 
 /*
@@ -216,22 +196,18 @@ Notes:
 char get_file_encoding(const char*filename)
 {
   FILE *file=fopen(filename,"rb");
-  char rv='F';
   if (file) {
+    char rv='F';
     if ( getc(file)==EOF ) {
       rv='Z';
-    } else if (is_binary_byte_stream(file)) {
-      rv='B';
-    } else if (is_plain_text_byte_stream(file)) {
-      rv='T';
-    } else if (is_utf8_byte_stream(file)) {
-      rv='U';
     } else {
-      rv='H';
+      rv=get_stream_encoding(file);
     }
     fclose(file);
+    return rv;
+ } else {
+   return 'F';
  }
- return rv;
 }
 
 
