@@ -3,6 +3,7 @@
   * Minor fixes to compile on FreeBSD
   * Improve detection and handling of UTF-8 files
   * Fix crash with xim-enabled fox-1.6 
+  * Fix empty font dialog on Win32
 
 2009-11-15
   * Improved handling of UTF-8 text 
