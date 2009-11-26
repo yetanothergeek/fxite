@@ -1,3 +1,9 @@
+2009-11-25
+  * Bump version to 0.3
+  * Minor fixes to compile on FreeBSD
+  * Improve detection and handling of UTF-8 files
+  * Fix crash with xim-enabled fox-1.6 
+
 2009-11-15
   * Improved handling of UTF-8 text 
   * Fix to compile on x86_64
