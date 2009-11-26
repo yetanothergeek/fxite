@@ -529,6 +529,20 @@ static FXint ReadRegInt(FXRegistry *reg, const char*key, FXint def, FXint min=0,
 #define ReadStr(k,df) { k=reg->readStringEntry(GetSectForKey(""#k),""#k,df); }
 #define WriteStr(k) {reg->writeStringEntry(GetSectForKey(""#k),""#k,k.text()); }
 
+#ifdef FOX_1_6
+  FXbool LocaleIsUTF8(){
+# ifdef WIN32
+    return GetACP()==CP_UTF8;
+# else
+    const FXchar* str;
+    if((str=getenv("LC_CTYPE"))!=NULL || (str=getenv("LC_ALL"))!=NULL || (str=getenv("LANG"))!=NULL){
+      return (strstr(str,"utf")!=NULL || strstr(str,"UTF")!=NULL);
+    }
+    return false;
+# endif
+  }
+#endif
+
 
 Settings::Settings(FXMainWindow*w)
 {
@@ -614,7 +628,7 @@ Settings::Settings(FXMainWindow*w)
   ReadInt(SaveBeforeExecCmd,true);
   ReadInt(WhitespaceShowsEOL,true);
   ReadIntRng(DefaultFileFormat,DEFAULT_EOL_FORMAT,0,2);
-  ReadInt(DefaultToAscii,!FXSystem::localeIsUTF8());
+  ReadInt(DefaultToAscii,!LocaleIsUTF8());
   ReadInt(WrapToolbar,true);
   ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
 

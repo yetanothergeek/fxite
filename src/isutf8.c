@@ -205,9 +205,9 @@ char get_file_encoding(const char*filename)
     }
     fclose(file);
     return rv;
- } else {
-   return 'F';
- }
+  } else {
+    return 'F';
+  }
 }
 
 

@@ -729,7 +729,7 @@ void TopWindow::SetInfo(const char*msg, bool hide_docname)
 
 
 
-void SetShellEnv(const char*file, long line)
+static void SetShellEnv(const char*file, long line)
 {
   char linenum[8]="\0\0\0\0\0\0\0";
   snprintf(linenum,sizeof(linenum)-1, "%ld", line);

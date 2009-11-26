@@ -163,6 +163,10 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     _lasterror=_("Document is marked read-only.");
     return false;
   }
+  if (!FXStat::isFile(filename)) {
+    _lasterror=strerror(errno);
+    return false;
+  }
   bool DefaultToAscii=Settings::instance()->DefaultToAscii;
   switch (get_file_encoding(filename)) {
     case 'B': { // Binary file

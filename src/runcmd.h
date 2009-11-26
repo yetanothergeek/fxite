@@ -43,7 +43,7 @@ private:
   FXInputHandle StdIN_Rd, StdOUT_Wr, StdERR_Wr;
 #else
   FXDECLARE(CmdIO);
-  pid_t childPid;
+  FXint childPid;
   bool excess();
 public:
   long onData(FXObject*o,FXSelector sel,void*p);

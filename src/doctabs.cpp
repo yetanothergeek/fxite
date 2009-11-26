@@ -439,10 +439,10 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
         if (dnd_data)  {
           dnd_accept=false;
           DocTab*src;
-          pid_t pid;
+          FXint pid;
           sscanf((const char*)dnd_data, "%p,%d", &src, &pid);
           FXFREE(&dnd_data);
-          if ((pid==getpid())&&(src!=this)) {
+          if ((pid==fxgetpid())&&(src!=this)) {
             FXWindow *trg;
             if (defaultDragCursor==getApp()->getDefaultCursor(DEF_HSPLIT_CURSOR)) {
               trg=((src->getX()+ev->win_x)-getX())>(getWidth()/2)?this->getNext()->getNext():this;
@@ -515,7 +515,7 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
     }
     case SEL_DND_REQUEST: {
       FXString fmt="";
-      fmt.format("%p,%d", this, getpid());
+      fmt.format("%p,%d", this, fxgetpid());
       FXint len=fmt.length()+1;
       char*dnd_data=NULL;
       FXMALLOC(&dnd_data,char,len);
@@ -538,7 +538,7 @@ DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,text)
   FXApp*a=bar->getApp();
   if (!FxteDnDTabType) {
     FXString DnDName;
-    DnDName.format("%s_%d", TAB_DND_NAME, getpid());
+    DnDName.format("%s_%d", TAB_DND_NAME, fxgetpid());
     FxteDnDTabType=a->registerDragType(DnDName);
   }
   setDefaultDragCursor(a->getDefaultCursor(

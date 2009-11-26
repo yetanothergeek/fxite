@@ -7,6 +7,7 @@
 # define UnEscape(s) { s=unescape(s); }
 # define AddInput(file,mode,tgt,sel) addInput(file,mode,tgt,sel)
 # define freeElms(e) FXFREE(&e)
+FXbool LocaleIsUTF8();
 #else
 # define ONE_SECOND ((FXuint)1000000000)
 # define PathMatch(pattern,file,flags) FXPath::match(file,pattern,flags)
@@ -28,6 +29,7 @@
 # define REX_NOT_EMPTY  FXRex::NotEmpty
 # define FXRexError     FXRex::Error
 # define FXIntVal(s,b) ((FXint)strtol(s.text(),NULL,b))
+# define LocaleIsUTF8() FXSystem::localeIsUTF8()
 #endif
 
 
