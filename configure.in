@@ -49,6 +49,7 @@ AC_ARG_WITH([system-lua],
     ]
     )
     PKG_CHECK_MODULES([LUA], [${LUA_PKG_NAME} >= 5.1.2])
+    AM_CONDITIONAL(WITH_SYSTEM_LUA, true)
   ]
   ,
   [
@@ -62,6 +63,7 @@ AC_ARG_WITH([system-lua],
       ;;
     esac
     LUA_LIBS="-Wl,-E -L`pwd`/lua -llua -lm"
+    AM_CONDITIONAL(WITH_SYSTEM_LUA, false)
   ]
 )
 
