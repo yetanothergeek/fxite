@@ -125,11 +125,12 @@ static unsigned long decodeutf8(unsigned char *buf, int nbytes)
   Do this by collecting bytes for a character into a buffer and then decode
   the bytes and re-encode them and compare that they are identical to the 
   original bytes. If any step fails, return 'H' for "high" (extended ASCII).
-  If EOF is reached, return 'U' for UTF-8, or 'T' for text if the file might also be 
-  interpreted as seven-bit US-ASCII. At the same time, also check check for control
-  characters: we will accept carriage-returns, line-feeds, form-feeds, and horizontal
-  or vertical tabs - Any other characters with a value less than 32 would probably
-  indicate this is not a text file at all, so return 'B' for binary.
+  If EOF is reached, return 'U' for UTF-8, or 'T' for text if the file might also
+  be interpreted as seven-bit US-ASCII. At the same time, also check for control
+  characters: we will accept carriage-returns, line-feeds, form-feeds, audibles[1],
+  and horizontal or vertical tabs - Any other characters with a value less than 32 
+  would probably indicate this is not a text file at all, so return 'B' for binary.
+  [1] Some autoconf configure scripts contain BEL chars as an awk field separator.
  */
 static char get_stream_encoding(FILE *file) {
   enum { MAX_UTF8_BYTES = 6 };
@@ -144,7 +145,7 @@ static char get_stream_encoding(FILE *file) {
   for (;;) {
     c = getc(file);
     if (c != EOF){
-      if ( (c<32) && (!strchr("\n\t\r\f\v",c)) ) { 
+      if ( (c<32) && (!strchr("\n\t\r\f\v\a",c)) ) { 
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
