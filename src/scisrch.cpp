@@ -259,6 +259,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
   if (searchfor.empty()) { return 0; }
   bool bol_only=(opts & SCFIND_REGEXP)&&(compare(searchfor,"^")==0); // Match empty string at beginning of line.
   bool eol_only=(opts & SCFIND_REGEXP)&&(compare(searchfor,"$")==0); // Match empty string at end of line.
+  FXuint srchflags=REX_FORWARD|((eol_only||bol_only) ? 0 : REX_NOT_EMPTY); // Allow empty matches only at start or end.
   FXuint rexflags=0;
   FXString search_pattern=searchfor;
   if (opts & SCFIND_REGEXP) {
@@ -310,7 +311,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
     }
     while (1) {
       if (end<=start) { break; }
-      if (rx.match(content,end,begs,ends,REX_FORWARD,MAX_CAPTURES,start,end)) {
+      if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
         FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
         if (opts & SCFIND_REGEXP) { UnEscape(newstr); }
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
