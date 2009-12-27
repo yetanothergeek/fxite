@@ -16,7 +16,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
+#include <unistd.h>
 #include <lua.hpp>
 #include <fx.h>
 
@@ -107,7 +107,8 @@ static FXObjectListOf<StateInfo> states;
 /*
   Find the StateInfo associated with this Lua state
 */
-static StateInfo* LookupState(lua_State *L) {
+static StateInfo* LookupState(lua_State *L)
+{
   for (FXint i=0; i<states.no(); i++) {
     if ( states[i]->L == L ) { return states[i]; }
   }
@@ -125,7 +126,8 @@ static StateInfo* LookupState(lua_State *L) {
   cause problems if the error message contains slashes beyond the filename,
   but it should be OK in most cases.
 */
-static void format_message(const char *rawmsg, FXString &outmsg) {
+static void format_message(const char *rawmsg, FXString &outmsg)
+{
     FXString s=rawmsg;
     outmsg="";
     s.substitute("\t", "  ", true);
@@ -297,7 +299,7 @@ static int optimize(lua_State *L)
 
 /*
   This hook gets called each time the interpreter executes a line of code.
-  It stores the current script file name and line nuber, checks if the
+  It stores the current script file name and line number, checks if the
   user is trying to cancel the script, and occasionally refreshes the GUI.
 */
 static void debug_hook(lua_State *L, lua_Debug *ar)
@@ -342,10 +344,7 @@ static void override(lua_State *L, const char*module, const char* funcname, lua_
 }
 
 
-/*
-  Don't let scripts try to read from stdin,
-  as this would block indefinitely
-*/
+/* Don't let scripts try to read from stdin, as this would block indefinitely */
 static void close_stdin(lua_State *L)
 {
   lua_getfield(L, LUA_GLOBALSINDEX, "io");
@@ -375,8 +374,6 @@ static void set_string_token(lua_State *L, const char*name, const char*value)
     fxwarning(_("*** %s: Failed to set value for %s\n"), LUA_MODULE_NAME, name);
   }
 }
-
-
 
 
 
@@ -476,8 +473,6 @@ void MacroRunner::PopKeepers(lua_State *L)
   }
 }
 
-#include <unistd.h>
-
 
 /*
   Create a new Lua state and execute the source as
@@ -493,7 +488,6 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   override(L,"io","stdin", NULL);
   override(L,"_G","print", print);
   close_stdin(L);
-
   StateInfo*si=new StateInfo(L);
   si->script=isfilename?source.text():NULL;
   states.append(si);
@@ -510,33 +504,32 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
     status = luaL_loadstring(L, source.text());
   }
   switch (status) {
-  case 0: {
-    FXint base = lua_gettop(L); /* function index */
-    lua_pushcfunction(L, traceback); /* push traceback function */
-    lua_insert(L, base); /* put it under chunk and args */
-    status = lua_pcall(L, 0, 0, base);
-    lua_remove(L, base); /* remove traceback function */
-    if (0 == status) {
-      PopKeepers(L);
-      status = lua_pcall(L, 0, 0, 0);
-
-    } else {
-      lua_gc(L, LUA_GCCOLLECT, 0); /* force garbage collection if error */
-      show_error(L, si->script);
+    case 0: {
+      FXint base = lua_gettop(L); /* function index */
+      lua_pushcfunction(L, traceback); /* push traceback function */
+      lua_insert(L, base); /* put it under chunk and args */
+      status = lua_pcall(L, 0, 0, base);
+      lua_remove(L, base); /* remove traceback function */
+      if (0 == status) {
+        PopKeepers(L);
+        status = lua_pcall(L, 0, 0, 0);
+      } else {
+        lua_gc(L, LUA_GCCOLLECT, 0); /* force garbage collection if error */
+        show_error(L, si->script);
+      }
+      break;
     }
-    break;
-  }
-  case LUA_ERRSYNTAX:
-    show_error(L, si->script);
-    break;
-  case LUA_ERRMEM:
-     script_error(si->script,_("Out of memory."),true,-1);
-     break;
-  case LUA_ERRFILE:
-     script_error(si->script,_("Failed to open script file."),true,-1);
-     break;
-  default:
-     script_error(si->script,_("Unknown error while loading script file."),true,-1);
+    case LUA_ERRSYNTAX:
+      show_error(L, si->script);
+      break;
+    case LUA_ERRMEM:
+      script_error(si->script,_("Out of memory."),true,-1);
+      break;
+    case LUA_ERRFILE:
+      script_error(si->script,_("Failed to open script file."),true,-1);
+      break;
+    default:
+      script_error(si->script,_("Unknown error while loading script file."),true,-1);
   }
   lua_close(L);
   states.erase(states.find(si));
