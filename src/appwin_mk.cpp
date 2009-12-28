@@ -871,6 +871,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
   getApp()->runWhileEvents();
   bool rv=isfilename?macros->DoFile(script):macros->DoString(script);
   if (!destroying) {
+    tabbook->ForEachTab(ResetUndoLevelCB,NULL);
     DisableUI(false);
     SetInfo("");
     if (FocusedDoc()) { FocusedDoc()->setFocus(); }

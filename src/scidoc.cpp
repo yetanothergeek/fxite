@@ -63,6 +63,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   _filetime=0;
   splitter_style=SPLIT_NONE;
   search=new SciSearch(this);
+  user_undo_level=0;
 
   sendMessage(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   sendMessage(SCI_SETMARGINWIDTHN, 1, 4);
@@ -949,5 +950,39 @@ void SciDoc::SmartHome(bool smart) {
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME+(SCMOD_SHIFT<<16),smart?SCI_VCHOMEEXTEND:SCI_HOMEEXTEND);
   sendMessage(SCI_ASSIGNCMDKEY,
     SCK_HOME+(SCMOD_SHIFT<<16)+(SCMOD_ALT<<16), smart?SCI_VCHOMERECTEXTEND:SCI_HOMERECTEXTEND);
+}
+
+
+// Strange things can happen when we allow grouping of undo actions by end-users.
+// For example, if a Lua script calls SCI_BEGINUNDOACTION and forgets to call 
+// SCI_ENDUNDOACTION, or if the script terminates abnormally, the document might 
+// continue collecting actions that can't be individually un-done. To help prevent
+// such situations, all script-generated calls to affect undo grouping should be 
+// made through this method:
+void SciDoc::SetUserUndoLevel(FXint action)
+{
+  switch (action) {
+    case -1: { // pop one undo level
+      if (user_undo_level>0) {
+        user_undo_level--;
+        sendMessage(SCI_ENDUNDOACTION, 0, 0);
+      }
+      break;
+    }
+    case 0: { // pop all undo levels
+      while (user_undo_level>0) {
+        user_undo_level--;
+        sendMessage(SCI_ENDUNDOACTION, 0, 0);
+      }
+      break;
+    }
+    case 1: { // push one undo level
+      if (user_undo_level<16) {
+        user_undo_level++;
+        sendMessage(SCI_BEGINUNDOACTION, 0, 0);
+      }
+      break;
+    }
+  }
 }
 

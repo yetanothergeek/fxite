@@ -383,6 +383,12 @@ bool TopWindow::IsDocValid(SciDoc*sci)
 }
 
 
+// In case a Lua script left the SCI_*UNDOACTION level in an unbalanced state.
+bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  ((SciDoc*)(page->getFirst()))->SetUserUndoLevel(0);
+  return true;
+}
 
 
 
@@ -562,4 +568,7 @@ for (int i=0; i<=SCLEX_AUTOMATIC; i++) {
       }
     }
 }
+
+
+
 

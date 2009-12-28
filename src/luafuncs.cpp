@@ -1138,9 +1138,9 @@ static int batch(lua_State*L)
   DOC_REQD
   luaL_argcheck(L, lua_gettop(L)>0, 1, _("expected boolean"));
   if (lua_toboolean(L,1)) {
-    sci->sendMessage(SCI_BEGINUNDOACTION, 0, 0);
+    sci->SetUserUndoLevel(+1);
   } else {
-    sci->sendMessage(SCI_ENDUNDOACTION, 0, 0);
+    sci->SetUserUndoLevel(-1);
   }
   return 0;
 }

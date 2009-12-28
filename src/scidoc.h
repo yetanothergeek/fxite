@@ -48,8 +48,8 @@ private:
   char _selectionbg[16];
 
   FXTime _filetime;
-
   FXint splitter_style;
+  unsigned char user_undo_level;
 
   unsigned char _loading:1;
   unsigned char _dirty:1;
@@ -173,6 +173,7 @@ public:
   void SetEolModeFromContent();
   void SetUTF8(bool utf8);
   bool GetUTF8() { return _utf8; }
+  void SetUserUndoLevel(FXint action); // 1:push level; -1: pop level; 0:reset level
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
