@@ -47,6 +47,7 @@ private:
   static bool ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
+  static bool ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
