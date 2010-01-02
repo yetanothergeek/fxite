@@ -28,6 +28,7 @@
  @@@Named Instances and Configurations@@@
  @@@Crash Recovery@@@
  @@@Embedded Scripting Engine@@@
+ @@@Support and Contact Information@@@
  
 ###Introduction###
 __APP__ is a standard GUI (Graphical User Interface) style text editor for \
@@ -1361,6 +1362,8 @@ Also note that X11's %%%WM_CLASS%%% string is set according to the configuration
 This allows you to specify different window manager hints for different instances, or \
 to manipulate specific __APP__ windows using tools like %%%wmctrl%%% and %%%devil's pie%%%.
 
+
+
 ###Embedded Scripting Engine###
 
 __APP__ features a built-in script interpreter using the %%%Lua%%% programming language. \
@@ -1402,4 +1405,18 @@ have important unsaved changes!
 
 In the event that the interpreter becomes "stuck", you may be able to cancel the running script using the \
 same method described in the "Shell Commands and Filters" chapter of this document.
+
+
+
+###Support and Contact Information###
+
+Questions or comments regarding __APP__ should be directed to the %%%fxscintilla-users%%% mailing list. \
+For more details, visit:
+  ===http://lists.nongnu.org/mailman/listinfo/fxscintilla-users===
+
+Bug reports may be submitted at:
+  ===http://savannah.nongnu.org/bugs/?group=fxscintilla===
+
+You can also contact the primary author (Jeff Pohlmeyer) directly via email at:
+  ===yetanothergeek@gmail.com===
 
