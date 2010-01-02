@@ -375,15 +375,10 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
         FXString flags="";
         if (mm->wParam & SCFIND_MATCHCASE) { flags.append("\"matchcase\""); }
         if (mm->wParam & SCFIND_WHOLEWORD) { flags.append(",\"wholeword\""); }
-        if (mm->wParam & SCFIND_WORDSTART) { flags.append(",\"wordstart\""); }
         if (mm->wParam & SCFIND_REGEXP)    { flags.append(",\"regexp\""); }
-        if (mm->wParam & SCFIND_POSIX)    { flags.append(",\"posix\""); }
         if (flags[0]==',') { flags.erase(0,1); }
-        if (mm->message==SCI_SEARCHNEXT) {
-          text.format(_LUAMOD_".find(\"%s\", "_LUAMOD_".caret(), "_LUAMOD_".nchars(), {%s})",what.text(),flags.text());
-        } else {
-          text.format(_LUAMOD_".find(\"%s\", "_LUAMOD_".caret(), 0, {%s})", what.text(), flags.text());
-        }
+        text.format( _LUAMOD_".gofind(\"%s\", {%s}%s)",
+                       what.text(), flags.text(), mm->message==SCI_SEARCHNEXT?"":", false"  );
         break;
       }
       case SCI_PASTE: {
