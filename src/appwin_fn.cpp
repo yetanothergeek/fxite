@@ -30,6 +30,7 @@
 #include "backup.h"
 #include "menuspec.h"
 #include "shmenu.h"
+#include "search.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -388,6 +389,13 @@ bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*us
 {
   ((SciDoc*)(page->getFirst()))->SetUserUndoLevel(0);
   return true;
+}
+
+
+// Exposes "userland" search behavior to scripting engine.
+bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forward)
+{ 
+  return srchdlgs->FindPhrase(ControlDoc(),searchstring,searchmode,forward);
 }
 
 

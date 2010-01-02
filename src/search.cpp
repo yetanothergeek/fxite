@@ -554,6 +554,15 @@ bool SearchDialogs::FindPrev(SciDoc*sci)
 
 
 
+bool SearchDialogs::FindPhrase(SciDoc*sci, const char* phrase, FXuint mode, bool forward)
+{
+  searchstring=phrase;
+  searchmode=mode;
+  return forward?FindNext(sci):FindPrev(sci);
+}
+
+
+
 bool GetPrimarySelection(SciDoc*sci, FXString&target)
 {
   return sci->getShell()->getDNDData(FROM_SELECTION,FXWindow::stringType, target);

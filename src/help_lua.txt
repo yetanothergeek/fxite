@@ -43,7 +43,8 @@
 
 
 %%%Search functions%%%
-@@@find@@@ -- Search for text within the document.
+@@@find@@@ -- Silently search for text within the document.
+@@@gofind@@@ -- Search and select text within the document.
 @@@match@@@ -- Find a matching bracket, brace, or parenthesis.
 
 
@@ -471,6 +472,23 @@ you could use something like this:
    __MOD__.message("Search phrase not found.")
  end
 ===
+
+###gofind###
+===__MOD__.gofind(phrase, {options} [, forward])
+===
+Searches within the active document for the string %%%phrase%%%, beginning at \
+the current caret postion. The %%%options%%% argument is a table, consult the \
+documentation of the ===__MOD__.find()=== function for a description \
+of its elements. If the optional %%%forward%%% argument is %%%false%%%, \
+it searches backwards to the start of the document, otherwise it searches \
+forwards to the end of the document.
+
+This function behaves similar to the editors's "Find Next" and "Find Prev" menu \
+items -- If the search term is found, its text is selected and scrolled into view. \
+If the search term is not found, the user might be prompted whether to retry (wrap) the search \
+from the beginning or end of the document, and might also be notified of a failed \
+search, depending on the "Search wrap" and "Verbose search messages" \
+settings in the editor's preferences dialog. This function does not return any value.
 
 
 

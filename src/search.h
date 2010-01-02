@@ -63,6 +63,7 @@ public:
   void ShowReplaceDialog(SciDoc*sci);
   bool FindNext(SciDoc*sci);
   bool FindPrev(SciDoc*sci);
+  bool FindPhrase(SciDoc*sci, const char* phrase, FXuint mode, bool forward);
   void FindSelected(SciDoc*sci, bool forward);
   bool GoToSelected(SciDoc*sci);
   bool ShowGoToDialog(SciDoc*sci);

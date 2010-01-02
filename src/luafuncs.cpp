@@ -97,37 +97,45 @@ static int ArgErrFmt(lua_State *L, int numarg, const char *fmt, ...)
 }
 
 
+
+static bool check_find_flags(lua_State* L, int pos, int &flags)
+{
+  flags=0;
+  luaL_argcheck(L, lua_istable(L,pos), pos, _("expected table"));
+  int n=lua_objlen(L, pos);
+  for (int i=1; i<=n; i++) {
+    lua_rawgeti(L, pos, i);
+    if (lua_isstring(L,-1)) {
+      const char*flagname = lua_tostring(L, -1);
+      if (strcasecmp(flagname, "matchcase") == 0){
+        flags+= SCFIND_MATCHCASE;
+      } else if (strncasecmp(flagname, "wholeword", 5) == 0) {
+        flags+= SCFIND_WHOLEWORD;
+      } else if (strncasecmp(flagname, "regexp", 5) == 0) {
+        flags+= SCFIND_REGEXP;
+      } else { 
+        ArgErrFmt(L, pos, _("unknown flag at table element #%d"), i);
+      } 
+    } else { 
+      ArgErrFmt(L, pos, _("table element #%d is not a string"), i);
+    }
+    lua_pop(L,1);
+  }
+  if ( (flags&SCFIND_WHOLEWORD) && (flags&SCFIND_REGEXP) ) {
+    luaL_argerror(L, pos, _("Cannot specify \"wholeword\" and \"regexp\" together."));
+  }
+  return true;
+} 
+
+
+// find(phrase, start, stop, {options})
 static int find(lua_State* L)
 {
   int flags=0;
-  int i,n;
   DOC_REQD
   long cpMin=luaL_checklong(L,2);
   long cpMax=luaL_checklong(L,3);
-  luaL_argcheck(L,lua_istable(L,4),4,_("expected table"));
-  n=lua_objlen(L,4);
-  for (i=1;i<=n; i++) {
-    lua_rawgeti(L,4,i);
-    if (lua_isstring(L, -1)) {
-      const char*flagname=lua_tostring(L,-1);
-      if (strcasecmp(flagname, "matchcase")==0){
-        flags += SCFIND_MATCHCASE;
-      } else if (strncasecmp(flagname, "wholeword",5)==0) {
-        flags += SCFIND_WHOLEWORD;
-      } else if (strncasecmp(flagname, "regexp", 5)==0) {
-        flags += SCFIND_REGEXP;
-      } else {
-        ArgErrFmt(L,4, _("unknown flag at table element #%d"), i);
-      }
-    } else {
-      ArgErrFmt(L,4,_("table element #%d is not a string"), i);
-    }
-    lua_pop(L, 1);
-  }
-  if ((flags&SCFIND_WHOLEWORD)&&(flags&SCFIND_REGEXP)) {
-    luaL_argerror(L,4,_("Cannot specify \"wholeword\" and \"regexp\" together."));
-  }
-
+  if (!check_find_flags(L,4,flags)) { return 0; }
   const char*lpstrText=luaL_checkstring(L,1);
   int rv=sci->search->FindTextNoSel(lpstrText,flags,cpMin,cpMax);
   switch(rv) {
@@ -142,6 +150,19 @@ static int find(lua_State* L)
       break;
     }
   }
+  return 0;
+}
+
+
+// gofind(phrase, {options} [, forward])
+static int gofind(lua_State* L)
+{  
+  DOC_REQD;
+  int flags=0;
+  const char*lpstrText=luaL_checkstring(L,1);
+  if (!check_find_flags(L,2,flags)) { return 0; }
+  bool forward=(lua_gettop(L)>2)?lua_toboolean(L,3):true;
+  tw->FindText(lpstrText,flags,forward);
   return 0;
 }
 
@@ -1646,6 +1667,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"insert", insert},
   {"rowcol", rowcol},
   {"find", find},
+  {"gofind", gofind},
   {"basename", basename},
   {"dirname", dirname},
   {"fullpath", fullpath},
