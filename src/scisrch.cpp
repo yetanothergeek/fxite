@@ -68,7 +68,7 @@ void SciSearch::EnsureAnchorDirection(bool forward)
   we escape all special characters, and then wrap the whole thing
   with \< \> if we want to do a whole word search.
 */
-void rx_escape(FXString &pat,bool whole)
+static void rx_escape(FXString &pat,bool whole)
 {
   static const char escapes[]="\\(){}[]|^$*+?.";
   static const char wordchars[]="ACBDEFGHIJKLMNOPQRSTUVWXYZ_acbdefghijklmnopqrstuvwxyz0123456789";
@@ -182,6 +182,50 @@ bool SciSearch::FindText(const FXString &what, FXuint sciflags, bool isfwd, bool
 }
 
 
+/* 
+  When the user enters escape sequences in a regex replacement, we interpret them literally.
+  But we need to convert them beforehand so they won't get mixed up with sequences in the 
+  document's text, because we want to leave those unconverted. But for literal searches, 
+  we need to make sure that backslashes and ampersands do *not* get interpreted by FXRex, 
+  so instead we escape them now.
+*/
+static FXString PrepareReplacement(const FXString &repl_in, FXuint opts)
+{
+  FXString repl_out;
+  if (opts & SCFIND_REGEXP) {
+    repl_out.length(repl_in.length());
+    repl_out.trunc(0);
+    for (int i=0; i<repl_in.length(); i++) {
+      if (repl_in[i] == '\\') {
+        i++;
+        switch (repl_in[i]) { // Convert escape sequences to their literal chars.
+          case '\\': { repl_out.append("\\\\"); break; }
+          case 'a':  { repl_out.append('\a'); break; }
+          case 'b':  { repl_out.append('\b'); break; }
+          case 'f':  { repl_out.append('\f'); break; }
+          case 'n':  { repl_out.append('\n'); break; }
+          case 'r':  { repl_out.append('\r'); break; }
+          case 't':  { repl_out.append('\t'); break; }
+          case 'v':  { repl_out.append('\v'); break; }
+          default: {
+            repl_out.append("\\");
+            repl_out.append(repl_in[i]);
+          }
+        }
+      } else { // Pass anything else through as-is
+        repl_out.append(repl_in[i]);
+      }
+    }
+  } else { // Escape these special chars if we're doing a literal search/replace
+    repl_out=repl_in;
+    repl_out.substitute("\\", "\\\\", true);
+    repl_out.substitute("&", "\\&", true);
+  }
+  return repl_out;
+}
+
+
+
 void SciSearch::ReplaceSelection(const FXString &replacewith, FXuint opts)
 {
   long start=SciMsg(SCI_GETSELECTIONSTART,0,0);
@@ -189,13 +233,8 @@ void SciSearch::ReplaceSelection(const FXString &replacewith, FXuint opts)
   if ( start == end ) { return; }
   SciMsg(SCI_SETSEARCHFLAGS,0,0);
   SciMsg(SCI_TARGETFROMSELECTION,0,0);
-  FXString repl_template=replacewith;
-  if (!(opts & SCFIND_REGEXP)) {
-    repl_template.substitute("\\", "\\\\", true);
-    repl_template.substitute("&", "\\&", true);
-  }
+  FXString repl_template=PrepareReplacement(replacewith,opts);
   FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
-  if (opts & SCFIND_REGEXP) { UnEscape(newstr); }
   SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
   SelectTarget(start<end);
 }
@@ -218,11 +257,7 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
   if (!(opts & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
  	FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx)) { return 0; }
-  FXString repl_template=replacewith;
-  if (!(opts & SCFIND_REGEXP)) {
-    repl_template.substitute("\\", "\\\\", true);
-    repl_template.substitute("&", "\\&", true);
-  }
+  FXString repl_template=PrepareReplacement(replacewith,opts);
   long start=0;
   long end=SciMsg(SCI_GETLENGTH,0,0);
   if (end==0) { return 0; }
@@ -235,13 +270,12 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
   while (1) {
     if (end==start) { break; }
     if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
-      FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
-      count++;
-      if (opts & SCFIND_REGEXP) { UnEscape(newstr); }
       SciMsg(SCI_SETTARGETSTART,begs[0],0);
       SciMsg(SCI_SETTARGETEND,ends[0],0);
+      FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
       SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
       content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
+      count++;
       start=SciMsg(SCI_GETTARGETEND,0,0);
       end=SciMsg(SCI_GETLENGTH,0,0);
       if (eol_only) {start++;}
@@ -270,11 +304,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
   if (!(opts & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
  	FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx)) { return 0; }
-  FXString repl_template=replacewith;
-  if (!(opts & SCFIND_REGEXP)) {
-    repl_template.substitute("\\", "\\\\", true);
-    repl_template.substitute("&", "\\&", true);
-  }
+  FXString repl_template=PrepareReplacement(replacewith,opts);
   long patlen=search_pattern.length();
   long count=0;
   if (patlen==0) { return 0; }
@@ -298,10 +328,9 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
     SciMsg(SCI_SETSEARCHFLAGS,0,0);
     if (bol_only) { // Special case, start of first line
       if (rx.match(content,end,begs,ends,REX_FORWARD|REX_NOT_EMPTY,MAX_CAPTURES,start,end)) {
-        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
-        if (opts & SCFIND_REGEXP) { UnEscape(newstr); }
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
         SciMsg(SCI_SETTARGETEND,ends[0],0);
+        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
         SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
@@ -312,10 +341,9 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
     while (1) {
       if (end<=start) { break; }
       if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
-        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
-        if (opts & SCFIND_REGEXP) { UnEscape(newstr); }
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
         SciMsg(SCI_SETTARGETEND,ends[0],0);
+        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
         SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
