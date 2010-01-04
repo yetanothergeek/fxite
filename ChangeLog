@@ -1,3 +1,14 @@
+2010-01-04
+  * Bump version to 0.4
+  * Allow files with \007 char's (e.g. configure scripts) as plain-text.
+  * Don't build local lua if using system lua.
+  * Prevent endless loop on some empty regex conditions.
+  * Protect unbalanced calls to batch() function in scripts.
+  * Expose "userland" search behavior to scripting engine.
+  * Improve behavior of recorded searches.
+  * Add contact information to help file.
+  * Preserve escape sequences in regex search/replace operations.
+
 2009-11-25
   * Bump version to 0.3
   * Minor fixes to compile on FreeBSD
