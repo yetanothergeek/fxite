@@ -244,13 +244,14 @@ FXListItem *NewListItem(tagEntry *te)
 }
 
 
+
 bool FindTag(FXWindow*shell,
   const FXString &tagname, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat)
 {
   outfile="";
   outcoords="";
   outpat="";
-  if (!tagname.empty()) {
+  if (unloadtagsmenu->getMenu()->numChildren() && !tagname.empty()) {
     FXWindow*w;
     MytagEntry*mt=NULL;
     TagDialog dlg(shell,tagname);
@@ -309,11 +310,6 @@ bool FindTag(SciDoc*sci, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXStr
   if (s.empty()) { sci->WordAtPos(s); }
   return FindTag(sci->getShell(),s,unloadtagsmenu,outfile,outcoords,outpat);
 }
-
-
-
-
-
 
 
 
