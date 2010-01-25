@@ -122,7 +122,7 @@ view_zoom("in"|"out"|"default"|"closest"|"furthest")
 view_tabs("position", "top"|"bottom"|"left"|"right")
 view_tabs("width", "uniform"|"packed")
 view_language(name)
-view_clear_ouptput()
+view_clear_output()
 ===
 The ===file_load_tags_file=== and ===file_export=== functions will display their usual dialogs if \
 a filename is not specified. \
