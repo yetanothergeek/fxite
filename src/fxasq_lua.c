@@ -335,7 +335,7 @@ int luaopen_dialog(lua_State *L)
   lua_pushcfunction(L,asq_done);
   lua_rawset(L,-3);
 
-  luaL_openlib(L, NULL, &asq_funcs[1], 0);
-  luaL_openlib(L, DLG_MODULE_NAME, asq_funcs, 0);
+  luaL_register(L, NULL, &asq_funcs[1]);
+  luaL_register(L, DLG_MODULE_NAME, asq_funcs);
   return 0;
 }

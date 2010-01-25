@@ -492,7 +492,7 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   si->script=isfilename?source.text():NULL;
   states.append(si);
   lua_sethook(L,debug_hook,LUA_MASKLINE,1);
-  luaL_openlib(L, LUA_MODULE_NAME, LuaFuncs(tw), 0);
+  luaL_register(L, LUA_MODULE_NAME, LuaFuncs(tw));
   override(L,LUA_MODULE_NAME,"script", scriptname);
   override(L,LUA_MODULE_NAME,"optimize", optimize);
   luaL_openlib(L, LUA_MODULE_NAME, LuaCommands(tw), 0);
