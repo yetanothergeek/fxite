@@ -1,25 +1,16 @@
 #!/usr/bin/env lua
 
 --[[
-
     Script to create the "luasci.h" file.
     Requires the fxscintilla source tree (either as the working directory, 
     or specified on the command line).
     It also needs "lua" and "cpp" somewhere in your $PATH
 --]]
 
-local scintilla_h="include/Scintilla.h"
-local scintilla_iface="scintilla/include/Scintilla.iface"
-local wkdir="./"
+local scintilla_h="fxscintilla/Scintilla.h"
+local scintilla_iface="fxscintilla/Scintilla.iface"
 
-if arg and arg[1] then
-  wkdir=arg[1]:find("/$") and arg[1] or arg[1].."/"
-end
-
-scintilla_h = wkdir .. scintilla_h
-scintilla_iface = wkdir .. scintilla_iface
-
-for _,test in ipairs({wkdir,scintilla_h,scintilla_iface}) do
+for _,test in ipairs({scintilla_h,scintilla_iface}) do
   local testfile,err=io.open(test,"r")
   if testfile then
     testfile:close() 
@@ -136,7 +127,7 @@ print(
 print("typedef enum {")
 for i,v in ipairs(alltypes)
 do
-  print("  SLT_"..v:upper()..", ")
+  print("  SLT_"..v:upper()..",")
 end
 print("  SLT_LAST\n} SciCmdType;\n\n")  
 
