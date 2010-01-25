@@ -332,7 +332,7 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
       }
     } else {  
       if (pdoc->InsertString(atPos,selText.s, selText.len)) {
-        SetEmptySelection(atPos);
+        SetEmptySelection(atPos+selText.len);
         FullPaint();
       }
     }
