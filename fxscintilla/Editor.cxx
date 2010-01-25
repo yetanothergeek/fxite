@@ -2256,7 +2256,7 @@ void Editor::DrawEOL(Surface *surface, ViewStyle &vsDraw, PRectangle rcLine, Lin
 	if (virtualSpace) {
 		rcSegment.left = xEol + xStart;
 		rcSegment.right = xEol + xStart + virtualSpace;
-		surface->FillRectangle(rcSegment, vsDraw.styles[ll->styles[ll->numCharsInLine] & styleMask].back.allocated);
+		surface->FillRectangle(rcSegment, overrideBackground ? background : vsDraw.styles[ll->styles[ll->numCharsInLine] & styleMask].back.allocated);
 		if (!hideSelection && ((vsDraw.selAlpha == SC_ALPHA_NOALPHA) || (vsDraw.selAdditionalAlpha == SC_ALPHA_NOALPHA))) {
 			SelectionSegment virtualSpaceRange(SelectionPosition(pdoc->LineEnd(line)), SelectionPosition(pdoc->LineEnd(line), sel.VirtualSpaceFor(pdoc->LineEnd(line))));
 			for (size_t r=0; r<sel.Count(); r++) {
@@ -2351,7 +2351,7 @@ void Editor::DrawEOL(Surface *surface, ViewStyle &vsDraw, PRectangle rcLine, Lin
 		PRectangle rcPlace = rcSegment;
 
 		if (wrapVisualFlagsLocation & SC_WRAPVISUALFLAGLOC_END_BY_TEXT) {
-			rcPlace.left = ll->positions[ll->numCharsInLine] + xStart + virtualSpace;
+			rcPlace.left = xEol + xStart + virtualSpace;
 			rcPlace.right = rcPlace.left + vsDraw.aveCharWidth;
 		} else {
 			// draw left of the right text margin, to avoid clipping by the current clip rect
@@ -3912,6 +3912,7 @@ void Editor::Clear() {
 }
 
 void Editor::SelectAll() {
+	sel.Clear();
 	SetSelection(0, pdoc->Length());
 	Redraw();
 }

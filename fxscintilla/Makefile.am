@@ -117,4 +117,5 @@ StyleContext.h \
 UniConversion.h \
 ViewStyle.h \
 WindowAccessor.h \
-XPM.h
+XPM.h \
+version.h
