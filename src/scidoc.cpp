@@ -277,6 +277,12 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
     wrote=fh.writeBlock(buf,len);
     if (fh.close() && (wrote==len)) {
       if (as_itself) {
+        if (_filename.empty() && !getLanguage()) {
+          if (!setLanguageFromFileName(FXPath::name(filename).text())) {
+            setLanguageFromContent();
+          }
+          sendMessage(SCI_COLOURISE,0,-1);
+        }
         _filename=FXPath::absolute(filename);
         _filetime=FXStat::modified(_filename);
         sendMessage(SCI_SETSAVEPOINT,0,0);

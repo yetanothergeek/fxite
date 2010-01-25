@@ -1000,14 +1000,7 @@ long TopWindow::onFileSave(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onFileSaveAs(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=ControlDoc();
-  if ( filedlgs->SaveFileAs(sci) ) {
-    if (!sci->getLanguage()) {
-      if (!sci->setLanguageFromFileName(FXPath::name(sci->Filename()).text())) {
-        sci->setLanguageFromContent();
-      }
-      sci->sendMessage(SCI_COLOURISE,0,-1);
-    }
-  }
+  filedlgs->SaveFileAs(sci);
   return 1;
 }
 
