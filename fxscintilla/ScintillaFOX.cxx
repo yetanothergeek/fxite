@@ -325,12 +325,14 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   if (selText.rectangular) {
     PasteRectangular(selStart, selText.s, selText.len);
   } else {
-    selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
-    if (pdoc->InsertString(atPos>0?atPos:selStart.Position(),selText.s, selText.len)) {
-      if (atPos<0) {
-        SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
-      } else {  
-        SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
+    if (atPos<0) {
+      selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
+      if (pdoc->InsertString(selStart.Position(),selText.s, selText.len)) {
+        SetEmptySelection( (selStart.Position()) + selText.len );
+      }
+    } else {  
+      if (pdoc->InsertString(atPos,selText.s, selText.len)) {
+        SetEmptySelection(atPos);
         FullPaint();
       }
     }
