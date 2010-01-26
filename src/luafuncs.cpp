@@ -45,6 +45,7 @@
 #include "doctabs.h"
 #include "filer.h"
 #include "prefs.h"
+#include "appmain.h"
 
 #include "intl.h"
 #include "luafuncs.h"
@@ -926,7 +927,7 @@ static int readonly(lua_State*L)
 // void message([title,] message [,icon])
 static int message(lua_State*L)
 {
-  const char* title=tw->getApp()->getAppName().text();
+  const char* title=EXE_NAME;
   const char* msg;
   const char* type="I";
 
@@ -956,7 +957,7 @@ static int message(lua_State*L)
 static int confirm(lua_State*L)
 {
   luaL_argcheck(L,(lua_gettop(L)>=3)&&lua_isboolean(L,3),3,_("expected boolean"));
-  const char* title=lua_isnil(L,1)?tw->getApp()->getAppName().text():luaL_checkstring(L,1);
+  const char* title=lua_isnil(L,1)?EXE_NAME:luaL_checkstring(L,1);
   const char* msg=luaL_checkstring(L,2);
   bool deflt=lua_toboolean(L,3);
   FXuint rv=FXMessageBox::question(tw, MBOX_YES_NO, title, "%s",msg);
@@ -969,7 +970,7 @@ static int confirm(lua_State*L)
 // string input([title,] message [,default [,style]])
 static int input(lua_State*L)
 {
-  const char* title=tw->getApp()->getAppName().text();
+  const char* title=EXE_NAME;
   const char* msg="";
   FXString txt="";
   const char* type="S";
@@ -1051,7 +1052,7 @@ FXIMPLEMENT(PickList, FXList, ClickListMap, ARRAYNUMBER(ClickListMap))
 static int choose(lua_State*L) {
   int argmsg=1;
   int argtbl=2;
-  FXString title=tw->getApp()->getAppName().text();
+  FXString title=EXE_NAME;
   if (lua_gettop(L)>2) {
     title=luaL_checkstring(L,1);
     argmsg++;
