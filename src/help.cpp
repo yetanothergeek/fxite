@@ -30,6 +30,7 @@
 
 #include "intl.h"
 #include "help.h"
+
 #include "helptext.h"
 #include "help_lua.h"
 
@@ -45,6 +46,7 @@ enum {
   SCHLP_H1,
   SCHLP_NORMAL
 };
+
 #define SCHLP_FIRST SCHLP_FIXED
 #define SCHLP_LAST SCHLP_NORMAL
 #define SCHLP_LOGO SCHLP_LAST+1
@@ -97,14 +99,14 @@ class SciHelp: public FXScintilla {
   long jump_pos;
   bool find(const FXString &what);
   void replace(const char*oldstr, const char*newstr);
-
 public:
   SciHelp(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, FXuint opts=LAYOUT_FILL, bool dark=false);
   ~SciHelp();
-  void load(const char*txt);
+  void load(const char*txt, unsigned int size);
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p);
   long onCommand(FXObject*o, FXSelector sel, void*p);
   FXTextField *srchbox;
+  const char*loaded;
   enum {
     ID_SCINTILLA=FXScintilla::ID_LAST,
     ID_GOBACK,
@@ -113,6 +115,7 @@ public:
     ID_ZOOMOUT,
     ID_LAST
   };
+  
 };
 
 
@@ -133,6 +136,7 @@ SciHelp::SciHelp(FXComposite*p,FXObject*tgt,FXSelector sel, FXuint opts, bool da
   sects=NULL;
   last_pos=0;
   jump_pos=-1;
+  loaded=NULL;
 
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME,SCI_DOCUMENTSTART);
   sendMessage(SCI_ASSIGNCMDKEY,SCK_END,SCI_DOCUMENTEND);
@@ -203,6 +207,8 @@ SciHelp::SciHelp(FXComposite*p,FXObject*tgt,FXSelector sel, FXuint opts, bool da
 
 }
 
+
+
 void SciHelp::replace(const char*oldstr, const char*newstr)
 {
   const char*content;
@@ -221,15 +227,16 @@ void SciHelp::replace(const char*oldstr, const char*newstr)
 
 
 
-void SciHelp::load(const char*txt)
+void SciHelp::load(const char*txt, unsigned int size)
 {
   FXint beg[3]={0,0,0};
   FXint end[3]={0,0,0};
+  loaded=txt;
   const char *content=NULL;
   freelists();
   sendMessage(SCI_SETREADONLY,false,0);
   sendMessage(SCI_CLEARALL,0,0);
-  sendString(SCI_APPENDTEXT, strlen(txt),txt);
+  sendString(SCI_APPENDTEXT, size, txt);
   sendString(SCI_APPENDTEXT, 32,FXString('\n',32).text());
   sendMessage(SCI_SETSTYLING,sendMessage(SCI_GETLENGTH,0,0),SCHLP_NORMAL);
   sendMessage(SCI_STARTSTYLING,0,0xff);
@@ -274,7 +281,6 @@ void SciHelp::load(const char*txt)
     replace(*c,*(c+1));
   }
 
-
   // Make the editor's name stand out a little...
   FXRex appname_rx("\\<"APP_NAME"\\>", REX_NORMAL|REX_NEWLINE);
   content=(const char*)(sendMessage(SCI_GETCHARACTERPOINTER,0,0));
@@ -315,8 +321,6 @@ void SciHelp::load(const char*txt)
 
 
 
-
-
 static void free_link_cb(void *p) {
   if (p) {
     HelpLink*link=(HelpLink*)p;
@@ -324,6 +328,7 @@ static void free_link_cb(void *p) {
     delete link;
   }
 }
+
 
 
 void SciHelp::freelists()
@@ -339,6 +344,7 @@ void SciHelp::freelists()
   last_pos=0;
   jump_pos=-1;
 }
+
 
 
 SciHelp::~SciHelp()
@@ -396,7 +402,6 @@ long SciHelp::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p)
   }
   return rv;
 }
-
 
 
 
@@ -469,8 +474,6 @@ bool SciHelp::find(const FXString &what)
 
 
 
-static FXDialogBox *dlg=NULL;
-
 #ifndef __WIN32__
 extern void SetNetWmIcon(FXTopWindow*win);
 #else
@@ -485,55 +488,92 @@ extern void SetNetWmIcon(FXTopWindow*win);
      w->setPadRight(p);
 
 
-static FXint _which = -1;
+class HelpDialog;
+
+static HelpDialog *instance = NULL;
+
+#define HELP_DECOR DECOR_TITLE|DECOR_BORDER|DECOR_MINIMIZE|DECOR_MAXIMIZE|DECOR_CLOSE|DECOR_RESIZE
+#define RAISED FRAME_RAISED|FRAME_THICK
+#define TEXTFIELD_OPTS TEXTFIELD_NORMAL|TEXTFIELD_ENTER_ONLY
 
 
-void do_load(SciHelp*sc,FXint which)
-{
-  if (_which==which) { return; }
-  _which=which;
- sc->hide();
- switch (which) {
-  case 0:
-    sc->load((const char*)helptext);
-    break;
-  case 1:
-    sc->load((const char*)help_lua);
-    break;
-  }
-  sc->show();
-}
-
-
-
-void show_help(FXMainWindow*win, FXint which, bool dark) {
-  if (!dlg) {
-    dlg=new FXDialogBox(win->getApp(),_(APP_NAME" Help"),DECOR_TITLE|DECOR_BORDER,0,0,560,360);
-    PAD(dlg,1);
-    FXVerticalFrame *vbox=new FXVerticalFrame(dlg, LAYOUT_FILL|FRAME_NONE);
+class HelpDialog: public FXDialogBox {
+  FXDECLARE(HelpDialog)
+  HelpDialog(){}
+  SciHelp*sc;
+public:
+  HelpDialog(FXMainWindow*win, bool dark):FXDialogBox(win->getApp(),_(APP_NAME" Help"),HELP_DECOR) {
+    FXint w=getApp()->getRootWindow()->getWidth();
+    FXint h=getApp()->getRootWindow()->getHeight();
+    setWidth( w>800 ? w*0.6875 : w*0.875 );
+    setHeight( h>600 ? h*0.667 : h*0.75 );
+    setX((w-getWidth())/2);
+    setY((h-getHeight())/2);
+    PAD(this,1);
+    FXVerticalFrame *vbox=new FXVerticalFrame(this, LAYOUT_FILL|FRAME_NONE);
     PAD(vbox,0);
     vbox->setVSpacing(1);
     FXHorizontalFrame*scfrm=new FXHorizontalFrame(vbox, LAYOUT_FILL|FRAME_SUNKEN|FRAME_THICK);
     PAD(scfrm,0);
-    SciHelp*sc=new SciHelp(scfrm, NULL,0, LAYOUT_FILL|HSCROLLER_NEVER,dark);
-    dlg->setUserData(sc);
-    FXHorizontalFrame *btns=new FXHorizontalFrame(vbox, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED|FRAME_THICK);
-    new FXButton(btns,_(" &Back "), NULL, sc, SciHelp::ID_GOBACK, FRAME_RAISED|FRAME_THICK);
+    sc=new SciHelp(scfrm, NULL,0, LAYOUT_FILL|HSCROLLER_NEVER,dark);
+    setUserData(sc);
+    FXHorizontalFrame *btns=new FXHorizontalFrame(vbox, LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|RAISED);
+    new FXButton(btns,_(" &Back "), NULL, sc, SciHelp::ID_GOBACK, RAISED);
     new FXLabel(btns, "  ");
-    sc->srchbox=new FXTextField(btns,24,sc, SciHelp::ID_SEARCH,TEXTFIELD_NORMAL|TEXTFIELD_ENTER_ONLY);
-    new FXButton(btns,_(" &Find "), NULL, sc, SciHelp::ID_SEARCH, FRAME_RAISED|FRAME_THICK);
+    sc->srchbox=new FXTextField(btns,24,sc, SciHelp::ID_SEARCH,TEXTFIELD_OPTS);
+    new FXButton(btns,_(" &Find "), NULL, sc, SciHelp::ID_SEARCH, RAISED);
     btns=new FXHorizontalFrame(btns, LAYOUT_RIGHT|LAYOUT_FILL_X|FRAME_NONE,0,0,0,0, 16,8,0,0,0,0);
-    new FXButton(btns," + ", NULL, sc, SciHelp::ID_ZOOMIN, FRAME_RAISED|FRAME_THICK|LAYOUT_LEFT);
-    new FXButton(btns," - ", NULL, sc, SciHelp::ID_ZOOMOUT, FRAME_RAISED|FRAME_THICK|LAYOUT_LEFT);
-    new FXButton(btns,_(" &Close "), NULL, dlg, FXDialogBox::ID_HIDE, FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT);
-    dlg->setIcon(win->getIcon());
-    dlg->changeFocus(sc->srchbox);
-    dlg->create();
-    SetNetWmIcon(dlg);
+    new FXButton(btns," + ", NULL, sc, SciHelp::ID_ZOOMIN,  RAISED|LAYOUT_LEFT);
+    new FXButton(btns," - ", NULL, sc, SciHelp::ID_ZOOMOUT, RAISED|LAYOUT_LEFT);
+    new FXButton(btns,_(" &Close "), NULL, this, FXDialogBox::ID_CLOSE, RAISED|LAYOUT_RIGHT);
+    setIcon(win->getIcon());
+    changeFocus(sc->srchbox);
+    create();
+    SetNetWmIcon(this);
+    show();
+    getApp()->runWhileEvents();
   }
-  do_load((SciHelp*)dlg->getUserData(),which);
-  if (dlg->shown()) { dlg->hide(); }
-  dlg->show(PLACEMENT_SCREEN);
-}
+  long onCmdClose(FXObject*o, FXSelector sel, void*p) {
+    instance=NULL;
+    return FXDialogBox::onCmdClose(o,sel,p);
+  }
+  void Load(FXint which) {
+    sc->hide();
+    const char*todo;
+    unsigned int len;
+    switch (which) {
+      case 0: {
+        todo=(const char*)helptext;
+        len=sizeof(helptext);
+        break;
+      }
+      case 1: {
+        todo=(const char*)help_lua;
+        len=sizeof(help_lua);
+        break;
+      }
+    }
+    if (sc->loaded!=todo) { sc->load(todo,len); }
+    sc->show();
+    if (shown()) { hide(); }
+    show(PLACEMENT_SCREEN);
+  }
+};
 
+
+
+FXDEFMAP(HelpDialog) HelpDialogMap[] = {
+  FXMAPFUNC(SEL_COMMAND, FXDialogBox::ID_CLOSE, HelpDialog::onCmdClose),
+};
+
+
+FXIMPLEMENT(HelpDialog,FXDialogBox,HelpDialogMap,ARRAYNUMBER(HelpDialogMap));
+
+
+
+void show_help(FXMainWindow*win, FXint which, bool dark)
+{
+  if (!instance) { instance=new HelpDialog(win,dark); }
+  instance->Load(which);
+}
 
