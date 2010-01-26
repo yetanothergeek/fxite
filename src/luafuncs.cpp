@@ -1412,7 +1412,6 @@ class SelSaver: public FXWindow
     FXuchar*data;
     FXuint len;
   public:
-    enum {ID_SELREQ,ID_LAST};
     long onSelectionRequest(FXObject*o, FXSelector sel, void*p) {
       FXDragType dragtype=((FXEvent*)p)->target;
       if ( string.empty() ) { return 0; }
@@ -1434,24 +1433,31 @@ class SelSaver: public FXWindow
       }
       return 0;
     }
-    long onSelectionLost(FXObject*o, FXSelector sel, void*p){
+    long onSelectionLost(FXObject*o, FXSelector sel, void*p) {
       string="";
       return 1;
     }
     bool SetSel(const FXchar*s) {
+      if (!string.empty()) { releaseSelection(); }
       string=s;
       return ( s && s[0] && acquireSelection(&FXWindow::stringType,1) );
     }
     const char*GetSel() {
       data=NULL;
       len=0;
-      if (getDNDData(FROM_SELECTION,FXWindow::textType, data, len)&&data&&*data) {
-        return (const char*) data;
-      } else {
-        return NULL;
+      FXDragType types[] = {textType,utf8Type,stringType,0};
+      for ( FXDragType*type=types; *type; type++ ) {
+        if (getDNDData(FROM_SELECTION,*type, data, len)&&data&&*data) {
+          return (const char*) data;
+        } 
       }
+      return NULL;
     }
-    SelSaver(FXComposite *p):FXWindow(p) { create(); }
+    SelSaver(FXComposite *p):FXWindow(p) { 
+      create();
+      if (!textType) { textType = getApp()->registerDragType(textTypeName); }
+      if (!utf8Type) { utf8Type = getApp()->registerDragType(utf8TypeName); }
+    }
 };
 
 FXDEFMAP(SelSaver) SelSaverMap[] = {
