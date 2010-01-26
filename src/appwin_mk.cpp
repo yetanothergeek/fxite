@@ -512,11 +512,12 @@ bool TopWindow::RemoveFileFromTagsMenu(const FXString &filename)
 
 bool TopWindow::SetLanguage(const FXString &name)
 {
-  FXWindow*mnu;
-  for (mnu=langmenu->getFirst(); mnu; mnu=mnu->getNext()) {
-    if (compare(((FXMenuCommand*)mnu)->getText(),name)==0) {
-      onSetLanguage(mnu,0,NULL);
-      return true;
+  for (FXWindow*grp=langmenu->getFirst(); grp; grp=grp->getNext()) {
+    for (FXWindow*mnu=((FXMenuCascade*)grp)->getMenu()->getFirst(); mnu; mnu=mnu->getNext()) {
+      if (compare(((FXMenuCommand*)mnu)->getText(),name)==0) {
+        onSetLanguage(mnu,0,NULL);
+        return true;
+      }
     }
   }
   return false;
