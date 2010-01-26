@@ -924,11 +924,35 @@ static int readonly(lua_State*L)
 
 
 
+// Limit dialog message text to 32 lines, maximum of 96 chars per line.
+static void fixup_message(FXString &dst, const char*src)
+{
+#define msg_max_width 96
+#define msg_max_height 32
+  char line[msg_max_width+1];
+  const char*p1=src;
+  const char*p2;
+  int numlines=0;
+  do {
+    p2=strchr(p1, '\n');
+    int width = p2 ? (p2-p1) : strlen(p1);
+    memset(line,0,sizeof(line));
+    strncpy(line, p1, width>msg_max_width?msg_max_width:width);
+    dst.append(line);
+    if (p2) { dst.append('\n'); } else { return; }
+    if (++numlines >= msg_max_height) { return; }
+    p1=p2+1;
+  } while (1);
+}
+
+
+
 // void message([title,] message [,icon])
 static int message(lua_State*L)
 {
   const char* title=EXE_NAME;
   const char* msg;
+  FXString fmsg;
   const char* type="I";
 
   switch (lua_gettop(L)) {
@@ -943,10 +967,11 @@ static int message(lua_State*L)
       type=luaL_optstring(L,3,"I");
     }
   }
+  fixup_message(fmsg, msg);
   switch (toupper(type[0])) {
-    case 'W' : { FXMessageBox::warning(tw,MBOX_OK,title,"%s",msg); break; }
-    case 'E' : { FXMessageBox::error(tw,MBOX_OK,title,"%s",msg);  break; }
-    default  : { FXMessageBox::information(tw,MBOX_OK,title,"%s",msg); break; }
+    case 'W' : { FXMessageBox::warning(     tw, MBOX_OK, title, "%s", fmsg.text()); break; }
+    case 'E' : { FXMessageBox::error(       tw, MBOX_OK, title, "%s", fmsg.text()); break; }
+    default  : { FXMessageBox::information( tw, MBOX_OK, title, "%s", fmsg.text()); break; }
   }
   return 0;
 }
@@ -959,8 +984,10 @@ static int confirm(lua_State*L)
   luaL_argcheck(L,(lua_gettop(L)>=3)&&lua_isboolean(L,3),3,_("expected boolean"));
   const char* title=lua_isnil(L,1)?EXE_NAME:luaL_checkstring(L,1);
   const char* msg=luaL_checkstring(L,2);
+  FXString fmsg;
   bool deflt=lua_toboolean(L,3);
-  FXuint rv=FXMessageBox::question(tw, MBOX_YES_NO, title, "%s",msg);
+  fixup_message(fmsg, msg);
+  FXuint rv=FXMessageBox::question(tw, MBOX_YES_NO, title, "%s", fmsg.text());
   lua_pushboolean(L, rv==MBOX_CLICKED_YES?true:rv==MBOX_CLICKED_NO?false:deflt);
   return 1;
 }
@@ -972,6 +999,7 @@ static int input(lua_State*L)
 {
   const char* title=EXE_NAME;
   const char* msg="";
+  FXString fmsg;
   FXString txt="";
   const char* type="S";
   FXint opt=INPUTDIALOG_STRING;
@@ -1007,7 +1035,8 @@ static int input(lua_State*L)
       break;
     }
   }
-  FXInputDialog dlg(tw,title,msg,NULL,opt);
+  fixup_message(fmsg, msg);
+  FXInputDialog dlg(tw,title,fmsg.text(),NULL,opt);
   dlg.setText(txt);
   if (dlg.execute(PLACEMENT_OWNER)) {
     lua_pushstring(L,dlg.getText().text());
@@ -1059,6 +1088,7 @@ static int choose(lua_State*L) {
     argtbl++;
   }
   const char*msg=luaL_checkstring(L,argmsg);
+  FXString fmsg;
   int i,n;
   luaL_argcheck(L, lua_istable(L,argtbl), argtbl, _("table expected") );
   n=lua_objlen(L,argtbl);
@@ -1072,7 +1102,8 @@ static int choose(lua_State*L) {
   }
 
   FXDialogBox dlg(tw, title);
-  new FXLabel(&dlg, msg);
+  fixup_message(fmsg, msg);
+  new FXLabel(&dlg, fmsg.text());
   FXList*list=new PickList(&dlg);
 
   list->setNumVisible(n<12?n:12);
