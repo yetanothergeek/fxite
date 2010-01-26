@@ -1667,8 +1667,20 @@ static int scrollpos(lua_State* L)
   }
 }
 
-
-
+static int lexer(lua_State* L)
+{
+  char*buf=NULL;
+  DOC_REQD
+  sptr_t len=sci->sendString(SCI_GETLEXERLANGUAGE, 0, buf);
+  if (len) {
+    buf=(char*)calloc(len+1, 1);
+    sci->sendString(SCI_GETLEXERLANGUAGE, 0, buf);
+    lua_pushstring(L,buf);
+    free(buf);
+    return 1;
+  }
+  return 0;
+}
 
 static const struct luaL_reg fxte_funcs[] = {
   {"seltext", seltext},
@@ -1721,6 +1733,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"lowercase", lowercase},
   {"scintilla", scintilla},
   {"scrollpos", scrollpos},
+  {"lexer", lexer},
   {NULL, NULL}
 };
 

@@ -8,6 +8,7 @@
 @@@activate@@@ -- Activate a document tab.
 @@@filename@@@ -- Return the filename of a document.
 @@@ndocs@@@ -- Return the number of open documents.
+@@@lexer@@@ -- Return the name of the language lexer.
 
 
 %%%Cursor functions%%%
@@ -196,6 +197,12 @@ Returns the full path and filename of the active document.
 ===__MOD__.ndocs()
 ===
 Returns the total number of open documents.
+
+###lexer###
+===__MOD__.lexer()
+===
+Returns the internal name of the Scintilla lexer in use for the active document.
+If there is no lexer currently loaded, it returns the string ==="null"===
 
 
 ###caret###
