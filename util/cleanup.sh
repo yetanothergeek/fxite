@@ -23,7 +23,7 @@ done
 
 rm -f fxite-*.tar.gz
 
-rm -f po/*.pot 'aclocal.m4'
+rm -f po/*.pot 'po/remove-potcdate.sed' 'aclocal.m4'
 
 rm -f 'configure' 'src/fxite' 'sl.obj' 'helptext.h' 'help_lua.h' 'tags' 'gmon.out'
 rm -f callgrind.out.[0-9]* *.log
