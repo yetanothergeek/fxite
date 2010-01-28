@@ -1,3 +1,20 @@
+2010-01-28
+  * Made "find tag definition" fail silently if no tag files are loaded.
+  * Replaced deprecated calls to luaL_openlib with luaL_register.
+  * Fixed spelling of view_clear_output in help file.
+  * Fixed updating of syntax when saving a new document.
+  * Fixed a bug when middle-click pasting to an empty top line.
+  * Fix default titlebar text for scripted dialogs.
+  * Prevent oversized script dialogs caused by too much text.
+  * Fixed a problem with the help dialog not closing, and made it resizable.
+  * Fixed a bug with help text not being properly terminated.
+  * Made scripting function "xsel" more robust.
+  * Fixed broken view_language() scripting function.
+  * Upgraded FXScintilla to the latest "official" Scintilla 2.02 release.
+  * New scripting function lexer() returns Scintilla lexer name.
+  * Made file dialogs on MS-Windows handle *.lnk files a little better.
+  * Fixed detection of null bytes in test for binary files.
+
 2010-01-04
   * Bump version to 0.4
   * Allow files with \007 char's (e.g. configure scripts) as plain-text.
