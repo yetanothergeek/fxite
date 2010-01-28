@@ -76,7 +76,7 @@ case $host_os in
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
-    FOX_LIBS="${srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -mwindows"
+    FOX_LIBS="${srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid -mwindows"
   ;;
 esac
 

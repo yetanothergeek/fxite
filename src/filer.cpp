@@ -42,6 +42,51 @@ FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel):FXObject()
 }
 
 
+#ifdef WIN32
+extern "C" {
+  int ReadShortcut(char **dst, const char*src);
+}
+
+
+/*
+  Fox doesn't automatically handle MS-Windows shortcut files, so...
+  Iterate through each filename in the file dialog's getFilenames() list,
+  if any of them are shortcut (*.lnk) files, dereference the link and
+  make the string point to the "real" disk file. If we have multiple files,
+  remove any links that point to a directory. But if we only have one string
+  in the list, and the string is a link pointing to a directory, we will 
+  dereference it so the dialog can change into that folder.
+*/
+static void FixupShortcuts(FXWindow*w, FXString* filenames) {
+  if (!filenames) return;
+  FXString* fn;
+  FXString* tail=filenames;
+  FXuint count=0;
+  for (fn=filenames; !fn->empty(); fn++) { 
+    FXString ext=FXPath::extension(*fn).upper();
+    if (ext=="LNK") {
+      char*tmp=NULL;
+      if (ReadShortcut(&tmp, fn->text())) {
+        *fn=tmp;
+      } else {
+        FXMessageBox::error(w,MBOX_OK,_("Error in shortcut"),"%s\n%s",fn->text(),tmp);
+      }
+      free(tmp);
+    }
+    tail=fn;
+    count++;
+  }
+  if (count>1) {
+    for (fn=filenames; !fn->empty(); fn++) {
+      if (FXStat::isDirectory(*fn)) {
+        *fn=tail->text();
+        *tail="";
+        tail--;
+      }
+    }
+  }
+}
+#endif
 
 static void GetPathForDlg(SciDoc*sci, FXString &path)
 {
@@ -56,12 +101,79 @@ static void GetPathForDlg(SciDoc*sci, FXString &path)
 }
 
 
+/*
+  A curious behavior of Fox's FileDialog is that you cannot manually enter a filename
+  and have it returned, instead the file *must* be selected from the list box. 
+  As a workaround, our subclass exposes the FXTextField where the name is entered. 
+  Note that this trick will NOT work with SELECTFILE_MULTIPLE!
+*/
+class MySelector: public FXFileSelector {
+  public:
+    FXTextField*txtfld() { return filename; }
+};
+
+
+
+class MyFileDlg: public FXFileDialog {
+#ifdef WIN32
+private:
+  FXString*filenames;
+  bool own_filenames;
+  void DeleteFilenames() { 
+    if (filenames&&own_filenames) {
+      delete[] filenames;
+      filenames=NULL;
+    }
+  }
+public:
+    ~MyFileDlg() { DeleteFilenames(); }
+    FXString*getFilenames() {
+      own_filenames=false;
+      return filenames;
+    }
+    FXString getFilename() { 
+      return filenames ? (*filenames) : FXFileDialog::getFilename();
+    }
+    FXuint execute(FXuint placement=PLACEMENT_CURSOR) {
+      DeleteFilenames();
+      FXuint rv=FXFileDialog::execute(placement);
+      if (rv) {
+        filenames = FXFileDialog::getFilenames();
+        own_filenames=true;
+        if (filenames) {
+          FixupShortcuts(getShell(), filenames);
+          if (FXStat::isDirectory(filenames->text())) {
+            setFilename("*");
+            filenames->append("\\.");
+            setDirectory(filenames->text());
+            DeleteFilenames();
+            return execute(placement);
+          }
+        }
+      }
+      return rv;
+    }
+    MyFileDlg(FXWindow*owner, const FXString&caption):FXFileDialog(owner,caption) { 
+      filenames=NULL;
+    }
+#else
+  public:
+    MyFileDlg(FXWindow*owner, const FXString&caption):FXFileDialog(owner,caption) {}
+#endif
+  public:
+    FXTextField* txtfld() { return ((MySelector*)filebox)->txtfld(); }
+};
+
+
+
+
+
 bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
 {
   FXString result="";
   FXString path;
   GetPathForDlg(sci,path);
-  FXFileDialog dlg(sci->getShell(),_("Save file as"));
+  MyFileDlg dlg(sci->getShell(),_("Save file as"));
   dlg.setPatternList(_patterns);
   dlg.setDirectory(path);
   if (dlg.execute(PLACEMENT_OWNER)) {
@@ -94,7 +206,7 @@ bool FileDialogs::Export(SciDoc*sci,
   if (filename) {
     saveName=filename;
   } else {
-    FXFileDialog dlg(sci->getShell(),title);
+    MyFileDlg dlg(sci->getShell(),title);
     if (sci->Filename().empty()) {
       path=FXSystem::getCurrentDirectory();
       tmp=_("Untitled");
@@ -200,38 +312,19 @@ bool FileDialogs::TryClose(SciDoc*sci, const char*alt)
 
 
 
-/*
-  A curious behavior of the FXFileDialog is that you cannot manually enter
-  a filename and have it returned, instead the file *must* be selected from
-  the list box. As a workaround, we declare a "Dummy" dialog that exposes
-  the FXTextField where the name is entered. Note that this trick will NOT
-  work with SELECTFILE_MULTIPLE!
-*/
-class MySelector: public FXFileSelector {
-  public:
-    FXTextField*txtfld() { return filename; }
-};
-
-class MyFileDlg: public FXFileDialog {
-  public:
-    FXTextField* txtfld() { return ((MySelector*)filebox)->txtfld(); }
-};
-
-
-
 bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
 {
   const char* caption=multi?_("Select files to open"):_("Select file to open");
   FXString path="";
   GetPathForDlg(sci,path);
-  FXFileDialog dlg(sci->getShell(), caption);
+  MyFileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_patterns);
   dlg.setDirectory(path);
   dlg.setSelectMode(multi?SELECTFILE_MULTIPLE:SELECTFILE_EXISTING);
   if (dlg.execute(PLACEMENT_OWNER)) {
     filenames=dlg.getFilenames();
     if ( (!multi) && (!filenames) ) { // Maybe it's not selected, but still in the textfield.
-      FXString fn=((MyFileDlg*)&dlg)->txtfld()->getText();
+      FXString fn=dlg.txtfld()->getText();
       if (!fn.empty()) {
         filenames=new FXString[2];
         filenames[0]=fn.text();
@@ -249,7 +342,7 @@ bool FileDialogs::GetOpenTagFilename(SciDoc*sci, FXString &filename)
   const char* caption=_("Open tags file");
   FXString path="";
   GetPathForDlg(sci,path);
-  FXFileDialog dlg(sci->getShell(), caption);
+  MyFileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_("Tag Files (TAGS,tags)\nAll Files (*)"));
   dlg.setDirectory(path);
   if (dlg.execute(PLACEMENT_OWNER)) {
