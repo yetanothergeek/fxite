@@ -505,8 +505,8 @@ public:
   HelpDialog(FXMainWindow*win, bool dark):FXDialogBox(win->getApp(),_(APP_NAME" Help"),HELP_DECOR) {
     FXint w=getApp()->getRootWindow()->getWidth();
     FXint h=getApp()->getRootWindow()->getHeight();
-    setWidth( w>800 ? w*0.6875 : w*0.875 );
-    setHeight( h>600 ? h*0.667 : h*0.75 );
+    setWidth( (FXint)( w>800 ? w*0.6875 : w*0.875 ) );
+    setHeight( (FXint)( h>600 ? h*0.667 : h*0.75 ) );
     setX((w-getWidth())/2);
     setY((h-getHeight())/2);
     PAD(this,1);
@@ -539,8 +539,8 @@ public:
   }
   void Load(FXint which) {
     sc->hide();
-    const char*todo;
-    unsigned int len;
+    const char*todo=NULL;
+    unsigned int len=0;
     switch (which) {
       case 0: {
         todo=(const char*)helptext;

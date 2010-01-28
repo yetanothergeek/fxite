@@ -1217,7 +1217,7 @@ ID_READONLY
 long TopWindow::onShowLineNums( FXObject*o, FXSelector sel, void*p )
 {
   prefs->ShowLineNumbers=!prefs->ShowLineNumbers;
-  tabbook->ForEachTab(LineNumsCB, (void*)prefs->ShowLineNumbers);
+  tabbook->ForEachTab(LineNumsCB, (void*)(FXival)prefs->ShowLineNumbers);
   linenums_chk->setCheck(prefs->ShowLineNumbers);
   SyncToggleBtn(o,sel);
   return 1;
@@ -1241,7 +1241,7 @@ long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
 long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowWhiteSpace=!prefs->ShowWhiteSpace;
-  tabbook->ForEachTab(WhiteSpaceCB, (void*)prefs->ShowWhiteSpace);
+  tabbook->ForEachTab(WhiteSpaceCB, (void*)(FXival)prefs->ShowWhiteSpace);
   white_chk->setCheck(prefs->ShowWhiteSpace);
   SyncToggleBtn(o,sel);
   return 1;
@@ -1251,7 +1251,7 @@ long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowRightEdge=!prefs->ShowRightEdge;
-  tabbook->ForEachTab(ShowMarginCB, (void*)prefs->ShowRightEdge);
+  tabbook->ForEachTab(ShowMarginCB, (void*)(FXival)prefs->ShowRightEdge);
   margin_chk->setCheck(prefs->ShowRightEdge);
   SyncToggleBtn(o,sel);
   return 1;
@@ -1261,7 +1261,7 @@ long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowIndentGuides = !prefs->ShowIndentGuides;
-  tabbook->ForEachTab(ShowIndentCB, (void*)prefs->ShowIndentGuides);
+  tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)prefs->ShowIndentGuides);
   guides_chk->setCheck(prefs->ShowIndentGuides);
   SyncToggleBtn(o,sel);
   return 1;
