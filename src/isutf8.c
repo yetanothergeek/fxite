@@ -145,7 +145,7 @@ static char get_stream_encoding(FILE *file) {
   for (;;) {
     c = getc(file);
     if (c != EOF){
-      if ( (c<32) && (!strchr("\n\t\r\f\v\a",c)) ) { 
+      if ( (c<32) && ( (c==0) || (!strchr("\n\t\r\f\v\a",c)) ) ) { 
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
