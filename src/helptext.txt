@@ -426,8 +426,8 @@ depending on the setting of:
   '%%%Edit->Preferences->editor->Treat plain-text files as UTF-8%%%'
 
 Note that __APP__ does not provide any sort of "on the fly" conversion between encodings, so if you want to \
-work with an extended ASCII file as if it were UTF-8 encoded, you will need to convert the file using an external
-tool such as the "===iconv===" program before opening it in __APP__. 
+work with an extended ASCII file as if it were UTF-8 encoded, you will need to convert the file using an \
+external tool such as the "===iconv===" program before opening it in __APP__. 
 
 If you paste plain-text data that contains character codes which are not valid UTF-8 into a UTF-8 encoded document, \
 __APP__ will try to convert the data to UTF-8 before inserting it into the document. But it will not attempt to \
