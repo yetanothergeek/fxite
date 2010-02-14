@@ -831,12 +831,13 @@ static int close(lua_State*L)
 static int save(lua_State*L)
 {
   DOC_REQD
-  const char *fn=NULL;
   int nargs=lua_gettop(L);
   if (nargs==0) {
-    fn=sci->Filename().text();
+    char*fn=strdup(sci->Filename().text());
+    lua_pushboolean(L,tw->FileDlgs()->SaveFile(sci,fn));
+    free(fn);
   } else {
-    fn=luaL_checkstring(L,1);
+    const char *fn=luaL_checkstring(L,1);
     if (FXStat::exists(fn)) {
       bool overwrite=((nargs>1) && lua_toboolean(L,2));
       if ( !overwrite ) {
@@ -844,8 +845,8 @@ static int save(lua_State*L)
         return 1;
       }
     }
+    lua_pushboolean(L,tw->FileDlgs()->SaveFile(sci,fn));
   }
-  lua_pushboolean(L,tw->FileDlgs()->SaveFile(sci,fn));
   return 1;
 }
 
