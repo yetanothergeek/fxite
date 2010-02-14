@@ -1075,6 +1075,7 @@ void TopWindow::ParseCommands(const FXString &commands)
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
+#include <X11/Xatom.h>
 void SetNetWmIcon(FXTopWindow*win)
 {
   FXIcon*ico=win->getIcon();
@@ -1101,7 +1102,18 @@ void SetNetWmIcon(FXTopWindow*win)
       PropModeReplace, (const FXuchar*) icon_buf, icon_buf_size);
     free(icon_buf);
   }
-}
+
+  Atom net_wm_pid = XInternAtom(d, "_NET_WM_PID", 0);
+  pid_t pid=fxgetpid();
+  XChangeProperty(d, win->id(), net_wm_pid, cardinal, 32,
+    PropModeReplace, (const FXuchar*) &pid, sizeof(pid));
+  FXString hn=FXSystem::getHostName();
+  if (!hn.empty()) {
+    Atom wm_client_machine = XInternAtom(d, "WM_CLIENT_MACHINE", 0);
+    XChangeProperty(d, win->id(), wm_client_machine, XA_STRING, 32,
+      PropModeReplace, (const FXuchar*) hn.text(), hn.length());
+  }
+} 
 #else
 #define SetNetWmIcon(win)
 #endif
