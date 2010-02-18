@@ -746,7 +746,6 @@ long TopWindow::onSetLanguage(FXObject*o, FXSelector sel, void*p)
   LangStyle*ls=(LangStyle*) ((FXWindow*)o)->getUserData();
   SciDoc*sci=ControlDoc();
   sci->setLanguage(ls);
-  sci->sendMessage(SCI_COLOURISE,0,-1);
   for (FXWindow*wmc=langmenu->getFirst(); wmc; wmc=wmc->getNext()) {
     FXPopup*pu=((FXMenuCascade*)wmc)->getMenu();
     for (FXWindow*wmr=pu->getFirst(); wmr; wmr=wmr->getNext()) {

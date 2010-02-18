@@ -281,7 +281,6 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
           if (!setLanguageFromFileName(FXPath::name(filename).text())) {
             setLanguageFromContent();
           }
-          sendMessage(SCI_COLOURISE,0,-1);
         }
         _filename=FXPath::absolute(filename);
         _filetime=FXStat::modified(_filename);
@@ -467,6 +466,7 @@ void SciDoc::UpdateStyle()
   DefaultBG[7]='\0';
   if (_lang) {
     sendMessage(SCI_SETLEXER, _lang->id, 0);
+    sendMessage(SCI_SETSTYLEBITS, sendMessage(SCI_GETSTYLEBITSNEEDED,0,0), 0);
     for (i=0; i<=KEYWORDSET_MAX; i++) { sendString(SCI_SETKEYWORDS, i, ""); }
     if (_lang->words) {
       for (i=0; _lang->words[i]; i++) {
@@ -508,6 +508,7 @@ void SciDoc::UpdateStyle()
     sendMessage(SCI_SETLEXER, 0, 0);
     sendMessage(SCI_SETLEXERLANGUAGE, 0, 0);
   }
+  sendMessage(SCI_COLOURISE,0,-1);
   if (Slave()) { Slave()->UpdateStyle(); }
 }
 
