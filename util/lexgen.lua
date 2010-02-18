@@ -5,10 +5,15 @@ require "util/wordlist"
 require "util/htmlstyle"
 require "util/markdownstyle"
 
+
 filetypes.cpp="*.cc|*.cpp|*.cxx|*.hh|*.hpp|*.hxx|*.ipp|*.sma"
 filetypes.c="*.c"
 filetypes.makefile="[Mm]akefile*"
 
+if filetypes.html and filetypes.php then
+  filetypes.html=filetypes.html.."|"..filetypes.php
+  filetypes.php=nil
+end
 
 local shbangs={
   bash =   "ash|bash|dash|sh",
@@ -57,7 +62,6 @@ end
 -- The "state" argument is like the "MODULE_NAME" portion
 -- of "SCE_RB_MODULE_NAME" (where "lexpfx" is "SCE_RB_")
 function defstyle(state)
-io.stderr:write(state,"\n")
   if (lextag =="SCLEX_HTML") then
     local ht_index=(ht_vals["SCE_H"..state] or -1)+1
     local tbl=hypertext[ht_index]
@@ -114,10 +118,8 @@ end
 
 
 
-----[[
 print(string.format("/* lexname=%s lexpfx=%s lextag=%s */", 
   lexname or "UNKNOWN", lexpfx or "UNKNOWN", lextag or "UNKNOWN"))
---]]
 
 if (lexname=="c") or (lexname=="javascript") or (lexname=="java") then
   print(string.format("#define SCLEX_%s SCLEX_CPP", lexname_upper))
