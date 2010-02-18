@@ -153,12 +153,12 @@ public:
       }
       return rv;
     }
-    MyFileDlg(FXWindow*owner, const FXString&caption):FXFileDialog(owner,caption) { 
+    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) { 
       filenames=NULL;
     }
 #else
   public:
-    MyFileDlg(FXWindow*owner, const FXString&caption):FXFileDialog(owner,caption) {}
+    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) {}
 #endif
   public:
     FXTextField* txtfld() { return ((MySelector*)filebox)->txtfld(); }
