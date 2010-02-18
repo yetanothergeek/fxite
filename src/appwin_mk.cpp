@@ -1020,6 +1020,9 @@ void TopWindow::ParseCommands(const FXString &commands)
             }
             break;
           }
+          case 'q' : {
+            break; // "quiet" option is invalid for a new instance, so just ignore it.
+          }
           default: fprintf(stderr, _("Warning: unrecognized option: %s\n"), sect.text());
         }
         break;
