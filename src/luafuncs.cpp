@@ -861,7 +861,7 @@ static bool breathe(lua_State*L)
   a->flush();
   a->repaint();
   a->runWhileEvents();
-  if ( (!tw) || tw->IsMacroCancelled()) {
+  if ( (!tw) || tw->IsMacroCancelled() || tw->Closing() ) {
     lua_pushstring(L, _("Macro cancelled by user."));
     lua_error(L);
     return false;
@@ -901,10 +901,10 @@ static int quit(lua_State*L)
   DOC_REQD
   if ((tw->Tabs()->Count()==1)&&(sci->Filename().empty())&&(!sci->Dirty()))
   {
-    tw->close();
+    tw->getApp()->addChore(tw,TopWindow::ID_CLOSEWAIT,NULL);
+    lua_pushstring(L,LuaQuitMessage());
+    lua_error(L);
   }
-  lua_pushstring(L,LuaQuitMessage());
-  lua_error(L);
   return 0;
 }
 

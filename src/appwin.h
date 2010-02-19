@@ -170,7 +170,6 @@ private:
   bool destroying;
   bool close_all_confirmed;
   bool kill_commands_confirmed;
-  bool closing;
   bool command_timeout;
   FXint need_status;
   void CreateToolbar();
@@ -404,7 +403,7 @@ public:
   bool CloseAll(bool close_last);
   bool IsMacroCancelled();
   bool Destroying() { return destroying; }
-  bool Closing() { return closing; }
+  bool Closing();
   bool SetReadOnly(SciDoc*sci, bool rdonly);
   SciDoc*ControlDoc();
   SciDoc*FocusedDoc();

@@ -210,7 +210,7 @@ static int scriptname(lua_State *L)
 /* Override Lua's standard os.exit() function, so we can have a clean shutdown. */
 static int osexit(lua_State *L)
 {
-  tw->getApp()->addTimeout(tw,TopWindow::ID_CLOSEWAIT, ONE_SECOND/10, NULL);
+  tw->getApp()->addChore(tw,TopWindow::ID_CLOSEWAIT,NULL);
   lua_pushstring(L,LuaQuitMessage());
   lua_error(L);
   return 0;

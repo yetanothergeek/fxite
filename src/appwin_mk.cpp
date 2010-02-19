@@ -50,6 +50,9 @@
 #define PACK_UNIFORM ( PACK_UNIFORM_WIDTH | PACK_UNIFORM_HEIGHT )
 
 
+static bool topwin_closing = false;
+
+bool TopWindow::Closing() { return topwin_closing; }
 
 
 TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
@@ -132,7 +135,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   destroying=false;
   close_all_confirmed=false;
   kill_commands_confirmed=false;
-  closing=false;
+  topwin_closing=false;
   MenuSpec*killcmd=MenuMgr::LookupMenu(ID_KILL_COMMAND);
   killkey=parseAccel(killcmd->accel);
   if (killkey && FXSELID(killkey)) {
@@ -210,7 +213,7 @@ void TopWindow::SaveClipboard()
 // Create a new tab and editor panel
 bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, bool hooked)
 {
-  if (closing) return false;
+  if (topwin_closing) return false;
   FXString fn="";
   SciDoc*sci=NULL;
   if ( tabbook->Count() >= prefs->MaxFiles ) { return false; }
@@ -883,8 +886,12 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 
 
 long TopWindow::onCloseWait(FXObject*o, FXSelector sel, void*p)
-{
-  close();
+{  
+  if (FXSELTYPE(sel)==SEL_CHORE) {
+    getApp()->addTimeout(this,ID_CLOSEWAIT, ONE_SECOND/10, NULL);
+  } else {
+    close();
+  }
   return 1;
 }
 
@@ -895,26 +902,28 @@ long TopWindow::onCloseWait(FXObject*o, FXSelector sel, void*p)
 #define not_confirmed() {\
  close_all_confirmed=false; \
  kill_commands_confirmed=false; \
- closing=false; \
+ topwin_closing=false; \
 }
 
 FXbool TopWindow::close(FXbool notify)
 {
+  if (topwin_closing) { return false; }
   if (!getApp()->getActiveWindow()) {
     hide();
     getApp()->runWhileEvents();
+    if (topwin_closing) { return false; }
     show();
     getApp()->runWhileEvents();
+    if (topwin_closing) { return false; }
   }
-  if (FocusedDoc() && (!FocusedDoc()->isEnabled()) && (!closing) && (!kill_commands_confirmed) ) {
+  if ((!tabbook->isEnabled()) && (!kill_commands_confirmed) ) {
     if (!confirm(_("Command in progress"), "%s", _("External command in progress - exit anyway?"))) {
       not_confirmed();
       return false;
     }
     kill_commands_confirmed=true;
-    closing=true;
     command_timeout=true;
-    getApp()->addTimeout(this,ID_CLOSEWAIT, ONE_SECOND, NULL);
+    getApp()->addChore(this,ID_CLOSEWAIT, NULL);
     getApp()->runWhileEvents();
     return false;
   }
@@ -949,7 +958,6 @@ FXbool TopWindow::close(FXbool notify)
      }
      session_data="";
   }
-
   prefs->Maximize=isMaximized();
   if (prefs->Maximize) {
     restore();
@@ -962,7 +970,8 @@ FXbool TopWindow::close(FXbool notify)
   prefs->Height=getHeight();
 
   getApp()->runWhileEvents();
-  closing=true;
+  if (topwin_closing) { return false; }
+  topwin_closing=true;
   delete srchdlgs;
   delete prefs;
   delete recent_files;
