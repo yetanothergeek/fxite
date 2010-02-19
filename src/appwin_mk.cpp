@@ -1113,7 +1113,7 @@ void SetNetWmIcon(FXTopWindow*win)
   FXString hn=FXSystem::getHostName();
   if (!hn.empty()) {
     Atom wm_client_machine = XInternAtom(d, "WM_CLIENT_MACHINE", 0);
-    XChangeProperty(d, win->id(), wm_client_machine, XA_STRING, 32,
+    XChangeProperty(d, win->id(), wm_client_machine, XA_STRING, 8,
       PropModeReplace, (const FXuchar*) hn.text(), hn.length());
   }
 } 
