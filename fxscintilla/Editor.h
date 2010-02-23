@@ -98,8 +98,8 @@ public:
  */
 class Editor : public DocWatcher {
 	// Private so Editor objects can not be copied
-	Editor(const Editor &) : DocWatcher() {}
-	Editor &operator=(const Editor &) { return *this; }
+	Editor(const Editor &);
+	Editor &operator=(const Editor &);
 
 protected:	// ScintillaBase subclass needs access to much of Editor
 
@@ -283,6 +283,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	SelectionPosition SelectionStart();
 	SelectionPosition SelectionEnd();
 	void SetRectangularRange();
+	void ThinRectangularRange();
 	void InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection=false);
 	void SetSelection(SelectionPosition currentPos_, SelectionPosition anchor_);
 	void SetSelection(int currentPos_, int anchor_);
@@ -337,7 +338,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
         PRectangle rcLine, LineLayout *ll, int subLine);
 	void DrawLine(Surface *surface, ViewStyle &vsDraw, int line, int lineVisible, int xStart,
 		PRectangle rcLine, LineLayout *ll, int subLine);
-	void DrawBlockCaret(Surface *surface, ViewStyle &vsDraw, LineLayout *ll, int subLine, 
+	void DrawBlockCaret(Surface *surface, ViewStyle &vsDraw, LineLayout *ll, int subLine,
 		int xStart, int offset, int posCaret, PRectangle rcCaret, ColourAllocated caretColour);
 	void DrawCarets(Surface *surface, ViewStyle &vsDraw, int line, int xStart,
 		PRectangle rcLine, LineLayout *ll, int subLine);
@@ -441,6 +442,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool PointInSelMargin(Point pt);
 	void LineSelection(int lineCurrent_, int lineAnchor_);
 	void DwellEnd(bool mouseMoved);
+	void MouseLeave();
 	virtual void ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, bool alt);
 	void ButtonMove(Point pt);
 	void ButtonUp(Point pt, unsigned int curTime, bool ctrl);
@@ -460,7 +462,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void SetAnnotationHeights(int start, int end);
 	void SetDocPointer(Document *document);
-	
+
 	void SetAnnotationVisible(int visible);
 
 	void Expand(int &line, bool doExpand);
@@ -471,7 +473,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool PositionIsHotspot(int position);
 	bool PointIsHotspot(Point pt);
 	void SetHotSpotRange(Point *pt);
-	void GetHotSpotRange(int& hsStart, int& hsEnd);
+	void GetHotSpotRange(int &hsStart, int &hsEnd);
 
 	int CodePage() const;
 	virtual bool ValidCodePage(int /* codePage */) const { return true; }

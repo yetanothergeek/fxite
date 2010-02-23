@@ -27,8 +27,8 @@ class CallTip {
 	bool useStyleCallTip;   // if true, STYLE_CALLTIP should be used
 
 	// Private so CallTip objects can not be copied
-	CallTip(const CallTip &) {}
-	CallTip &operator=(const CallTip &) { return *this; }
+	CallTip(const CallTip &);
+	CallTip &operator=(const CallTip &);
 	void DrawChunk(Surface *surface, int &x, const char *s,
 		int posStart, int posEnd, int ytext, PRectangle rcClient,
 		bool highlight, bool draw);
@@ -61,7 +61,7 @@ public:
 
 	/// Setup the calltip and return a rectangle of the area required.
 	PRectangle CallTipStart(int pos, Point pt, const char *defn,
-		const char *faceName, int size, int codePage_, 
+		const char *faceName, int size, int codePage_,
 		int characterSet, Window &wParent);
 
 	void CallTipCancel();

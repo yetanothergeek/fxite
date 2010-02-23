@@ -13,20 +13,31 @@ static StyleDef erlang_style[] = {
   { "character", SCE_ERLANG_CHARACTER, STRING_FG, _DEFLT_BG, Normal },
   { "macro", SCE_ERLANG_MACRO, _DEFLT_FG, _DEFLT_BG, Normal },
   { "record", SCE_ERLANG_RECORD, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "separator", SCE_ERLANG_SEPARATOR, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "preproc", SCE_ERLANG_PREPROC, _DEFLT_FG, _DEFLT_BG, Normal },
   { "nodename", SCE_ERLANG_NODE_NAME, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "commentfunction", SCE_ERLANG_COMMENT_FUNCTION, COMMNT_FG, _DEFLT_BG, Italic },
+  { "commentmodule", SCE_ERLANG_COMMENT_MODULE, COMMNT_FG, _DEFLT_BG, Italic },
+  { "commentdoc", SCE_ERLANG_COMMENT_DOC, COMMNT_FG, _DEFLT_BG, Italic },
+  { "commentdocmacro", SCE_ERLANG_COMMENT_DOC_MACRO, COMMNT_FG, _DEFLT_BG, Italic },
+  { "atomquoted", SCE_ERLANG_ATOM_QUOTED, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "macroquoted", SCE_ERLANG_MACRO_QUOTED, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "recordquoted", SCE_ERLANG_RECORD_QUOTED, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "nodenamequoted", SCE_ERLANG_NODE_NAME_QUOTED, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "bifs", SCE_ERLANG_BIFS, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "modules", SCE_ERLANG_MODULES, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "modulesatt", SCE_ERLANG_MODULES_ATT, _DEFLT_FG, _DEFLT_BG, Normal },
   { "unknown", SCE_ERLANG_UNKNOWN, STREOL_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
 
 static const char* erlang_words[]= {
-  "after begin case catch cond end fun if let of query receive when define record export import include include_lib ifdef ifndef else endif undef apply attribute call do in letrec module primop try",
+  "after and andalso band begin bnot bor bsl bsr bxor case catch cond div end fun if let not of or orelse query receive rem try when xor",
   NULL
 };
 
 
-static const char* erlang_mask = "*.erl";
+static const char* erlang_mask = "*.erl|*.hrl";
 
 
 static const char* erlang_apps = "";
