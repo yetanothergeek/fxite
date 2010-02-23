@@ -511,7 +511,7 @@ void TopWindow::DeleteMenus()
 
 static const char *Scintilla_Copyright =" \
 The Scintilla editing control and the PDF/HTML export code are\n\
-copyright 1998-2009 by Neil Hodgson <neilh@scintilla.org>\n\
+copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>\n\
 and are released under the following license:\n\
 \n\
 All Rights Reserved\n\
@@ -597,7 +597,7 @@ void TopWindow::About()
 {
   if ( FXMessageBox::information(this,MBOX_OK,_("About "EXE_NAME),
     "Free eXtensIble Text Editor (FXiTe) %s %s\n\n"
-      "Copyright (c) 2009 Jeffrey Pohlmeyer\n  <%s>\n\n"
+      "Copyright (c) 2009,2010 Jeffrey Pohlmeyer\n  <%s>\n\n"
       "%s"
       "    GNU GENERAL PUBLIC LICENSE Version 3\n\n"
       "%s FOX-%d.%d.%d; FXScintilla-%s; %s\n",
