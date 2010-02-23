@@ -1131,15 +1131,15 @@ long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 }
 
 #ifndef __WIN32__
-extern void SetNetWmIcon(FXTopWindow*win, const char*class_name);
+extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
 #else
-#define SetNetWmIcon(win,class_name)
+#define SetupXAtoms(win,class_name)
 #endif
 
 void PrefsDialog::create()
 {
   FXDialogBox::create();
-  SetNetWmIcon(this, "preferences");
+  SetupXAtoms(this, "prefs");
   show(PLACEMENT_DEFAULT);
   acclist->setWidth((acclist->getParent()->getWidth()/3)*2);
   acclist->setHeaderSize(0,(acclist->getWidth()/2)-8);

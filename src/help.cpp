@@ -475,9 +475,9 @@ bool SciHelp::find(const FXString &what)
 
 
 #ifndef __WIN32__
-extern void SetNetWmIcon(FXTopWindow*win, const char*class_name);
+extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
 #else
-#define SetNetWmIcon(win,class_name)
+#define SetupXAtoms(win,class_name)
 #endif
 
 
@@ -529,7 +529,7 @@ public:
     setIcon(win->getIcon());
     changeFocus(sc->srchbox);
     create();
-    SetNetWmIcon(this, "help");
+    SetupXAtoms(this, "help");
     show();
     getApp()->runWhileEvents();
   }

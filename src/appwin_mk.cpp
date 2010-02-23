@@ -1088,7 +1088,7 @@ void TopWindow::ParseCommands(const FXString &commands)
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xatom.h>
-void SetNetWmIcon(FXTopWindow*win, const char*class_name)
+void SetupXAtoms(FXTopWindow*win, const char*class_name)
 {
   FXIcon*ico=win->getIcon();
   Display*d=(Display*)(win->getApp()->getDisplay());
@@ -1133,7 +1133,7 @@ void SetNetWmIcon(FXTopWindow*win, const char*class_name)
     PropModeReplace, (const FXuchar*) cn.text(), cn.length());
 } 
 #else
-#define SetNetWmIcon(win,class_name)
+#define SetupXAtoms(win,class_name)
 #endif
 
 
@@ -1157,7 +1157,7 @@ void TopWindow::create()
   FXIcon*ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP);
   ico->create();
   setIcon(ico);
-  SetNetWmIcon(this, ((AppClass*)(getApp()))->ServerName().text());
+  SetupXAtoms(this, ((AppClass*)(getApp()))->ServerName().text());
   if (prefs->Maximize) { maximize(); }
   FXFont fnt(a, prefs->FontName, prefs->FontSize/10);
   GetFontDescription(prefs->fontdesc,&fnt);
