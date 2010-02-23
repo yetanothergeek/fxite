@@ -1,3 +1,14 @@
+2010-02-23
+  * Bump version to 0.5
+  * Fixed an error in the handling of style bits and colourising.
+  * Fixed a small line wrapping nit in the help text.
+  * Fixed a bug with fxite.save() losing reference to document's filename.
+  * Export WM_CLIENT_MACHINE and _NET_WM_PID atoms to X-server.
+  * Made a better looking WM_CLASS name for X11
+  * Ignore -q option when starting a new instance.
+  * Avoid calling TopWindow::close() after window is deleted.
+
+
 2010-01-28
   * Made "find tag definition" fail silently if no tag files are loaded.
   * Replaced deprecated calls to luaL_openlib with luaL_register.
