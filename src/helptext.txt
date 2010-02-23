@@ -1358,10 +1358,15 @@ With some clever use of symbolic links, you should be able to share some aspects
 of your configurations (like tools menu items, for instance) while maintaining \
 separate copies of other confguration files.
 
-Also note that X11's %%%WM_CLASS%%% string is set according to the configuration name. \
+Also note that X11's %%%WM_CLASS%%% string is set according to the server name. \
 This allows you to specify different window manager hints for different instances, or \
 to manipulate specific __APP__ windows using tools like %%%wmctrl%%% and %%%devil's pie%%%.
 
+Server names should contain only ASCII alphanumeric characters and underscores, any other \
+characters will be converted to underscores. The names are not case sensitive, that is:  \
+%%%MYSERVER%%%,  %%%MyServer%%% and %%%myserver%%% are all considered as the same name.
+
+Configuration names must consist of only lowercase alphabet (%%%a-z%%%) and numbers (%%%0-9%%%). 
 
 
 ###Embedded Scripting Engine###

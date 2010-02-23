@@ -42,6 +42,7 @@ private:
   bool quitting;
   AppClass() {}
   FXString sock_name;
+  FXString server_name;
   void ClientParse();
   void ExecuteClientRequest();
 #ifdef WIN32
@@ -77,6 +78,7 @@ public:
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
   const FXString &SocketName() { return sock_name; }
+  const FXString &ServerName() { return server_name; }
   FXint run() { srv_commands=""; return FXApp::run(); }
 };
 

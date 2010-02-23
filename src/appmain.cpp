@@ -521,6 +521,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
     }
   }
   if ( sock_name.empty() ) { sock_name="DEFAULT"; }
+  server_name=sock_name.text();
 #ifndef WIN32
   char*d=DisplayString(getDisplay());
   if (d) {
@@ -530,13 +531,16 @@ void AppClass::init(int& argc, char** argv, bool connect)
   }
 #endif
   sock_name.upper();
+  server_name.upper();
 
   unsigned char c;
   for (c=1; ; c++) {
     if ( ((c>='A')&&(c<='Z')) || ((c>='0')&&(c<='9')) || (c=='_') ) { continue; }
     sock_name.substitute(c, '_', true);
+    server_name.substitute(c, '_', true);
     if (c==255) { break; }
   }
+  server_name.lower();
   sock_name.prepend(configdir.text());
   configdir=FXPath::directory(configdir);
   configdir=FXPath::directory(configdir);
