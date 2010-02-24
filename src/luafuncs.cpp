@@ -1683,6 +1683,24 @@ static int lexer(lua_State* L)
   return 0;
 }
 
+
+
+static int window(lua_State* L)
+{
+  lua_pushnumber(L,(lua_Number)((FXuval)tw->id()));
+  return(1);
+}
+
+
+
+static int pid(lua_State* L)
+{
+  lua_pushnumber(L,fxgetpid());
+  return(1);
+}
+
+
+
 static const struct luaL_reg fxte_funcs[] = {
   {"seltext", seltext},
   {"text", text},
@@ -1735,6 +1753,8 @@ static const struct luaL_reg fxte_funcs[] = {
   {"scintilla", scintilla},
   {"scrollpos", scrollpos},
   {"lexer", lexer},
+  {"window", window},
+  {"pid", pid},
   {NULL, NULL}
 };
 

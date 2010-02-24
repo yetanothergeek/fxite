@@ -71,6 +71,9 @@
 @@@quit@@@ -- Terminate the application.
 @@@script@@@ -- filename of the running script.
 @@@scintilla@@@ -- Low-level access to the editor widget.
+@@@pid@@@ -- Process ID of the editor.
+@@@window@@@ -- Top-level window ID of the editor.
+
 
 %%%Dialog functions%%%
 @@@choose@@@ -- Choose from a list of items.
@@ -716,6 +719,16 @@ Currently only string, numeric, and boolean types are supported, any API call th
 or returns complex types will result in an error.  This function makes some effort to protect \
 itself from garbage being passed to Scintilla, but ultimately %%%you%%% are expected to know what you're doing!
 
+###pid###
+===__MOD__.pid()
+===
+Returns the process ID of the editor.
+
+
+###window###
+===__MOD__.window()
+===
+Returns the window ID of the editor's top-level window.
 
 
 ###choose###
