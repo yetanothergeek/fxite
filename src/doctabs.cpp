@@ -288,7 +288,13 @@ DocTab*DocTabs::ActiveTab() {
 
 
 FXWindow*DocTabs::ActivePage() {
-  return childAtIndex((getCurrent()*2)+1);
+  FXWindow*page=childAtIndex((getCurrent()*2)+1);
+  if (page) {
+    return page;
+  } else {
+    layout();
+    return childAtIndex((getCurrent()*2)+1);
+  }
 }
 
 
