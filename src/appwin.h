@@ -167,6 +167,7 @@ private:
   FXAccelTable*temp_accels;
   FXString session_data;
   HistMenu*recent_files;
+  FXWindow* active_widget;
   bool destroying;
   bool close_all_confirmed;
   bool kill_commands_confirmed;
@@ -279,6 +280,7 @@ public:
   long onFileExport(     FXObject*o, FXSelector sel, void*p );
   long onShowHelp(       FXObject*o, FXSelector sel, void*p );
   long onTBarCustomCmd(  FXObject*o, FXSelector sel, void*p);
+  long onFocusIn(        FXObject*o, FXSelector sel, void*p );
   long onTestSomething(  FXObject*o, FXSelector sel, void*p );
   enum {
     ID_TABS_TOP=FXMainWindow::ID_LAST,
@@ -436,5 +438,6 @@ public:
   void About();
   void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
+  FXID GetActiveWindow();
 };
 

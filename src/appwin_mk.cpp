@@ -818,7 +818,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
       }
     }
   }
-  sci->setFocus();
+  if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
   need_status=1;
   return success;
 }
@@ -878,7 +878,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
     tabbook->ForEachTab(ResetUndoLevelCB,NULL);
     DisableUI(false);
     SetInfo("");
-    if (FocusedDoc()) { FocusedDoc()->setFocus(); }
+    if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
   return rv;
@@ -1132,8 +1132,34 @@ void SetupXAtoms(FXTopWindow*win, const char*class_name)
   XChangeProperty(d, win->id(), wm_class, XA_STRING, 8,
     PropModeReplace, (const FXuchar*) cn.text(), cn.length());
 } 
+
+
+
+FXID TopWindow::GetActiveWindow()
+{
+  FXID rv=0;
+  Display*dpy=(Display*)getApp()->getDisplay();
+  Window root=getApp()->getRootWindow()->id();
+  static Atom xa=XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+  Atom rtype;
+  int fmt;
+  ulong n;
+  ulong rem;
+  FXuchar *xw;
+  if (XGetWindowProperty(dpy,root,xa,0,sizeof(Window),False,XA_WINDOW,&rtype,&fmt,&n,&rem,&xw)==Success) {
+    rv=*((Window*)xw);
+    XFree(xw);
+  }
+  return rv;
+}
+
+
 #else
 #define SetupXAtoms(win,class_name)
+FXID TopWindow::GetActiveWindow()
+{
+  return id();
+}
 #endif
 
 

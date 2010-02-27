@@ -130,6 +130,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPSEL(SEL_DOUBLECLICKED,     ID_OUTLIST_CLICK, onOutlistClick),
   TWMAPSEL(SEL_KEYPRESS,          ID_OUTLIST_CLICK, onOutlistClick),
   TWMAPSEL(SEL_RIGHTBUTTONRELEASE,ID_OUTLIST_CLICK, onOutlistClick),
+  TWMAPSEL(SEL_FOCUSIN,           ID_OUTLIST_CLICK, onOutlistClick),
   TWMAPFUNC(ID_FILE_SAVED,onFileSaved),
   TWMAPFUNC(ID_OPEN_PREVIOUS, onOpenPrevious),
   TWMAPFUNC(ID_OPEN_SELECTED, onOpenSelected),
@@ -143,6 +144,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPSEL(SEL_FOCUSIN,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STALE,CheckStale),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STYLE,CheckStyle),
+  FXMAPFUNC(SEL_FOCUSIN,0,TopWindow::onFocusIn),
   TWMAPSEL(SEL_COMMAND,ID_TEST_SOMETHING,onTestSomething),
   TWMAPSEL(SEL_CHORE,  ID_TEST_SOMETHING,onTestSomething),
 };
@@ -232,6 +234,19 @@ long TopWindow::onBookmark(FXObject*o, FXSelector sel, void*p)
     }
     default:return 0;
   }
+}
+
+
+
+long TopWindow::onFocusIn(FXObject*o, FXSelector sel, void*p)
+{
+  long rv=FXMainWindow::onFocusIn(o,sel,p);
+  if (active_widget==outlist) {
+    outlist->setFocus();
+  } else if (FocusedDoc()) { 
+    FocusedDoc()->setFocus();
+  }
+  return rv;
 }
 
 
@@ -860,6 +875,7 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
     case SEL_FOCUSIN: {
       getApp()->addChore(this, ID_CHECK_STALE);
       if (sci->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,sci); }
+      active_widget=sci;
       return 1;
     }
     default: { return 1; }
@@ -1392,10 +1408,13 @@ long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
   if ( dlg->execute(PLACEMENT_OWNER) ) {
     if ( prefs->SaveBeforeExecCmd && (!SaveAll(true)) ) { return 1; }
     FXString cmd=dlg->getText();
+    ClosedDialog();
     RunCommand(sci,cmd);
+  } else {
+    ClosedDialog();
   }
   delete dlg;
-  ClosedDialog();
+
   return 1;
 }
 
@@ -1521,6 +1540,10 @@ long TopWindow::onOutlistClick(FXObject*o, FXSelector sel, void*p)
         }
         return 0;
       }
+    }
+    case SEL_FOCUSIN: {
+      active_widget=outlist;
+      return 0;
     }
     default: { return 0; }
   }
