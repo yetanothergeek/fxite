@@ -1155,10 +1155,11 @@ FXID TopWindow::GetActiveWindow()
 
 
 #else
+#include <windows.h>
 #define SetupXAtoms(win,class_name)
 FXID TopWindow::GetActiveWindow()
 {
-  return id();
+  return GetForegroundWindow();
 }
 #endif
 
