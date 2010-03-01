@@ -1088,6 +1088,21 @@ void TopWindow::ParseCommands(const FXString &commands)
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xatom.h>
+
+#ifdef FOX_1_6
+#include <unistd.h>
+static FXString GetHostName()
+{
+  FXchar name[1024];
+  if(gethostname(name,sizeof(name))==0){
+    return FXString(name);
+  }
+  return "localhost";
+}
+#else
+#define GetHostName() FXSystem::getHostName()
+#endif
+
 void SetupXAtoms(FXTopWindow*win, const char*class_name)
 {
   FXIcon*ico=win->getIcon();
@@ -1119,7 +1134,7 @@ void SetupXAtoms(FXTopWindow*win, const char*class_name)
   pid_t pid=fxgetpid();
   XChangeProperty(d, win->id(), net_wm_pid, cardinal, 32,
     PropModeReplace, (const FXuchar*) &pid, sizeof(pid));
-  FXString hn=FXSystem::getHostName();
+  FXString hn=GetHostName();
   if (!hn.empty()) {
     Atom wm_client_machine = XInternAtom(d, "WM_CLIENT_MACHINE", 0);
     XChangeProperty(d, win->id(), wm_client_machine, XA_STRING, 8,
