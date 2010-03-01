@@ -1112,9 +1112,9 @@ void SetupXAtoms(FXTopWindow*win, const char*class_name)
   if (net_wm_icon&&cardinal) {
     FXint w=ico->getWidth();
     FXint h=ico->getHeight();
-    CARD32 *icon_buf=NULL;
+    unsigned long *icon_buf=NULL;
     FXint icon_buf_size=(w*h)+2;
-    icon_buf=(CARD32*)malloc(icon_buf_size*sizeof(CARD32));
+    icon_buf=(unsigned long*)malloc(icon_buf_size*sizeof(unsigned long));
     FXint j=0;
     icon_buf[j++]=w;
     icon_buf[j++]=h;
