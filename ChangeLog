@@ -1,3 +1,10 @@
+2010-02-27
+  * Add Lua functions to get process id and window id.
+  * Fixed a bug with ActivePage() sometimes incorrectly returning NULL.
+  * Prevent stealing focus from windows raised by Tools commands.
+  * Update Scintilla to 2.0.3 (from CVS)
+
+
 2010-02-23
   * Bump version to 0.5
   * Fixed an error in the handling of style bits and colourising.
