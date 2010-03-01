@@ -23,7 +23,7 @@
   Editor's Note: 
    This file was shamelessly stolen from the original author and subsequently butchered
    by the perpetrator, so please don't blame Lars Wirzenius if you find any bugs!
-  - Jeff Pohlmeyer
+  - Jeff Pohlmeyer 2009-2010
 */
 
 #include <assert.h>
