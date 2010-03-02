@@ -1158,8 +1158,8 @@ FXID TopWindow::GetActiveWindow()
   static Atom xa=XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
   Atom rtype;
   int fmt;
-  ulong n;
-  ulong rem;
+  unsigned long n;
+  unsigned long rem;
   FXuchar *xw;
   if (XGetWindowProperty(dpy,root,xa,0,sizeof(Window),False,XA_WINDOW,&rtype,&fmt,&n,&rem,&xw)==Success) {
     rv=*((Window*)xw);
