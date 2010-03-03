@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -23,7 +23,6 @@
 #include "shmenu.h"
 #include "appwin.h"
 
-
 #include "intl.h"
 #include "tooltree.h"
 
@@ -38,6 +37,8 @@ ToolsTree::ToolsTree(FXComposite*p, FXObject*tgt, FXSelector sel, UserMenu**menu
   dummy_item=NULL;
   scan(false);
 }
+
+
 
 const char*ToolsTree::getFilePath(FXTreeItem*item) {
   if ( item->getParent() ) {
@@ -151,6 +152,7 @@ void ToolsTree::scan(bool rebuild)
 }
 
 
+
 UserMenu*ToolsTree::GetUserMenu(FXTreeItem*item) {
   for (FXTreeItem*i=item; i; i=i->getParent()) {
     if (i->getParent()==tools) {
@@ -159,6 +161,7 @@ UserMenu*ToolsTree::GetUserMenu(FXTreeItem*item) {
   }
   return NULL;
 }
+
 
 
 /* An OK button that is only enabled when the selected tree item is a tool (i.e. a leaf node) */
@@ -172,12 +175,15 @@ public:
     if (item && !item->hasItems()) { enable(); } else { disable(); }
     return 1;
   }
-  enum { ID_CHECK_ENABLE=FXButton::ID_LAST };  
+  enum { ID_CHECK_ENABLE=FXButton::ID_LAST };
   OkBtn(FXComposite*p):FXButton(p,_("OK"),NULL,p,FXDialogBox::ID_ACCEPT,BUTTON_NORMAL|BUTTON_INITIAL|LAYOUT_CENTER_X){}
 };
-FXDEFMAP(OkBtn)OkBtnMap[]={ FXMAPFUNC(SEL_CHANGED,OkBtn::ID_CHECK_ENABLE,OkBtn::onCheckEnable) };
-FXIMPLEMENT(OkBtn,FXButton,OkBtnMap,ARRAYNUMBER(OkBtnMap));
 
+
+
+FXDEFMAP(OkBtn)OkBtnMap[]={ FXMAPFUNC(SEL_CHANGED,OkBtn::ID_CHECK_ENABLE,OkBtn::onCheckEnable) };
+
+FXIMPLEMENT(OkBtn,FXButton,OkBtnMap,ARRAYNUMBER(OkBtnMap));
 
 
 
@@ -198,5 +204,4 @@ bool ToolsTree::SelectTool(FXWindow* owner, UserMenu** menus, FXMenuCommand*&mc)
     return false;
   }
 }
-
 

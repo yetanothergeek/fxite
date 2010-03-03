@@ -89,6 +89,7 @@ typedef struct _HelpLink {
 } HelpLink;
 
 
+
 class SciHelp: public FXScintilla {
   FXDECLARE(SciHelp)
   SciHelp(){}
@@ -115,7 +116,7 @@ public:
     ID_ZOOMOUT,
     ID_LAST
   };
-  
+
 };
 
 

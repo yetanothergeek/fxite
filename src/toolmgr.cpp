@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -31,7 +31,6 @@
 
 #include "intl.h"
 #include "toolmgr.h"
-
 
 
 
@@ -172,6 +171,7 @@ void ToolsDialog::clear()
 }
 
 
+
 void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
 {
   UserMenu*um=tree->GetUserMenu(item);
@@ -216,6 +216,7 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
     opts_panel->reparent(middle_box,apply_btn->getParent());
   }
 }
+
 
 
 void ToolsTree::MakeDummyMenu(FXTreeItem*parent_item)
@@ -312,7 +313,7 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
   dummy_item->setData(cmd);
   setCurrentItem(dummy_item);
   selectItem(dummy_item);
- 
+
 }
 
 
@@ -326,8 +327,9 @@ static FXuint AskSaveChanges(FXWindow*w, bool hasitems,const char*name)
     name,
     _("has unsaved settings."),
     _("Do you want to save your changes?")
-);
+  );
 }
+
 
 
 long ToolsDialog::onClose(FXObject*o, FXSelector sel, void*p)
@@ -362,6 +364,7 @@ long ToolsDialog::onClose(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long ToolsDialog::onMoveListChoose(FXObject*o, FXSelector sel, void*p)
 {
   if (move_list->getItemData(move_list->getCurrentItem())) {
@@ -371,6 +374,7 @@ long ToolsDialog::onMoveListChoose(FXObject*o, FXSelector sel, void*p)
   }
   return 1;
 }
+
 
 
 void ToolsDialog::SetMoveOptions(FXTreeItem *item)
@@ -483,7 +487,6 @@ long ToolsDialog::onTreeListAfterChanged(FXObject*o, FXSelector sel, void*p)
   }
   return 0;
 }
-
 
 
 
@@ -728,6 +731,7 @@ FXuint ToolsDialog::GetPermsForItem(FXTreeItem *item)
   return ( (comparecase(kind,"commands")==0) || (comparecase(kind,"filters")==0)  || IsExecSnippet() )?
     FXIO::OwnerFull:FXIO::OwnerReadWrite;
 }
+
 
 
 long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)

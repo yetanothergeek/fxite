@@ -21,7 +21,6 @@
 #include <Scintilla.h>
 #include <FXScintilla.h>
 
-
 #include "compat.h"
 #include "scidoc.h"
 #include "scisrch.h"
@@ -36,6 +35,7 @@ FXDEFMAP(SciSearchOptions) SciSearchOptionsMap[]={
 };
 
 FXIMPLEMENT(SciSearchOptions,FXHorizontalFrame,SciSearchOptionsMap,ARRAYNUMBER(SciSearchOptionsMap))
+
 
 
 void SciSearchOptions::SetSciFlags(FXuint n)
@@ -153,7 +153,6 @@ public:
 
 
 
-
 FXDEFMAP(SciReplDlg) SciReplDlgMap[]={
   FXMAPFUNC(SEL_COMMAND, SciReplDlg::ID_SCI_OPTS, SciReplDlg::onSciOpts),
   FXMAPFUNCS(SEL_COMMAND, SciReplDlg::ID_SRCH_HIST,SciReplDlg::ID_REPL_HIST, SciReplDlg::onSrchHist),
@@ -184,6 +183,7 @@ void SciReplDlg::AppendHist(const FXString& search,const FXString& replace,FXuin
   }
   sciflags=oldmode;
 }
+
 
 
 void SciReplDlg::stop(FXuint stopval)
@@ -322,7 +322,6 @@ FXuint SciReplDlg::execute(bool first_time)
 
 
 
-
 SciReplDlg::SciReplDlg(FXWindow*p, bool find_only):FXDialogBox(p,find_only?_("Find"):_("Replace"))
 {
   sciflags=0;
@@ -369,7 +368,6 @@ SciReplDlg::SciReplDlg(FXWindow*p, bool find_only):FXDialogBox(p,find_only?_("Fi
 
 
 
-
 FXIMPLEMENT(SearchDialogs, FXObject, NULL, 0);
 
 
@@ -381,11 +379,14 @@ SearchDialogs::SearchDialogs(FXWindow*shell) {
   _shell=shell;
 }
 
+
+
 SearchDialogs::~SearchDialogs()
 {
   delete find_dlg;
   find_dlg=NULL;
 }
+
 
 
 bool SearchDialogs::SearchFailed()
@@ -468,7 +469,7 @@ bool SearchDialogs::ShowFindDialog(SciDoc*sci)
   // so save the current placement, destroy the dialog, and restore X and Y next time.
   prev_x=find_dlg->getX();
   prev_y=find_dlg->getY();
-  find_dlg->destroy(); 
+  find_dlg->destroy();
   return !(initial);
 }
 
@@ -609,5 +610,4 @@ bool SearchDialogs::ShowGoToDialog(SciDoc*sci)
   sci->setFocus();
   return rv;
 }
-
 

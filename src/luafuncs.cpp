@@ -46,6 +46,8 @@
 #include "filer.h"
 #include "prefs.h"
 #include "appmain.h"
+#include "scisrch.h"
+#include "luasci.h"
 
 #include "intl.h"
 #include "luafuncs.h"
@@ -55,7 +57,6 @@
 /*
   Not impemented:
   function keygrab ( [prompt] ) -- Intercept a keystroke from the editor.
-  function scintilla ( msg_id, wparam, lparam ) -- Send a message directly to the Scintilla widget.
   var wordchars : string -- The characters that are considered part of a word.
 */
 
@@ -83,8 +84,6 @@ if (!sci) { \
 #define CheckReadOnly() { if (sci->GetReadOnly()) { luaL_error(L, _("Attempt to modify a read-only document")); } }
 
 #define sendPointer sendString
-
-#include <scisrch.h>
 
 
 static int ArgErrFmt(lua_State *L, int numarg, const char *fmt, ...)
@@ -114,10 +113,10 @@ static bool check_find_flags(lua_State* L, int pos, int &flags)
         flags+= SCFIND_WHOLEWORD;
       } else if (strncasecmp(flagname, "regexp", 5) == 0) {
         flags+= SCFIND_REGEXP;
-      } else { 
+      } else {
         ArgErrFmt(L, pos, _("unknown flag at table element #%d"), i);
-      } 
-    } else { 
+      }
+    } else {
       ArgErrFmt(L, pos, _("table element #%d is not a string"), i);
     }
     lua_pop(L,1);
@@ -126,7 +125,8 @@ static bool check_find_flags(lua_State* L, int pos, int &flags)
     luaL_argerror(L, pos, _("Cannot specify \"wholeword\" and \"regexp\" together."));
   }
   return true;
-} 
+}
+
 
 
 // find(phrase, start, stop, {options})
@@ -155,9 +155,10 @@ static int find(lua_State* L)
 }
 
 
+
 // gofind(phrase, {options} [, forward])
 static int gofind(lua_State* L)
-{  
+{
   DOC_REQD;
   int flags=0;
   const char*lpstrText=luaL_checkstring(L,1);
@@ -183,6 +184,7 @@ static int match(lua_State* L)
 }
 
 
+
 //  function word ( [position] ) -- Get the word at the specified location.
 static int word(lua_State* L)
 {
@@ -195,9 +197,9 @@ static int word(lua_State* L)
 }
 
 
-/*
-  Translate between rectangular (line/column) and linear (position) locations.
-*/
+
+
+//  Translate between rectangular (line/column) and linear (position) locations.
 static int rowcol(lua_State* L)
 {
   int argc=lua_gettop(L);
@@ -246,7 +248,7 @@ static int rowcol(lua_State* L)
 }
 
 
-/* Set or get the endpoints of the scintilla selection */
+// Set or get the endpoints of the scintilla selection
 static int select(lua_State* L)
 {
   int argc=lua_gettop(L);
@@ -336,6 +338,7 @@ static int GetSciNavCmd(const char*str, bool fwd, bool sel, bool rect, bool smar
     }
   } else return SCI_NULL;
 }
+
 
 
 // go(mode,count [,extend [,rect]])
@@ -530,7 +533,6 @@ static int paste(lua_State* L)
 
 
 
-
 // seltext()
 static int seltext(lua_State*L)
 {
@@ -547,6 +549,7 @@ static int seltext(lua_State*L)
 }
 
 
+
 // insert([text])
 static int insert(lua_State*L)
 {
@@ -556,6 +559,7 @@ static int insert(lua_State*L)
   sci->sendString(SCI_REPLACESEL,0,txt);
   return 0;
 }
+
 
 
 // text([text])
@@ -1343,14 +1347,14 @@ static int mkdir(lua_State* L)
     lua_pushboolean(L, true);
     return 1;
   } else {
-     if (FXDir::create(path)) {
-        lua_pushboolean(L, true);
-        return 1;
-      } else {
-        lua_pushboolean(L, false);
-        lua_pushstring(L, strerror(errno));
-        return 2;
-      }
+    if (FXDir::create(path)) {
+      lua_pushboolean(L, true);
+      return 1;
+    } else {
+      lua_pushboolean(L, false);
+      lua_pushstring(L, strerror(errno));
+      return 2;
+    }
   }
 }
 
@@ -1450,16 +1454,18 @@ class SelSaver: public FXWindow
       for ( FXDragType*type=types; *type; type++ ) {
         if (getDNDData(FROM_SELECTION,*type, data, len)&&data&&*data) {
           return (const char*) data;
-        } 
+        }
       }
       return NULL;
     }
-    SelSaver(FXComposite *p):FXWindow(p) { 
+    SelSaver(FXComposite *p):FXWindow(p) {
       create();
       if (!textType) { textType = getApp()->registerDragType(textTypeName); }
       if (!utf8Type) { utf8Type = getApp()->registerDragType(utf8TypeName); }
     }
 };
+
+
 
 FXDEFMAP(SelSaver) SelSaverMap[] = {
   FXMAPFUNC(SEL_SELECTION_REQUEST,0,SelSaver::onSelectionRequest),
@@ -1502,7 +1508,7 @@ static int lowercase(lua_State* L)
   return 0;
 }
 
-#include "luasci.h"
+
 
 static SciCmdDesc* lookup_cmd_id(int cmd)
 {
@@ -1511,6 +1517,8 @@ static SciCmdDesc* lookup_cmd_id(int cmd)
   }
   return NULL;
 }
+
+
 
 static SciCmdDesc* lookup_cmd_str(const char*cmd)
 {
@@ -1521,6 +1529,8 @@ static SciCmdDesc* lookup_cmd_str(const char*cmd)
   }
   return NULL;
 }
+
+
 
 static int scintilla(lua_State* L)
 {
@@ -1549,7 +1559,7 @@ static int scintilla(lua_State* L)
   }
 
   if (((desc->wparam==SLT_INT)&&(desc->lparam==SLT_STRINGRESULT))) {
-    /* We can allow missing wparam (length) for some string result types */
+    // We can allow missing wparam (length) for some string result types
   } else {
     if (desc->wparam!=SLT_VOID) { luaL_checkany(L,2); }
     if (desc->lparam!=SLT_VOID) { luaL_checkany(L,3); }
@@ -1651,6 +1661,7 @@ static int scintilla(lua_State* L)
 }
 
 
+
 static int scrollpos(lua_State* L)
 {
   DOC_REQD
@@ -1667,6 +1678,8 @@ static int scrollpos(lua_State* L)
     return 0;
   }
 }
+
+
 
 static int lexer(lua_State* L)
 {
@@ -1757,6 +1770,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"pid", pid},
   {NULL, NULL}
 };
+
 
 
 const luaL_reg* LuaFuncs(TopWindow*topwin)

@@ -70,10 +70,8 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
 
   statusbar=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED, 0,0,0,0, 3,3,3,3, 7,3);
 
-
   vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
   CreateToolbar();
-
 
   hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
@@ -105,7 +103,6 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   encname->setShadowColor(clr);
   encname->setBackColor(clr);
   encname->setEditable(false);
-
 
   general_info=new FXLabel(statusbar, FXString::null, NULL,JUSTIFY_LEFT|LAYOUT_FIX_Y);
   general_info->setUserData((void*)DontFreezeMe());
@@ -318,7 +315,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   }
   recent_files->remove(sci->Filename());
 
-  //  If the only thing we had open prior to this file was a single, 
+  //  If the only thing we had open prior to this file was a single,
   //  empty, untitled, unmodified document, then close it...
   if ((tabbook->Count()==2) && (!sci->Filename().empty())) {
     SciDoc*sc0=(SciDoc*)(tabbook->PageAt(0)->getFirst());
@@ -440,7 +437,6 @@ bool TopWindow::CloseFile(bool close_last, bool hooked)
 bool TopWindow::RunHookScript(const char*hookname)
 {
   static bool running_hook_script=false;
-
   FXString hook;
   if (running_hook_script) { return false; }
   hook.format("%s%s%c%s%c%s.lua", GetApp()->ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, hookname);
@@ -547,7 +543,6 @@ bool TopWindow::ShowLineNumbers()
 
 void TopWindow::ShowStatusBar(bool showit)
 {
-
   prefs->ShowStatusBar=showit;
   status_chk->setCheck(showit);
   SyncToggleBtn(status_chk,FXSEL(SEL_COMMAND,ID_SHOW_STATUSBAR));
@@ -626,6 +621,8 @@ void TopWindow::ShowToolbar(bool showit)
     onShowToolbar(toolbar_chk,FXSEL(SEL_COMMAND,ID_SHOW_TOOLBAR),(void*)showit);
   }
 }
+
+
 
 bool TopWindow::ShowToolbar()
 {
@@ -715,7 +712,6 @@ void TopWindow::DisableUI(bool disabled)
 
 
 
-
 void TopWindow::SetInfo(const char*msg, bool hide_docname)
 {
   if (hide_docname) {
@@ -738,7 +734,7 @@ static void SetShellEnv(const char*file, long line)
   char linenum[8]="\0\0\0\0\0\0\0";
   snprintf(linenum,sizeof(linenum)-1, "%ld", line);
   FXSystem::setEnvironment("l",linenum);
-  FXSystem::setEnvironment("f",file); 
+  FXSystem::setEnvironment("f",file);
 }
 
 
@@ -824,6 +820,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
 }
 
 
+
 bool TopWindow::InsertFile(SciDoc *sci, const FXString &filename)
 {
   if (sci->InsertFile(filename.text())) {
@@ -834,6 +831,7 @@ bool TopWindow::InsertFile(SciDoc *sci, const FXString &filename)
   }
   return false;
 }
+
 
 
 /*
@@ -864,6 +862,7 @@ bool TopWindow::IsMacroCancelled()
 }
 
 
+
 bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 {
   if (!CheckKillCommand(this,temp_accels)) { return false; }
@@ -885,8 +884,9 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 }
 
 
+
 long TopWindow::onCloseWait(FXObject*o, FXSelector sel, void*p)
-{  
+{
   if (FXSELTYPE(sel)==SEL_CHORE) {
     getApp()->addTimeout(this,ID_CLOSEWAIT, ONE_SECOND/10, NULL);
   } else {
@@ -897,13 +897,15 @@ long TopWindow::onCloseWait(FXObject*o, FXSelector sel, void*p)
 
 
 
-#define confirm(hdr,fmt,arg) ( FXMessageBox::question(this,MBOX_OK_CANCEL,hdr,fmt,arg) == MBOX_CLICKED_OK)
+#define confirm(hdr,fmt,arg) \
+  ( FXMessageBox::question(this,MBOX_OK_CANCEL,hdr,fmt,arg) == MBOX_CLICKED_OK )
 
 #define not_confirmed() {\
  close_all_confirmed=false; \
  kill_commands_confirmed=false; \
  topwin_closing=false; \
 }
+
 
 FXbool TopWindow::close(FXbool notify)
 {
@@ -1079,6 +1081,8 @@ void TopWindow::ParseCommands(const FXString &commands)
   }
 }
 
+
+
 #ifndef __WIN32__
 #define NET_WM_ICON
 #endif
@@ -1146,7 +1150,7 @@ void SetupXAtoms(FXTopWindow*win, const char*class_name)
   Atom wm_class = XInternAtom(d, "WM_CLASS", 0);
   XChangeProperty(d, win->id(), wm_class, XA_STRING, 8,
     PropModeReplace, (const FXuchar*) cn.text(), cn.length());
-} 
+}
 
 
 
@@ -1167,7 +1171,6 @@ FXID TopWindow::GetActiveWindow()
   }
   return rv;
 }
-
 
 #else
 #include <windows.h>
@@ -1193,7 +1196,7 @@ void TopWindow::create()
   UpdateToolbar();
 
   FXMainWindow::create();
-  
+
   show(prefs->placement);
 
   FXIcon*ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP);

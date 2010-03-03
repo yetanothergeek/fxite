@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -39,6 +39,7 @@
 }
 
 
+
 // Display a Windows system error message in a dalog box.
 void WinErrMsg(const char*msg, int code) {
   LPVOID lpMsgBuf;
@@ -48,6 +49,7 @@ void WinErrMsg(const char*msg, int code) {
   FXMessageBox::error(FXApp::instance(), MBOX_OK, "Command error", "Error %s:\n%s", msg, (char*)lpMsgBuf);
   LocalFree(lpMsgBuf);
 }
+
 
 
 #define CleanupAndReturn(s,b) \
@@ -63,7 +65,6 @@ void WinErrMsg(const char*msg, int code) {
     cmd=NULL; \
   } \
   return b;
-
 
 
 
@@ -85,7 +86,7 @@ bool CreateChildProcess(char* cmdline, HANDLE StdIN_Rd, HANDLE StdOUT_Wr, HANDLE
 
 
 
-// Set up a file handle for a child process: 
+// Set up a file handle for a child process:
 //   DuplicateHandle() for Win9x; SetHandleInformation() for WinNT
 static bool SetupHandle(HANDLE &FD)
 {
@@ -110,7 +111,7 @@ static bool SetupHandle(HANDLE &FD)
 // uses blocking I/O - the "canceler" is ignored!
 bool CmdIO::run(const char *command, bool*canceler)
 {
-  stdinFD = stdoutFD = stderrFD = StdIN_Rd = StdOUT_Wr = StdERR_Wr = NULL;  
+  stdinFD = stdoutFD = stderrFD = StdIN_Rd = StdOUT_Wr = StdERR_Wr = NULL;
   RecvString = ErrString = "";
   PROCESS_INFORMATION pi;
   SECURITY_ATTRIBUTES sa;
@@ -120,9 +121,9 @@ bool CmdIO::run(const char *command, bool*canceler)
   char TempOut[MAX_PATH];
   char TempErr[MAX_PATH];
   ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
-  sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
-  sa.bInheritHandle = TRUE; 
-  sa.lpSecurityDescriptor = NULL; 
+  sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+  sa.bInheritHandle = TRUE;
+  sa.lpSecurityDescriptor = NULL;
   DWORD exitcode=0;
   ZeroMemory(TempOut,MAX_PATH);
   ZeroMemory(TempErr,MAX_PATH);
@@ -144,7 +145,7 @@ bool CmdIO::run(const char *command, bool*canceler)
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
           appendLine(ErrString);
-        } else { 
+        } else {
           if (!ErrString.empty()) {
             ErrString.append('\n');
             appendLine(ErrString);
@@ -161,7 +162,7 @@ bool CmdIO::run(const char *command, bool*canceler)
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
           appendLine(RecvString);
-        } else { 
+        } else {
           if (!RecvString.empty()) {
             RecvString.append('\n');
             appendLine(RecvString);
@@ -197,7 +198,7 @@ bool CmdIO::run(const char *command, bool*canceler)
       SafeClose(stdinFD);
       SafeClose(stdoutFD);
       SafeClose(stderrFD);
-    } else {     
+    } else {
       CleanupAndReturn("creating process", false);
     }
   }
@@ -233,7 +234,7 @@ bool CmdIO::run(const char *command, bool*canceler)
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
           appendLine(RecvString);
-        } else { 
+        } else {
           if (!RecvString.empty()) {
             RecvString.append('\n');
             appendLine(RecvString);
@@ -277,7 +278,6 @@ bool CmdIO::run(const char *command, bool*canceler)
   }
   CleanupAndReturn("", (exitcode==0));
 }
-
 
 #endif
 

@@ -34,6 +34,7 @@
 #include "intl.h"
 #include "scidoc.h"
 
+
 FXDEFMAP(SciDoc) SciDocMap[] = {
   FXMAPFUNC(SEL_KEYPRESS, 0, SciDoc::onKeyPress)
 };
@@ -85,7 +86,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
 
 SciDoc::~SciDoc()
 {
- delete search;
+  delete search;
 }
 
 
@@ -100,6 +101,7 @@ long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
     return FXScintilla::onKeyPress(o,sel,p);
   }
 }
+
 
 
 void SciDoc::SetEolModeFromContent()
@@ -139,11 +141,16 @@ void SciDoc::SetEolModeFromContent()
   sendMessage(SCI_CONVERTEOLS,sendMessage(SCI_GETEOLMODE,0,0),0);
 }
 
+
+
 extern "C" {
   char get_file_encoding(const char*filename);
 }
 
+
+
 const char* SciDoc::BinaryFileMessage() { return "Binary file detected."; }
+
 
 
 static bool ConfirmOpenBinary(SciDoc*sci, const char*filename)
@@ -154,13 +161,14 @@ static bool ConfirmOpenBinary(SciDoc*sci, const char*filename)
 }
 
 
+
 bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
 {
   _lasterror="";
   errno=0;
   bool rv=true;
   bool ro=GetReadOnly();
-  if (ro&&insert) { 
+  if (ro&&insert) {
     _lasterror=_("Document is marked read-only.");
     return false;
   }
@@ -182,7 +190,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       if (!insert) { SetUTF8(!DefaultToAscii); }
       break;
     }
-    case 'H': { // High (extended ASCII) text file. 
+    case 'H': { // High (extended ASCII) text file.
       if (!insert) { SetUTF8(false); }
       break;
     }
@@ -192,7 +200,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     }
     case 'Z': { // Zero-length (empty) file.
       if (!insert) { SetUTF8(!DefaultToAscii); }
-      break; 
+      break;
     }
     case 'F': { // Failure, could not read the file.
       _lasterror=strerror(errno);
@@ -202,7 +210,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
   }
   FXFile fh(filename, FXFile::Reading);
   if (fh.isOpen()) {
-    if (ro) { 
+    if (ro) {
       // This might happen e.g. if we are updating a document that has been modified externally
       sendMessage(SCI_SETREADONLY,0,0);
     }
@@ -513,7 +521,9 @@ void SciDoc::UpdateStyle()
 }
 
 
+
 #define slave(f,v) { if (Slave()) { Slave()->f(v); } }
+
 
 
 void SciDoc::CaretLineBG(const char*bgcolor)
@@ -746,10 +756,9 @@ bool SciDoc::GoToStringCoords(const char*coords)
 
 
 
-/*
- Move caret to specified row and column coordinates -
- NOTE: First row is one, NOT zero!!!
-*/
+
+// Move caret to specified row and column coordinates -
+// NOTE: First row is one, NOT zero!!!
 void SciDoc::GoToCoords(long row, long col)
 {
   long rows,cols,pos;
@@ -820,11 +829,14 @@ void SciDoc::ShowLineNumbers(bool showit)
 
 
 
-void SciDoc::ShowWhiteSpace(bool showit) {
+void SciDoc::ShowWhiteSpace(bool showit)
+{
   sendMessage(SCI_SETVIEWWS, showit?SCWS_VISIBLEALWAYS:SCWS_INVISIBLE, 0);
   sendMessage(SCI_SETVIEWEOL, showit? (showit&&Settings::instance()->WhitespaceShowsEOL):0 , 0);
   slave(ShowWhiteSpace,showit);
 }
+
+
 
 void SciDoc::SetUTF8(bool utf8)
 {
@@ -834,14 +846,17 @@ void SciDoc::SetUTF8(bool utf8)
 }
 
 
-void SciDoc::GetSelection(CharacterRange &crange) {
+
+void SciDoc::GetSelection(CharacterRange &crange)
+{
   crange.cpMin = sendMessage(SCI_GETSELECTIONSTART,0,0);
   crange.cpMax = sendMessage(SCI_GETSELECTIONEND,0,0);
 }
 
 
 
-void SciDoc::SetLineIndentation(int line, int indent) {
+void SciDoc::SetLineIndentation(int line, int indent)
+{
   if (indent < 0) { return; }
   sendMessage(SCI_BEGINUNDOACTION,0,0);
   CharacterRange crange;
@@ -877,7 +892,8 @@ void SciDoc::SetLineIndentation(int line, int indent) {
 
 
 
-int SciDoc::GetLineLength(int line) {
+int SciDoc::GetLineLength(int line)
+{
   return sendMessage(SCI_GETLINEENDPOSITION, line, 0) - sendMessage(SCI_POSITIONFROMLINE, line, 0);
 }
 
@@ -903,6 +919,7 @@ long SciDoc::GetLineText(long linenum, FXString &text)
 }
 
 
+
 int SciDoc::Stale() {
   if (!check_stale) { return 0; }
   if (_filename.empty()) { return 0; }
@@ -918,7 +935,6 @@ int SciDoc::Stale() {
 
 void SciDoc::SetSplit(FXint style)
 {
-
   FXSplitter*sp=(FXSplitter*)getParent();
   if (style==splitter_style) { return; }
   splitter_style=style;
@@ -952,7 +968,8 @@ void SciDoc::SetSplit(FXint style)
 
 
 
-void SciDoc::SmartHome(bool smart) {
+void SciDoc::SmartHome(bool smart)
+{
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME,smart?SCI_VCHOME:SCI_HOME);
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME+(SCMOD_SHIFT<<16),smart?SCI_VCHOMEEXTEND:SCI_HOMEEXTEND);
   sendMessage(SCI_ASSIGNCMDKEY,
@@ -960,11 +977,12 @@ void SciDoc::SmartHome(bool smart) {
 }
 
 
+
 // Strange things can happen when we allow grouping of undo actions by end-users.
-// For example, if a Lua script calls SCI_BEGINUNDOACTION and forgets to call 
-// SCI_ENDUNDOACTION, or if the script terminates abnormally, the document might 
+// For example, if a Lua script calls SCI_BEGINUNDOACTION and forgets to call
+// SCI_ENDUNDOACTION, or if the script terminates abnormally, the document might
 // continue collecting actions that can't be individually un-done. To help prevent
-// such situations, all script-generated calls to affect undo grouping should be 
+// such situations, all script-generated calls to affect undo grouping should be
 // made through this method:
 void SciDoc::SetUserUndoLevel(FXint action)
 {

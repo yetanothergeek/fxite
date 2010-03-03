@@ -26,18 +26,14 @@
 #include <FXScintilla.h>
 #include <lua.h>
 
-
 #include "intl.h"
 #include "appmain.h"
-
 #include "scidoc.h"
 #include "prefs.h"
 #include "shmenu.h"
 #include "lang.h"
 #include "menuspec.h"
-
 #include "compat.h"
-
 #include "appwin.h"
 
 #define TEST_SOMETHING 0
@@ -53,11 +49,13 @@ static const char*usercmdflags[]={
   NULL
 };
 
+
 static const char*usersnipflags[]={
   "read", _("Insert file's contents."),
   "exec", _("Insert command output."),
   NULL
 };
+
 
 
 /*
@@ -91,6 +89,7 @@ public:
 };
 
 
+
 FXDEFMAP(TopMenuPane) TopMenuPaneMap[] = {
   FXMAPFUNC(SEL_CHORE,TopMenuPane::ID_FOCUS_DOC,TopMenuPane::onFocusDoc),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNPOST,TopMenuPane::onCmdUnpost),
@@ -100,12 +99,10 @@ FXIMPLEMENT(TopMenuPane,FXMenuPane,TopMenuPaneMap,ARRAYNUMBER(TopMenuPaneMap))
 
 
 
-
 void TopWindow::CreateLanguageMenu()
 {
   langmenu=new FXMenuPane(this);
   langcasc=new FXMenuCascade(viewmenu,_("&Language"),NULL,langmenu);
-  LangStyle*ls;
   FXMenuRadio*mr;
 
   cpp_langmenu=new FXMenuPane(langmenu);
@@ -141,9 +138,8 @@ void TopWindow::CreateLanguageMenu()
   mr=new FXMenuRadio(misc_langmenu,_("none"),this,ID_SET_LANGUAGE);
   mr->setUserData(NULL);
 
-  for (ls=languages; ls->name; ls++) {
+  for (LangStyle*ls=languages; ls->name; ls++) {
     FXMenuPane*mp;
-
     switch (ls->id) {
     case SCLEX_COBOL:
     case SCLEX_F77:
@@ -204,7 +200,6 @@ void TopWindow::CreateLanguageMenu()
       mp=asm_langmenu;
       break;
     }
-
     case SCLEX_LATEX:
     case SCLEX_TEX:
     case SCLEX_METAPOST:
@@ -221,11 +216,9 @@ void TopWindow::CreateLanguageMenu()
 
 
 
-
-
 static FXMenuTitle*NewTitle(FXComposite*p, const FXString&text, FXIcon*ic=NULL, FXPopup*pup=NULL, FXuint opts=0)
 {
- 	FXMenuTitle*rv=new FXMenuTitle(p, text, ic, pup, opts);
+  FXMenuTitle*rv=new FXMenuTitle(p, text, ic, pup, opts);
   if (pup) { pup->setUserData((void*)rv); }
   return rv;
 }
@@ -234,7 +227,7 @@ static FXMenuTitle*NewTitle(FXComposite*p, const FXString&text, FXIcon*ic=NULL, 
 
 static FXMenuCascade*NewCascade(FXComposite*p, const FXString&text, FXIcon*ic=NULL, FXPopup*pup=NULL, FXuint opts=0)
 {
- 	FXMenuCascade*rv=new FXMenuCascade(p, text, ic, pup, opts);
+  FXMenuCascade*rv=new FXMenuCascade(p, text, ic, pup, opts);
   if (pup) { pup->setUserData((void*)rv); }
   return rv;
 }
@@ -282,7 +275,6 @@ void TopWindow::CreateZoomMenu()
   MkMnuCmd(viewzoommenu,ID_ZOOM_NEAR);
   MkMnuCmd(viewzoommenu,ID_ZOOM_FAR);
 }
-
 
 
 
@@ -352,8 +344,6 @@ void TopWindow::CreateMenus()
   fmt_dos_mnu=MkMnuRad(fileformatmenu,ID_FMT_DOS);
   fmt_mac_mnu=MkMnuRad(fileformatmenu,ID_FMT_MAC);
   fmt_unx_mnu=MkMnuRad(fileformatmenu,ID_FMT_UNIX);
-
-
 
   MkMnuCmd(editmenu,ID_PREFS_DIALOG);
 
@@ -494,14 +484,13 @@ void TopWindow::CreateMenus()
   MkMnuCmd(helpmenu,ID_SHOW_LUA_HELP);
   new FXMenuSeparator(helpmenu, 0);
   MkMnuCmd(helpmenu,ID_HELP_ABOUT);
-
 }
 
 
 
 void TopWindow::DeleteMenus()
 {
- delete usercmdmenu;
+  delete usercmdmenu;
   delete userfiltermenu;
   delete usersnipmenu;
   delete usermacromenu;
@@ -649,6 +638,7 @@ void TopWindow::About()
 }
 
 
+
 #define TBarOpts (FRAME_NONE|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT)
 
 #define UsedWidthOf(f) ((f&&f->getLast())?(f->getLast()->getX()+f->getLast()->getWidth()):0)
@@ -670,14 +660,14 @@ public:
     bool prefwrap=Settings::instance()->WrapToolbar;
     if ((!prefwrap)&&(!wraptoolbar)) { return; }
     FXint kids1=rows[0]->numChildren();
-    FXint kids2=rows[1]->numChildren(); 
+    FXint kids2=rows[1]->numChildren();
     if ((prefwrap)&&(kids1>0)&&(kids2==0)&&(width<UsedWidthOf(rows[0]))) {
       FXWindow *topright=rows[0]->childAtIndex((kids1/2));
       if (topright && (kids1%2==0)) { topright=topright->getPrev(); }
       while ( rows[0]->getLast() && (rows[0]->getLast() != topright) ) {
         rows[0]->getLast()->reparent(rows[1], rows[1]->getFirst());
       }
-    } else if ( (kids2>0) && ((!prefwrap)||(width>(UsedWidthOf(rows[0])+UsedWidthOf(rows[1])))) ) { 
+    } else if ( (kids2>0) && ((!prefwrap)||(width>(UsedWidthOf(rows[0])+UsedWidthOf(rows[1])))) ) {
       while (rows[1]->getFirst()) {
         rows[1]->getFirst()->reparent(rows[0],NULL);
       }
@@ -690,19 +680,19 @@ public:
     if (rows[0]->numChildren()==0) { return; }
     FXint wdt=0;
     for (FXWindow*row=getFirst(); row; row=row->getNext()) {
-      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) { 
+      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
         btn->setLayoutHints(btn->getLayoutHints()&~LAYOUT_FIX_WIDTH);
       }
     }
     layout();
     for (FXWindow*row=getFirst(); row; row=row->getNext()) {
-      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) { 
+      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
         FXint w=btn->getWidth();
         if (w>wdt) { wdt=w; }
       }
     }
-    for (FXWindow*row=getFirst(); row; row=row->getNext()) { 
-      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) { 
+    for (FXWindow*row=getFirst(); row; row=row->getNext()) {
+      for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
         btn->setLayoutHints(btn->getLayoutHints()|LAYOUT_FIX_WIDTH);
         btn->setWidth(wdt);
       }
@@ -718,11 +708,13 @@ public:
 };
 
 
+
 FXDEFMAP(ToolBarFrame)ToolBarFrameMap[]={
   FXMAPFUNC(SEL_CONFIGURE, 0, ToolBarFrame::onConfigure)
 };
 
 FXIMPLEMENT(ToolBarFrame,FXVerticalFrame,ToolBarFrameMap,ARRAYNUMBER(ToolBarFrameMap));
+
 
 
 void TopWindow::UpdateToolbarWrap()
@@ -749,10 +741,10 @@ void TopWindow::SetTBarBtnFontCB(FXButton*btn, void*user_data)
   }
   btn->setFont(tw->toolbar_font);
   btn->destroy();
-  if (tw->shown()) { 
+  if (tw->shown()) {
     btn->create();
   }
-  if (btn->getNext()==NULL) { 
+  if (btn->getNext()==NULL) {
     ((ToolBarFrame*)(tw->toolbar_frm))->normalize();
     ((ToolBarFrame*)(tw->toolbar_frm))->reconf();
   }
@@ -845,5 +837,4 @@ void TopWindow::CreateToolbar()
   toolbar_frm=new ToolBarFrame(vbox);
   if (!prefs->ShowToolbar) { toolbar_frm->hide(); }
 }
-
 

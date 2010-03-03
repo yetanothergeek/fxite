@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -22,7 +22,6 @@
 #include <fx.h>
 #include "sl.h"
 
-
 #include "menuspec.h"
 #include "compat.h"
 
@@ -32,18 +31,17 @@
 #define MAX_ENTRIES_PER 32   // Maximum entries per menu pane
 #define MAX_ENTRIES_ALL 512  // Maximum total entries per UserMenu object
 
-FXDEFMAP(UserMenu) UserMenuMap[]={
-};
-
+FXDEFMAP(UserMenu) UserMenuMap[] = { };
 
 FXIMPLEMENT(UserMenu,FXObject,UserMenuMap,ARRAYNUMBER(UserMenuMap));
+
 
 
 class UsrMnuCmd: public FXMenuCommand {
   FXDECLARE(UsrMnuCmd);
   UsrMnuCmd(){}
 public:
-  UsrMnuCmd( FXComposite *p, 
+  UsrMnuCmd( FXComposite *p,
              const FXString &text, FXObject *tgt=NULL, FXSelector sel=0):FXMenuCommand(p,text,NULL,tgt,sel){}
 
   long onButtonRelease(FXObject*o,FXSelector sel,void*p) {
@@ -74,7 +72,7 @@ public:
 
 
 
-FXDEFMAP(UsrMnuCmd) MyCmdMap[]={
+FXDEFMAP(UsrMnuCmd) MyCmdMap[] = {
   FXMAPFUNC(SEL_KEYRELEASE,0,UsrMnuCmd::onKeyRelease),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,UsrMnuCmd::onButtonRelease)
 };
@@ -95,6 +93,7 @@ UserMenu::UserMenu(FXMenuPane *owner,
   topowner=owner;
   rescan();
 }
+
 
 
 void UserMenu::DeletePanes()
@@ -119,6 +118,7 @@ UserMenu::~UserMenu()
 }
 
 
+
 void UserMenu::create()
 {
   for (FXint i=0; i<panes.no(); i++) {
@@ -126,6 +126,7 @@ void UserMenu::create()
   }
   topcasc->create();
 }
+
 
 
 void UserMenu::rescan()
@@ -228,6 +229,7 @@ typedef struct _StrNode {
 } StrNode;
 
 
+
 int NodeCmp(StrNode*n1, StrNode*n2)
 {
   return strcasecmp(n1->data, n2->data);
@@ -259,6 +261,7 @@ public:
   static void IncCount(UserMenu*um) { um->count++; um->hasitems=true; }
   static void ScanDir(UserMenu*um, FXMenuPane*parent, const char *directory) { um->ScanDir(parent, directory); }
 };
+
 
 
 int NodeCB(StrNode*n, FXMenuPane*mp)
@@ -338,11 +341,9 @@ void UserMenu::ScanDir(FXMenuPane*parent, const char *directory)
 
 
 
-
-
 class HistMnuCmd: public FXMenuCommand {
 public:
-  HistMnuCmd( FXComposite *p, 
+  HistMnuCmd( FXComposite *p,
               const FXString &text, FXObject *tgt=NULL, FXSelector sel=0):FXMenuCommand(p,text,NULL,tgt,sel){}
   ~HistMnuCmd() { free(getUserData()); }
 };
@@ -354,7 +355,6 @@ FXDEFMAP(HistMenu) HistMenuMap[] = {
 };
 
 FXIMPLEMENT(HistMenu,FXMenuPane,HistMenuMap,ARRAYNUMBER(HistMenuMap))
-
 
 
 
@@ -391,13 +391,15 @@ void HistMenu::add_item(const FXString &txt, bool prepended)
 
 
 
-void HistMenu::prepend(const FXString &txt) {
+void HistMenu::prepend(const FXString &txt)
+{
   add_item(txt, true);
 }
 
 
 
-void HistMenu::append(const FXString &txt) {
+void HistMenu::append(const FXString &txt)
+{
   add_item(txt, false);
 }
 

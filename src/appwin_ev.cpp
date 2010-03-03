@@ -182,21 +182,22 @@ long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
     case ID_FMT_DOS:{
       EolMode=SC_EOL_CRLF;
       break;
-    } 
-    case ID_FMT_MAC:{ 
+    }
+    case ID_FMT_MAC:{
       EolMode=SC_EOL_CR;
       break;
-    } 
+    }
     case ID_FMT_UNIX:{
       EolMode=SC_EOL_LF;
       break;
-    } 
+    }
   }
   FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
   FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
   RadioUpdate(FXSELID(sel),ID_FMT_DOS,ID_FMT_UNIX);
   return 1;
 }
+
 
 
 bool TopWindow::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
@@ -210,6 +211,7 @@ bool TopWindow::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_dat
   }
   return true;
 }
+
 
 
 long TopWindow::onBookmark(FXObject*o, FXSelector sel, void*p)
@@ -243,14 +245,14 @@ long TopWindow::onFocusIn(FXObject*o, FXSelector sel, void*p)
   long rv=FXMainWindow::onFocusIn(o,sel,p);
   if (active_widget==outlist) {
     outlist->setFocus();
-  } else if (FocusedDoc()) { 
+  } else if (FocusedDoc()) {
     FocusedDoc()->setFocus();
   }
   return rv;
 }
 
 
-
+/* Utility function, only used for testing new stuff */
 long TopWindow::onTestSomething(FXObject*o, FXSelector sel, void*p)
 {
   if (FXSELTYPE(sel)==SEL_CHORE) {
@@ -449,6 +451,7 @@ long TopWindow::onMacroShow(FXObject*o, FXSelector sel, void*p)
   }
   return 1;
 }
+
 
 
 long TopWindow::onMacroRecord(FXObject*o, FXSelector sel, void*p)
@@ -725,7 +728,6 @@ long TopWindow::onTimer(FXObject*o, FXSelector sel, void*p)
       }
     }
   }
-
   if (prefs->Autosave) {
     if (SaveTicks < prefs->AutosaveInterval) {
       SaveTicks++;
@@ -884,11 +886,9 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
 
 
 
-
 // Switch tab orientations
 long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 {
-
   switch(FXSELID(sel)){
     case ID_TABS_TOP:
       tabbook->setTabStyle(TABBOOK_TOPTABS);
@@ -948,6 +948,7 @@ long TopWindow::onMoveTab(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long TopWindow::onTabActivate(FXObject*o, FXSelector sel, void*p)
 {
   tabbook->ActivateTab((DocTab*)(((FXMenuCommand*)o)->getUserData()));
@@ -998,11 +999,13 @@ long TopWindow::onFileSaveACopy(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long TopWindow::onFileSaveAll(FXObject*o, FXSelector sel, void*p)
 {
   SaveAll(false);
   return 1;
 }
+
 
 
 long TopWindow::onFileSave(FXObject*o, FXSelector sel, void*p)
@@ -1054,6 +1057,7 @@ long TopWindow::onUndo(FXObject*o, FXSelector sel, void*p)
   UpdateEolMenu(sci);
   return 1;
 }
+
 
 
 long TopWindow::onRedo(FXObject*o, FXSelector sel, void*p)
@@ -1225,9 +1229,6 @@ long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
   return 1;
 }
 
-/*
-ID_READONLY
-*/
 
 
 long TopWindow::onShowLineNums( FXObject*o, FXSelector sel, void*p )
@@ -1238,6 +1239,7 @@ long TopWindow::onShowLineNums( FXObject*o, FXSelector sel, void*p )
   SyncToggleBtn(o,sel);
   return 1;
 }
+
 
 
 long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
@@ -1254,6 +1256,7 @@ long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
 }
 
 
+
 long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowWhiteSpace=!prefs->ShowWhiteSpace;
@@ -1262,6 +1265,7 @@ long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
   SyncToggleBtn(o,sel);
   return 1;
 }
+
 
 
 long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
@@ -1274,6 +1278,7 @@ long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowIndentGuides = !prefs->ShowIndentGuides;
@@ -1282,6 +1287,7 @@ long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
   SyncToggleBtn(o,sel);
   return 1;
 }
+
 
 
 long TopWindow::onShowOutputPane(FXObject*o, FXSelector sel, void*p)
@@ -1301,6 +1307,7 @@ long TopWindow::onShowStatusBar(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
 {
   if (!prefdlg) { prefdlg=new PrefsDialog(this, prefs); }
@@ -1317,7 +1324,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
   getApp()->setWheelLines(prefs->WheelLines);
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) { UpdateToolbar(); }
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) { UpdateToolbarWrap(); }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) { 
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
     delete toolbar_font;
     toolbar_font=NULL;
     ForEachToolbarButton(SetTBarBtnFontCB,this);
@@ -1392,6 +1399,7 @@ long TopWindow::onFilterSel(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
 long TopWindow::onKillCommand(FXObject*o, FXSelector sel, void*p)
 {
   command_timeout=true;
@@ -1414,7 +1422,6 @@ long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
     ClosedDialog();
   }
   delete dlg;
-
   return 1;
 }
 
@@ -1564,6 +1571,7 @@ long TopWindow::onChangeCase(FXObject*o, FXSelector sel, void*p)
   }
   return 1;
 }
+
 
 
 long TopWindow::onTBarCustomCmd(FXObject*o, FXSelector sel, void*p)

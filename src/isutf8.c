@@ -19,8 +19,8 @@
  */
 
 
-/* 
-  Editor's Note: 
+/*
+  Editor's Note:
    This file was shamelessly stolen from the original author and subsequently butchered
    by the perpetrator, so please don't blame Lars Wirzenius if you find any bugs!
   - Jeff Pohlmeyer 2009-2010
@@ -123,12 +123,12 @@ static unsigned long decodeutf8(unsigned char *buf, int nbytes)
 /*
   Determine if the contents of an open file form a valid UTF8 byte stream.
   Do this by collecting bytes for a character into a buffer and then decode
-  the bytes and re-encode them and compare that they are identical to the 
+  the bytes and re-encode them and compare that they are identical to the
   original bytes. If any step fails, return 'H' for "high" (extended ASCII).
   If EOF is reached, return 'U' for UTF-8, or 'T' for text if the file might also
   be interpreted as seven-bit US-ASCII. At the same time, also check for control
   characters: we will accept carriage-returns, line-feeds, form-feeds, audibles[1],
-  and horizontal or vertical tabs - Any other characters with a value less than 32 
+  and horizontal or vertical tabs - Any other characters with a value less than 32
   would probably indicate this is not a text file at all, so return 'B' for binary.
   [1] Some autoconf configure scripts contain BEL chars as an awk field separator.
  */
@@ -145,11 +145,11 @@ static char get_stream_encoding(FILE *file) {
   for (;;) {
     c = getc(file);
     if (c != EOF){
-      if ( (c<32) && ( (c==0) || (!strchr("\n\t\r\f\v\a",c)) ) ) { 
+      if ( (c<32) && ( (c==0) || (!strchr("\n\t\r\f\v\a",c)) ) ) {
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
-      if (c >= 0x80) { 
+      if (c >= 0x80) {
         /* Can't be 7-bit, so it's either valid UTF-8, or "extended" ASCII */
         result='U';
       }
@@ -188,7 +188,7 @@ Test the contents of FILENAME and return one of the following values:
   Z: Zero-length (empty) file.
   F: Failure, could not read the file.
 
-Notes: 
+Notes:
   A return value of 'T' could also be treated as valid UTF-8
   Unknown encodings might be incorrectly returned as 'B' or 'H' !!!
 
@@ -215,3 +215,4 @@ char get_file_encoding(const char*filename)
 #ifdef TEST_FOR_GET_FILE_ENCODING
   int main (int argc, char*argv[]) { printf("%c\n", get_file_encoding(argv[1])); }
 #endif
+

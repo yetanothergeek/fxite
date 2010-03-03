@@ -405,7 +405,8 @@ static const char* helptext[]= {
 };
 
 
-void usage(const char*prog) {
+void usage(const char*prog)
+{
   fxmessage("\n");
   fxmessage(_("Usage: %s [options] [files] ...\n"), FXPath::name(prog).text());
   for (const char**s=helptext; *s; s++) {
@@ -419,14 +420,16 @@ void usage(const char*prog) {
 #define _WIN32_IE 0x0400
 #include <shlobj.h>
 #include <sys/stat.h>
-bool IsDir(const FXString &dn) {
-  struct stat st; 
+bool IsDir(const FXString &dn)
+{
+  struct stat st;
   return ( (stat(dn.text(),&st)==0) && S_ISDIR(st.st_mode) );
 }
 
-bool IsWin9x() { 
-  OSVERSIONINFO OSversion; 
-  OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO); 
+bool IsWin9x()
+{
+  OSVERSIONINFO OSversion;
+  OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
   ::GetVersionEx(&OSversion);
   return (OSversion.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS);
 }
@@ -470,7 +473,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
       configdir.append(PATHSEP);
     }
   }
-
   for ( i=1; i<getArgc(); i++) {
     const char *arg=getArgv()[i];
     if ((strcmp(argv[i],"--help")==0)||(strcmp(argv[i],_("--help"))==0)) {
@@ -532,9 +534,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
 #endif
   sock_name.upper();
   server_name.upper();
-
-  unsigned char c;
-  for (c=1; ; c++) {
+  for (unsigned char c=1; ; c++) {
     if ( ((c>='A')&&(c<='Z')) || ((c>='0')&&(c<='9')) || (c=='_') ) { continue; }
     sock_name.substitute(c, '_', true);
     server_name.substitute(c, '_', true);
@@ -575,7 +575,8 @@ void AppClass::exit(FXint code)
 
 
 
-bool get_config_name(int argc, char *argv[], FXString &cfg_name) {
+bool get_config_name(int argc, char *argv[], FXString &cfg_name)
+{
   cfg_name="";
   int i;
   for (i=1; i<argc; i++) {
@@ -662,7 +663,7 @@ int main(int argc, char *argv[])
 #else
     new FXToolTip(&app,0);
 #endif
-   
+
     app.create();
     app.MainWin(new TopWindow(&app));
     app.MainWin()->create();

@@ -49,8 +49,7 @@ void TopWindow::TranslatorCB(const char*text, void*user_data)
 // Update a set of radio buttons
 void TopWindow::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
 {
-  FXSelector i;
-  for (i=min; i<=max; i++) {
+  for (FXSelector i=min; i<=max; i++) {
     MenuSpec*spec=MenuMgr::LookupMenu(i);
     if (spec && spec->ms_mc) {
       ((FXMenuRadio*)(spec->ms_mc))->setCheck(curr==i);
@@ -166,8 +165,7 @@ bool TopWindow::WhiteSpaceCB(FXint index, DocTab*tab, FXWindow*page, void*user_d
 
 bool TopWindow::ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
-  SciDoc*sci;
-  for (sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
+  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
     sci->SetShowEdge((bool)user_data);
   }
   return true;
@@ -177,9 +175,7 @@ bool TopWindow::ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_d
 
 bool TopWindow::ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
-  SciDoc*sci;
-  for (sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
-
+  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
     sci->SetShowIndent((bool)user_data);
   }
   return true;
@@ -215,7 +211,7 @@ void TopWindow::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
   sci->SelectionBG(prefs->selectionStyle()->bg);
   if (prefs->ShowWhiteSpace) { sci->ShowWhiteSpace(true); }
   if (prefs->ShowLineNumbers) { sci->ShowLineNumbers(true); }
-  
+
   sci->sendMessage(SCI_SETVIRTUALSPACEOPTIONS,
     (SCVS_RECTANGULARSELECTION|(prefs->CaretPastEOL?SCVS_USERACCESSIBLE:0)), 0);
 
@@ -257,7 +253,6 @@ long TopWindow::CheckStyle(FXObject*o, FXSelector sel, void*p)
   tabbook->ForEachTab(StyleNextDocCB,this,false);
   return 1;
 }
-
 
 
 
@@ -384,6 +379,7 @@ bool TopWindow::IsDocValid(SciDoc*sci)
 }
 
 
+
 // In case a Lua script left the SCI_*UNDOACTION level in an unbalanced state.
 bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
@@ -392,9 +388,10 @@ bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*us
 }
 
 
+
 // Exposes "userland" search behavior to scripting engine.
 bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forward)
-{ 
+{
   return srchdlgs->FindPhrase(ControlDoc(),searchstring,searchmode,forward);
 }
 
@@ -405,7 +402,7 @@ bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forwar
 #else
 
 /*
-  We don't want to pop up the notification dialog for external changes unless our application 
+  We don't want to pop up the notification dialog for external changes unless our application
   currently has the focus, and that's easy enough to do with the Fox API - But - we also don't
   want to pop up the dialog unless our application is on the current virtual desktop, and the
   only way I can see to do that is via the X11 API. I guess this stuff is fairly expensive,
@@ -415,7 +412,7 @@ bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forwar
 # include <X11/Xatom.h>
 
 static int GetXIntProp(FXWindow *win, Atom prop)
-{ 
+{
   int num = 0;
   Atom type_ret;
   int format_ret;
@@ -438,7 +435,7 @@ static bool IsDesktopCurrent(TopWindow*tw)
   static bool failed=false;
   static Atom NET_WM_DESKTOP=None;
   static Atom NET_CURRENT_DESKTOP=None;
-  if (!failed) { 
+  if (!failed) {
     if (NET_WM_DESKTOP==None) {
       NET_WM_DESKTOP=XInternAtom((Display*)tw->getApp()->getDisplay(), "_NET_WM_DESKTOP",true);
     }
@@ -517,8 +514,8 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
 
 
 /*
-  When in split-view mode, ControlDoc() refers to the view at the top (or left) of 
-  the split,and FocusedDoc() refers to whichever view has the focus; In single-view 
+  When in split-view mode, ControlDoc() refers to the view at the top (or left) of
+  the split,and FocusedDoc() refers to whichever view has the focus; In single-view
   mode there is no difference between the ControlDoc and the FocusedDoc.
 */
 SciDoc*TopWindow::ControlDoc()
@@ -548,7 +545,7 @@ char*strndup(const char*src,int len)
   strncpy(dst,src,len);
   return dst;
 }
-#endif 
+#endif
 
 
 
@@ -564,19 +561,18 @@ UserMenu**TopWindow::UserMenus() const
 // along with the number of word lists per lexer
 // ( Only used during development, to help with the
 //   syntax-highlighting interface. )
-#include <cctype>
+
 class WordList;
 class Accessor;
+#include <cctype>
 #include <KeyWords.h>
+
 void TopWindow::DumpLexers() {
-for (int i=0; i<=SCLEX_AUTOMATIC; i++) {
-      const LexerModule*lex=LexerModule::Find(i);
-      if (lex) {
-        fprintf(stdout, "%d %s %d\n", i, lex->languageName, lex->GetNumWordLists());
-      }
+  for (int i=0; i<=SCLEX_AUTOMATIC; i++) {
+    const LexerModule*lex=LexerModule::Find(i);
+    if (lex) {
+      fprintf(stdout, "%d %s %d\n", i, lex->languageName, lex->GetNumWordLists());
     }
+  }
 }
-
-
-
 

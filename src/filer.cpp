@@ -54,7 +54,7 @@ extern "C" {
   if any of them are shortcut (*.lnk) files, dereference the link and
   make the string point to the "real" disk file. If we have multiple files,
   remove any links that point to a directory. But if we only have one string
-  in the list, and the string is a link pointing to a directory, we will 
+  in the list, and the string is a link pointing to a directory, we will
   dereference it so the dialog can change into that folder.
 */
 static void FixupShortcuts(FXWindow*w, FXString* filenames) {
@@ -62,7 +62,7 @@ static void FixupShortcuts(FXWindow*w, FXString* filenames) {
   FXString* fn;
   FXString* tail=filenames;
   FXuint count=0;
-  for (fn=filenames; !fn->empty(); fn++) { 
+  for (fn=filenames; !fn->empty(); fn++) {
     FXString ext=FXPath::extension(*fn).upper();
     if (ext=="LNK") {
       char*tmp=NULL;
@@ -88,6 +88,8 @@ static void FixupShortcuts(FXWindow*w, FXString* filenames) {
 }
 #endif
 
+
+
 static void GetPathForDlg(SciDoc*sci, FXString &path)
 {
   if (sci->Filename().empty()) {
@@ -101,10 +103,11 @@ static void GetPathForDlg(SciDoc*sci, FXString &path)
 }
 
 
+
 /*
   A curious behavior of Fox's FileDialog is that you cannot manually enter a filename
-  and have it returned, instead the file *must* be selected from the list box. 
-  As a workaround, our subclass exposes the FXTextField where the name is entered. 
+  and have it returned, instead the file *must* be selected from the list box.
+  As a workaround, our subclass exposes the FXTextField where the name is entered.
   Note that this trick will NOT work with SELECTFILE_MULTIPLE!
 */
 class MySelector: public FXFileSelector {
@@ -119,7 +122,7 @@ class MyFileDlg: public FXFileDialog {
 private:
   FXString*filenames;
   bool own_filenames;
-  void DeleteFilenames() { 
+  void DeleteFilenames() {
     if (filenames&&own_filenames) {
       delete[] filenames;
       filenames=NULL;
@@ -131,7 +134,7 @@ public:
       own_filenames=false;
       return filenames;
     }
-    FXString getFilename() { 
+    FXString getFilename() {
       return filenames ? (*filenames) : FXFileDialog::getFilename();
     }
     FXuint execute(FXuint placement=PLACEMENT_CURSOR) {
@@ -153,7 +156,7 @@ public:
       }
       return rv;
     }
-    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) { 
+    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) {
       filenames=NULL;
     }
 #else
@@ -163,8 +166,6 @@ public:
   public:
     FXTextField* txtfld() { return ((MySelector*)filebox)->txtfld(); }
 };
-
-
 
 
 
@@ -179,7 +180,6 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   if (dlg.execute(PLACEMENT_OWNER)) {
     result=dlg.getFilename();
   }
-
   if (!result.empty()) {
     if (FXStat::exists(result)) {
       switch (FXMessageBox::question(sci->getShell(), MBOX_YES_NO_CANCEL, _("Overwrite?"),
@@ -194,6 +194,7 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   }
   return false;
 }
+
 
 
 bool FileDialogs::Export(SciDoc*sci,
@@ -228,7 +229,6 @@ bool FileDialogs::Export(SciDoc*sci,
       saveName=dlg.getFilename();
     }
   }
-
   if (!saveName.empty()) {
     if (FXStat::exists(saveName)) {
       switch (FXMessageBox::question(sci->getShell(), MBOX_YES_NO_CANCEL, _("Overwrite?"),
@@ -374,5 +374,4 @@ bool FileDialogs::AskReload(SciDoc*sci) {
   sci->DoStaleTest(true);
   return true;
 }
-
 

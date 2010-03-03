@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -31,7 +31,7 @@ private:
 protected:
   ClipTextField(){}
 public:
- 	 ClipTextField(FXComposite *p,
+   ClipTextField(FXComposite *p,
      FXint ncols, FXObject *tgt=NULL, FXSelector sel=0, FXuint opts=TEXTFIELD_NORMAL, FXint x=0, FXint y=0,
      FXint w=0, FXint h=0, FXint pl=DEFAULT_PAD, FXint pr=DEFAULT_PAD, FXint pt=DEFAULT_PAD, FXint pb=DEFAULT_PAD
    ):FXTextField(p,ncols,tgt,sel,opts,x,y,w,h,pl,pr,pt,pb) {}
@@ -96,6 +96,4 @@ public:
   HistBox(FXWindow* p, const FXString& caption, const FXString& label, const FXString &regname);
   virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
 };
-
-
 

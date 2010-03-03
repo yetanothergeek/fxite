@@ -16,11 +16,16 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <cctype>
 
 #include <fxkeys.h>
 #include <fx.h>
 #include <Scintilla.h>
 #include <FXScintilla.h>
+
+class WordList;
+class Accessor;
+#include <KeyWords.h>
 
 #include "compat.h"
 #include "scidoc.h"
@@ -65,8 +70,8 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_FILTERS_EDIT,PrefsDialog::onFiltersEdit),
   FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_TBAR_AVAIL_ITEMS,PrefsDialog::ID_TBAR_INSERT_CUSTOM,PrefsDialog::onToolbarEdit)
 };
-FXIMPLEMENT(PrefsDialog,FXDialogBox,PrefsDialogMap,ARRAYNUMBER(PrefsDialogMap));
 
+FXIMPLEMENT(PrefsDialog,FXDialogBox,PrefsDialogMap,ARRAYNUMBER(PrefsDialogMap));
 
 
 
@@ -87,8 +92,8 @@ public:
 FXDEFMAP(MyColorWell) MyColorWellMap[]={
   FXMAPFUNC(SEL_DOUBLECLICKED,0,MyColorWell::onDoubleClicked)
 };
-FXIMPLEMENT(MyColorWell,FXColorWell,MyColorWellMap,ARRAYNUMBER(MyColorWellMap));
 
+FXIMPLEMENT(MyColorWell,FXColorWell,MyColorWellMap,ARRAYNUMBER(MyColorWellMap));
 
 
 
@@ -139,6 +144,7 @@ FXDEFMAP(StyleEdit) StyleEditMap[]={
   FXMAPFUNC(SEL_COMMAND,StyleEdit::ID_STYLE_BTN,StyleEdit::onStyleBtn),
   FXMAPFUNC(SEL_COMMAND,StyleEdit::ID_COLOR_BTN,StyleEdit::onColorBtn)
 };
+
 FXIMPLEMENT(StyleEdit,FXHorizontalFrame,StyleEditMap,ARRAYNUMBER(StyleEditMap));
 
 
@@ -171,6 +177,7 @@ long StyleEdit::onStyleBtn(FXObject*o,FXSelector sel,void*p)
 }
 
 
+
 long StyleEdit::onColorBtn(FXObject*o,FXSelector sel,void*p)
 {
   FXColorWell*cw=(FXColorWell*)o;
@@ -200,6 +207,7 @@ static void conceal(FXFrame*w) {
   w->setBaseColor(c);
   w->setBorderColor(c);
 }
+
 
 
 StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXint labelwidth, bool bgonly):
@@ -363,7 +371,6 @@ static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acck
 
 
 
-
 long PrefsDialog::onAccelEdit(FXObject*o, FXSelector s, void*p)
 {
   if (o!=acclist) { return 0; }
@@ -495,10 +502,6 @@ long PrefsDialog::onKeywordEdit(FXObject*o,FXSelector sel,void*p)
 }
 
 
-#include <cctype>
-class WordList;
-class Accessor;
-#include <KeyWords.h>
 
 long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
 {
@@ -604,7 +607,7 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
 // Subclass FXListItem to show custom tooltip...
 class TBarListItem: public FXListItem {
 public:
- 	TBarListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic,ptr){ }
+  TBarListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic,ptr){ }
   virtual FXString getTipText() const {
     FXString tip;
     MenuSpec*spec=(MenuSpec*)getData();
@@ -618,7 +621,7 @@ public:
 // Subclass FXIconItem to show custom tooltip...
 class KBindListItem: public FXIconItem {
 public:
- 	KBindListItem(const FXString &text, FXIcon*bi=NULL, FXIcon*mi=NULL, void*ptr=NULL):FXIconItem(text,bi,mi,ptr) {}
+  KBindListItem(const FXString &text, FXIcon*bi=NULL, FXIcon*mi=NULL, void*ptr=NULL):FXIconItem(text,bi,mi,ptr) {}
   virtual FXString getTipText() const {
     FXString tip;
     MenuSpec*spec=(MenuSpec*)getData();
@@ -626,7 +629,6 @@ public:
     return tip;
   }
 };
-
 
 
 
@@ -640,7 +642,7 @@ FXuint PrefsDialog::ChangedToolbar()
 
 void PrefsDialog::AddToolbarButton(FXListItem*item, FXint &iUsed, FXint&nUsed)
 {
-  if (iUsed<0) { 
+  if (iUsed<0) {
     tbar_used_items->appendItem(item);
   } else {
     tbar_used_items->getItem(iUsed)->setSelected(false);
@@ -659,7 +661,6 @@ void PrefsDialog::AddToolbarButton(FXListItem*item, FXint &iUsed, FXint&nUsed)
 
 
 
-
 long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
 {
   FXint iAvail=tbar_avail_items->getCurrentItem();
@@ -673,7 +674,7 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
       FXMenuCommand*mc;
       if (ToolsTree::SelectTool(this, ((TopWindow*)main_win)->UserMenus(), mc)) {
         const char*newpath=(const char*)mc->getUserData();
-        if (newpath) { 
+        if (newpath) {
           // If the command is already in the used items list, just select it...
           for (FXint i=0; i<nUsed; i++) {
             const char*oldpath=MenuMgr::GetUsrCmdPath((MenuSpec*)tbar_used_items->getItemData(i));
@@ -691,12 +692,12 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
       }
     }
     case ID_TBAR_USED_ITEMS: { break; }
-    case ID_TBAR_ITEM_INSERT: { 
+    case ID_TBAR_ITEM_INSERT: {
       item=(TBarListItem*)(tbar_avail_items->extractItem(iAvail));
       AddToolbarButton(item, iUsed, nUsed);
       break;
     }
-    case ID_TBAR_ITEM_REMOVE: { 
+    case ID_TBAR_ITEM_REMOVE: {
       item=(TBarListItem*)(tbar_used_items->extractItem(tbar_used_items->getCurrentItem()));
       spec=(MenuSpec*)item->getData();
       if (spec->type=='u') {
@@ -717,7 +718,7 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
       changed_toolbar|=ToolbarChangedLayout;
       break;
     }
-    case ID_TBAR_ITEM_RAISE: { 
+    case ID_TBAR_ITEM_RAISE: {
       tbar_used_items->moveItem(iUsed, iUsed-1);
       iUsed--;
       tbar_used_items->selectItem(iUsed);
@@ -725,7 +726,7 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
       changed_toolbar|=ToolbarChangedLayout;
       break;
     }
-    case ID_TBAR_ITEM_LOWER: { 
+    case ID_TBAR_ITEM_LOWER: {
       tbar_used_items->moveItem(iUsed, iUsed+1);
       iUsed++;
       tbar_used_items->selectItem(iUsed);
@@ -735,7 +736,7 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
     }
   }
   tbar_used_items->makeItemVisible(iUsed);
-  if (nUsed<TBAR_MAX_BTNS) { 
+  if (nUsed<TBAR_MAX_BTNS) {
     tbar_ins_btn->enable();
     tbar_custom_btn->enable();
   } else {
@@ -785,12 +786,12 @@ FXTabItem* PrefsDialog::MakeToolbarTab()
 
   new FXLabel(right_column, _("&Visible items:"));
   tbar_avail_items=new FXList(left_column,this,ID_TBAR_AVAIL_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
-  tbar_used_items=new FXList(right_column,this,ID_TBAR_USED_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL); 
+  tbar_used_items=new FXList(right_column,this,ID_TBAR_USED_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
 
   FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
 
-  tbar_custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."), 
+  tbar_custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
                                 NULL,this, ID_TBAR_INSERT_CUSTOM,BUTTON_NORMAL|LAYOUT_CENTER_X);
 
   FXHorizontalFrame* UpDnBtns=new FXHorizontalFrame( right_column,
@@ -866,7 +867,7 @@ FXTabItem* PrefsDialog::MakeSyntaxTab()
   FXVerticalFrame *left_column;
   FXVerticalFrame *right_column;
   FXint i=0;
-  
+
   FXVerticalFrame*vframe= new FXVerticalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   frame=new FXHorizontalFrame(vframe,FRAME_RAISED|LAYOUT_FILL);
   left_column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
@@ -1032,7 +1033,7 @@ FXTabItem* PrefsDialog::MakeEditorTab()
   FXCheckButton*chk;
   FXSpinner *spin;
   FXListBox*list;
-  
+
   frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL|PACK_UNIFORM_HEIGHT);
 
@@ -1047,7 +1048,6 @@ FXTabItem* PrefsDialog::MakeEditorTab()
 
   chk=new FXCheckButton(column, _("Allow caret beyond end of line"), prefs, Settings::ID_TOGGLE_CARET_PAST_EOL);
   chk->setCheck(prefs->CaretPastEOL, FALSE);
-
 
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_CARET_WIDTH, SPIN_OPTS);
@@ -1130,11 +1130,15 @@ long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
   return 0;
 }
 
+
+
 #ifndef __WIN32__
 extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
 #else
 #define SetupXAtoms(win,class_name)
 #endif
+
+
 
 void PrefsDialog::create()
 {
@@ -1149,8 +1153,6 @@ void PrefsDialog::create()
   acclist->show();
 #endif
 }
-
-
 
 
 

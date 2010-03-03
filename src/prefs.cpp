@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -69,8 +69,7 @@ Text files (*.txt)|\
 
 long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 {
-  switch FXSELID(sel)
-  {
+  switch FXSELID(sel) {
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
     case ID_TOGGLE_USE_TABS:    { UseTabs = !UseTabs; break; }
     case ID_TOGGLE_AUTO_INDENT: { AutoIndent = !AutoIndent; break; }
@@ -83,7 +82,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_TOGGLE_CARET_PAST_EOL:  { CaretPastEOL  = !CaretPastEOL;  break; }
     case ID_TOGGLE_VIEW_WHITESPACE_EOL: { WhitespaceShowsEOL = !WhitespaceShowsEOL; break; }
     case ID_TOGGLE_ASCII_DEFAULT: { DefaultToAscii = !DefaultToAscii; break; }
-    case ID_TOGGLE_WRAP_TOOLBAR: { 
+    case ID_TOGGLE_WRAP_TOOLBAR: {
       WrapToolbar = !WrapToolbar;
       FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
       *changed|=ToolbarChangedWrap;
@@ -216,7 +215,6 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 
 
 
-
 static StyleDef GlobalStyle[] = {
   { "default",     STYLE_DEFAULT,     "#000000", "#ffffff", Normal },
   { "linenumber",  STYLE_LINENUMBER,  "#0000c0", "#d0d0d0", Normal },
@@ -234,7 +232,6 @@ static StyleDef CaretLineStyle =   { "caretline",   0,     "#000000", "#f8f8f8",
 static StyleDef RightMarginStyle = { "rightmargin", 0,     "#000000", "#ff0000", Normal };
 static StyleDef SelectionStyle =   { "selection",   0,     "#c0c0c0", "#c0c0c0", Normal };
 static StyleDef CaretStyle =       { "caret",       0,     "#000000", "#000000", Normal };
-
 
 
 
@@ -405,7 +402,7 @@ void FindFont(FXString &FontName) {
 
 
 /*
-  Break some of the preference settings up into to categories, each category represents a 
+  Break some of the preference settings up into to categories, each category represents a
   separate section header in the config file. Note that in order for the Read/Write macros
   to work correctly, these strings must *exactly* match their respective variable names!
 */

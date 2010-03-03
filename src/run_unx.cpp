@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -71,7 +71,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
       if (remaining>0) {
         ssize_t sent=write(stdinFD,SendString.text()+(SendString.length()-remaining),remaining);
         remaining -= sent;
-      } 
+      }
       if (remaining<=0) {
         app->removeInput(stdinFD, INPUT_WRITE);
         fsync(stdinFD);
@@ -129,6 +129,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
   }
   return 1;
 }
+
 
 
 #define ERRMSG(w,s) FXMessageBox::error(w, MBOX_OK, _("Shell command"), "%s", s);
@@ -220,6 +221,7 @@ bool CmdIO::cleanup(bool rv)
 }
 
 
+
 bool CmdIO::run(const char *command, bool*canceler)
 {
   stdinFD = stdoutFD = stderrFD = 0;
@@ -265,6 +267,7 @@ bool CmdIO::run(const char *command, bool*canceler)
 }
 
 
+
 bool CmdIO::excess()
 {
   if (_canceler&&*_canceler) {
@@ -283,3 +286,4 @@ bool CmdIO::excess()
 
 
 #endif
+

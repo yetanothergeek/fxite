@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -115,7 +115,7 @@ public:
   static StyleDef *caretStyle();
 
   long onChangeSetting(FXObject*o, FXSelector sel, void*p);
-  
+
   enum {
     ID_TOGGLE_SMART_HOME,
     ID_TOGGLE_USE_TABS,
@@ -161,5 +161,4 @@ enum {
   ToolbarChangedFont   = 1<<1,
   ToolbarChangedWrap   = 1<<2
 };
-
 

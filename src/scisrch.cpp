@@ -45,7 +45,7 @@ void SciSearch::SelectTarget(bool forward)
 }
 
 
-/* This helps make sure we don't "re-find" our selection when the search direction changes */
+// This helps make sure we don't "re-find" our selection when the search direction changes
 void SciSearch::EnsureAnchorDirection(bool forward)
 {
   long start=SciMsg(SCI_GETSELECTIONSTART,0,0);
@@ -89,7 +89,8 @@ static void rx_escape(FXString &pat,bool whole)
 }
 
 
-/* Check for valid regex syntax */
+
+// Check for valid regex syntax
 bool SciSearch::CheckRegex(const FXRex &rx, bool quiet)
 {
   if (rx.empty()) {
@@ -102,7 +103,6 @@ bool SciSearch::CheckRegex(const FXRex &rx, bool quiet)
     return true;
   }
 }
-
 
 
 
@@ -123,7 +123,7 @@ int SciSearch::FindTextNoSel(const FXString &what, FXuint sciflags, long &beg, l
     rx_escape(search_pattern,sciflags & SCFIND_WHOLEWORD);
   }
   if (!(sciflags & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
- 	FXRex rx(search_pattern, rexflags, &rxerr);
+  FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx, true)) { return -rxerr; }
   content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
   bool isfwd=end>beg;
@@ -154,7 +154,7 @@ bool SciSearch::FindText(const FXString &what, FXuint sciflags, bool isfwd, bool
     rx_escape(search_pattern,sciflags & SCFIND_WHOLEWORD);
   }
   if (!(sciflags & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
- 	FXRex rx(search_pattern, rexflags, &rxerr);
+  FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx)) {
     sci->setFocus();
     return true;
@@ -182,11 +182,12 @@ bool SciSearch::FindText(const FXString &what, FXuint sciflags, bool isfwd, bool
 }
 
 
-/* 
+
+/*
   When the user enters escape sequences in a regex replacement, we interpret them literally.
-  But we need to convert them beforehand so they won't get mixed up with sequences in the 
-  document's text, because we want to leave those unconverted. But for literal searches, 
-  we need to make sure that backslashes and ampersands do *not* get interpreted by FXRex, 
+  But we need to convert them beforehand so they won't get mixed up with sequences in the
+  document's text, because we want to leave those unconverted. But for literal searches,
+  we need to make sure that backslashes and ampersands do *not* get interpreted by FXRex,
   so instead we escape them now.
 */
 static FXString PrepareReplacement(const FXString &repl_in, FXuint opts)
@@ -255,7 +256,7 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
     rx_escape(search_pattern,opts & SCFIND_WHOLEWORD);
   }
   if (!(opts & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
- 	FXRex rx(search_pattern, rexflags, &rxerr);
+  FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx)) { return 0; }
   FXString repl_template=PrepareReplacement(replacewith,opts);
   long start=0;
@@ -302,7 +303,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
     rx_escape(search_pattern,opts & SCFIND_WHOLEWORD);
   }
   if (!(opts & SCFIND_MATCHCASE)) rexflags |= REX_ICASE;
- 	FXRex rx(search_pattern, rexflags, &rxerr);
+  FXRex rx(search_pattern, rexflags, &rxerr);
   if (!CheckRegex(rx)) { return 0; }
   FXString repl_template=PrepareReplacement(replacewith,opts);
   long patlen=search_pattern.length();

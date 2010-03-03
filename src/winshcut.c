@@ -9,7 +9,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -31,7 +31,7 @@
 #include <olectlid.h>
 #include "intl.h"
 
-/* 
+/*
   Attempt to read a MS-Windows shortcut (*.lnk) file.
   Returns 1 on success and places the target path in *dst,
   on error it returns 0 and places an error message in *dst.
@@ -65,9 +65,9 @@ int ReadShortcut(char**dst, const char*src)
   }
   hres = sh_lnk->lpVtbl->QueryInterface(sh_lnk, &IID_IPersistFile,(void*)&persist_file);
   if (SUCCEEDED(hres)) {
-    WCHAR wsz[MAX_PATH]; 
-    MultiByteToWideChar(CP_ACP, 0, (LPCSTR)src, -1, wsz, MAX_PATH); 
-    hres = persist_file->lpVtbl->Load(persist_file, wsz, STGM_READ); 
+    WCHAR wsz[MAX_PATH];
+    MultiByteToWideChar(CP_ACP, 0, (LPCSTR)src, -1, wsz, MAX_PATH);
+    hres = persist_file->lpVtbl->Load(persist_file, wsz, STGM_READ);
     if (SUCCEEDED(hres)) {
         sh_lnk->lpVtbl->GetPath(sh_lnk, *dst, MAX_PATH, NULL, SLGP_RAWPATH);
     } else {
@@ -75,7 +75,7 @@ int ReadShortcut(char**dst, const char*src)
       result = 0;
     }
     persist_file->lpVtbl->Release(persist_file);
-  } else { 
+  } else {
     strncpy(*dst, _("ReadShortcut: QueryInterface failed"), MAX_PATH-1);
     result = 0;
   }
@@ -84,3 +84,4 @@ int ReadShortcut(char**dst, const char*src)
 }
 
 #endif
+
