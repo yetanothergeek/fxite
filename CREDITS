@@ -1,0 +1,59 @@
+FxiTe incorporates software and ideas from various sources,
+including:
+
+
+Much of the user interface design, substantial portions of
+the help text, and the I/O routines for running external
+programs were derived from The Nirvana Editor (NEdit)
+Copyright (C) 1999 Mark Edel
+http://www.nedit.org/
+
+
+SL - A small and efficient linked list library is used in a
+few places where lightweight and sortable lists were needed.
+Copyright (C) 2003-2005 Stig Brautaset.
+http://stig.brautaset.org/
+
+
+The module containing functions for reading tag files was 
+taken from the exuberant ctags example program.
+Copyright (c) 1996-2003 Darren Hiebert.
+http://ctags.sourceforge.net/
+
+
+The code for testing UTF-8 files was derived from "isutf8"
+Copyright (C) 2005  Lars Wirzenius
+(Part of the "moreutils" package.)
+http://packages.debian.org/unstable/utils/moreutils
+
+
+Code for reading Windows shortcuts was taken from "realpath"
+Copyright (C) 2001 Steven Barker
+(Part of the "cygutils" package.)
+http://cygwin.com/packages/cygutils/
+
+
+The Scintilla editing control and the PDF/HTML export code:
+Copyright (C) 1998-2010 by Neil Hodgson
+http://scintilla.org/
+
+
+The Fox GUI Toolkit:
+Copyright (C) 1997,2010 by Jeroen van der Zijp. 
+http://fox-toolkit.org/
+
+
+FXScintilla, the Fox port of Scintilla:
+Copyright 2001-2004 by Gilles Filippini
+http://www.nongnu.org/fxscintilla/
+
+
+The Lua scripting language and interpreter:
+Copyright (C) 1994-2008 Lua.org, PUC-Rio.
+http://www.lua.org/
+
+
+It is quite possible I have forgotten somebody or something,
+so if you think your name belongs here, please let me know!
+
+
