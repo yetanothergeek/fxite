@@ -113,7 +113,7 @@ static unsigned long decodeutf8(unsigned char *buf, int nbytes)
     if ((buf[j] & 0xC0) != 0x80) { return INVALID_CHAR; }
     u = (u << 6) | (buf[j] & 0x3f);
   }
-  /* UTF-8 can't contain codes 0xd800–0xdfff (UTF-16 surrogates) OR 0xfffe OR 0xffff */
+  /* UTF-8 can't contain codes 0xd800-0xdfff (UTF-16 surrogates) OR 0xfffe OR 0xffff */
   if (u >= 0xD800 && u <= 0xDFFF) { return INVALID_CHAR; }
   if (u == 0xFFFE || u == 0xFFFF) { return INVALID_CHAR; }
   return u;
@@ -144,31 +144,33 @@ static char get_stream_encoding(FILE *file) {
   fseek(file,0,SEEK_SET);
   for (;;) {
     c = getc(file);
-    if (c != EOF){
+    if (c != EOF) {
       if ( (c<32) && ( (c==0) || (!strchr("\n\t\r\f\v\a",c)) ) ) {
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
       if (c >= 0x80) {
-        /* Can't be 7-bit, so it's either valid UTF-8, or "extended" ASCII */
+        /* Can't be 7-bit, so it's either valid UTF-8, "extended" ASCII, or binary. */
         result='U';
       }
     }
-    if (c == EOF || c < 0x80 || (c & 0xC0) != 0x80) {
-      /* New char starts, deal with previous one. */
-      if (nbytes > 0) {
-        code = decodeutf8(buf, nbytes);
-        if (code == INVALID_CHAR) { return 'H'; }
-        nbytes2 = encodeutf8(code, buf2, MAX_UTF8_BYTES);
-        if (nbytes != nbytes2 || memcmp(buf, buf2, nbytes) != 0) { return 'H'; }
+    if (result!='H') {
+      if (c == EOF || c < 0x80 || (c & 0xC0) != 0x80) {
+        /* New char starts, deal with previous one. */
+        if (nbytes > 0) {
+          code = decodeutf8(buf, nbytes);
+          if (code == INVALID_CHAR) { result='H'; }
+          nbytes2 = encodeutf8(code, buf2, MAX_UTF8_BYTES);
+          if (nbytes != nbytes2 || memcmp(buf, buf2, nbytes) != 0) { result='H'; }
+        }
+        nbytes = 0;
+        /* If it's UTF8, start collecting again. */
+        if (c != EOF && c >= 0x80) { buf[nbytes++] = c; }
+      } else {
+         /* This is a continuation byte, append to buffer. */
+         if (nbytes == MAX_UTF8_BYTES) { result='H'; }
+         buf[nbytes++] = c;
       }
-      nbytes = 0;
-      /* If it's UTF8, start collecting again. */
-      if (c != EOF && c >= 0x80) { buf[nbytes++] = c; }
-    } else {
-       /* This is a continuation byte, append to buffer. */
-       if (nbytes == MAX_UTF8_BYTES) { return 'H'; }
-       buf[nbytes++] = c;
     }
     if (c == EOF) { break; }
   }
