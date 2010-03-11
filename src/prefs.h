@@ -113,6 +113,7 @@ public:
   static StyleDef *rightmarginStyle();
   static StyleDef *selectionStyle();
   static StyleDef *caretStyle();
+  static const FXchar *defaultFileFilters();
 
   long onChangeSetting(FXObject*o, FXSelector sel, void*p);
 

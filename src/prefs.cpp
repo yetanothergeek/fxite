@@ -65,6 +65,7 @@ Web files (*html,*.htm,*.php*)|\
 Text files (*.txt)|\
 ")
 
+static const char* default_file_filters = FILE_FILTERS;
 
 
 long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
@@ -339,7 +340,7 @@ StyleDef* Settings::caretlineStyle()   { return &CaretLineStyle; }
 StyleDef* Settings::rightmarginStyle() { return &RightMarginStyle; }
 StyleDef* Settings::selectionStyle()   { return &SelectionStyle; }
 StyleDef* Settings::caretStyle()       { return &CaretStyle; }
-
+const FXchar *Settings::defaultFileFilters() { return default_file_filters; }
 
 
 // List of possible font names - we check if any system
@@ -656,7 +657,7 @@ Settings::Settings(FXMainWindow*w)
     DocTabPosition=tmp.text()[0];
   }
 
-  ReadStr(FileFilters,FILE_FILTERS);
+  ReadStr(FileFilters, default_file_filters);
   FileFilters.substitute("|", "\n", true);
   ReadStr(ShellCommand,SHELL_COMMAND);
 
