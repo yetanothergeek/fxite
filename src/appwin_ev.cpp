@@ -1330,6 +1330,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     ForEachToolbarButton(SetTBarBtnFontCB,this);
     toolbar_frm->getParent()->layout();
   }
+  filedlgs->patterns(prefs->FileFilters);
   return 1;
 }
 
