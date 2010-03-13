@@ -36,6 +36,7 @@ class Accessor;
 #include "histbox.h"
 #include "tooltree.h"
 #include "menuspec.h"
+#include "filterdlg.h"
 
 #include "intl.h"
 #include "prefdlg.h"
@@ -929,7 +930,19 @@ FXTabItem* PrefsDialog::MakeSyntaxTab()
 
 long PrefsDialog::onFiltersEdit(FXObject*o,FXSelector sel,void*p)
 {
-  prefs->FileFilters=filters_edit->getText().substitute('|','\n',true);
+  FXString filters=prefs->FileFilters;
+  filters.substitute('\n', '|', true);
+  FileFiltersDlg dlg(this,filters);
+  if (dlg.execute(PLACEMENT_SCREEN)) {
+    filters=dlg.getText();
+    filters.substitute('|', '\n', true);
+    prefs->FileFilters=filters.text();
+  }
+#ifdef WIN32
+  hide();
+  show();
+  ((FXWindow*)o)->setFocus();
+#endif
   return 1;
 }
 
@@ -985,11 +998,8 @@ FXTabItem* PrefsDialog::MakeGeneralTab()
   new FXLabel(hframe, _("Maximum number of open files."));
 
   hframe=new FXHorizontalFrame(left_column);
-  hframe->setPadBottom(8);
-  spin=new FXSpinner(hframe, 2, prefs, Settings::ID_SET_WHEEL_LINES,SPIN_OPTS);
-  spin->setValue(prefs->WheelLines);
-  spin->setRange(1,32);
-  new FXLabel(hframe, _("Mouse wheel acceleration."));
+  hframe->setPadLeft(12);
+  new FXButton(hframe, _(" File dialog filters... "), NULL, this, ID_FILTERS_EDIT);
 
   new FXLabel(right_column,_("Save open files before executing:"));
   chk=new FXCheckButton(right_column, _("Tools->Filter Selection"), prefs, Settings::ID_SAVE_ON_FILTER_SEL);
@@ -1012,13 +1022,14 @@ FXTabItem* PrefsDialog::MakeGeneralTab()
   tf->setText(prefs->ShellCommand);
 #endif
 
-  vframe=new FXVerticalFrame(vframe,FRAME_NONE|LAYOUT_FILL_X|FRAME_NONE|LAYOUT_BOTTOM);
-  vframe=new FXVerticalFrame(vframe,FRAME_SUNKEN|LAYOUT_FILL_X|FRAME_NONE|LAYOUT_BOTTOM);
-  new FXLabel(vframe, _("File dialog filters, e.g.   All Files (*)|Web files (*.html,*.php)|..."),
-  NULL, LABEL_NORMAL|FRAME_NONE|JUSTIFY_LEFT|LAYOUT_FILL_X,0,0,0,0,0,0,0,0);
-  filters_edit=new ClipTextField(vframe, 48, this, ID_FILTERS_EDIT, TEXTFIELD_NORMAL|LAYOUT_FILL_X);
-  filters_edit->setText(prefs->FileFilters);
-  filters_edit->setText(filters_edit->getText().substitute('\n', '|', true));
+  new FXHorizontalSeparator(right_column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
+  hframe=new FXHorizontalFrame(right_column);
+  hframe->setPadTop(12);
+  spin=new FXSpinner(hframe, 2, prefs, Settings::ID_SET_WHEEL_LINES,SPIN_OPTS);
+  spin->setValue(prefs->WheelLines);
+  spin->setRange(1,32);
+  new FXLabel(hframe, _("Mouse wheel acceleration."));
+
   return tab;
 }
 
