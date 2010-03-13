@@ -68,6 +68,7 @@ FXDEFMAP(ToolsDialog) ToolsDialogMap[] = {
   FXMAPFUNC(SEL_TIMEOUT, ToolsDialog::ID_NEW_SCAN_CHORE,ToolsDialog::onNewScanChore),
   FXMAPFUNC(SEL_COMMAND, FXDialogBox::ID_ACCEPT, ToolsDialog::onClose),
   FXMAPFUNC(SEL_COMMAND, FXDialogBox::ID_CANCEL, ToolsDialog::onClose),
+  FXMAPFUNC(SEL_CLOSE, 0, ToolsDialog::onClose),
   FXMAPFUNC(SEL_CHORE, FXDialogBox::ID_ACCEPT, ToolsDialog::onClose),
   FXMAPFUNC(SEL_COMMAND, ToolsDialog::ID_MOVELIST_CHOOSE,ToolsDialog::onMoveListChoose)
 };
@@ -334,7 +335,7 @@ static FXuint AskSaveChanges(FXWindow*w, bool hasitems,const char*name)
 
 long ToolsDialog::onClose(FXObject*o, FXSelector sel, void*p)
 {
-  if (FXSELTYPE(sel)==SEL_COMMAND) {
+  if ( (FXSELTYPE(sel)==SEL_COMMAND) || (FXSELTYPE(sel)==SEL_CLOSE) ) {
     if (tree->PrevItem() && modified) {
       tree->setCurrentItem(tree->PrevItem());
       tree->selectItem(tree->PrevItem());
