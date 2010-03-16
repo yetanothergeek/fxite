@@ -76,7 +76,7 @@ struct FXTimer;
 using namespace FX;
 
 typedef FXFont * FontID;
-typedef FXDrawable * SurfaceID;
+typedef void * SurfaceID;
 typedef FXWindow * WindowID;
 typedef FXMenuPane * MenuID;
 typedef FXTimer * TickerID;
