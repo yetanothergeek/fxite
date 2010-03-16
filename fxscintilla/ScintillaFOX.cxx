@@ -315,12 +315,15 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
 #endif // WIN32
 
-  selText.Copy((char*)data,len,CodePage(),0,isRectangular,false);
+  char*dest = Document::TransformLineEnds((int*)&len, (char*)data, len, pdoc->eolMode);
+  selText.Set(dest, len, CodePage(), 0, isRectangular, false);
   pdoc->BeginUndoAction();
 
   if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
 
-  SelectionPosition selStart = SelectionStart();
+  SelectionPosition selStart = sel.IsRectangular() ?
+	  sel.Rectangular().Start() :
+	  sel.Range(sel.Main()).Start();
 
   if (selText.rectangular) {
     PasteRectangular(selStart, selText.s, selText.len);
@@ -1077,7 +1080,8 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   for (FXDragType *dt=InUTF8Mode(_scint)?types:types+1; *dt; dt++) {
     if(event->target==*dt){
       // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
-      size_t len=strlen(_scint->copyText.s);
+      size_t len=_scint->copyText.len;
+      if (!_scint->copyText.rectangular) {len--;}
       FXCALLOC(&cbdata,FXuchar,len+1);
       memcpy(cbdata,_scint->copyText.s,len);
   #ifndef WIN32
