@@ -268,6 +268,13 @@ void ScintillaFOX::UnclaimSelection()
   }
 }
 
+#ifdef WIN32
+static CLIPFORMAT cfColumnSelect()
+{
+  static CLIPFORMAT cf = static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
+  return cf;
+}
+#endif
 
 #define InUTF8Mode(sf) (sf->CodePage()==SC_CP_UTF8)
 
@@ -308,9 +315,7 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 #ifdef WIN32
   len=0;
   while(data[len]) { len++; }
-  static CLIPFORMAT cfColumnSelect = 
-    static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
-  isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
+  isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect()) != 0;
 #else // !WIN32
   isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
 #endif // WIN32
@@ -438,6 +443,22 @@ void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
   }
 }
 
+#ifdef WIN32
+void ScintillaFOX::Copy()
+{
+  if (_fxsc.hasSelection()) {
+    FXDragType dt[2] = { 
+      FXWindow::stringType,
+      sel.selType==Selection::selRectangle ? cfColumnSelect() : 0
+    };
+    if (_fxsc.acquireClipboard(dt, dt[1]?2:1)) {
+      CopySelectionRange(&copyText);
+    }
+  } else {
+    _fxsc.releaseClipboard();
+  }
+}
+#else
 void ScintillaFOX::Copy()
 {
   if (_fxsc.hasSelection()) {
@@ -449,6 +470,7 @@ void ScintillaFOX::Copy()
     _fxsc.releaseClipboard();
   }
 }
+#endif
 
 void ScintillaFOX::Paste()
 {
