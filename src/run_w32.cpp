@@ -40,31 +40,30 @@
 
 
 
-// Display a Windows system error message in a dalog box.
-void WinErrMsg(const char*msg, int code) {
+// Puts a Windows system error message into the FXString err.
+static void WinErrMsg(FXString &err, const char*msg, int code) {
   LPVOID lpMsgBuf;
   FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
                  NULL, code, MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
   for (char*p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
-  FXMessageBox::error(FXApp::instance(), MBOX_OK, "Command error", "Error %s:\n%s", msg, (char*)lpMsgBuf);
+  err.format("Error %s:\n[%d] %s", msg, code, (char*)lpMsgBuf);
   LocalFree(lpMsgBuf);
 }
 
 
-
-#define CleanupAndReturn(s,b) \
-  if (!b) { WinErrMsg(s,GetLastError()); } \
+#define Cleanup() \
   SafeClose(StdIN_Rd); \
   SafeClose(StdOUT_Wr); \
   SafeClose(StdERR_Wr); \
   SafeClose(stdinFD); \
   SafeClose(stdoutFD); \
-  SafeClose(stderrFD); \
-  if (cmd) { \
-    free(cmd); \
-    cmd=NULL; \
-  } \
-  return b;
+  SafeClose(stderrFD); 
+
+
+#define CleanupAndReturn(s,b) \
+  if (!(b)) { WinErrMsg(ErrString, s,GetLastError()); } \
+  Cleanup(); \
+  return (b);
 
 
 
@@ -115,7 +114,7 @@ bool CmdIO::run(const char *command, bool*canceler)
   RecvString = ErrString = "";
   PROCESS_INFORMATION pi;
   SECURITY_ATTRIBUTES sa;
-  char*cmd=NULL;
+  FXString cmd=command;
   static const ssize_t bufsize=1024;
   char buf[bufsize];
   char TempOut[MAX_PATH];
@@ -127,14 +126,18 @@ bool CmdIO::run(const char *command, bool*canceler)
   DWORD exitcode=0;
   ZeroMemory(TempOut,MAX_PATH);
   ZeroMemory(TempErr,MAX_PATH);
+  cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%f%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%L%", FXSystem::getEnvironment("l"), true);
+  cmd.substitute("%l%", FXSystem::getEnvironment("l"), true);
   if (SendString.empty()&&!IsWin9x()) {   // Output pipe only, no need for input...
     if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
     if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
     if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
     if (!SetHandleInformation(stderrFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stderr",false); }
     StdIN_Rd=NULL;
-    cmd=strdup(command);
-    if (CreateChildProcess(cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
+
+    if (CreateChildProcess(cmd.text(), StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
       SafeClose(StdOUT_Wr);
       SafeClose(StdERR_Wr);
       SafeClose(StdIN_Rd);
@@ -184,8 +187,7 @@ bool CmdIO::run(const char *command, bool*canceler)
     if (StdOUT_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stdout temp file", false); }
     StdERR_Wr=CreateFile(TempErr,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
     if (StdERR_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stderr temp file", false); }
-    cmd=strdup(command);
-    if (CreateChildProcess(cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
+    if (CreateChildProcess(cmd.text(), StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
       SafeClose(StdIN_Rd);
       SafeClose(StdOUT_Wr);
       SafeClose(StdERR_Wr);
@@ -246,7 +248,7 @@ bool CmdIO::run(const char *command, bool*canceler)
       SafeClose(stdoutFD);
       RecvString.substitute("\r", "", true);
     } else {
-      WinErrMsg("opening output log", GetLastError());
+      WinErrMsg(ErrString, "opening output log", GetLastError());
     }
     DeleteFile(TempOut);
   }
@@ -272,11 +274,16 @@ bool CmdIO::run(const char *command, bool*canceler)
       SafeClose(stderrFD);
       ErrString.substitute('\r', ' ', true);
     } else {
-      WinErrMsg("opening error log", GetLastError());
+      WinErrMsg(ErrString, "opening error log", GetLastError());
     }
     DeleteFile(TempErr);
   }
-  CleanupAndReturn("", (exitcode==0));
+  DWORD gle=GetLastError();
+  if (gle && (gle!=ERROR_BROKEN_PIPE)) {
+    WinErrMsg(ErrString,"running command",GetLastError());
+  }
+  Cleanup();
+  return (exitcode==0);
 }
 
 #endif

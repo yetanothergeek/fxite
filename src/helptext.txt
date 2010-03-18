@@ -1097,6 +1097,7 @@ changed via:
 __APP__ also exports the following environment variables to the external commands:
     ===$f===  = Full path and filename of the active document.
     ===$l===  = Current line number.
+(On MS-Windows, these variables can be referenced as  ===%F%===  and  ===%L%===  respectively.)
 
 In the event that an external command becomes "stuck" (e.g. an caught in an infinite loop, \
 or waiting for input that never arrives, etc.) you can usually cancel the command by \
