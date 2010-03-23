@@ -157,7 +157,7 @@ MenuSpec types:
   referenced by that MenuSpec's ms_mc field.
   The initial values here are simply reasonable defaults for a "typical" toolbar.
 */
-FXint toolbar_buttons[TBAR_MAX_BTNS+1]= {
+static FXint toolbar_buttons[TBAR_MAX_BTNS+1]= {
   TW::ID_NEW,
   TW::ID_OPEN_FILE,
   TW::ID_SAVE,
@@ -199,7 +199,7 @@ static MenuSpec* custom_commands[TBAR_MAX_BTNS+1] = {
 
 
 // We aren't using any fancy icons, but we can at least make each button a different color...
-ColorName tbar_colors[TBAR_MAX_BTNS] = {
+static ColorName tbar_colors[TBAR_MAX_BTNS] = {
   "#BBFFFF",
   "#FFEECC",
   "#CCEEFF",
