@@ -33,6 +33,12 @@ Copyright (C) 2001 Steven Barker
 http://cygwin.com/packages/cygutils/
 
 
+Code for guessing if a Windows executable will create a GUI
+window was pulled from the "PEDUMP" program.
+Written by Matt Pietrek 1994-1998
+http://www.wheaty.net/
+
+
 The Scintilla editing control and the PDF/HTML export code:
 Copyright (C) 1998-2010 by Neil Hodgson
 http://scintilla.org/
