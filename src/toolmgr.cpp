@@ -95,7 +95,7 @@ typedef struct {
 
 
 
-bool ParseToolInfo(const char *filepath, ToolInfo&info)
+static bool ParseToolInfo(const char *filepath, ToolInfo&info)
 {
   info.filepath=filepath;
   FXString fn=FXPath::name(filepath);

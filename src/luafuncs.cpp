@@ -596,7 +596,7 @@ typedef struct _DocCBData {
 
 
 
-bool FindIndexFromNameCB(FXint index, DocTab*tab, FXWindow*page, void*p)
+static bool FindIndexFromNameCB(FXint index, DocTab*tab, FXWindow*page, void*p)
 {
   DocCBData* data=(DocCBData*)p;
   SciDoc*sci=(SciDoc*)page->getFirst();

@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -66,7 +66,7 @@ static LangStyle LangNULL = {
 
 
 
-int KeywordListsCount(LangStyle*lang)
+static int KeywordListsCount(LangStyle*lang)
 {
   int i=0;
   while (lang->words[i]) { i++; }
@@ -163,7 +163,7 @@ StyleDef* GetStyleFromId(StyleDef*styles, int id)
 }
 
 
-long InvertColor(long rgb)
+static long InvertColor(long rgb)
 {
   long r,g,b;
   r=FXREDVAL(rgb);

@@ -405,7 +405,7 @@ static const char* helptext[]= {
 };
 
 
-void usage(const char*prog)
+static void usage(const char*prog)
 {
   fxmessage("\n");
   fxmessage(_("Usage: %s [options] [files] ...\n"), FXPath::name(prog).text());
@@ -575,7 +575,7 @@ void AppClass::exit(FXint code)
 
 
 
-bool get_config_name(int argc, char *argv[], FXString &cfg_name)
+static bool get_config_name(int argc, char *argv[], FXString &cfg_name)
 {
   cfg_name="";
   int i;

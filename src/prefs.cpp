@@ -236,7 +236,7 @@ static StyleDef CaretStyle =       { "caret",       0,     "#000000", "#000000",
 
 
 
-FXbool IsColor(const char*clr)
+static FXbool IsColor(const char*clr)
 {
   const char*p;
   if ( (clr) && (clr[0]=='#') && (strlen(clr)==7) ) {
@@ -363,7 +363,7 @@ static const char* tryfonts[] = {
 
 // Try to guess at a suitable font - we only do this when
 // there is no "FontName" entry in the registry.
-void FindFont(FXString &FontName) {
+static void FindFont(FXString &FontName) {
   FXFontDesc*fonts=NULL;
   FXuint numfonts=0;
   if (FXFont::listFonts(fonts,numfonts,FXString::null)) {

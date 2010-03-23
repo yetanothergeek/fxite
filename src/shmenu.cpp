@@ -180,7 +180,7 @@ void UserMenu::setText(const FXString &s)
 
 
 
-bool MakeLabelFromPath(const char*path, FXString &label)
+static bool MakeLabelFromPath(const char*path, FXString &label)
 {
   label=FXPath::name(path);
 
@@ -230,7 +230,7 @@ typedef struct _StrNode {
 
 
 
-int NodeCmp(StrNode*n1, StrNode*n2)
+static int NodeCmp(StrNode*n1, StrNode*n2)
 {
   return strcasecmp(n1->data, n2->data);
 }
@@ -238,7 +238,7 @@ int NodeCmp(StrNode*n1, StrNode*n2)
 
 typedef int (*SlFunc)(void*,void*);
 
-void NodeFree(void*p)
+static void NodeFree(void*p)
 {
   StrNode*n=(StrNode*)p;
   free(n);
@@ -246,7 +246,7 @@ void NodeFree(void*p)
 
 
 
-StrNode*NodeNew(const char*s)
+static StrNode*NodeNew(const char*s)
 {
   StrNode*n=(StrNode*)malloc(sizeof(StrNode));
   n->next=NULL;

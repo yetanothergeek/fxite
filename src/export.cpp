@@ -2,7 +2,7 @@
 Large portions of this file were adapted from the SciTE text
 editor source code.
 
-SciTE is copyright 1998-2009 by Neil Hodgson <neilh@scintilla.org>
+SciTE is copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 and is released under the following license:
 
 All Rights Reserved
@@ -249,7 +249,7 @@ public:
 };
 
 
-int IntFromHexDigit(int ch) {
+static int IntFromHexDigit(int ch) {
   if ((ch >= '0') && (ch <= '9')) {
     return ch - '0';
   } else if (ch >= 'A' && ch <= 'F') {

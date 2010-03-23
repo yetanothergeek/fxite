@@ -255,7 +255,7 @@ MacroRecorder::~MacroRecorder() {
   clear();
 }
 
-void requote(FXString&s)
+static void requote(FXString&s)
 {
   s.substitute("\\", "\\\\", true);
   s.substitute("\n", "\\n", true);

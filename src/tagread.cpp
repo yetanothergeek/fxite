@@ -207,7 +207,7 @@ void TagDialog::SetLabel()
 
 
 
-bool IsCallTipFile(const char*filename)
+static bool IsCallTipFile(const char*filename)
 {
   FXFile fh(filename,FXIO::Reading);
   if (fh.isOpen()) {
@@ -224,7 +224,7 @@ bool IsCallTipFile(const char*filename)
 
 
 
-FXListItem *NewListItem(tagEntry *te)
+static FXListItem *NewListItem(tagEntry *te)
 {
   char *txt;
   if (te->address.pattern) {
@@ -245,7 +245,7 @@ FXListItem *NewListItem(tagEntry *te)
 
 
 
-bool FindTag(FXWindow*shell,
+static bool FindTag(FXWindow*shell,
   const FXString &tagname, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat)
 {
   outfile="";
@@ -313,7 +313,7 @@ bool FindTag(SciDoc*sci, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXStr
 
 
 
-void TagToTip(tagEntry *te, FXString&calltip)
+static void TagToTip(tagEntry *te, FXString&calltip)
 {
   const char*sig=tagsField(te,"signature");
   if (sig && te->name) {
@@ -334,7 +334,7 @@ void TagToTip(tagEntry *te, FXString&calltip)
   and parse it for the tagname. If found, append its tip text to the calltip string.
 */
 
-bool IsTagFile(const char*filename,const FXString &tagname, FXString &calltip) {
+static bool IsTagFile(const char*filename,const FXString &tagname, FXString &calltip) {
   FXint size=FXStat::size(filename);
   if (size>0) {
     FXFile fh(filename,FXIO::Reading);
