@@ -963,6 +963,7 @@ void SciDoc::SetSplit(FXint style)
     sci->ShowWhiteSpace(ShowWhiteSpace());
     sci->GoToPos(GetCaretPos());
     sci->sendMessage(SCI_SETZOOM,sendMessage(SCI_GETZOOM,0,0),0);
+    sci->SetShowEdge(GetShowEdge());
   }
 }
 
