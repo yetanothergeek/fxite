@@ -62,9 +62,9 @@ protected:
   inline bool IsBrace(long &pos);
   void GetSelection(CharacterRange &crange);
   bool DoLoadFromFile(const char*filename,bool insert=false);
+public:
   SciDoc*Master() { return (SciDoc*)getPrev(); }
   SciDoc*Slave() { return (SciDoc*)getNext(); }
-public:
   SciSearch *search;
   long onKeyPress(FXObject *o, FXSelector sel, void *p);
   SciDoc(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0);

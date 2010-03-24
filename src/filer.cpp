@@ -363,12 +363,15 @@ bool FileDialogs::AskReload(SciDoc*sci) {
        )!=MBOX_CLICKED_YES ) { return false; }
   }
   long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
+  SciDoc*sci2=sci->Slave();
+  long pos2=sci2?sci2->sendMessage(SCI_GETCURRENTPOS,0,0):0;
   if ( !sci->LoadFromFile(sci->Filename().text()) ) {
     FXMessageBox::error(sci->getShell(),
       MBOX_OK,_("Reload failed"), "%s\n%s", sci->Filename().text(), sci->GetLastError().text());
     return false;
   }
   sci->sendMessage(SCI_GOTOPOS,pos,0);
+  if (sci2) { sci2->sendMessage(SCI_GOTOPOS,pos2,0); }
   FXTabItem*tab=(FXTabItem*)sci->getParent()->getPrev();
   tab->setText(FXPath::name(sci->Filename()));
   sci->DoStaleTest(true);
