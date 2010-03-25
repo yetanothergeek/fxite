@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 // With Borland C++ 5.5, including <string> includes Windows.h leading to defining
 // FindText to FindTextA which makes calls here to Document::FindText fail.
@@ -150,6 +151,7 @@ Editor::Editor() {
 	caretSticky = false;
 	multipleSelection = false;
 	additionalSelectionTyping = false;
+	multiPasteMode = SC_MULTIPASTE_ONCE;
 	additionalCaretsBlink = true;
 	additionalCaretsVisible = true;
 	virtualSpaceOptions = SCVS_NONE;
@@ -3535,7 +3537,7 @@ long Editor::FormatRange(bool draw, Sci_RangeToFormat *pfr) {
 
 	int nPrintPos = pfr->chrg.cpMin;
 	int visibleLine = 0;
-	int widthPrint = pfr->rc.Width() - vsPrint.fixedColumnWidth;
+	int widthPrint = pfr->rc.right - pfr->rc.left - vsPrint.fixedColumnWidth;
 	if (printWrapState == eWrapNone)
 		widthPrint = LineLayout::wrapWidthInfinite;
 
@@ -3733,7 +3735,11 @@ void Editor::AddCharUTF(char *s, unsigned int len, bool treatAsDBCS) {
 				if (wrapState != eWrapNone) {
 					AutoSurface surface(this);
 					if (surface) {
-						WrapOneLine(surface, pdoc->LineFromPosition(positionInsert));
+						if (WrapOneLine(surface, pdoc->LineFromPosition(positionInsert))) {
+							SetScrollBars();
+							SetVerticalScrollPos();
+							Redraw();
+						}
 					}
 				}
 			}
@@ -3790,6 +3796,38 @@ void Editor::AddCharUTF(char *s, unsigned int len, bool treatAsDBCS) {
 
 	if (recordingMacro) {
 		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(s));
+	}
+}
+
+void Editor::InsertPaste(SelectionPosition selStart, const char *text, int len) {
+	if (multiPasteMode == SC_MULTIPASTE_ONCE) {
+		selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
+		if (pdoc->InsertString(selStart.Position(), text, len)) {
+			SetEmptySelection(selStart.Position() + len);
+		}
+	} else {
+		// SC_MULTIPASTE_EACH
+		for (size_t r=0; r<sel.Count(); r++) {
+			if (!RangeContainsProtected(sel.Range(r).Start().Position(),
+				sel.Range(r).End().Position())) {
+				int positionInsert = sel.Range(r).Start().Position();
+				if (!sel.Range(r).Empty()) {
+					if (sel.Range(r).Length()) {
+						pdoc->DeleteChars(positionInsert, sel.Range(r).Length());
+						sel.Range(r).ClearVirtualSpace();
+					} else {
+						// Range is all virtual so collapse to start of virtual space
+						sel.Range(r).MinimizeVirtualSpace();
+					}
+				}
+				positionInsert = InsertSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
+				if (pdoc->InsertString(positionInsert, text, len)) {
+					sel.Range(r).caret.SetPosition(positionInsert + len);
+					sel.Range(r).anchor.SetPosition(positionInsert + len);
+				}
+				sel.Range(r).ClearVirtualSpace();
+			}
+		}
 	}
 }
 
@@ -3908,9 +3946,9 @@ bool Editor::CanPaste() {
 }
 
 void Editor::Clear() {
-	UndoGroup ug(pdoc);
 	// If multiple selections, don't delete EOLS
 	if (sel.Empty()) {
+		UndoGroup ug(pdoc, sel.Count() > 1);
 		for (size_t r=0; r<sel.Count(); r++) {
 			if (!RangeContainsProtected(sel.Range(r).caret.Position(), sel.Range(r).caret.Position() + 1)) {
 				if (sel.Range(r).Start().VirtualSpace()) {
@@ -4499,14 +4537,36 @@ void Editor::PageMove(int direction, Selection::selTypes selt, bool stuttered) {
 	}
 }
 
-void Editor::ChangeCaseOfSelection(bool makeUpperCase) {
+void Editor::ChangeCaseOfSelection(int caseMapping) {
 	UndoGroup ug(pdoc);
 	for (size_t r=0; r<sel.Count(); r++) {
 		SelectionRange current = sel.Range(r);
-		pdoc->ChangeCase(Range(current.Start().Position(), current.End().Position()),
-	        makeUpperCase);
-		// Automatic movement cuts off last character so reset to exactly the same as it was.
-		sel.Range(r) = current;
+		SelectionRange currentNoVS = current;
+		currentNoVS.ClearVirtualSpace();
+		char *text = CopyRange(currentNoVS.Start().Position(), currentNoVS.End().Position());
+		size_t rangeBytes = currentNoVS.Length();
+		if (rangeBytes > 0) {
+			std::string sText(text, rangeBytes);
+
+			std::string sMapped = CaseMapString(sText, caseMapping);
+
+			if (sMapped != sText) {
+				size_t firstDifference = 0;
+				while (sMapped[firstDifference] == sText[firstDifference])
+					firstDifference++;
+				size_t lastDifference = sMapped.size() - 1;
+				while (sMapped[lastDifference] == sText[lastDifference])
+					lastDifference--;
+				size_t endSame = sMapped.size() - 1 - lastDifference;
+				pdoc->DeleteChars(currentNoVS.Start().Position() + firstDifference, 
+					rangeBytes - firstDifference - endSame);
+				pdoc->InsertString(currentNoVS.Start().Position() + firstDifference, 
+					sMapped.c_str() + firstDifference, lastDifference - firstDifference + 1);
+				// Automatic movement changes selection so reset to exactly the same as it was.
+				sel.Range(r) = current;
+			}
+		}
+		delete []text;
 	}
 }
 
@@ -5100,10 +5160,10 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		Duplicate(false);
 		break;
 	case SCI_LOWERCASE:
-		ChangeCaseOfSelection(false);
+		ChangeCaseOfSelection(cmLower);
 		break;
 	case SCI_UPPERCASE:
-		ChangeCaseOfSelection(true);
+		ChangeCaseOfSelection(cmUpper);
 		break;
 	case SCI_WORDPARTLEFT:
 		MovePositionTo(MovePositionSoVisible(pdoc->WordPartLeft(sel.MainCaret()), -1));
@@ -5211,7 +5271,7 @@ void Editor::Indent(bool forwards) {
 					int indentation = pdoc->GetLineIndentation(lineCurrentPos);
 					int indentationStep = pdoc->IndentSize();
 					pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationStep);
-					SetEmptySelection(pdoc->GetLineIndentPosition(lineCurrentPos));
+					sel.Range(r) = SelectionRange(pdoc->GetLineIndentPosition(lineCurrentPos));
 				} else {
 					int newColumn = ((pdoc->GetColumn(caretPosition) - 1) / pdoc->tabInChars) *
 							pdoc->tabInChars;
@@ -5250,6 +5310,31 @@ void Editor::Indent(bool forwards) {
 	}
 }
 
+class CaseFolderASCII : public CaseFolderTable {
+public:
+	CaseFolderASCII() {
+		StandardASCII();
+	}
+	~CaseFolderASCII() {
+	}
+	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
+		if (lenMixed > sizeFolded) {
+			return 0;
+		} else {
+			for (size_t i=0; i<lenMixed; i++) {
+				folded[i] = mapping[static_cast<unsigned char>(mixed[i])];
+			}
+			return lenMixed;
+		}
+	}
+};
+
+
+CaseFolder *Editor::CaseFolderForEncoding() {
+	// Simple default that only maps ASCII upper case to lower case.
+	return new CaseFolderASCII();
+}
+
 /**
  * Search of a text in the document, in the given range.
  * @return The position of the found text, -1 if not found.
@@ -5261,13 +5346,15 @@ long Editor::FindText(
 
 	Sci_TextToFind *ft = reinterpret_cast<Sci_TextToFind *>(lParam);
 	int lengthFound = istrlen(ft->lpstrText);
+	std::auto_ptr<CaseFolder> pcf(CaseFolderForEncoding());
 	int pos = pdoc->FindText(ft->chrg.cpMin, ft->chrg.cpMax, ft->lpstrText,
 	        (wParam & SCFIND_MATCHCASE) != 0,
 	        (wParam & SCFIND_WHOLEWORD) != 0,
 	        (wParam & SCFIND_WORDSTART) != 0,
 	        (wParam & SCFIND_REGEXP) != 0,
 	        wParam,
-	        &lengthFound);
+	        &lengthFound,
+			pcf.get());
 	if (pos != -1) {
 		ft->chrgText.cpMin = pos;
 		ft->chrgText.cpMax = pos + lengthFound;
@@ -5304,6 +5391,7 @@ long Editor::SearchText(
 	const char *txt = reinterpret_cast<char *>(lParam);
 	int pos;
 	int lengthFound = istrlen(txt);
+	std::auto_ptr<CaseFolder> pcf(CaseFolderForEncoding());
 	if (iMessage == SCI_SEARCHNEXT) {
 		pos = pdoc->FindText(searchAnchor, pdoc->Length(), txt,
 		        (wParam & SCFIND_MATCHCASE) != 0,
@@ -5311,7 +5399,8 @@ long Editor::SearchText(
 		        (wParam & SCFIND_WORDSTART) != 0,
 		        (wParam & SCFIND_REGEXP) != 0,
 		        wParam,
-		        &lengthFound);
+		        &lengthFound,
+				pcf.get());
 	} else {
 		pos = pdoc->FindText(searchAnchor, 0, txt,
 		        (wParam & SCFIND_MATCHCASE) != 0,
@@ -5319,14 +5408,31 @@ long Editor::SearchText(
 		        (wParam & SCFIND_WORDSTART) != 0,
 		        (wParam & SCFIND_REGEXP) != 0,
 		        wParam,
-		        &lengthFound);
+		        &lengthFound,
+				pcf.get());
 	}
-
 	if (pos != -1) {
 		SetSelection(pos, pos + lengthFound);
 	}
 
 	return pos;
+}
+
+std::string Editor::CaseMapString(const std::string &s, int caseMapping) {
+	std::string ret(s);
+	for (size_t i=0; i<ret.size(); i++) {
+		switch (caseMapping) {
+			case cmUpper:
+				if (ret[i] >= 'a' && ret[i] <= 'z')
+					ret[i] = static_cast<char>(ret[i] - 'a' + 'A');
+				break;
+			case cmLower:
+				if (ret[i] >= 'A' && ret[i] <= 'Z')
+					ret[i] = static_cast<char>(ret[i] - 'A' + 'a');
+				break;
+		}
+	}
+	return ret;
 }
 
 /**
@@ -5335,13 +5441,16 @@ long Editor::SearchText(
  */
 long Editor::SearchInTarget(const char *text, int length) {
 	int lengthFound = length;
+
+	std::auto_ptr<CaseFolder> pcf(CaseFolderForEncoding());
 	int pos = pdoc->FindText(targetStart, targetEnd, text,
 	        (searchFlags & SCFIND_MATCHCASE) != 0,
 	        (searchFlags & SCFIND_WHOLEWORD) != 0,
 	        (searchFlags & SCFIND_WORDSTART) != 0,
 	        (searchFlags & SCFIND_REGEXP) != 0,
 	        searchFlags,
-	        &lengthFound);
+	        &lengthFound,
+			pcf.get());
 	if (pos != -1) {
 		targetStart = pos;
 		targetEnd = pos + lengthFound;
@@ -7138,9 +7247,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return wrapState;
 
 	case SCI_SETWRAPVISUALFLAGS:
-		wrapVisualFlags = wParam;
-		InvalidateStyleRedraw();
-		ReconfigureScrollBars();
+		if (wrapVisualFlags != static_cast<int>(wParam)) {
+			wrapVisualFlags = wParam;
+			InvalidateStyleRedraw();
+			ReconfigureScrollBars();
+		}
 		break;
 
 	case SCI_GETWRAPVISUALFLAGS:
@@ -7155,18 +7266,22 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return wrapVisualFlagsLocation;
 
 	case SCI_SETWRAPSTARTINDENT:
-		wrapVisualStartIndent = wParam;
-		InvalidateStyleRedraw();
-		ReconfigureScrollBars();
+		if (wrapVisualStartIndent != static_cast<int>(wParam)) {
+			wrapVisualStartIndent = wParam;
+			InvalidateStyleRedraw();
+			ReconfigureScrollBars();
+		}
 		break;
 
 	case SCI_GETWRAPSTARTINDENT:
 		return wrapVisualStartIndent;
 
 	case SCI_SETWRAPINDENTMODE:
-		wrapIndentMode = wParam;
-		InvalidateStyleRedraw();
-		ReconfigureScrollBars();
+		if (wrapIndentMode != static_cast<int>(wParam)) {
+			wrapIndentMode = wParam;
+			InvalidateStyleRedraw();
+			ReconfigureScrollBars();
+		}
 		break;
 
 	case SCI_GETWRAPINDENTMODE:
@@ -8271,6 +8386,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETADDITIONALSELECTIONTYPING:
 		return additionalSelectionTyping;
+
+	case SCI_SETMULTIPASTE:
+		multiPasteMode = wParam;
+		break;
+
+	case SCI_GETMULTIPASTE:
+		return multiPasteMode;
 
 	case SCI_SETADDITIONALCARETSBLINK:
 		additionalCaretsBlink = wParam != 0;

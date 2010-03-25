@@ -2,6 +2,7 @@ noinst_LIBRARIES = libfxscintilla.a
 libfxscintilla_a_CXXFLAGS = $(AM_CXXFLAGS) $(FOX_CFLAGS) -DSCI_LEXER -DFOX
 
 libfxscintilla_a_SOURCES = \
+version.h \
 AutoComplete.cxx \
 CallTip.cxx \
 CellBuffer.cxx \
@@ -76,7 +77,7 @@ ViewStyle.cxx \
 WindowAccessor.cxx \
 XPM.cxx
 
-noinst_HEADERS = \
+noinst_HEADERS =  \
 version.h \
 Accessor.h \
 AutoComplete.h \
@@ -116,4 +117,5 @@ StyleContext.h \
 UniConversion.h \
 ViewStyle.h \
 WindowAccessor.h \
-XPM.h
+XPM.h \
+version.h
