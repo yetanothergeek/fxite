@@ -217,6 +217,9 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
 
   if (filename) {
     fn=FXPath::simplify(FXPath::absolute(filename));
+#ifdef WIN32
+     FileDialogs::ReadShortcut(this,fn);
+#endif
     tabbook->ForEachTab(FileAlreadyOpenCB,&fn);
     if (fn.empty()) {
       if (rowcol) {

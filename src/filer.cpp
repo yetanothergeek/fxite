@@ -48,6 +48,39 @@ extern "C" {
 }
 
 
+// True if file extension is '*.lnk'
+#define IsLinkExt(s) (FXPath::extension(s).lower()=="lnk")
+
+
+/*
+  Read the Windows shortcut (*.lnk) file passed in as "filename".
+  If the filename does not end with the *.lnk extension, returns
+  true, the filename parameter is unchanged.
+  If the link cannot be read (e.g. corrupted file) it displays an
+  error dialog describing the reason for the failure and returns
+  false, the filename parameter is unchanged.
+  If reading of the link is successful, it returns true and the
+  "filename" parameter is modified and will contain the name of
+  the file that the shortcut points to.
+*/
+bool FileDialogs::ReadShortcut(FXWindow*w, FXString &filename)
+{
+  bool rv=true;
+  if (IsLinkExt(filename)) {
+    char*tmp=NULL;
+     if (::ReadShortcut(&tmp, filename.text())) {
+      filename=FXPath::simplify(FXPath::absolute(tmp));
+    } else {
+      FXMessageBox::error(w,MBOX_OK,_("Error in shortcut"),"%s\n%s",filename.text(),tmp);
+      rv=false;
+    }
+    free(tmp);
+  }
+  return rv;
+}
+
+
+
 /*
   Fox doesn't automatically handle MS-Windows shortcut files, so...
   Iterate through each filename in the file dialog's getFilenames() list,
@@ -63,8 +96,7 @@ static void FixupShortcuts(FXWindow*w, FXString* filenames) {
   FXString* tail=filenames;
   FXuint count=0;
   for (fn=filenames; !fn->empty(); fn++) {
-    FXString ext=FXPath::extension(*fn).upper();
-    if (ext=="LNK") {
+    if (IsLinkExt(*fn)) {
       char*tmp=NULL;
       if (ReadShortcut(&tmp, fn->text())) {
         *fn=tmp;

@@ -45,4 +45,7 @@ public:
   void *getUserData() { return user_data; }
   void setUserData(void*p) { user_data=p; }
   FileDialogs(FXObject*tgt, FXSelector sel);
+#ifdef WIN32
+  static bool ReadShortcut(FXWindow*w, FXString &filename);
+#endif
 };
