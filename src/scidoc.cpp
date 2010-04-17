@@ -177,13 +177,14 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     return false;
   }
   bool DefaultToAscii=Settings::instance()->DefaultToAscii;
+  bool DefaultToSbcs=Settings::instance()->DefaultToSbcs;
   switch (get_file_encoding(filename)) {
     case 'B': { // Binary file
       if ( !ConfirmOpenBinary(this,filename) ) {
         _lasterror=BinaryFileMessage();
         return false;
       }
-      if (!insert) { SetUTF8(false); }
+      if (!insert) { SetUTF8(!DefaultToSbcs); }
       break;
     }
     case 'T': { // Plain US-ASCII text file
@@ -191,7 +192,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       break;
     }
     case 'H': { // High (extended ASCII) text file.
-      if (!insert) { SetUTF8(false); }
+      if (!insert) { SetUTF8(!DefaultToSbcs); }
       break;
     }
     case 'U': { // UTF-8 encoded text file.

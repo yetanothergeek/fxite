@@ -1113,8 +1113,11 @@ FXTabItem* PrefsDialog::MakeEditorTab()
   list->setNumVisible(list->getNumItems());
   list->setCurrentItem(prefs->SearchWrap);
   new FXHorizontalSeparator(column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
-  chk=new FXCheckButton(column, _("Treat plain-text files as UTF-8"), prefs, Settings::ID_TOGGLE_ASCII_DEFAULT);
+  chk=new FXCheckButton(column, _("Open 7-bit ASCII files as UTF-8"), prefs, Settings::ID_TOGGLE_ASCII_DEFAULT);
   chk->setCheck(!prefs->DefaultToAscii, FALSE);
+  chk->setPadBottom(4);
+  chk=new FXCheckButton(column, _("Treat other files as broken UTF-8"), prefs, Settings::ID_TOGGLE_SBCS_DEFAULT);
+  chk->setCheck(!prefs->DefaultToSbcs, FALSE);
   chk->setPadBottom(8);
   spinframe=new FXHorizontalFrame(column);
   new FXLabel(spinframe, _("Default file format:"));

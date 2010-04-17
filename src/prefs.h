@@ -80,6 +80,7 @@ public:
   FXulong WrapToolbar:1;
 
   FXulong DefaultToAscii:1;
+  FXulong DefaultToSbcs:1;
 
   FXFontDesc fontdesc;
   FXint ToolbarButtonSize;
@@ -133,6 +134,7 @@ public:
     ID_TOGGLE_VIEW_WHITESPACE_EOL,
     ID_TOGGLE_WRAP_TOOLBAR,
     ID_TOGGLE_ASCII_DEFAULT,
+    ID_TOGGLE_SBCS_DEFAULT,
     ID_SAVE_ON_FILTER_SEL,
     ID_SAVE_ON_INS_CMD,
     ID_SAVE_ON_EXEC_CMD,

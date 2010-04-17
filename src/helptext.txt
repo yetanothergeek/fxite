@@ -418,12 +418,21 @@ transform the line endings in the current document into a different format from 
 
 ###Character Sets and Encodings###
 
-When you open a file in __APP__, it first scans the file's contents to try and determine if the file \
-is encoded as UTF-8, and any file which does not look like valid UTF-8 will be treated as plain-text \
-(one byte per char) format. For new files, empty files, or files whose encoding is ambiguous \
-(i.e. files that contain only 7-bit character codes) the file may be treated as either UTF-8 or plain ASCII \
+When you open a file in __APP__, it first scans the file's contents and tries to determine \
+if the file is encoded as UTF-8.   If the encoding cannot be determined, it consults the settings \
+under:
+  %%%Edit->Preferences->editor%%%
+
+For new files, empty files, or files whose encoding is ambiguous (i.e. files that contain \
+only 7-bit character codes) the file may be treated as either UTF-8 or plain ASCII, \
 depending on the setting of:
-  '%%%Edit->Preferences->editor->Treat plain-text files as UTF-8%%%'
+  %%%[x] Open 7-bit ASCII files as UTF-8%%%
+
+For binary files, extended single-byte encodings, or invalid UTF-8, you can force such \
+files to be treated as UTF-8 by setting:
+  %%%[x] Treat other files as broken UTF-8%%%
+(You will probably never want to enable this option, unless you encounter a corrupted UTF-8 \
+file, or you just want to test the compliance of the UTF-8 handler on a deliberately broken file.)
 
 Note that __APP__ does not provide any sort of "on the fly" conversion between encodings, so if you want to \
 work with an extended ASCII file as if it were UTF-8 encoded, you will need to convert the file using an \
