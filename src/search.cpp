@@ -78,7 +78,7 @@ SciSearchOptions::SciSearchOptions(FXComposite *p, FXObject *tgt, FXSelector sel
 {
   target=tgt;
   message=sel;
-  matchcase = new FXCheckButton(this, _("Match &case "), this, ID_TOGGLE_CHK);
+  matchcase = new FXCheckButton(this, _("&Match case "), this, ID_TOGGLE_CHK);
   wholeword = new FXCheckButton(this, _("W&hole word "), this, ID_TOGGLE_CHK);
   regexp =    new FXCheckButton(this, _("&Reg expr. "), this, ID_TOGGLE_CHK);
 }
