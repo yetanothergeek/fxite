@@ -1,3 +1,18 @@
+2010-04-27
+  * Update file dialog filters when preferences dialog is dismissed.
+  * Prompt for unsaved changes if tool manager is closed from window menu.
+  * Added a dialog to edit the filter list for file dialogs.
+  * Fixed copy/paste operations in rectangular selections.
+  * Fixed some of the issues with running external commands on Windows.
+  * Copy right margin indicator setting for split view
+  * Remember secondary view's cursor position when reloading file
+  * Made convert selection to upper/lower case also work for UTF-8 text.
+  * Updated Scintilla to 2.3.0 CVS (2010-03-25)
+  * Open windows *.lnk files from command line.
+  * Allow forced opening of broken UTF-8 files.
+  * Added a new "smart" auto-indent option.
+
+
 2010-02-27
   * Add Lua functions to get process id and window id.
   * Fixed a bug with ActivePage() sometimes incorrectly returning NULL.
