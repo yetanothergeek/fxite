@@ -1086,7 +1086,7 @@ void TopWindow::ParseCommands(const FXString &commands)
 
 
 
-#ifndef __WIN32__
+#ifndef WIN32
 #define NET_WM_ICON
 #endif
 

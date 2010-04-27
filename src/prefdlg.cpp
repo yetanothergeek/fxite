@@ -1152,7 +1152,7 @@ long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 
 
 
-#ifndef __WIN32__
+#ifndef WIN32
 extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
 #else
 #define SetupXAtoms(win,class_name)
