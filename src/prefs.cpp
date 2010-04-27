@@ -73,7 +73,6 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
   switch FXSELID(sel) {
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
     case ID_TOGGLE_USE_TABS:    { UseTabs = !UseTabs; break; }
-    case ID_TOGGLE_AUTO_INDENT: { AutoIndent = !AutoIndent; break; }
     case ID_TOGGLE_BRACE_MATCH: { BraceMatch = !BraceMatch; break; }
     case ID_TOGGLE_ASK_CLOSE_MULTI_MENU: { PromptCloseMultiMenu = !PromptCloseMultiMenu; break; }
     case ID_TOGGLE_ASK_CLOSE_MULTI_EXIT: { PromptCloseMultiExit = !PromptCloseMultiExit; break; }
@@ -149,6 +148,13 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       LIMIT_RANGE(SearchWrap,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
       break;
     }
+
+    case ID_SET_AUTO_INDENT: {
+      AutoIndent=(FXival)p;
+      LIMIT_RANGE(AutoIndent,AUTO_INDENT_NONE,AUTO_INDENT_SMART);
+      break;
+    }
+
     case ID_SET_SPLIT_VIEW: {
       SplitView=(FXival)p;
       LIMIT_RANGE(SplitView,SPLIT_NONE,SPLIT_BESIDE);
@@ -601,7 +607,6 @@ Settings::Settings(FXMainWindow*w)
   ReadIntRng(SplitView,0,SPLIT_NONE,SPLIT_BESIDE);
   ReadInt(OutputPaneHeight,64);
   ReadInt(SmartHome,false);
-  ReadInt(AutoIndent,false);
   ReadInt(BraceMatch,true);
   ReadInt(UseTabs,true);
   ReadInt(CaretPastEOL,false);
@@ -613,6 +618,7 @@ Settings::Settings(FXMainWindow*w)
   ReadInt(SmoothScroll,true);
   ReadIntRng(WheelLines,3,1,32);
   ReadIntRng(SearchWrap,SEARCH_WRAP_ASK,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
+  ReadIntRng(AutoIndent,AUTO_INDENT_NONE,AUTO_INDENT_NONE,AUTO_INDENT_SMART);
   ReadInt(SearchVerbose,true);
   ReadInt(SearchOptions,0);
   ReadInt(ZoomFactor,0);

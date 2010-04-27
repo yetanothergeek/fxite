@@ -827,31 +827,7 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
           break;
         }
         case SCN_CHARADDED: {
-          if ( (line>0) && (prefs->AutoIndent) && (scn->ch=='\n') ) {
-            int prev_line=line-1;
-            if (prev_line>=0) {
-              bool tmp_tab=false;
-              if ( (sci->GetLineLength(prev_line)>0) && !sci->UseTabs() ) {
-                if (sci->sendMessage(SCI_GETCHARAT,sci->sendMessage(SCI_POSITIONFROMLINE,prev_line,0),0)=='\t') {
-                  tmp_tab=true;
-                }
-              }
-              long prev_indent=sci->sendMessage(SCI_GETLINEINDENTATION, prev_line, 0);
-              long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
-              if ( curr_indent < prev_indent ) {
-                if (tmp_tab) {
-                  sci->UseTabs(true);
-                  sci->SetLineIndentation(line,prev_indent);
-                  sci->UseTabs(false);
-                } else {
-                  sci->SetLineIndentation(line,prev_indent);
-                }
-                if (sci->UseTabs()||tmp_tab) {
-                  sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+1);
-                }
-              }
-            }
-          }
+          CharAdded(sci,line,pos,scn->ch);
           break;
         }
         case SCN_DOUBLECLICK: {

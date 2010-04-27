@@ -34,6 +34,12 @@ Steps to adding a new preference:
 
 typedef struct _StyleDef StyleDef;
 
+typedef enum { 
+  AUTO_INDENT_NONE=0,
+  AUTO_INDENT_BASIC,
+  AUTO_INDENT_SMART
+} AutoIndentPolicy;
+
 class Settings: public FXObject {
   FXDECLARE(Settings);
   static FXbool loaded;
@@ -62,7 +68,6 @@ public:
   FXulong DocTabsPacked:1;
   FXulong Maximize:1;
   FXulong SmartHome:1;
-  FXulong AutoIndent:1;
 
   FXulong BraceMatch:1;
   FXulong UseTabs:1;
@@ -81,6 +86,8 @@ public:
 
   FXulong DefaultToAscii:1;
   FXulong DefaultToSbcs:1;
+
+  FXint AutoIndent;
 
   FXFontDesc fontdesc;
   FXint ToolbarButtonSize;
@@ -122,7 +129,6 @@ public:
     ID_TOGGLE_SMART_HOME,
     ID_TOGGLE_USE_TABS,
     ID_TOGGLE_BRACE_MATCH,
-    ID_TOGGLE_AUTO_INDENT,
     ID_TOGGLE_ASK_CLOSE_MULTI_EXIT,
     ID_TOGGLE_ASK_CLOSE_MULTI_MENU,
     ID_TOGGLE_WATCH_EXTERN,
@@ -153,6 +159,7 @@ public:
     ID_SET_FILE_FORMAT,
     ID_SET_TOOLBAR_BTN_SIZE,
     ID_SET_SEARCH_OPTS,
+    ID_SET_AUTO_INDENT,
     ID_LAST
   };
   static Settings*instance();

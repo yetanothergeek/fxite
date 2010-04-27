@@ -1048,11 +1048,17 @@ FXTabItem* PrefsDialog::MakeEditorTab()
   frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL|PACK_UNIFORM_HEIGHT);
 
+  spinframe=new FXHorizontalFrame(column);
+  new FXLabel(spinframe, _("Auto indent:"));
+  list=new FXListBox(spinframe,prefs,Settings::ID_SET_AUTO_INDENT,LIST_BOX_OPTS);
+  list->appendItem(_("off"),NULL,NULL);
+  list->appendItem(_("basic"),NULL,NULL);
+  list->appendItem(_("smart"),NULL,NULL);
+  list->setNumVisible(list->getNumItems());
+  list->setCurrentItem(prefs->AutoIndent);
+
   chk=new FXCheckButton(column, _("Smart home key"), prefs, Settings::ID_TOGGLE_SMART_HOME);
   chk->setCheck(prefs->SmartHome, FALSE);
-
-  chk=new FXCheckButton(column, _("Auto indent new lines"), prefs, Settings::ID_TOGGLE_AUTO_INDENT);
-  chk->setCheck(prefs->AutoIndent, FALSE);
 
   chk=new FXCheckButton(column, _("Smooth scrolling"), prefs, Settings::ID_TOGGLE_SMOOTH_SCROLL);
   chk->setCheck(prefs->SmoothScroll, FALSE);

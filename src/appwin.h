@@ -195,6 +195,7 @@ private:
   void SetSrchDlgsPrefs();
   void DoneSci(SciDoc*sci);
   void EnableUserFilters(bool enabled);
+  void CharAdded(SciDoc*sci, long line, long pos, int ch);
   FXString save_hook;
   FXHotKey killkey;
   FXString bookmarked_file;

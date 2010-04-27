@@ -557,6 +557,62 @@ UserMenu**TopWindow::UserMenus() const
 
 
 
+void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
+{
+  if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; } 
+  switch (ch) {
+    case '\r': { 
+      if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
+    }
+    case '\n': {
+      int prev_line=line-1;
+      bool tmp_tab=false;
+      if ( (sci->GetLineLength(prev_line)>0) && !sci->UseTabs() ) {
+        long prev_pos=sci->sendMessage(SCI_POSITIONFROMLINE,prev_line,0);
+        if (sci->sendMessage(SCI_GETCHARAT,prev_pos,0)=='\t') {
+          tmp_tab=true; // If previous line has a tab, override the editor preference.
+        }
+      }
+      long prev_indent=sci->sendMessage(SCI_GETLINEINDENTATION, prev_line, 0);
+      if (prefs->AutoIndent==AUTO_INDENT_SMART) {
+        long prev_pos=pos-2;
+        if (sci->sendMessage(SCI_GETEOLMODE,0,0)==SC_EOL_CRLF) { prev_pos--; }
+        int prev_char=sci->sendMessage(SCI_GETCHARAT,prev_pos,0);
+        if (prev_char=='{') { prev_indent += prefs->TabWidth; }
+      }
+      long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
+      if ( curr_indent < prev_indent ) {
+        if (tmp_tab) {
+          sci->UseTabs(true);
+          sci->SetLineIndentation(line,prev_indent);
+          sci->UseTabs(false);
+        } else {
+          sci->SetLineIndentation(line,prev_indent);
+        }
+        if (sci->UseTabs()||tmp_tab) {
+          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+1);
+        }
+      }
+      break;
+    }
+    case '}': {
+      if (prefs->AutoIndent==AUTO_INDENT_SMART) {
+        getApp()->runWhileEvents();
+        int opener=sci->sendMessage(SCI_BRACEMATCH,pos-1,0);
+        if (opener>=0) {
+          long match_line=sci->sendMessage(SCI_LINEFROMPOSITION,opener,0);
+          if (match_line<line) {
+            long match_indent=sci->sendMessage(SCI_GETLINEINDENTATION, match_line, 0);
+            sci->sendMessage(SCI_SETLINEINDENTATION, line, match_indent);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
 // Prints the names of the compiled-in lexers to stdout,
 // along with the number of word lists per lexer
 // ( Only used during development, to help with the

@@ -346,13 +346,14 @@ these keyboard shortcuts will shift the text by one tab stop rather than one \
 space.
 
 Programmers who use structured languages usually prefer some form of \
-automatic indent, so that they don't have to continually re-type the sequences \
-of tabs and/or spaces needed to maintain lengthy running indents. Although \
-__APP__ does not offer any sort of fancy "smart" indent, it does however provide \
-a more basic type of automatic indentation which simply lines up the cursor \
-position with the previous line. You can enable this behavior by using the \
-%%%Auto indent new lines%%% option under the %%%editor%%% tab of the \
-%%%Preferences%%% dialog.
+automatic indentation, so that they don't have to continually re-type the sequences \
+of tabs and/or spaces needed to maintain lengthy running indents.  __APP__  offers \
+two types of auto-indent, a "basic" type which simply lines up the cursor position with \
+the previous line, and a slightly more sophisticated version that adds a further level of \
+indentation when you press ENTER immediately after typing an opening brace '%%%{%%%'.   This "smart" \
+version also un-indents back to the previous level as soon as you type the corresponding closing \
+brace '%%%}%%%'.   You can select the desired behavior by using the %%%Auto indent%%% option under \
+the %%%editor%%% tab of the %%%Preferences%%% dialog.
 
 
 
