@@ -209,6 +209,7 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   MyFileDlg dlg(sci->getShell(),_("Save file as"));
   dlg.setPatternList(_patterns);
   dlg.setDirectory(path);
+  dlg.txtfld()->setFocus();
   if (dlg.execute(PLACEMENT_OWNER)) {
     result=dlg.getFilename();
   }
@@ -257,6 +258,7 @@ bool FileDialogs::Export(SciDoc*sci,
 #endif
     dlg.setPatternList(patts);
     dlg.setDirectory(path);
+    dlg.txtfld()->setFocus();
     if (dlg.execute(PLACEMENT_OWNER)) {
       saveName=dlg.getFilename();
     }
