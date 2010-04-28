@@ -46,7 +46,7 @@
 
 
 FXDEFMAP(Settings) SettingsMap[]={
-  FXMAPFUNCS(SEL_COMMAND,Settings::ID_TOGGLE_SMART_HOME,Settings::ID_SET_SEARCH_OPTS, Settings::onChangeSetting)
+  FXMAPFUNCS(SEL_COMMAND,Settings::ID_TOGGLE_SMART_HOME,Settings::ID_SET_AUTO_INDENT, Settings::onChangeSetting)
 };
 
 FXIMPLEMENT(Settings, FXObject, SettingsMap, ARRAYNUMBER(SettingsMap));
