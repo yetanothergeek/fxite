@@ -590,7 +590,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
           sci->SetLineIndentation(line,prev_indent);
         }
         if (sci->UseTabs()||tmp_tab) {
-          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+1);
+          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+(prev_indent/prefs->TabWidth));
         }
       }
       break;
