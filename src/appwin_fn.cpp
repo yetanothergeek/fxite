@@ -469,6 +469,8 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
       if ( !CheckingStale ) {
         if (!IsDesktopCurrent(this)) { return 1; }
         CheckingStale=true;
+        FXPopup *popup=getApp()->getPopupWindow();
+        if (popup) { popup->popdown(); }
         if ( FXMessageBox::question(this, MBOX_YES_NO, _("File changed"),
              "%s\n%s\n\n%s",
              sci->Filename().text(),
@@ -491,6 +493,8 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
       if ( !CheckingStale ) {
         if (!IsDesktopCurrent(this)) { return 1; }
         CheckingStale=true;
+        FXPopup *popup=getApp()->getPopupWindow();
+        if (popup) { popup->popdown(); }
         if ( FXMessageBox::question(this, MBOX_YES_NO, _("File status error"),
              "%s:\n%s\n(%s)\n\n%s",
              _("Error checking the status of"),
