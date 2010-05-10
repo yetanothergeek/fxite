@@ -1,6 +1,6 @@
 /*
   fxasq.h - Header file for fxasq.cpp
-  Copyright (c) 2007-2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2007-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
