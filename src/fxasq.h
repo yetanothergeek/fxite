@@ -38,7 +38,7 @@ class FxAsqWin: public FXObject {
 
     FxAsqWin(const char*title, const char **buttons);
     ~FxAsqWin();
-    int Run(FxAsqItem**results);
+    int Run(FxAsqItem**results=NULL);
 
     void HR();
     void Label(    const char*text);
