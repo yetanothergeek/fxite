@@ -129,6 +129,7 @@ FXIMPLEMENT(GroupBox,FXGroupBox,GroupBoxMap,ARRAYNUMBER(GroupBoxMap));
 int FxAsqWin::Run(FxAsqItem**results)
 {
   Results=NULL;
+  dlg->create();
   FXint hgt=btnbox->getHeight()+userbox->getHeight();
   dlg->setHeight(hgt);
   FXint bbw=btnbox->getWidth();
@@ -164,7 +165,6 @@ int FxAsqWin::Run(FxAsqItem**results)
       }
     }
   }
-  dlg->create();
   FXint rv=dlg->execute(PLACEMENT_SCREEN);
   if (results) {
     PutResults();
