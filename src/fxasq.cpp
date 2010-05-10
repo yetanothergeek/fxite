@@ -256,9 +256,9 @@ void FxAsqWin::HR()
 
 
 
-void FxAsqWin::Label(const char*text)
+void FxAsqWin::Label(const char*text, int justify)
 {
-  new FXLabel(userbox,text,NULL,LABEL_NORMAL|JUSTIFY_LEFT );
+  new FXLabel(userbox,text,NULL,LABEL_NORMAL|justify);
 }
 
 

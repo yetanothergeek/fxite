@@ -41,7 +41,7 @@ class FxAsqWin: public FXObject {
     int Run(FxAsqItem**results=NULL);
 
     void HR();
-    void Label(    const char*text);
+    void Label(    const char*text, int justify=JUSTIFY_LEFT);
     void CheckBox( const char*key, const bool value, const char*label);
     void Text(     const char*key, const char*value, const char*label);
     void Password( const char*key, const char*value, const char*label);
