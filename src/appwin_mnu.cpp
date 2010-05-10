@@ -33,6 +33,7 @@
 #include "shmenu.h"
 #include "lang.h"
 #include "menuspec.h"
+#include "fxasq.h"
 #include "compat.h"
 #include "appwin.h"
 
@@ -592,48 +593,71 @@ For more information, visit http://www.lua.org/license.html .\
 #endif
 
 static const char* Fox_LGPL="\
-This software uses the FOX Toolkit Library, released \n\
+   This software uses the FOX Toolkit Library, released   \n\
 under the GNU Lesser General Public License and \n\
 the FOX Library License addendum.\n\
 \n\
 For more details, visit http://www.fox-toolkit.org\
 ";
 
+#define App_About "\
+Free eXtensIble Text Editor (FXiTe) %s %s\n\n\
+Copyright (c) 2009,2010 Jeffrey Pohlmeyer\n\
+<%s>\n\n\
+%s\
+GNU GENERAL PUBLIC LICENSE Version 3\n\n\
+%s FOX-%d.%d.%d; FXScintilla-%s; %s\n\
+"
 
 void TopWindow::About()
 {
-  if ( FXMessageBox::information(this,MBOX_OK,_("About "EXE_NAME),
-    "Free eXtensIble Text Editor (FXiTe) %s %s\n\n"
-      "Copyright (c) 2009,2010 Jeffrey Pohlmeyer\n  <%s>\n\n"
-      "%s"
-      "    GNU GENERAL PUBLIC LICENSE Version 3\n\n"
-      "%s FOX-%d.%d.%d; FXScintilla-%s; %s\n",
-    _("Version"),
-    VERSION,
-    "yetanothergeek@gmail.com",
-    _("This program is free software, under the terms of the\n"),
-    _("Running"),
-    fxversion[0],fxversion[1],fxversion[2],
-    FXScintilla::version().text(),
-    LUA_RELEASE
-  ) != MBOX_CLICKED_OK ) {
-    return;
-  }
-  if ( FXMessageBox::information(this,MBOX_OK,"About Scintilla", "%s", Scintilla_Copyright) != MBOX_CLICKED_OK ) {
-    return;
-  }
-  if ( FXMessageBox::information(this,MBOX_OK,"About Lua", "%s", Lua_License) != MBOX_CLICKED_OK ) {
-    return;
-  }
-
-#ifdef FOX_1_6
-  if ( FXMessageBox::information(this,MBOX_OK,"About Lua (continued)", "%s", Lua_License_2) != MBOX_CLICKED_OK ) {
-    return;
-  }
-#endif
-
-  if ( FXMessageBox::information(this,MBOX_OK,"About FOX Toolkit", "%s", Fox_LGPL) != MBOX_CLICKED_OK ) {
-    return;
+  while (1) {
+    const char *btns[]={
+      _(" About &Scintilla "),
+      _(" About &Lua "),
+      _(" About &FOX "),
+      _(" &Close   "),NULL};
+    const char*btn[]={_("    &Close    "), NULL};
+    FxAsqWin*dlg=NULL;
+    FXString msg;
+    int rv=-1;
+    dlg=new FxAsqWin(_("About "EXE_NAME), btns);
+    msg.format(App_About, _("Version"), VERSION, "yetanothergeek@gmail.com",
+      _("  This program is free software, under the terms of the  \n"),
+      _("Running"),
+      fxversion[0],fxversion[1],fxversion[2],
+      FXScintilla::version().text(),
+      LUA_RELEASE);
+    dlg->Label(msg.text(), JUSTIFY_CENTER_X);
+    rv=dlg->Run(NULL);
+    delete dlg;
+    switch (rv) {
+      case 0: {
+        dlg=new FxAsqWin(_("About Scintilla"), btn);
+        dlg->Label(Scintilla_Copyright);
+        dlg->Run();
+        delete dlg;
+        break;
+      }
+      case 1: { 
+        dlg=new FxAsqWin(_("About Lua"), btn);
+        dlg->Label(Lua_License);
+  #ifdef FOX_1_6 
+        dlg->Label(Lua_License_2);
+  #endif
+        dlg->Run();
+        delete dlg;
+        break;
+      }
+      case 2: {
+        dlg=new FxAsqWin(_("About FOX Toolkit"), btn);
+        dlg->Label(Fox_LGPL,JUSTIFY_CENTER_X);
+        dlg->Run();
+        delete dlg;
+        break;
+      }
+      default: { return; }
+    }
   }
 }
 
