@@ -115,9 +115,9 @@ static MenuSpec menu_specs[] = {
   {TW::ID_FILTER_SEL,       "ToolsFilterSel",  _("&Filter selection"),  _("filter sel"),   "Alt+R",        'm', {NULL}},
   {TW::ID_INSERT_CMD_OUT,   "ToolsInsert",     _("&Insert command"),    _("insert cmd"),   "Alt+I",        'm', {NULL}},
   {TW::ID_RUN_COMMAND,      "ToolsExecute",    _("&Execute command"),   _("exec cmd"),     "Alt+X",        'm', {NULL}},
-  {TW::ID_MACRO_RECORD,     "ToolsRecMacro",   _("Re&cord macro"),      _("record macro"),   "Alt+K",      'm', {NULL}},
-  {TW::ID_MACRO_PLAYBACK,   "ToolsPlayMacro",  _("&Play macro"),        _("play macro"),    "Ctrl+K",      'm', {NULL}},
-  {TW::ID_MACRO_TRANSLATE,  "ToolsShowMacro",  _("&Show macro"),        _("show macro"),    "Ctrl+Shift+K",'m', {NULL}},
+  {TW::ID_MACRO_RECORD,     "ToolsRecMacro",   _("Re&cord macro"),      _("record macro"), "Alt+K",        'm', {NULL}},
+  {TW::ID_MACRO_PLAYBACK,   "ToolsPlayMacro",  _("&Play macro"),        _("play macro"),   "Ctrl+K",       'm', {NULL}},
+  {TW::ID_MACRO_TRANSLATE,  "ToolsShowMacro",  _("&Show macro"),        _("show macro"),   "Ctrl+Shift+K", 'm', {NULL}},
   {TW::ID_CONFIGURE_TOOLS,  "ToolsCustomize",  _("Customi&ze menu..."), _("edit tools"),   "",             'm', {NULL}},
   {TW::ID_RESCAN_USER_MENU, "ToolsRebuild",    _("Re&build menu"),      _("update tools"), "",             'm', {NULL}},
   {TW::ID_TAB_NEXT,         "DocsFocusNext",   _("&Next"),              _("next doc"),     "Ctrl+PgDn",    'm', {NULL}},
@@ -263,8 +263,6 @@ static void SetSpecTBarBtnText(MenuSpec*spec)
 
 
 
-
-
 //  When UserMenu objects are re-scanned, the menu commands they contain become invalid.
 //  If any of our toolbar buttons reference these menu commands, we need to invalidate the
 //  menu commands, while at the same time saving the filename that the item pointed to.
@@ -308,6 +306,7 @@ void MenuMgr::ValidateUsrTBarCmd(FXMenuCommand *mc)
     }
   }
 }
+
 
 
 // After we have completed re-scanning the UserMenu object, there might
@@ -379,7 +378,6 @@ void MenuMgr::GetTBarBtnTip(MenuSpec*spec, FXString &tip)
         }
       } while (1);
       tip.substitute("/"," -> ");
-//      tip.text()[0]=toupper(tip.text()[0]);
       tip.at(0)=toupper(tip.text()[0]);
       for (char*c=&(tip.at(0)); *c; c++) { if (c[0]==' ') { c[1]=toupper(c[1]); } }
     } else {
@@ -430,6 +428,7 @@ MenuSpec* MenuMgr::AddTBarUsrCmd(FXMenuCommand*mc)
   }
   return NULL;
 }
+
 
 
 //  When we read a user-defined toolbar item from the registry, its menu item has not
@@ -524,6 +523,7 @@ static MenuSpec* LookupMenuByPref(const char* pref)
 }
 
 
+
 FXint*MenuMgr::TBarBtns() { return toolbar_buttons; }
 
 
@@ -541,7 +541,6 @@ const char* MenuMgr::GetUsrCmdPath(MenuSpec*spec) {
   }
   return NULL;
 }
-
 
 
 
@@ -666,5 +665,4 @@ void MenuMgr::WriteToolbarButtons(FXRegistry*reg, const char* tbar_section)
   }
   FreeTBarUsrCmds();
 }
-
 
