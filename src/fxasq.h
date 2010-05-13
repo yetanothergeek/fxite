@@ -25,6 +25,7 @@ class FxAsqWin: public FXObject {
   private:
     friend class ActionBox;
 
+    FXint focused_btn;
     FxAsqItem*Results;
     FXDialogBox*dlg;
     FXHorizontalFrame *btnbox;
@@ -36,7 +37,7 @@ class FxAsqWin: public FXObject {
     FXVerticalFrame *userbox;
   public:
 
-    FxAsqWin(const char*title, const char **buttons);
+    FxAsqWin(const char*title, const char **buttons, FXint focus_btn=0);
     ~FxAsqWin();
     int Run(FxAsqItem**results=NULL);
 

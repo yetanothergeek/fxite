@@ -66,10 +66,11 @@ FXDEFMAP(MyDialog) MyDialogMap[]={
 FXIMPLEMENT(MyDialog,FXDialogBox,MyDialogMap,ARRAYNUMBER(MyDialogMap))
 
 
-FxAsqWin::FxAsqWin(const char*title, const char **buttons)
+FxAsqWin::FxAsqWin(const char*title, const char **buttons, FXint focus_btn)
 {
   FXApp*a=FXApp::instance();
   FXWindow*w=NULL;
+  focused_btn=focus_btn;
   if (!a) {
     a=new FXApp();
     int argc=1;
@@ -135,8 +136,10 @@ int FxAsqWin::Run(FxAsqItem**results)
   FXint bbw=btnbox->getWidth();
   FXint ubw=userbox->getWidth();
   dlg->setWidth(ubw>bbw?ubw:bbw);
+
   for (FXint i=keylist.first(); i<=keylist.last(); i=keylist.next(i))
   {
+    focused_btn=-1; // Focusing a button doesn't make much sense for interactive dialogs.
     FXWindow*obj=(FXWindow*)(keylist.data(i));
     if (IsList(obj)) {
       FXListBox* list=(FXListBox*)obj;
@@ -163,6 +166,16 @@ int FxAsqWin::Run(FxAsqItem**results)
           }
         }
       }
+    }
+  }
+  if (focused_btn>=0) { 
+    FXint i=0;
+    for (FXWindow*btn=btnbox->getFirst(); btn; btn=btn->getNext()) {
+      if (i==focused_btn) {
+        btn->setFocus();
+        break;
+      }
+      i++;
     }
   }
   FXint rv=dlg->execute(PLACEMENT_SCREEN);
