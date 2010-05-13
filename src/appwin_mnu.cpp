@@ -611,6 +611,7 @@ GNU GENERAL PUBLIC LICENSE Version 3\n\n\
 
 void TopWindow::About()
 {
+  int i=0;
   while (1) {
     const char *btns[]={
       _(" About &Scintilla "),
@@ -621,7 +622,7 @@ void TopWindow::About()
     FxAsqWin*dlg=NULL;
     FXString msg;
     int rv=-1;
-    dlg=new FxAsqWin(_("About "EXE_NAME), btns);
+    dlg=new FxAsqWin(_("About "EXE_NAME), btns, i++);
     msg.format(App_About, _("Version"), VERSION, "yetanothergeek@gmail.com",
       _("  This program is free software, under the terms of the  \n"),
       _("Running"),
