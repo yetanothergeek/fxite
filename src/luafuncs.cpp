@@ -1177,6 +1177,8 @@ static int pickfile(lua_State*L)
         dlg.setTitle(_("Select Directory"));
         if ( FXStat::exists(path) && !FXStat::isDirectory(path) ) {
           dlg.setFilename(FXPath::directory(path));
+        } else {
+          dlg.setFilename(FXSystem::getCurrentDirectory()+PATHSEP);
         }
         rv=dlg.execute(PLACEMENT_OWNER);
         break;
