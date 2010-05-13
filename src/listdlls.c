@@ -6,7 +6,8 @@
 #include "listdlls.h"
 
 // True if the bounds of *ptr are between base and end
-#define within(base,ptr,end) (ptr && (((void*)ptr)>base) && (((void*)ptr+sizeof(*ptr))<=end))
+#define within(base,ptr,end) ( \
+  (ptr) && ( (char*)ptr > (char*)base ) && ( ((char*)ptr+sizeof(*ptr)) <= (char*)end ) )
 
 // Returns a pointer to the header of a relative virtual address
 static PIMAGE_SECTION_HEADER RvaToHdr(LPVOID base, DWORD rva, PIMAGE_NT_HEADERS nt, LPVOID end)
@@ -50,7 +51,7 @@ int ListDlls(LPSTR exename, ListDllsCallback cb, void*user_data)
   HANDLE fh=INVALID_HANDLE_VALUE;
   HANDLE map=0;
   LPVOID base=NULL;
-  LPVOID end=0;
+  LPVOID end=NULL;
   DWORD size=0;
   DWORD sizehi=0;
   PIMAGE_NT_HEADERS nt=NULL;
@@ -69,7 +70,7 @@ int ListDlls(LPSTR exename, ListDllsCallback cb, void*user_data)
 
   base = MapViewOfFile(map, FILE_MAP_READ, 0, 0, 0);
   if (!base) { RETURN(LISTDLL_ERR_MAPVIEW); }
-  end=base+size;
+  end=(char*)base+size;
 
   if ( ((PIMAGE_DOS_HEADER)base)->e_magic != IMAGE_DOS_SIGNATURE ) { RETURN(LISTDLL_ERR_NOT_EXE); }
 
