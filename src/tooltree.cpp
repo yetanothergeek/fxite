@@ -209,9 +209,10 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
 {
   FXString path=getFilePath(parent_item);
   const char *ext;
-  switch(FXPath::name(path)[0]) {
-    case 'c':
-    case 'f': {
+  UserMenu*um=GetUserMenu(parent_item);
+  switch (um?um->getSelector():0) {
+    case TopWindow::ID_USER_COMMAND:
+    case TopWindow::ID_USER_FILTER: {
 #ifdef WIN32
       ext="bat";
 #else
@@ -219,7 +220,7 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
 #endif
       break;
     }
-    case 'm': {
+    case TopWindow::ID_USER_MACRO: {
       ext="lua";
       break;
     }
@@ -259,7 +260,6 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
   dummy_item->setData(cmd);
   setCurrentItem(dummy_item);
   selectItem(dummy_item);
-
 }
 
 
