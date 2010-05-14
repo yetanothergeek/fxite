@@ -380,7 +380,11 @@ HistoryTextField::~HistoryTextField()
 FXuint HistBox::execute(FXuint placement)
 {
   ((HistoryTextField*)input)->start();
-  return FXInputDialog::execute(placement);
+  FXuint rv=FXInputDialog::execute(placement);
+  if (rv) {
+    ((HistoryTextField*)input)->append();
+  }
+  return rv;
 }
 
 
