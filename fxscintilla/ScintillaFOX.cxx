@@ -167,7 +167,6 @@ private:
   void ReceivedSelection(FXDNDOrigin origin, int atPos);
   void NotifyKey(int key, int modifiers);
   void NotifyURIDropped(const char *list);
- 	virtual std::string CaseMapString(const std::string &s, int caseMapping);
   
   // From ScintillaBase
   virtual bool ModifyScrollBars(int nMax, int nPage);
@@ -319,7 +318,6 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect()) != 0;
 #else // !WIN32
   isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
-  if (isRectangular) { len--; }  // Forget the extra '\0'
 #endif // WIN32
 
   char*dest = Document::TransformLineEnds((int*)&len, (char*)data, len, pdoc->eolMode);
@@ -370,19 +368,6 @@ void ScintillaFOX::NotifyURIDropped(const char *list) {
 
   NotifyParent(scn);
 }
-
-std::string ScintillaFOX::CaseMapString(const std::string &s, int caseMapping) {
-  if (s.size() == 0) { return std::string(); }
-  if (caseMapping == cmSame) { return s; }
-  FXString mapped=s.c_str();
-  if (caseMapping == cmUpper) {
-    mapped.upper();
-  } else {
-    mapped.lower();
-  }
-  std::string ret(mapped.text(), mapped.length());
-  return ret;
-} 
 
 int ScintillaFOX::KeyDefault(int key, int modifiers) {
   if (!(modifiers & SCI_CTRL) && !(modifiers & SCI_ALT) && (key < 256)) {

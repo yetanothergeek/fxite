@@ -1,3 +1,6 @@
+2010-05-06
+  * Updated to Scintilla 2.11 (from current Scintilla CVS)
+
 2010-01-25
   * Updated to Scintilla 2.02
   * Fix a bug when middle-click pasting to an empty top line.

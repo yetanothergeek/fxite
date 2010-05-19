@@ -1832,6 +1832,7 @@ static bool GoodTrailByte(int v) {
 }
 
 bool BadUTF(const char *s, int len, int &trailBytes) {
+	// For the rules: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 	if (trailBytes) {
 		trailBytes--;
 		return false;
@@ -1848,6 +1849,23 @@ bool BadUTF(const char *s, int len, int &trailBytes) {
 		if (len < 4)
 			return true;
 		if (GoodTrailByte(us[1]) && GoodTrailByte(us[2]) && GoodTrailByte(us[3])) {
+			if (*us == 0xf4) {
+				// Check if encoding a value beyond the last Unicode character 10FFFF
+				if (us[1] > 0x8f) {
+					return true;
+				} else if (us[1] == 0x8f) {
+					if (us[2] > 0xbf) {
+						return true;
+					} else if (us[2] == 0xbf) {
+						if (us[3] > 0xbf) {
+							return true;
+						}
+					}
+				}
+			} else if ((*us == 0xf0) && ((us[1] & 0xf0) == 0x80)) {
+				// Overlong
+				return true;
+			}
 			trailBytes = 3;
 			return false;
 		} else {
@@ -1858,6 +1876,22 @@ bool BadUTF(const char *s, int len, int &trailBytes) {
 		if (len < 3)
 			return true;
 		if (GoodTrailByte(us[1]) && GoodTrailByte(us[2])) {
+			if ((*us == 0xe0) && ((us[1] & 0xe0) == 0x80)) {
+				// Overlong
+				return true;
+			}
+			if ((*us == 0xed) && ((us[1] & 0xe0) == 0xa0)) {
+				// Surrogate
+				return true;
+			}
+			if ((*us == 0xef) && (us[1] == 0xbf) && (us[2] == 0xbe)) {
+				// U+FFFE
+				return true;
+			}
+			if ((*us == 0xef) && (us[1] == 0xbf) && (us[2] == 0xbf)) {
+				// U+FFFF
+				return true;
+			}
 			trailBytes = 2;
 			return false;
 		} else {
@@ -2026,8 +2060,8 @@ void Editor::LayoutLine(int line, Surface *surface, ViewStyle &vstyle, LineLayou
 						}
 						lastSegItalics = false;
 					} else if (isBadUTF) {
-						char hexits[3];
-						sprintf(hexits, "%2X", ll->chars[charInLine] & 0xff);
+						char hexits[4];
+						sprintf(hexits, "x%2X", ll->chars[charInLine] & 0xff);
 						ll->positions[charInLine + 1] =
 						    surface->WidthText(ctrlCharsFont, hexits, istrlen(hexits)) + 3;
 					} else {	// Regular character
@@ -2795,8 +2829,9 @@ void Editor::DrawLine(Surface *surface, ViewStyle &vsDraw, int line, int lineVis
 					        cc, 1, textBack, textFore);
 				}
 			} else if ((i == startseg) && (static_cast<unsigned char>(ll->chars[i]) >= 0x80) && IsUnicodeMode()) {
-				char hexits[3];
-				sprintf(hexits, "%2X", ll->chars[i] & 0xff);
+				// A single byte >= 0x80 in UTF-8 is a bad byte and is displayed as its hex value
+				char hexits[4];
+				sprintf(hexits, "x%2X", ll->chars[i] & 0xff);
 				DrawTextBlob(surface, vsDraw, rcSegment, hexits, textBack, textFore, twoPhaseDraw);
 			} else {
 				// Normal text display
@@ -4558,9 +4593,9 @@ void Editor::ChangeCaseOfSelection(int caseMapping) {
 				while (sMapped[lastDifference] == sText[lastDifference])
 					lastDifference--;
 				size_t endSame = sMapped.size() - 1 - lastDifference;
-				pdoc->DeleteChars(currentNoVS.Start().Position() + firstDifference, 
+				pdoc->DeleteChars(currentNoVS.Start().Position() + firstDifference,
 					rangeBytes - firstDifference - endSame);
-				pdoc->InsertString(currentNoVS.Start().Position() + firstDifference, 
+				pdoc->InsertString(currentNoVS.Start().Position() + firstDifference,
 					sMapped.c_str() + firstDifference, lastDifference - firstDifference + 1);
 				// Automatic movement changes selection so reset to exactly the same as it was.
 				sel.Range(r) = current;
@@ -6377,6 +6412,24 @@ void Editor::EnsureLineVisible(int lineDoc, bool enforcePolicy) {
 	}
 }
 
+int Editor::GetTag(char *tagValue, int tagNumber) {
+	char name[3] = "\\?";
+	const char *text = 0;
+	int length = 0;
+	if ((tagNumber >= 1) && (tagNumber <= 9)) {
+		name[1] = static_cast<char>(tagNumber + '0');
+		length = 2;
+		text = pdoc->SubstituteByPosition(name, &length);
+	}
+	if (tagValue) {
+		if (text)
+			memcpy(tagValue, text, length + 1);
+		else
+			*tagValue = '\0';
+	}
+	return length;
+}
+
 int Editor::ReplaceTarget(bool replacePatterns, const char *text, int length) {
 	UndoGroup ug(pdoc);
 	if (length == -1)
@@ -6761,6 +6814,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETSEARCHFLAGS:
 		return searchFlags;
 
+	case SCI_GETTAG:
+		return GetTag(CharPtrFromSPtr(lParam), wParam);
+
 	case SCI_POSITIONBEFORE:
 		return pdoc->MovePositionOutsideChar(wParam - 1, -1, true);
 
@@ -6981,14 +7037,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETSELECTIONSTART:
-		return Platform::Minimum(sel.MainAnchor(), sel.MainCaret());
+		return sel.LimitsForRectangularElseMain().start.Position();
 
 	case SCI_SETSELECTIONEND:
 		SetSelection(wParam, Platform::Minimum(sel.MainAnchor(), wParam));
 		break;
 
 	case SCI_GETSELECTIONEND:
-		return Platform::Maximum(sel.MainAnchor(), sel.MainCaret());
+		return sel.LimitsForRectangularElseMain().end.Position();
 
 	case SCI_SETPRINTMAGNIFICATION:
 		printMagnification = wParam;
