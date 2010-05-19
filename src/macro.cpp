@@ -21,9 +21,11 @@
 #include <fx.h>
 
 #include "compat.h"
+#include "appmain.h"
 #include "appwin.h"
 #include "luacmds.h"
 #include "luafuncs.h"
+#include "luafx.h"
 #include "fxasq_lua.h"
 
 #include "intl.h"
@@ -493,6 +495,7 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   states.append(si);
   lua_sethook(L,debug_hook,LUA_MASKLINE,1);
   luaL_register(L, LUA_MODULE_NAME, LuaFuncs(tw));
+  luaL_register(L, LUA_MODULE_NAME, LuaFxUtils(tw, EXE_NAME));
   override(L,LUA_MODULE_NAME,"script", scriptname);
   override(L,LUA_MODULE_NAME,"optimize", optimize);
   luaL_openlib(L, LUA_MODULE_NAME, LuaCommands(tw), 0);
