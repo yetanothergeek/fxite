@@ -1,3 +1,17 @@
+2010-05-19
+  * Set initial focus set to the edit field for file save dialogs.
+  * Resolve hotkey conflict in search dialogs (thanks to Ed A.)
+  * Dismiss active menu before displaying external changes dialog (fixes possible crash).
+  * Change behaviour of Help->About boxes.
+  * Fixed automatic sizing of custom dialogs in scripts for FOX 1.6
+  * Use Ctrl+Shift consistently for menu labels, some were using Shift+Ctrl.
+  * Fixed: custom tools dialog sometimes suggested wrong file extension for new items.
+  * Fixed pointer arithmetic warnings in "listdlls.c"
+  * Make sure filename field is initialized for fxite.pickfile("dir") function.
+  * Append history when history dialogs are confirmed by mouse click.
+  * Split FOX-specific and application-specific macro functions into separate files.
+
+
 2010-04-27
   * Update file dialog filters when preferences dialog is dismissed.
   * Prompt for unsaved changes if tool manager is closed from window menu.
