@@ -23,6 +23,7 @@ static StyleDef css_style[] = {
   { "extendedidentifier", SCE_CSS_EXTENDED_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
   { "extendedpseudoclass", SCE_CSS_EXTENDED_PSEUDOCLASS, _WORD3_FG, _DEFLT_BG, Bold },
   { "extendedpseudoelement", SCE_CSS_EXTENDED_PSEUDOELEMENT, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "media", SCE_CSS_MEDIA, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
