@@ -360,6 +360,7 @@ bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
     if ( (!multi) && (!filenames) ) { // Maybe it's not selected, but still in the textfield.
       FXString fn=dlg.txtfld()->getText();
       if (!fn.empty()) {
+        if (!FXPath::isAbsolute(fn)) { fn.prepend(dlg.getDirectory() + PATHSEP); }
         filenames=new FXString[2];
         filenames[0]=fn.text();
         filenames[1]="";
