@@ -563,7 +563,7 @@ UserMenu**TopWindow::UserMenus() const
 
 void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 {
-  if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; } 
+  if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
   switch (ch) {
     case '\r': { 
       if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
@@ -578,13 +578,22 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
         }
       }
       long prev_indent=sci->sendMessage(SCI_GETLINEINDENTATION, prev_line, 0);
+      long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
       if (prefs->AutoIndent==AUTO_INDENT_SMART) {
         long prev_pos=pos-2;
-        if (sci->sendMessage(SCI_GETEOLMODE,0,0)==SC_EOL_CRLF) { prev_pos--; }
+        long eolmode=sci->sendMessage(SCI_GETEOLMODE,0,0);
+        if (eolmode==SC_EOL_CRLF) { prev_pos--; }
         int prev_char=sci->sendMessage(SCI_GETCHARAT,prev_pos,0);
-        if (prev_char=='{') { prev_indent += prefs->TabWidth; }
+        if (prev_char=='{') {
+          if (sci->sendMessage(SCI_GETCHARAT,pos,0)=='}') { 
+            sci->sendString(SCI_INSERTTEXT,pos,
+              (eolmode==SC_EOL_LF)?"\n":(eolmode==SC_EOL_CRLF)?"\r\n":"\r");
+            sci->SetLineIndentation(line+1,prev_indent);
+            sci->sendMessage(SCI_GOTOPOS,pos,0);
+          }
+          prev_indent += prefs->TabWidth;
+        }
       }
-      long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
       if ( curr_indent < prev_indent ) {
         if (tmp_tab) {
           sci->UseTabs(true);
