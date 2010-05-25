@@ -348,12 +348,23 @@ bool FileDialogs::TryClose(SciDoc*sci, const char*alt)
 
 bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
 {
-  const char* caption=multi?_("Select files to open"):_("Select file to open");
+  const char* caption=multi?_("Open multiple files"):_("Select file to open");
   FXString path="";
   GetPathForDlg(sci,path);
   MyFileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_patterns);
   dlg.setDirectory(path);
+  if (multi) { // Give some indication that the user can't manually enter file names in multi mode.
+    FXColor bgcolor=sci->getApp()->getBaseColor();
+    FXLabel*label=(FXLabel*)dlg.txtfld()->getPrev();
+    if (label && (strcmp(label->getClassName(),"FXLabel")==0)) { label->setText(_("Selected :")); }
+    dlg.txtfld()->setEditable(false);
+    dlg.txtfld()->setBackColor(bgcolor);
+    dlg.txtfld()->setHiliteColor(bgcolor);
+    dlg.txtfld()->setShadowColor(bgcolor);
+    dlg.txtfld()->setBorderColor(bgcolor);
+    dlg.txtfld()->setTextColor(sci->getApp()->getForeColor());
+  }
   dlg.setSelectMode(multi?SELECTFILE_MULTIPLE:SELECTFILE_EXISTING);
   if (dlg.execute(PLACEMENT_OWNER)) {
     filenames=dlg.getFilenames();
