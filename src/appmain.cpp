@@ -400,6 +400,7 @@ static const char* helptext[]= {
 #ifndef WIN32
   _("  -d <name>        Connect to X display <name>."),
 #endif
+  _("  -v               Show version information and exit."),
   "",
   NULL
 };
@@ -513,6 +514,10 @@ void AppClass::init(int& argc, char** argv, bool connect)
         case 'w':
         {
           break;
+        }
+        case 'v': {
+          TopWindow::VersionInfo();
+          return;
         }
         default: {
           fxwarning(_("Unrecognized option: -%c\n"), argv[i][1]);

@@ -609,6 +609,17 @@ GNU GENERAL PUBLIC LICENSE Version 3\n\n\
 %s FOX-%d.%d.%d; FXScintilla-%s; %s\n\
 "
 
+void TopWindow::VersionInfo()
+{
+  fxmessage(App_About, _("Version"), VERSION, "yetanothergeek@gmail.com",
+    _("This program is free software, under the terms of the\n"),
+    _("Running"),
+    fxversion[0],fxversion[1],fxversion[2],
+    FXScintilla::version().text(),
+    LUA_RELEASE);
+  
+}
+
 void TopWindow::About()
 {
   int i=0;
