@@ -1,3 +1,11 @@
+2010-05-25
+  * Make smart indent work better when ENTER is pressed between adjacent braces {}
+  * Resolve path of filename in file open dialog when a name is entered manually.
+  * Indicate to users they can't manually enter file names in "Open files" dialog.
+  * Added a command line option to print version info.
+  * Bump version to 0.6
+
+
 2010-05-19
   * Set initial focus set to the edit field for file save dialogs.
   * Resolve hotkey conflict in search dialogs (thanks to Ed A.)

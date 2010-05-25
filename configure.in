@@ -1,7 +1,7 @@
 AC_INIT([fxite],0.5c, [yetanothergeek@gmail.com])
 
 PACKAGE="fxite"
-VERSION=0.5c
+VERSION=0.6
 
 AC_SUBST([VERSION])
 AC_SUBST([PACKAGE])
