@@ -43,6 +43,7 @@ public:
     idLast = SCID(100),
     ID_TICK,
     ID_IDLE,
+    ID_STYLE_IDLE,
     ID_LAST
   };
 public:
@@ -54,6 +55,7 @@ public:
   long onConfigure(FXObject *, FXSelector, void *);
   long onTimeoutTicking(FXObject *, FXSelector, void *);
   long onChoreIdle(FXObject *, FXSelector, void *);
+  long onChoreStyleIdle(FXObject *, FXSelector, void *);
   long onFocusIn(FXObject *, FXSelector, void *);
   long onFocusOut(FXObject *, FXSelector, void *);
   long onMotion(FXObject *, FXSelector, void *);

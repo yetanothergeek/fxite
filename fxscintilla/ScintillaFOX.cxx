@@ -149,6 +149,7 @@ private:
   virtual void NotifyParent(SCNotification scn);
   virtual void SetTicking(bool on);
   virtual bool SetIdle(bool on);
+  virtual void QueueStyling(int upTo);
   virtual void SetMouseCapture(bool on);
   virtual bool HaveMouseCapture();
   virtual bool PaintContains(PRectangle rc);
@@ -519,6 +520,15 @@ bool ScintillaFOX::SetIdle(bool on) {
   return true;
 }
 
+void ScintillaFOX::QueueStyling(int upTo) {
+  Editor::QueueStyling(upTo);
+  if (!styleNeeded.active) {
+    // Only allow one style needed to be queued
+    styleNeeded.active = true;
+    FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_STYLE_IDLE);
+  }
+}
+
 void ScintillaFOX::SetMouseCapture(bool on)
 {
   if (mouseDownCaptures) {
@@ -771,6 +781,7 @@ FXDEFMAP(FXScintilla) FXScintillaMap[]={
   FXMAPFUNC(SEL_CLIPBOARD_REQUEST,0,FXScintilla::onClipboardRequest),
   FXMAPFUNC(SEL_KEYPRESS,0,FXScintilla::onKeyPress),
   FXMAPFUNC(SEL_CHORE,FXScintilla::ID_IDLE,FXScintilla::onChoreIdle),
+  FXMAPFUNC(SEL_CHORE,FXScintilla::ID_STYLE_IDLE,FXScintilla::onChoreStyleIdle),
 };
 
 FXIMPLEMENT(FXScintilla,FXScrollArea,FXScintillaMap,ARRAYNUMBER(FXScintillaMap))
@@ -857,6 +868,13 @@ long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
   if (ret == false) {
     _scint->SetIdle(false);
   }
+  return 1;
+}
+
+long FXScintilla::onChoreStyleIdle(FXObject *, FXSelector, void *)
+{
+  // Idler will be automatically stopped
+  _scint->IdleStyling();
   return 1;
 }
 
