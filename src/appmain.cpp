@@ -476,16 +476,8 @@ void AppClass::init(int& argc, char** argv, bool connect)
   }
   for ( i=1; i<getArgc(); i++) {
     const char *arg=getArgv()[i];
-    if ((strcmp(argv[i],"--help")==0)||(strcmp(argv[i],_("--help"))==0)) {
-      usage(argv[0]);
-      return;
-    }
     if (argv[i][0]=='-') {
       switch (arg[1]) {
-        case 'h': {
-          usage(argv[0]);
-          return;
-        }
         case 's': {
           if (arg[2]) {
             sock_name=arg+2;
@@ -514,10 +506,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
         case 'w':
         {
           break;
-        }
-        case 'v': {
-          TopWindow::VersionInfo();
-          return;
         }
         default: {
           fxwarning(_("Unrecognized option: -%c\n"), argv[i][1]);
@@ -626,6 +614,32 @@ static bool get_config_name(int argc, char *argv[], FXString &cfg_name)
 
 
 
+static bool check_info_args(int argc, char *argv[])
+{
+  for (int i=1; i<argc; i++) {
+    if (argv[i][0]=='-') {
+      switch (argv[i][1]) {
+        case 'v': {
+          TopWindow::VersionInfo();
+          exit(0);
+        }
+        case 'h': {
+          usage(argv[0]);
+          exit(0);
+        }
+        case '-': {
+          if ((strcmp(argv[i],"--help")==0)||(strcmp(argv[i],_("--help"))==0)) {
+            usage(argv[0]);
+            exit(0);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
 int main(int argc, char *argv[])
 {
 
@@ -637,6 +651,7 @@ int main(int argc, char *argv[])
     TopWindow::DumpLexers();
     exit(0);
   }
+  check_info_args(argc,argv); // Checks for switches that exit after they print some info.
   FXString cfg_name="";
   if (!get_config_name(argc,argv,cfg_name)) { exit(1); }
   AppClass app("settings", cfg_name);
