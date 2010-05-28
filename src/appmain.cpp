@@ -614,7 +614,7 @@ static bool get_config_name(int argc, char *argv[], FXString &cfg_name)
 
 
 
-static bool check_info_args(int argc, char *argv[])
+static void check_info_args(int argc, char *argv[])
 {
   for (int i=1; i<argc; i++) {
     if (argv[i][0]=='-') {
