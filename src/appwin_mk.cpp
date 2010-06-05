@@ -1202,7 +1202,24 @@ void TopWindow::create()
 
   show(prefs->placement);
 
-  FXIcon*ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP);
+  FXIcon*ico=NULL;
+  FXString icon_file=GetApp()->ConfigDir()+"icon.xpm";
+  if (FXStat::isFile(icon_file)) {
+    FXFileStream*icon_strm=new FXFileStream();
+    if (icon_strm->open(icon_file.text(),FXStreamLoad)) {
+      ico=new FXXPMIcon(a,NULL,0,IMAGE_KEEP);
+      if ( ((FXXPMIcon*)ico)->loadPixels(*icon_strm) ) {
+        ico->scale(32,32);
+      } else {
+        delete ico;
+        ico=NULL;
+      }
+      icon_strm->close();
+    }
+    delete icon_strm;
+    if (!ico) { fxwarning(_("NOTE: Failed to load custom icon.\n")); }
+  }
+  if (!ico) { ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP); }
   ico->create();
   setIcon(ico);
   SetupXAtoms(this, ((AppClass*)(getApp()))->ServerName().text());

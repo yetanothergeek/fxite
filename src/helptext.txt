@@ -1379,6 +1379,11 @@ characters will be converted to underscores. The names are not case sensitive, t
 
 Configuration names must consist of only lowercase alphabet (%%%a-z%%%) and numbers (%%%0-9%%%). 
 
+To help distinguish between multiple configurations running on the same desktop, it is possible \
+to have a distinct window icon for each configuration. To do this, create a 32x32 XPM \
+image named ==="icon.xpm"===  and place it in the configuration directory, for example:
+   ===~/.foxrc/__EXE__/myconfig/icon.xpm===
+
 
 ###Embedded Scripting Engine###
 
