@@ -9,7 +9,7 @@
 # define freeElms(e) FXFREE(&e)
 FXbool LocaleIsUTF8();
 #else
-# define ONE_SECOND ((FXuint)1000000000)
+# define ONE_SECOND ((FXTime)1000000000)
 # define PathMatch(pattern,file,flags) FXPath::match(file,pattern,flags)
 # define SetFontFromDialog(dsc,dlg) { dsc=dlg.getFontDesc(); }
 # define SetDialogFromFont(dlg,dsc) { dlg.setFontDesc(dsc); }
