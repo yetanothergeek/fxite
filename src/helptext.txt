@@ -348,13 +348,17 @@ space.
 Programmers who use structured languages usually prefer some form of \
 automatic indentation, so that they don't have to continually re-type the sequences \
 of tabs and/or spaces needed to maintain lengthy running indents.  __APP__  offers \
-two types of auto-indent, a "basic" type which simply lines up the cursor position with \
-the previous line, and a slightly more sophisticated version that adds a further level of \
-indentation when you press ENTER immediately after typing an opening brace '%%%{%%%'.   This "smart" \
-version also un-indents back to the previous level as soon as you type the corresponding closing \
-brace '%%%}%%%'.   You can select the desired behavior by using the %%%Auto indent%%% option under \
+two types of auto-indent: the "basic" type, which simply lines up the cursor position with \
+the previous line; and a slightly more sophisticated "smart" version, described below. \
+You can select the desired behavior by using the %%%Auto indent%%% option under \
 the %%%editor%%% tab of the %%%Preferences%%% dialog.
 
+The "smart" indent option adds a further level of indentation when you press ENTER immediately \
+after typing an opening brace '%%%{%%%', and also un-indents back to the previous level as soon \
+as you type the corresponding closing brace '%%%}%%%'.  If you position the cursor directly \
+between a set of consecutive opening/closing braces %%%{}%%% and press ENTER, the editor \
+will format the braces into a typical "block" style indentation, and will position the cursor \
+so you are ready to begin filling in the block.
 
 
 ###Language Modes###
