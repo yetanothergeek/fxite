@@ -38,7 +38,6 @@ class TopWindow: public FXMainWindow {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
-  friend class TopMenuPane;
   static void TranslatorCB(const char*text, void*user_data);
   static bool ZoomStepCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool ZoomSpecCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
@@ -282,6 +281,7 @@ public:
   long onShowHelp(       FXObject*o, FXSelector sel, void*p );
   long onTBarCustomCmd(  FXObject*o, FXSelector sel, void*p );
   long onFocusIn(        FXObject*o, FXSelector sel, void*p );
+  long onFocusDoc(       FXObject*o, FXSelector sel, void*p );
   long onTestSomething(  FXObject*o, FXSelector sel, void*p );
   enum {
     ID_TABS_TOP=FXMainWindow::ID_LAST,
@@ -390,6 +390,7 @@ public:
     ID_FMT_MAC,
     ID_FMT_UNIX,
     ID_TBAR_CUSTOM_CMD,
+    ID_FOCUS_DOC,
     ID_TEST_SOMETHING,
     ID_LAST
   };

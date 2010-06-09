@@ -144,6 +144,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPSEL(SEL_FOCUSIN,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STALE,CheckStale),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STYLE,CheckStyle),
+  TWMAPSEL(SEL_CHORE,  ID_FOCUS_DOC,onFocusDoc),
   FXMAPFUNC(SEL_FOCUSIN,0,TopWindow::onFocusIn),
   TWMAPSEL(SEL_COMMAND,ID_TEST_SOMETHING,onTestSomething),
   TWMAPSEL(SEL_CHORE,  ID_TEST_SOMETHING,onTestSomething),
@@ -1555,5 +1556,19 @@ long TopWindow::onTBarCustomCmd(FXObject*o, FXSelector sel, void*p)
 {
   MenuSpec*spec=(MenuSpec*)(((FXButton*)o)->getUserData());
   return onUserCmd(spec->ms_mc, FXSEL(SEL_COMMAND,spec->ms_mc->getSelector()),p);
+}
+
+
+
+long TopWindow::onFocusDoc(FXObject*o, FXSelector sel, void*p ) {
+  if (skipfocus) {
+    skipfocus=false;
+  } else {
+    if (getApp()->getActiveWindow()==this) {
+      SciDoc*sci=FocusedDoc();
+      if (sci) { sci->setFocus(); }
+    }
+  }
+  return 0;
 }
 

@@ -70,29 +70,14 @@ public:
   TopMenuPane(FXComposite*o):FXMenuPane(o) {}
   long onCmdUnpost(FXObject*o, FXSelector sel, void*p ){
     long rv=FXMenuPane::onCmdUnpost(o,sel,p);
-    getApp()->addChore(this,ID_FOCUS_DOC,NULL);
+    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
     return rv;
   }
-  long onFocusDoc(FXObject*o, FXSelector sel, void*p ) {
-    FXWindow*aw=getApp()->getActiveWindow();
-    TopWindow*tw=GetApp()->MainWin();
-    if (tw->skipfocus) {
-      tw->skipfocus=false;
-    } else {
-      if (aw==tw) {
-        SciDoc*sci=tw->FocusedDoc();
-        if (sci) { sci->setFocus(); }
-      }
-    }
-    return 0;
-  }
-  enum { ID_FOCUS_DOC=FXMenuPane::ID_LAST };
 };
 
 
 
 FXDEFMAP(TopMenuPane) TopMenuPaneMap[] = {
-  FXMAPFUNC(SEL_CHORE,TopMenuPane::ID_FOCUS_DOC,TopMenuPane::onFocusDoc),
   FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNPOST,TopMenuPane::onCmdUnpost),
 };
 
