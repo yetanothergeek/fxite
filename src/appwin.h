@@ -280,7 +280,7 @@ public:
   long onFileFormat(     FXObject*o, FXSelector sel, void*p );
   long onFileExport(     FXObject*o, FXSelector sel, void*p );
   long onShowHelp(       FXObject*o, FXSelector sel, void*p );
-  long onTBarCustomCmd(  FXObject*o, FXSelector sel, void*p);
+  long onTBarCustomCmd(  FXObject*o, FXSelector sel, void*p );
   long onFocusIn(        FXObject*o, FXSelector sel, void*p );
   long onTestSomething(  FXObject*o, FXSelector sel, void*p );
   enum {
