@@ -738,6 +738,50 @@ FXDEFMAP(ToolBarFrame)ToolBarFrameMap[]={
 FXIMPLEMENT(ToolBarFrame,FXVerticalFrame,ToolBarFrameMap,ARRAYNUMBER(ToolBarFrameMap));
 
 
+/* Class that makes tool bar buttons restore document focus after they are clicked */
+class ToolBarBtn: public FXButton {
+  FXDECLARE(ToolBarBtn)
+  ToolBarBtn(){}
+public:
+  ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
+      FXButton(p,text,NULL,tgt,sel,FRAME_RAISED|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0) {}
+  long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
+    long rv=FXButton::onLeftBtnRelease(o,sel,p);
+    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
+    return rv;
+  }
+};
+
+FXDEFMAP(ToolBarBtn) ToolBarBtnMap[] = {
+  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,ToolBarBtn::onLeftBtnRelease),
+};
+
+FXIMPLEMENT(ToolBarBtn,FXButton,ToolBarBtnMap,ARRAYNUMBER(ToolBarBtnMap))
+
+
+
+/* Class that makes tool bar toggle buttons restore document focus after they are clicked */
+class ToolBarTogBtn: public FXToggleButton {
+  FXDECLARE(ToolBarTogBtn)
+  ToolBarTogBtn(){}
+public:
+  ToolBarTogBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
+      FXToggleButton( p,text,text,NULL,NULL,tgt,sel,
+                        FRAME_RAISED|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE,0,0,24,24,2,2,0,0) {}
+  long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
+    long rv=FXToggleButton::onLeftBtnRelease(o,sel,p);
+    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
+    return rv;
+  }
+};
+
+FXDEFMAP(ToolBarTogBtn) ToolBarTogBtnMap[] = {
+  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,ToolBarTogBtn::onLeftBtnRelease),
+};
+
+FXIMPLEMENT(ToolBarTogBtn,FXToggleButton,ToolBarTogBtnMap,ARRAYNUMBER(ToolBarTogBtnMap))
+
+
 
 void TopWindow::UpdateToolbarWrap()
 {
@@ -797,15 +841,13 @@ void TopWindow::UpdateToolbar()
       txt.substitute(' ','\n',true);
       FXLabel*btn;
       if ((spec->type=='k')||(spec->sel==ID_MACRO_RECORD)) {
-        btn=new FXToggleButton( (FXComposite*)(toolbar_frm->getFirst()),txt,txt,NULL,NULL,this,spec->sel,
-                                  FRAME_RAISED|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE,0,0,24,24, 2,2,0,0);
+        btn=new ToolBarTogBtn( (FXComposite*)(toolbar_frm->getFirst()),txt,this,spec->sel);
         if (spec->sel==ID_MACRO_RECORD) {
           ((FXToggleButton*)btn)->setState(recording!=NULL);
         }
       } else {
-        btn=new FXButton( (FXComposite*)(toolbar_frm->getFirst()),txt,NULL,this,
-                          (spec->type=='u')?ID_TBAR_CUSTOM_CMD:spec->sel,
-                          FRAME_RAISED|JUSTIFY_NORMAL,0,0,24,24, 2,2,0,0);
+        btn=new ToolBarBtn( (FXComposite*)(toolbar_frm->getFirst()),txt,this,
+                       (spec->type=='u')?ID_TBAR_CUSTOM_CMD:spec->sel );
         switch (spec->sel) { // These menus might be in a disabled state...
           case ID_MACRO_PLAYBACK:
           case ID_MACRO_TRANSLATE:
