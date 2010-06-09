@@ -98,42 +98,43 @@ FXDEFMAP(TopMenuPane) TopMenuPaneMap[] = {
 
 FXIMPLEMENT(TopMenuPane,FXMenuPane,TopMenuPaneMap,ARRAYNUMBER(TopMenuPaneMap))
 
+#define SubMenuPane TopMenuPane
 
 
 void TopWindow::CreateLanguageMenu()
 {
-  langmenu=new FXMenuPane(this);
+  langmenu=new SubMenuPane(this);
   langcasc=new FXMenuCascade(viewmenu,_("&Language"),NULL,langmenu);
   FXMenuRadio*mr;
 
-  cpp_langmenu=new FXMenuPane(langmenu);
+  cpp_langmenu=new SubMenuPane(langmenu);
   cpp_langcasc=new FXMenuCascade(langmenu,_("C/C++"),NULL,cpp_langmenu);
 
-  scr_langmenu=new FXMenuPane(langmenu);
+  scr_langmenu=new SubMenuPane(langmenu);
   scr_langcasc=new FXMenuCascade(langmenu,_("Scripting"),NULL,scr_langmenu);
 
-  cfg_langmenu=new FXMenuPane(langmenu);
+  cfg_langmenu=new SubMenuPane(langmenu);
   cfg_langcasc=new FXMenuCascade(langmenu,_("Config"),NULL,cfg_langmenu);
 
-  html_langmenu=new FXMenuPane(langmenu);
+  html_langmenu=new SubMenuPane(langmenu);
   html_langcasc=new FXMenuCascade(langmenu,_("Web"),NULL,html_langmenu);
 
-  inf_langmenu=new FXMenuPane(langmenu);
+  inf_langmenu=new SubMenuPane(langmenu);
   inf_langcasc=new FXMenuCascade(langmenu,_("Info"),NULL,inf_langmenu);
 
-  lgcy_langmenu=new FXMenuPane(langmenu);
+  lgcy_langmenu=new SubMenuPane(langmenu);
   lgcy_langcasc=new FXMenuCascade(langmenu,_("Legacy"),NULL,lgcy_langmenu);
 
-  tex_langmenu=new FXMenuPane(langmenu);
+  tex_langmenu=new SubMenuPane(langmenu);
   tex_langcasc=new FXMenuCascade(langmenu,_("Typeset"),NULL,tex_langmenu);
 
-  db_langmenu=new FXMenuPane(langmenu);
+  db_langmenu=new SubMenuPane(langmenu);
   db_langcasc=new FXMenuCascade(langmenu,_("Database"),NULL,db_langmenu);
 
-  asm_langmenu=new FXMenuPane(langmenu);
+  asm_langmenu=new SubMenuPane(langmenu);
   asm_langcasc=new FXMenuCascade(langmenu,_("Asm/HDL"),NULL,asm_langmenu);
 
-  misc_langmenu=new FXMenuPane(langmenu);
+  misc_langmenu=new SubMenuPane(langmenu);
   misc_langcasc=new FXMenuCascade(langmenu,_("Other"),NULL,misc_langmenu);
 
   mr=new FXMenuRadio(misc_langmenu,_("none"),this,ID_SET_LANGUAGE);
@@ -237,10 +238,10 @@ static FXMenuCascade*NewCascade(FXComposite*p, const FXString&text, FXIcon*ic=NU
 
 void TopWindow::CreateTabsMenu()
 {
-  tabmenu=new FXMenuPane(this);
+  tabmenu=new SubMenuPane(this);
   NewCascade(viewmenu,_("&Tabs"),NULL,tabmenu);
 
-  tabsidemenu=new FXMenuPane(this);
+  tabsidemenu=new SubMenuPane(this);
   NewCascade(tabmenu,_("&Position"),NULL,tabsidemenu);
 
   FXMenuRadio*tT=MkMnuRad(tabsidemenu,ID_TABS_TOP);
@@ -255,7 +256,7 @@ void TopWindow::CreateTabsMenu()
     default:  { tT->setCheck(); break; }
   }
 
-  tabwidthmenu=new FXMenuPane(this);
+  tabwidthmenu=new SubMenuPane(this);
   NewCascade(tabmenu,_("&Width"),NULL,tabwidthmenu);
 
   FXMenuRadio*tU=MkMnuRad(tabwidthmenu,ID_TABS_UNIFORM);
@@ -268,7 +269,7 @@ void TopWindow::CreateTabsMenu()
 
 void TopWindow::CreateZoomMenu()
 {
-  viewzoommenu=new FXMenuPane(this);
+  viewzoommenu=new SubMenuPane(this);
   NewCascade(viewmenu,_("&Zoom"),NULL,viewzoommenu);
   MkMnuCmd(viewzoommenu,ID_ZOOM_IN);
   MkMnuCmd(viewzoommenu,ID_ZOOM_OUT);
@@ -299,7 +300,7 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_RELOAD);
 
-  fileexportmenu=new FXMenuPane(this);
+  fileexportmenu=new SubMenuPane(this);
   NewCascade(filemenu,_("E&xport"),NULL,fileexportmenu);
   MkMnuCmd(fileexportmenu,ID_EXPORT_PDF);
   MkMnuCmd(fileexportmenu,ID_EXPORT_HTML);
@@ -310,7 +311,7 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_INSERT_FILE);
   MkMnuCmd(filemenu,ID_LOAD_TAGS);
-  unloadtagsmenu=new FXMenuCascade(filemenu,_("&Unload tags file"),NULL,(new FXMenuPane(filemenu)));
+  unloadtagsmenu=new FXMenuCascade(filemenu,_("&Unload tags file"),NULL,(new SubMenuPane(filemenu)));
   unloadtagsmenu->disable();
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_QUIT);
@@ -328,7 +329,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(editmenu,ID_TOLOWER);
   MkMnuCmd(editmenu,ID_TOUPPER);
 
-  editindentmenu=new FXMenuPane(this);
+  editindentmenu=new SubMenuPane(this);
   NewCascade(editmenu,_("&Indent"),NULL,editindentmenu);
 
   MkMnuCmd(editindentmenu,ID_INDENT_STEP);
@@ -339,7 +340,7 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(editmenu, 0);
   readonlymenu=MkMnuChk(editmenu,ID_READONLY,false);
 
-  fileformatmenu=new FXMenuPane(this);
+  fileformatmenu=new SubMenuPane(this);
   fileformatcasc=NewCascade(editmenu,_("File &Format"),NULL,fileformatmenu);
 
   fmt_dos_mnu=MkMnuRad(fileformatmenu,ID_FMT_DOS);
@@ -355,7 +356,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(searchmenu,ID_FINDNEXT);
   MkMnuCmd(searchmenu,ID_FINDPREV);
 
-  searchselectmenu=new FXMenuPane(this);
+  searchselectmenu=new SubMenuPane(this);
   NewCascade(searchmenu,_("Find &Selected"),NULL,searchselectmenu);
   MkMnuCmd(searchselectmenu,ID_NEXT_SELECTED);
   MkMnuCmd(searchselectmenu,ID_PREV_SELECTED);
@@ -366,7 +367,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(searchmenu,ID_GOTO_SELECTED);
   MkMnuCmd(searchmenu,ID_GOTO_ERROR);
 
-  searchmarkmenu=new FXMenuPane(this);
+  searchmarkmenu=new SubMenuPane(this);
   NewCascade(searchmenu,_("&Bookmark"),NULL,searchmarkmenu);
   MkMnuCmd(searchmarkmenu,ID_BOOKMARK_SET);
   MkMnuCmd(searchmarkmenu,ID_BOOKMARK_RETURN);
@@ -411,7 +412,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(toolsmenu,ID_INSERT_CMD_OUT);
   MkMnuCmd(toolsmenu,ID_RUN_COMMAND);
 
-  recordermenu=new FXMenuPane(this);
+  recordermenu=new SubMenuPane(this);
   NewCascade(toolsmenu,_("Macro &recorder"),NULL,recordermenu);
 
   recorderstartmenu=MkMnuCmd(recordermenu,ID_MACRO_RECORD);
@@ -459,7 +460,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(docmenu,ID_TAB_NEXT);
   MkMnuCmd(docmenu,ID_TAB_PREV);
 
-  tabordermenu=new FXMenuPane(this);
+  tabordermenu=new SubMenuPane(this);
   NewCascade(docmenu,_("&Move"),NULL,tabordermenu);
 
   MkMnuCmd(tabordermenu,ID_TAB_TOFIRST);
