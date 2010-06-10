@@ -160,6 +160,11 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       LIMIT_RANGE(SplitView,SPLIT_NONE,SPLIT_BESIDE);
       break;
     }
+    case ID_SET_KEEP_FILE_FILTER: {
+      KeepFileFilter=(FXival)p;
+      LIMIT_RANGE(KeepFileFilter,REMEMBER_NEVER,REMEMBER_ALWAYS);
+      break;
+    }
     case ID_SET_RIGHT_EDGE: {
       FXSpinner*spin=(FXSpinner*)o;
       RightEdgeColumn=spin->getValue();
@@ -478,6 +483,8 @@ static const char* main_keys[] = {
   "DefaultFileFormat",
   "DefaultToAscii",
   "DefaultToSbcs",
+  "KeepFileFilter",
+  "FileFilterIndex",
   NULL
 };
 
@@ -636,6 +643,12 @@ Settings::Settings(FXMainWindow*w)
   ReadIntRng(DefaultFileFormat,DEFAULT_EOL_FORMAT,0,2);
   ReadInt(DefaultToAscii,!LocaleIsUTF8());
   ReadInt(DefaultToSbcs,true);
+  ReadIntRng(KeepFileFilter,REMEMBER_NEVER,REMEMBER_NEVER,REMEMBER_ALWAYS);
+  if (KeepFileFilter==REMEMBER_ALWAYS) { 
+    ReadInt(FileFilterIndex,0);
+  } else {
+    FileFilterIndex=0;
+  }
   ReadInt(WrapToolbar,true);
   ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
 
@@ -778,6 +791,8 @@ Settings::~Settings()
   WriteInt(FontSize);
   WriteInt(DefaultToAscii);
   WriteInt(DefaultToSbcs);
+  WriteInt(KeepFileFilter);
+  WriteInt(FileFilterIndex);
 
   if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
   char dtp[2]={DocTabPosition,'\0'};

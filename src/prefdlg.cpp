@@ -997,9 +997,19 @@ FXTabItem* PrefsDialog::MakeGeneralTab()
   tf->setText(maxfiles);
   new FXLabel(hframe, _("Maximum number of open files."));
 
+  (new FXHorizontalSeparator(left_column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE))->setPadBottom(12);
   hframe=new FXHorizontalFrame(left_column);
   hframe->setPadLeft(12);
   new FXButton(hframe, _(" File dialog filters... "), NULL, this, ID_FILTERS_EDIT);
+
+  hframe=new FXHorizontalFrame(left_column, LAYOUT_FILL_X);
+  (new FXLabel(hframe, _("Remember\nlast-used filter :")))->setJustify(JUSTIFY_LEFT);
+  FXListBox* list=new FXListBox(hframe,prefs,Settings::ID_SET_KEEP_FILE_FILTER,LIST_BOX_OPTS|LAYOUT_BOTTOM);
+  list->appendItem(_("never"),NULL,NULL);
+  list->appendItem(_("during session"),NULL,NULL);
+  list->appendItem(_("across sessions"),NULL,NULL);
+  list->setNumVisible(list->getNumItems());
+  list->setCurrentItem(prefs->KeepFileFilter);
 
   new FXLabel(right_column,_("Save open files before executing:"));
   chk=new FXCheckButton(right_column, _("Tools->Filter Selection"), prefs, Settings::ID_SAVE_ON_FILTER_SEL);

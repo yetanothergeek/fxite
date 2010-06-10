@@ -25,6 +25,7 @@
 
 #include "scidoc.h"
 #include "export.h"
+#include "prefs.h"
 
 #include "intl.h"
 #include "filer.h"
@@ -200,6 +201,7 @@ public:
 };
 
 
+#define prefs Settings::instance()
 
 bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
 {
@@ -208,10 +210,12 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   GetPathForDlg(sci,path);
   MyFileDlg dlg(sci->getShell(),_("Save file as"));
   dlg.setPatternList(_patterns);
+  dlg.setCurrentPattern(prefs->FileFilterIndex);
   dlg.setDirectory(path);
   dlg.txtfld()->setFocus();
   if (dlg.execute(PLACEMENT_OWNER)) {
     result=dlg.getFilename();
+    prefs->FileFilterIndex=prefs->KeepFileFilter?dlg.getCurrentPattern():0;
   }
   if (!result.empty()) {
     if (FXStat::exists(result)) {
@@ -353,6 +357,7 @@ bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
   GetPathForDlg(sci,path);
   MyFileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_patterns);
+  dlg.setCurrentPattern(prefs->FileFilterIndex);
   dlg.setDirectory(path);
   if (multi) { // Give some indication that the user can't manually enter file names in multi mode.
     FXColor bgcolor=sci->getApp()->getBaseColor();
@@ -377,6 +382,7 @@ bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
         filenames[1]="";
       } else { filenames=NULL; }
     }
+    prefs->FileFilterIndex=prefs->KeepFileFilter?dlg.getCurrentPattern():0;
   } else { filenames=NULL; }
   return filenames!=NULL;
 }

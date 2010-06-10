@@ -40,6 +40,13 @@ typedef enum {
   AUTO_INDENT_SMART
 } AutoIndentPolicy;
 
+typedef enum { 
+  REMEMBER_NEVER=0,
+  REMEMBER_SESSION,
+  REMEMBER_ALWAYS
+} FileFilterPolicy;
+
+
 class Settings: public FXObject {
   FXDECLARE(Settings);
   static FXbool loaded;
@@ -88,6 +95,8 @@ public:
   FXulong DefaultToSbcs:1;
 
   FXint AutoIndent;
+  FXint FileFilterIndex;
+  FXint KeepFileFilter;
 
   FXFontDesc fontdesc;
   FXint ToolbarButtonSize;
@@ -159,6 +168,7 @@ public:
     ID_SET_FILE_FORMAT,
     ID_SET_TOOLBAR_BTN_SIZE,
     ID_SET_SEARCH_OPTS,
+    ID_SET_KEEP_FILE_FILTER,
     ID_SET_AUTO_INDENT,
     ID_LAST
   };
