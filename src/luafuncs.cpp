@@ -539,13 +539,28 @@ static int seltext(lua_State*L)
 
 
 
-// insert([text])
+// insert(text [,adjust])
 static int insert(lua_State*L)
 {
   DOC_REQD
   const char* txt=luaL_checkstring(L,1);
+  bool adjust=((lua_gettop(L)>1) && lua_isboolean(L,2))?lua_toboolean(L,2):false;
   CheckReadOnly();
-  sci->sendString(SCI_REPLACESEL,0,txt);
+  if (adjust && *txt && Settings::instance()->AutoIndent) { // Fix up indents for macro recorder
+    if (*txt=='}') {  // if text starts with a closing brace, align it first
+      sci->sendString(SCI_REPLACESEL,0,"}");
+      tw->AdjustIndent(sci,*txt);
+      sci->sendString(SCI_REPLACESEL,0,txt+1);
+    } else {
+      sci->sendString(SCI_REPLACESEL,0,txt);
+    }
+    const char*eos=strchr(txt,'\0')-1;
+    if (('\n'==*eos)||('\r'==*eos)) { // indent if new line  
+      tw->AdjustIndent(sci,*eos);
+    }
+  } else {  // ordinary insertion without auto-indent
+    sci->sendString(SCI_REPLACESEL,0,txt);
+  }
   return 0;
 }
 
