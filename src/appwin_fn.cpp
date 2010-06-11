@@ -561,9 +561,20 @@ UserMenu**TopWindow::UserMenus() const
 
 
 
+void TopWindow::AdjustIndent(SciDoc*sci, char ch)
+{
+  getApp()->runWhileEvents();
+  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
+  long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
+  CharAdded(sci,line,pos,ch); 
+}
+
+
+
 void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 {
   if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
+  if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
   switch (ch) {
     case '\r': { 
       if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
@@ -622,6 +633,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
       }
     }
   }
+  if (recording) { recording->sendMessage(SCI_STARTRECORD,0,0); }
 }
 
 

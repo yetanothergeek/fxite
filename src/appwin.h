@@ -442,5 +442,6 @@ public:
   void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
   FXID GetActiveWindow();
+  void AdjustIndent(SciDoc*sci,char ch);
 };
 
