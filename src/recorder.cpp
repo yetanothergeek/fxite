@@ -352,19 +352,19 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
           for (p=0; p<n; p++) {
             FXString part=s.section('\n', p);
             requote(part);
-            text.format(_LUAMOD_".insert(\"%s\\n\")", part.text());
+            text.format(_LUAMOD_".insert(\"%s\\n\",true)", part.text());
             callback(text.text(), user_data);
           }
           if (!s.section('\n', n).empty()) { // there may still be text beyond the last LF...
             FXString part=s.section('\n', n);
             requote(part);
-            text.format(_LUAMOD_".insert(\"%s\")", part.text());
+            text.format(_LUAMOD_".insert(\"%s\",true)", part.text());
             callback(text.text(), user_data);
           }
           continue;
         }
         requote(s);
-        text.format(_LUAMOD_".insert(\"%s\")", s.text());
+        text.format(_LUAMOD_".insert(\"%s\",true)", s.text());
         break;
       }
 
