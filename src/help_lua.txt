@@ -392,10 +392,16 @@ Returns the contents of the current selection as a string.
 
 
 ###insert###
-===__MOD__.insert(text)
+===__MOD__.insert(text [,adjust])
 ===
 Inserts the string %%%text%%% into the active document at the current caret position.
 If any text is currently selected, it is replaced.
+
+If the optional %%%adjust%%% argument is ///true///, automatic indentation will be performed \
+based on the the current tab and indent settings. Only the beginning and ending characters \
+of %%%text%%% are considered, so the indentation might not be reliable for %%%text%%% which \
+spans multiple lines. For best results, each line (including its newline character) should \
+be inserted separately when using the %%%adjust%%% option.
 
 
 ###text###
