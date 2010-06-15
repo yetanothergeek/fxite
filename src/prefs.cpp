@@ -383,7 +383,7 @@ static void FindFont(FXString &FontName) {
     for (const char**tryfont=tryfonts; *tryfont; tryfont++) {
       for (FXuint i=0; i<numfonts; i++) {
         FXFontDesc fd=fonts[i];
-        if (strstr(fd.face, *tryfont)==fd.face) {
+        if (strncasecmp(fd.face, *tryfont, strlen(*tryfont))==0) {
            FontName=fd.face;
            freeElms(fonts);
            return;
