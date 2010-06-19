@@ -143,7 +143,18 @@ void UserMenu::rescan()
   }
   ScanDir(topowner,topdir.text());
   if (created) { create(); }
-  if (topcasc && (!hasitems)) { topcasc->hide(); }
+  if (topcasc) {
+    if (hasitems) {
+      if (panes[0]->numChildren()==1) {
+        FXMenuCascade*mc=(FXMenuCascade*)panes[0]->getFirst();
+        if (mc && (strcmp(mc->getClassName(),"FXMenuCascade")==0)) {
+          if (mc->getText()=="Hidden") {
+            topcasc->hide();
+          }
+        }
+      }
+    } else { topcasc->hide(); }
+  }
 }
 
 
@@ -326,6 +337,7 @@ void UserMenu::ScanDir(FXMenuPane*parent, const char *directory)
       FXMenuCascade* mc;
       if (topcasc) {
         mc=new FXMenuCascade(parent,label,NULL,mp);
+        if (label=="Hidden") { mc->hide(); }
       } else {
         mc=new FXMenuCascade(parent,toplabel,NULL,mp);
         topcasc=mc;

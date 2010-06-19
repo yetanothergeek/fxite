@@ -1169,6 +1169,11 @@ also provides for renaming or deleting menu items and moving items from one subm
 To edit one of the commands after adding it to the menu, right-click the menu item, or select it \
 with the keyboard and press %%%Ctrl+Enter%%%.
 
+Any menu group named  ==="Hidden"===  is considered special. If you create a group with that name, \
+its items will be accessible via their assigned shortcut key, but the group will not be visible \
+on the tools menu. This allows you to associate keyboard shortcuts to custom commands without \
+cluttering up the menu.
+
 If you find managing your tools from the dialog is a bit too awkward, the items are stored in a \
 directory hierarchy under your  ===$HOME/.foxrc/__EXE__/<config-name>/tools/===  directory, and can be \
 manipulated using your favorite file manager or terminal. The filenames stored there might look \
