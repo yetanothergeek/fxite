@@ -17,9 +17,47 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_HEADER_STDC
 
-
-PKG_CHECK_MODULES([FOX], [fox >= 1.7], [AC_DEFINE(FOX_1_7)], [AC_DEFINE(FOX_1_6)])
-PKG_CHECK_MODULES([FOX], [fox >= 1.6])
+dnl #Let pkgconfig handle FOX flags unless they are set in the environment
+if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
+then
+  PKG_CHECK_MODULES([FOX], [fox >= 1.7], 
+    [
+      AC_MSG_RESULT([Found FOX-1.7 or newer])
+      AC_DEFINE(FOX_1_7)
+    ],
+    [
+      AC_MSG_RESULT([Could not find FOX-1.7 or newer])
+      PKG_CHECK_MODULES([FOX], [fox >= 1.6],
+        AC_MSG_RESULT([Found FOX-1.6.x])
+        AC_DEFINE(FOX_1_6))
+    ]
+  )
+else
+  if test "x${FOX_LIBS}" = "x"
+  then
+    AC_MSG_ERROR([If you set FOX_CFLAGS, you must also set FOX_LIBS])
+  fi
+  if test "x${FOX_CFLAGS}" = "x"
+  then
+    AC_MSG_ERROR([If you set FOX_LIBS, you must also set FOX_CFLAGS])
+  fi
+  AC_MSG_CHECKING([for FOX version in FOX_LIBS])
+  case "${FOX_LIBS}" in
+    *FOX-1.6*)
+      AC_MSG_RESULT([looks like version 1.6])
+      AC_DEFINE(FOX_1_6)
+    ;;
+    *FOX-1.7*|*FOX-1.8*)
+      AC_MSG_RESULT([looks like version 1.7 or newer])
+      AC_DEFINE(FOX_1_7)
+    ;;
+    *)
+      AC_MSG_RESULT([FAILED])
+      AC_MSG_WARN([could not find FOX version, assuming 1.6])
+      AC_DEFINE(FOX_1_6)
+    ;;
+  esac
+fi
 
 
 AC_ARG_WITH([system-lua],
@@ -73,6 +111,8 @@ case $host_os in
   *linux* )
     dnl #Tell Lua sources if we are on Linux
     AC_DEFINE(LUA_USE_LINUX)
+    dnl #Fedora-13 needs explicit libX11 and libdl, should be harmless otherwise
+    FOX_LIBS="${FOX_LIBS} -lX11 -ldl"
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
