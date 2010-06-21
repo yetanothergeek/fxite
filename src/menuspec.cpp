@@ -309,6 +309,13 @@ void MenuMgr::ValidateUsrTBarCmd(FXMenuCommand *mc)
 
 
 
+static void RemoveTBarBtnDataCB(FXButton*btn, void*user_data)
+{
+  if (btn->getUserData()==user_data) { btn->setUserData(NULL); }
+}
+
+
+
 // After we have completed re-scanning the UserMenu object, there might
 // still be some items that were deleted and never re-created. This procedure
 // cleans up any remaining "orphaned" items.
@@ -322,6 +329,8 @@ void MenuMgr::PurgeTBarCmds()
       for (FXint j=0; j<TBAR_MAX_BTNS; j++) {
         if (toolbar_buttons[j]==spec->sel) { toolbar_buttons[j]=0; }
       }
+      // If any toolbar button holds a reference to this spec, make sure we set it to NULL...
+      ((AppClass*)(FXApp::instance()))->MainWin()->ForEachToolbarButton(RemoveTBarBtnDataCB,spec);
       delete spec;
       custom_commands[i]=NULL;
     }
@@ -454,14 +463,6 @@ static MenuSpec* RegTBarUsrCmd(FXint index, const char*pref, const char*filename
   }
   return NULL;
 }
-
-
-
-static void RemoveTBarBtnDataCB(FXButton*btn, void*user_data)
-{
-  if (btn->getUserData()==user_data) { btn->setUserData(NULL); }
-}
-
 
 
 // The user has decided to remove a toolbar button for a user-defined menu item.
