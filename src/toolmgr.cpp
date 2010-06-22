@@ -130,11 +130,12 @@ long ToolsDialog::onNameField(FXObject*o, FXSelector sel, void*p)
   menukey_list->clearItems();
   char letter[2];
   letter[1]='\0';
-  menukey_list->appendItem(" ");
+  menukey_list->appendItem(" ",NULL,(void*)(FXival)(-1)); // Leave first item empty for no menu key
   for (int i=0; i<name_field->getText().length(); i++) {
     letter[0]=name_field->getText()[i];
     if ( (letter[0]!=' ')) {
-      menukey_list->appendItem(letter);
+      // Save the actual char index to the item's data pointer.
+      menukey_list->appendItem(letter,NULL,(void*)(FXival)i);
     }
   }
   menukey_list->setNumVisible(menukey_list->getNumItems());
@@ -349,7 +350,9 @@ long ToolsDialog::onTreeListAfterChanged(FXObject*o, FXSelector sel, void*p)
       index_field->setText(info.index);
       name_field->setText(casc->getText());
       onNameField(NULL,0,NULL);
-      menukey_list->setCurrentItem(info.name.find_first_of('_')+1);
+      menukey_list->setCurrentItem(
+        menukey_list->findItemByData((void*)(FXival)info.name.find_first_of('_'))
+      );
     }
     if (item==tree->Tools()) {
       helptext->setText(default_help_text);
@@ -374,7 +377,9 @@ long ToolsDialog::onTreeListAfterChanged(FXObject*o, FXSelector sel, void*p)
     name_field->setText(mnucmd->getText());
     extn_field->setText(info.ext);
     onNameField(NULL,0,NULL);
-    menukey_list->setCurrentItem(info.name.find_first_of('_')+1);
+    menukey_list->setCurrentItem(
+      menukey_list->findItemByData((void*)(FXival)info.name.find_first_of('_'))
+    );
     FXHotKey hk=parseAccel(info.accel);
     FXuint mask=FXSELTYPE(hk);
     FXuint key=FXSELID(hk);
@@ -522,7 +527,9 @@ bool ToolsDialog::BuildName(FXString &path, bool isdir)
     }
   }
   tmp.substitute(' ', '-', true);
-  if (menukey_list->getCurrentItem()) { tmp.insert(menukey_list->getCurrentItem()-1,"_"); }
+  if (menukey_list->getCurrentItem()>0) {
+    tmp.insert((FXival)(menukey_list->getItemData(menukey_list->getCurrentItem())),"_");
+  }
   path.append(tmp);
   if (!accel_field->getText().empty()) {
     FXuint accel_state=0;
