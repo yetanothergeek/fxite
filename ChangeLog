@@ -1,3 +1,19 @@
+2010-06-22
+  * Check for -v or -h command line options before initializing display.
+  * Added the capability to use custom window icons.
+  * Refocus document after clicking a sub-menu command or toolbar button.
+  * Added an option to remember the previously-selected file dialog filter.
+  * Fixed macro record/playback to work with auto-indent. (thanks again Ed A.)
+  * Ignore case of font names when searching for a suitable editor font on first run.
+  * Fixed configure.in to compile on Fedora-13 and Ubuntu.
+  * Added an option to make selected custom tools "hidden" on the tools menu.
+  * Fixed a crash when deleting a custom tool that was referenced by a toolbar button.
+  * Fixed an error calculating index of menu accelerators in tool manager.
+  * Set the initial focus to the "Name" field when creating a new tool manager item.
+  * Default to OFF for "View -> Line numbers"
+  * Updated Scintilla to 2.12 release.
+
+
 2010-05-25
   * Make smart indent work better when ENTER is pressed between adjacent braces {}
   * Resolve path of filename in file open dialog when a name is entered manually.
