@@ -583,6 +583,7 @@ long ToolsDialog::onNewScanChore(FXObject*o, FXSelector sel, void*p)
       getApp()->addTimeout(this,ID_NEW_SCAN_CHORE,ONE_SECOND/10);
     }
   } else {
+    name_field->setFocus();
     name_field->selectAll();
   }
   return 1;
