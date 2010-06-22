@@ -606,7 +606,7 @@ Settings::Settings(FXMainWindow*w)
     );
   }
   ReadInt(ShowStatusBar,true);
-  ReadInt(ShowLineNumbers,true);
+  ReadInt(ShowLineNumbers,false);
   ReadInt(ShowToolbar,true);
   ReadInt(ShowWhiteSpace,false);
   ReadInt(ShowOutputPane,false);
