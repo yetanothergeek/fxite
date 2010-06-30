@@ -148,7 +148,9 @@ static int input(lua_State*L)
   }
   switch (toupper(type[0])) {
     case 'I' : {
-      if (!lua_isnil(L,3)) { txt.format("%d", luaL_checkinteger(L,3)); }
+      if (!lua_isnil(L,3)) {
+        txt.format(sizeof(lua_Integer)>4?"%ld":"%d", luaL_checkinteger(L,3));
+      }
       opt=INPUTDIALOG_INTEGER;
       break;
     }
