@@ -346,16 +346,31 @@ Inserts the contents of the clipboard into the active document at the caret posi
 Any currently selected text will be replaced.
 
 ###delete###
-===__MOD__.delete([count])
+===__MOD__.delete([[mode],[count]])
 ===
-When called with a ///positive/// value for %%%count%%%, deletes that many characters to the ///right/// of the \
-caret or selection.
-When called with a ///negative/// value for %%%count%%%, deletes that many characters to the ///left/// of the \
-caret or selection.
+Deletes text from the document.
+
+If present, the optional %%%mode%%% argument (a string) must be one of the following:
+  ==="char"=== -- Deletes %%%count%%% number of characters.
+  ==="word"=== -- Deletes %%%count%%% number of words.
+  ==="line"=== -- Deletes all text from current position to the beginning or end of current line.
+
+When called with a ///positive/// value for %%%count%%%, deletes that many items to \
+the ///right/// of the caret or selection.
+When called with a ///negative/// value for %%%count%%%, deletes that many items to \
+the ///left/// of the caret or selection.
 If any text is currently selected, it is also removed as part of the initial deletion.
 
-Calling this function with no arguments is the same as ===__MOD__.delete(1)===.
-Raises an error if the value of %%%count%%% is zero.
+If the function is called with only a %%%count%%% (numeric) argument, the ==="char"=== mode is assumed.
+If called with only a %%%mode%%% (string) argument, a count of one is assumed.
+Calling the function with no arguments is the same as ===__MOD__.delete("char",1)===.
+This function raises an error if the value of %%%count%%% is zero.
+
+In ==="line"=== mode, only the current line is modified - that is, an absolute value of %%%count%%% \
+greater than one is pointless.
+
+If a new line is encountered in ==="word"=== mode, the newline sequence itself is actually \
+counted as a "word".
 
 
 

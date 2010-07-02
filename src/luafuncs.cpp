@@ -414,18 +414,49 @@ static void swap(int &a, int &b)
   b=tmp;
 }
 
+
+
 static int _delete(lua_State* L)
 {
   DOC_REQD
-  int count=luaL_optint(L,1,1);
-  int i;
-  int cmd=SCI_CLEAR;
-  luaL_argcheck(L, count!=0, 1, _("count must be non-zero"));
-  if (count<0) {
-    cmd=SCI_DELETEBACK;
-    count=abs(count);
+  int argc=lua_gettop(L);
+  int count=1;
+  int mode=0;
+  const char* modes[]={"char","word","line",NULL};
+  switch (argc) {
+    case 0: { break; }
+    case 1: {
+      if (lua_isnumber(L,1)) {
+        count=luaL_checkint(L,1);
+      } else {
+        mode=luaL_checkoption(L,1,"char",modes);
+      }
+      break;
+    }
+    default: { 
+      mode=luaL_checkoption(L,1,"char",modes);
+      count=luaL_checkint(L,2);
+    }
   }
-  for (i=0; i<count; i++) {
+  luaL_argcheck(L, count!=0, 1, _("count must be non-zero"));
+  int cmd=SCI_CLEAR;
+  switch (mode) {
+    case 0: {
+      cmd=count>0?SCI_CLEAR:SCI_DELETEBACK;
+      break;
+    }
+    case 1: {
+      cmd=count>0?SCI_DELWORDRIGHT:SCI_DELWORDLEFT;
+      break;
+    }
+    case 2: {
+      cmd=count>0?SCI_DELLINERIGHT:SCI_DELLINELEFT;
+      count=1;
+      break;
+    }
+  }
+  count=abs(count);
+  for (int i=0; i<count; i++) {
     sci->sendMessage(cmd, 0,0);
   }
   return 0;
