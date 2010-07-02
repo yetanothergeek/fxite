@@ -422,7 +422,7 @@ static int _delete(lua_State* L)
   int argc=lua_gettop(L);
   int count=1;
   int mode=0;
-  const char* modes[]={"char","word","line",NULL};
+  const char* modes[]={"char","word","edge",NULL};
   switch (argc) {
     case 0: { break; }
     case 1: {
