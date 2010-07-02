@@ -529,6 +529,22 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
         text.format(_LUAMOD_".lowercase()");
         break;
       }
+      case SCI_DELWORDLEFT: {
+        text.format(_LUAMOD_".delete(\"word\", -%ld)", mm->lParam+1);
+        break;
+      }
+      case SCI_DELWORDRIGHT: {
+        text.format(_LUAMOD_".delete(\"word\", %ld)", mm->lParam+1);
+        break;
+      }
+      case SCI_DELLINELEFT: {
+        text.format(_LUAMOD_".delete(\"edge\", -1)");
+        break;
+      }
+      case SCI_DELLINERIGHT: {
+        text.format(_LUAMOD_".delete(\"edge\", 1)");
+        break;
+      }
       case SCI_HOMEWRAP:                noimpl("SCI_HOMEWRAP");
       case SCI_HOMEWRAPEXTEND:          noimpl("SCI_HOMEWRAP");
       case SCI_LINEENDWRAP:             noimpl("SCI_LINEENDWRAP");
@@ -550,16 +566,12 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
       case SCI_STUTTEREDPAGEDOWN:       noimpl("SCI_STUTTEREDPAGEDOWN");
       case SCI_STUTTEREDPAGEDOWNEXTEND: noimpl("SCI_STUTTEREDPAGEDOWNEXTEND");
       case SCI_FORMFEED:                noimpl("SCI_FORMFEED");
-      case SCI_DELWORDLEFT:             noimpl("SCI_DELWORDLEFT");
-      case SCI_DELWORDRIGHT:            noimpl("SCI_DELWORDRIGHT");
       case SCI_EDITTOGGLEOVERTYPE:      noimpl("SCI_EDITTOGGLEOVERTYPE");
       case SCI_CANCEL:                  noimpl("SCI_CANCEL");
 
       case SCI_VCHOMEWRAP:              noimpl("SCI_VCHOMEWRAP");
       case SCI_VCHOMEWRAPEXTEND:        noimpl("SCI_VCHOMEWRAPEXTEND");
       case SCI_DELWORDRIGHTEND:         noimpl("SCI_DELWORDRIGHTEND");
-      case SCI_DELLINELEFT:             noimpl("SCI_DELLINELEFT");
-      case SCI_DELLINERIGHT:            noimpl("SCI_DELLINERIGHT");
       case SCI_LINETRANSPOSE:           noimpl("SCI_LINETRANSPOSE");
       case SCI_LINEDUPLICATE:           noimpl("SCI_LINEDUPLICATE");
       case SCI_HOMEDISPLAY:             noimpl("SCI_HOMEDISPLAY");
