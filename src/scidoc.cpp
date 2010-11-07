@@ -513,6 +513,8 @@ void SciDoc::UpdateStyle()
         }
       }
     }
+    SetProperty("lexer.cpp.track.preprocessor","0");
+    SetProperty("lexer.cpp.update.preprocessor","0");
   } else {
     sendMessage(SCI_SETLEXER, 0, 0);
     sendMessage(SCI_SETLEXERLANGUAGE, 0, 0);
