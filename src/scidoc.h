@@ -174,6 +174,9 @@ public:
   void SetUTF8(bool utf8);
   bool GetUTF8() { return _utf8; }
   void SetUserUndoLevel(FXint action); // 1:push level; -1: pop level; 0:reset level
+  void SetProperty(const char*key, const char*value);
+  bool GetProperty(const FXString &key, FXString &value, bool expanded=false);
+  int GetPropertyInt(const char*key, int default_value);
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))

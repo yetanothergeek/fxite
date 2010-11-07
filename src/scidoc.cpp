@@ -1013,3 +1013,39 @@ void SciDoc::SetUserUndoLevel(FXint action)
   }
 }
 
+
+
+void SciDoc::SetProperty(const char*key, const char*value)
+{
+  sendMessage(SCI_SETPROPERTY, reinterpret_cast<long>(key), reinterpret_cast<long>(value));
+}
+
+
+
+//  Lookup the property 'key' and place the result in 'value'.
+//  If 'expanded' is true "keyword replacement" will be performed as described
+//  in the Scintilla documentation. Returns true if the key is found, otherwise
+//  it sets 'value' to an empty string and returns false.
+bool SciDoc::GetProperty(const FXString &key, FXString &value, bool expanded)
+{
+  int gp=expanded?SCI_GETPROPERTYEXPANDED:SCI_GETPROPERTY;
+  int len=sendMessage(gp,reinterpret_cast<long>(key.text()),0);
+  if (len>0) {
+    value.length(len+1);
+    sendMessage(gp,reinterpret_cast<long>(key.text()),reinterpret_cast<long>(value.text()));
+    return true;
+  } else {
+    value="";
+    return false;
+  }
+}
+
+
+
+//  Lookup the integer property 'key' and return its value.
+//  If 'key' is not found, return 'default_value'
+//  If 'key' is found but is not an integer, return zero.
+int SciDoc::GetPropertyInt(const char*key, int default_value)
+{
+  return sendMessage(SCI_GETPROPERTYINT, reinterpret_cast<long>(key), default_value);
+}
