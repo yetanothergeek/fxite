@@ -541,18 +541,6 @@ SciDoc*TopWindow::FocusedDoc()
 
 
 
-#ifdef WIN32
-// Windows doesn't have this?
-char*strndup(const char*src,int len)
-{
-  char*dst=(char*)calloc(len+1,1);
-  strncpy(dst,src,len);
-  return dst;
-}
-#endif
-
-
-
 UserMenu**TopWindow::UserMenus() const
 {
   static UserMenu* menus[]={usercmdmenu, userfiltermenu, usersnipmenu, usermacromenu,NULL};

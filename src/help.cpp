@@ -228,6 +228,15 @@ void SciHelp::replace(const char*oldstr, const char*newstr)
 
 
 
+static char*my_strndup(const char*src,int len)
+{
+  char*dst=(char*)calloc(len+1,1);
+  strncpy(dst,src,len);
+  return dst;
+}
+
+
+
 void SciHelp::load(const char*txt, unsigned int size)
 {
   FXint beg[3]={0,0,0};
@@ -248,7 +257,7 @@ void SciHelp::load(const char*txt, unsigned int size)
     while (rx.match(content,beg,end,REX_FORWARD,2)) {
       sendMessage(SCI_SETTARGETSTART,beg[0],0);
       sendMessage(SCI_SETTARGETEND,end[0],0);
-      char*tmp=strndup(content+beg[1], end[1]-beg[1]);
+      char*tmp=my_strndup(content+beg[1], end[1]-beg[1]);
       sendString(SCI_REPLACETARGET,end[1]-beg[1],tmp);
       if ((i==SCHLP_H1)||(i==SCHLP_LINK)) {
         HelpLink*link=(HelpLink*)calloc(1, sizeof(HelpLink));

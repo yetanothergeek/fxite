@@ -35,7 +35,6 @@ FXbool LocaleIsUTF8();
 
 #ifdef WIN32
 # define NULL_FILE "NUL"
-  char*strndup(const char*src,int len);
   bool IsWin9x();
 # if 1
   bool IsDir(const FXString &dn);
