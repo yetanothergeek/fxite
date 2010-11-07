@@ -1,8 +1,8 @@
 // SciTE - Scintilla based Text Editor
-/** @file PropSet.cxx
+/** @file PropSetSimple.cxx
  ** A Java style properties file module.
  **/
-// Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
+// Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
 // Maintain a dictionary of properties
@@ -19,9 +19,6 @@
 #include <string>
 #include <map>
 
-#include "Platform.h"
-
-#include "PropSet.h"
 #include "PropSetSimple.h"
 
 #ifdef SCI_NAMESPACE
@@ -151,18 +148,14 @@ char *PropSetSimple::Expanded(const char *key) const {
 	return ret;
 }
 
-char *PropSetSimple::ToString() const {
-	mapss *props = static_cast<mapss *>(impl);
-	std::string sval;
-	for (mapss::const_iterator it=props->begin(); it != props->end(); it++) {
-		sval += it->first;
-		sval += "=";
-		sval += it->second;
-		sval += "\n";
+int PropSetSimple::GetExpanded(const char *key, char *result) const {
+	char *val = Expanded(key);
+	const int n = strlen(val);
+	if (result) {
+		strcpy(result, val);
 	}
-	char *ret = new char [sval.size() + 1];
-	strcpy(ret, sval.c_str());
-	return ret;
+	delete []val;
+	return n;	// Not including NUL
 }
 
 int PropSetSimple::GetInt(const char *key, int defaultValue) const {

@@ -100,8 +100,8 @@ REBOL \
 VBScript 
 do
   rm -f "Lex${UNUSED}.cxx"
-  awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' KeyWords.cxx > KeyWords.tmp
-  mv KeyWords.tmp KeyWords.cxx
+  awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' Catalogue.cxx > Catalogue.tmp
+  mv Catalogue.tmp Catalogue.cxx
 done
 
 sed -i 's#setSingleCharOp\.Contains(sc\.chNext)# (0) /* setSingleCharOp.Contains(sc.chNext) */ #' LexBash.cxx

@@ -25,7 +25,10 @@
 
 class WordList;
 class Accessor;
-#include <KeyWords.h>
+
+#include <ILexer.h>
+#include <LexerModule.h>
+#include <Catalogue.h>
 
 #include "compat.h"
 #include "scidoc.h"
@@ -527,7 +530,7 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
     tabopts->setCurrentItem(ls->tabs);
     if (ls->words){
       char**words;
-      const LexerModule*lm=LexerModule::Find(ls->id);
+      const LexerModule*lm=Catalogue::Find(ls->id);
       int nwl=lm?lm->GetNumWordLists():-1;
       int i=0;
       for (words=ls->words; *words; words++) {

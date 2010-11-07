@@ -1,3 +1,10 @@
+2010-11-03
+  * Updated to Scintilla 2.22 
+  * Major changes to directory structure.
+
+2010-10-30
+  * Switched repository from CVS to GIT
+
 2010-05-06
   * Updated to Scintilla 2.11 (from current Scintilla CVS)
 

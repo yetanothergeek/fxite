@@ -15,15 +15,19 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "PropSetSimple.h"
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -101,7 +105,7 @@ static void ColouriseVHDLDoc(
         }
         sc.SetState(SCE_VHDL_DEFAULT);
       }
-    } else if (sc.state == SCE_VHDL_COMMENT || sc.state == SCE_V_COMMENTLINEBANG) {
+    } else if (sc.state == SCE_VHDL_COMMENT || sc.state == SCE_VHDL_COMMENTLINEBANG) {
       if (sc.atLineEnd) {
         sc.SetState(SCE_VHDL_DEFAULT);
       }
@@ -113,7 +117,7 @@ static void ColouriseVHDLDoc(
       } else if (sc.ch == '\"') {
         sc.ForwardSetState(SCE_VHDL_DEFAULT);
       } else if (sc.atLineEnd) {
-        sc.ChangeState(SCE_V_STRINGEOL);
+        sc.ChangeState(SCE_VHDL_STRINGEOL);
         sc.ForwardSetState(SCE_VHDL_DEFAULT);
       }
     }

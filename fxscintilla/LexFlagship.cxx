@@ -10,19 +10,22 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "PropSetSimple.h"
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
 #include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -86,9 +89,13 @@ static void ColouriseFlagShipDoc(unsigned int startPos, int length, int initStyl
 				}
 				break;
 			case SCE_FS_NUMBER:
+				if (!IsAWordChar(sc.ch) && !(sc.ch == '.' && IsADigit(sc.chNext))) {
+					sc.SetState(SCE_FS_DEFAULT);
+				}
+				break;
 			case SCE_FS_NUMBER_C:
 				if (!IsAWordChar(sc.ch) && sc.ch != '.') {
-					sc.SetState(bEnableCode ? SCE_FS_DEFAULT : SCE_FS_DEFAULT_C);
+					sc.SetState(SCE_FS_DEFAULT_C);
 				}
 				break;
 			case SCE_FS_CONSTANT:

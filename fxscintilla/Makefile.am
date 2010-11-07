@@ -3,19 +3,21 @@ libfxscintilla_a_CXXFLAGS = $(AM_CXXFLAGS) $(FOX_CFLAGS) -DSCI_LEXER -DFOX
 
 libfxscintilla_a_SOURCES = \
 version.h \
+Accessor.cxx \
 AutoComplete.cxx \
 CallTip.cxx \
+Catalogue.cxx \
 CellBuffer.cxx \
 CharClassify.cxx \
+CharacterSet.cxx \
 ContractionState.cxx \
 Decoration.cxx \
 Document.cxx \
-DocumentAccessor.cxx \
 Editor.cxx \
 ExternalLexer.cxx \
 Indicator.cxx \
 KeyMap.cxx \
-KeyWords.cxx \
+LexA68k.cxx \
 LexASY.cxx \
 LexAda.cxx \
 LexAsm.cxx \
@@ -57,14 +59,19 @@ LexSmalltalk.cxx \
 LexSorcus.cxx \
 LexTCL.cxx \
 LexTeX.cxx \
+LexTxt2tags.cxx \
 LexVHDL.cxx \
 LexVerilog.cxx \
 LexYAML.cxx \
+LexerBase.cxx \
+LexerModule.cxx \
+LexerNoExceptions.cxx \
+LexerSimple.cxx \
 LineMarker.cxx \
 PerLine.cxx \
 PlatFOX.cxx \
 PositionCache.cxx \
-PropSet.cxx \
+PropSetSimple.cxx \
 RESearch.cxx \
 RunStyles.cxx \
 ScintillaBase.cxx \
@@ -74,7 +81,7 @@ Style.cxx \
 StyleContext.cxx \
 UniConversion.cxx \
 ViewStyle.cxx \
-WindowAccessor.cxx \
+WordList.cxx \
 XPM.cxx
 
 noinst_HEADERS =  \
@@ -82,26 +89,31 @@ version.h \
 Accessor.h \
 AutoComplete.h \
 CallTip.h \
+Catalogue.h \
 CellBuffer.h \
 CharClassify.h \
 CharacterSet.h \
 ContractionState.h \
 Decoration.h \
 Document.h \
-DocumentAccessor.h \
 Editor.h \
 ExternalLexer.h \
 FXScintilla.h \
 FontQuality.h \
+ILexer.h \
 Indicator.h \
 KeyMap.h \
-KeyWords.h \
+LexAccessor.h \
+LexerBase.h \
+LexerModule.h \
+LexerNoExceptions.h \
+LexerSimple.h \
 LineMarker.h \
+OptionSet.h \
 Partitioning.h \
 PerLine.h \
 Platform.h \
 PositionCache.h \
-PropSet.h \
 PropSetSimple.h \
 RESearch.h \
 RunStyles.h \
@@ -116,6 +128,5 @@ Style.h \
 StyleContext.h \
 UniConversion.h \
 ViewStyle.h \
-WindowAccessor.h \
-XPM.h \
-version.h
+WordList.h \
+XPM.h

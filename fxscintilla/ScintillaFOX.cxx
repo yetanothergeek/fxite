@@ -62,10 +62,8 @@
 #include "ScintillaWidget.h"
 #ifdef SCI_LEXER
 # include "SciLexer.h"
-# include "PropSet.h"
-# include "PropSetSimple.h"
-# include "Accessor.h"
-# include "KeyWords.h"
+# include "ILexer.h"
+# include "LexerModule.h"
 # include "ExternalLexer.h"
 #endif
 #include "SplitVector.h"
@@ -87,7 +85,6 @@
 #include "Selection.h"
 #include "PositionCache.h"
 #include "Editor.h"
-//#include "SString.h"
 #include "ScintillaBase.h"
 
 #ifdef WIN32
@@ -209,7 +206,13 @@ int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
 }
 
 bool ScintillaFOX::ValidCodePage(int codePage) const {
-  return codePage == 0 || codePage == SC_CP_UTF8 || codePage == SC_CP_DBCS;
+  return codePage == 0
+  || codePage == SC_CP_UTF8
+  || codePage == 932
+  || codePage == 936
+  || codePage == 949
+  || codePage == 950
+  || codePage == 1361;
 }
 
 sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {

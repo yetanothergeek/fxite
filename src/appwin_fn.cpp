@@ -646,11 +646,13 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 class WordList;
 class Accessor;
 #include <cctype>
-#include <KeyWords.h>
+#include <ILexer.h>
+#include <LexerModule.h>
+#include <Catalogue.h>
 
 void TopWindow::DumpLexers() {
   for (int i=0; i<=SCLEX_AUTOMATIC; i++) {
-    const LexerModule*lex=LexerModule::Find(i);
+    const LexerModule*lex=Catalogue::Find(i);
     if (lex) {
       fprintf(stdout, "%d %s %d\n", i, lex->languageName, lex->GetNumWordLists());
     }

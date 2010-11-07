@@ -7,19 +7,22 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "PropSetSimple.h"
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
 #include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -52,13 +55,6 @@ inline bool IsOperator(int ch) {
 	        ch == '?' || ch == '!' || ch == '.' || ch == '~')
 		return true;
 	return false;
-}
-
-static inline int MakeLowerCase(int ch) {
-	if (ch < 'A' || ch > 'Z')
-		return ch;
-	else
-		return ch - 'A' + 'a';
 }
 
 static void GetTextSegment(Accessor &styler, unsigned int start, unsigned int end, char *s, size_t len) {
@@ -619,7 +615,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 	int lineCurrent = styler.GetLine(startPos);
 	int lineState;
 	if (lineCurrent > 0) {
-		lineState = styler.GetLineState(lineCurrent);
+		lineState = styler.GetLineState(lineCurrent-1);
 	} else {
 		// Default client and ASP scripting language is JavaScript
 		lineState = eScriptJS << 8;
@@ -749,8 +745,18 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				if ((state != SCE_HPHP_COMMENT) && (state != SCE_HPHP_COMMENTLINE) && (state != SCE_HJ_COMMENT) && (state != SCE_HJ_COMMENTLINE) && (state != SCE_HJ_COMMENTDOC) && (!isStringState(state))) {
 				//Platform::DebugPrintf("state=%d, StateToPrint=%d, initStyle=%d\n", state, StateToPrint, initStyle);
 				//if ((state == SCE_HPHP_OPERATOR) || (state == SCE_HPHP_DEFAULT) || (state == SCE_HJ_SYMBOLS) || (state == SCE_HJ_START) || (state == SCE_HJ_DEFAULT)) {
-					if ((ch == '{') || (ch == '}') || (foldComment && (ch == '/') && (chNext == '*'))) {
-						levelCurrent += ((ch == '{') || (ch == '/')) ? 1 : -1;
+					if (ch == '#') {
+						int j = i + 1;
+						while ((j < lengthDoc) && IsASpaceOrTab(styler.SafeGetCharAt(j))) {
+							j++;
+						}
+						if (styler.Match(j, "region") || styler.Match(j, "if")) {
+							levelCurrent++;
+						} else if (styler.Match(j, "end")) {
+							levelCurrent--;
+						}
+					} else if ((ch == '{') || (ch == '}') || (foldComment && (ch == '/') && (chNext == '*')) ) {
+						levelCurrent += ((ch == '{') || (ch == '/') ) ? 1 : -1;
 					}
 				} else if (((state == SCE_HPHP_COMMENT) || (state == SCE_HJ_COMMENT)) && foldComment && (ch == '*') && (chNext == '/')) {
 					levelCurrent--;
@@ -802,8 +808,6 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				visibleChars = 0;
 				levelPrev = levelCurrent;
 			}
-			lineCurrent++;
-			lineStartVisibleChars = 0;
 			styler.SetLineState(lineCurrent,
 			                    ((inScriptType & 0x03) << 0) |
 			                    ((tagOpened & 0x01) << 2) |
@@ -811,6 +815,8 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 			                    ((aspScript & 0x0F) << 4) |
 			                    ((clientScript & 0x0F) << 8) |
 			                    ((beforePreProc & 0xFF) << 12));
+			lineCurrent++;
+			lineStartVisibleChars = 0;
 		}
 
 		// Allow falling through to mako handling code if newline is going to end a block
@@ -874,6 +880,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 		else if ((state != SCE_H_ASPAT) &&
 		         !isPHPStringState(state) &&
 		         (state != SCE_HPHP_COMMENT) &&
+		         (state != SCE_HPHP_COMMENTLINE) &&
 		         (ch == '<') &&
 		         (chNext == '?') &&
 				 !IsScriptCommentState(state) ) {
@@ -967,8 +974,6 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 			beforeLanguage = scriptLanguage;
 			scriptLanguage = eScriptPython;
 			styler.ColourTo(i, SCE_H_ASP);
-			if (foldHTMLPreprocessor && chNext == '%')
-				levelCurrent++;
 
 			ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
 			continue;
@@ -1095,9 +1100,6 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				inScriptType = eNonHtmlScript;
 			else
 				inScriptType = eHtml;
-			if (foldHTMLPreprocessor) {
-				levelCurrent--;
-			}
 			scriptLanguage = beforeLanguage;
 			continue;
 		}
@@ -1636,7 +1638,9 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				i += 2;
 			} else if (isLineEnd(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
-				state = SCE_HJ_STRINGEOL;
+				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
+					state = SCE_HJ_STRINGEOL;
+				}
 			}
 			break;
 		case SCE_HJ_STRINGEOL:
