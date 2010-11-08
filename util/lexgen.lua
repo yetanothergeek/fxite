@@ -9,6 +9,45 @@ require "util/markdownstyle"
 filetypes.cpp="*.cc|*.cpp|*.cxx|*.hh|*.hpp|*.hxx|*.ipp|*.sma"
 filetypes.c="*.c"
 filetypes.makefile="[Mm]akefile*"
+filetypes.javascript="*.js"
+filetypes.ruby="*.rb"
+filetypes.python="*.py"
+filetypes.css="*.css"
+
+local word_lists={
+  c=[[
+    asm auto break case char const continue default do double else enum
+    extern float for goto if inline int long register return short signed
+    sizeof static struct switch typedef union unsigned void volatile while
+  ]],
+
+  bash=[[
+    break case continue do done elif else esac exit fi for function
+    if in select then until while time
+  ]],
+
+  javascript=[[
+    abstract boolean break byte case catch char class const continue
+    debugger default delete do double else enum export extends final
+    finally float for function goto if implements import in instanceof
+    int interface long native new package private protected public
+    return short static super switch synchronized this throw throws
+    transient try typeof var void volatile while with
+  ]],
+
+  ruby=[[
+    __FILE__ and def end in or self unless __LINE__ begin defined? ensure module
+    redo super until BEGIN break do false next rescue then when END case else
+    for nil retry true while alias class elsif if not return undef yield
+  ]],
+  
+  python=[[
+    and as assert break class continue def del elif else except exec
+    finally for from global if import in is lambda None not or pass
+    print raise return try while with yield
+  ]],
+}
+
 
 if filetypes.html and filetypes.php then
   filetypes.html=filetypes.html.."|"..filetypes.php
@@ -32,7 +71,7 @@ numdesc=(arg and arg[2]) and tonumber(arg[2]) or 1
 local lexname_lower=lexname:lower()
 local lexname_upper=lexname:upper()
 
-local iface_file="../fxscintilla/scintilla/include/Scintilla.iface"
+local iface_file="./fxscintilla/Scintilla.iface"
 local iface=io.open(iface_file, "r")
 local values={}
 local lextag=nil
@@ -156,6 +195,14 @@ else
 end
 
 
+function simplify(s)
+  if not s then return "" end
+  s=s:gsub('[\n\t ]+',' ')
+  s=s:gsub('^ ', '')
+  s=s:gsub(' $', '')
+  return s
+end
+
 
 if (numdesc>0) then
   print(string.format("static const char* %s_words[]= {",lexname_lower))
@@ -172,16 +219,16 @@ if (numdesc>0) then
       end
       words=tmpwords
     end
-    if (lexname=="c") and (num==1) then
-      words="asm auto break case char const continue default do double else enum extern float for goto if inline int long register return short signed sizeof static struct switch typedef union unsigned void volatile while"
-    elseif (lexname=="bash") and (num==1) then
-      words="break case continue do done elif else esac exit fi for function if in select then until while time"
-    elseif (lexname=="r") or (lexname=="conf") then
+    if (num==1) and word_lists[lexname] then
+      words=simplify(word_lists[lexname])
+    end
+    if (lexname=="conf") then
       words=""
     elseif (lexname=="flagship") and (num==2) then
       words=""
+    elseif (lexname=="r") and (num>1) then
+      words=""
     end 
-    --words=(words and words:sub(1,1984)) or "" -- fox 1.6 can only handle strings < 2000 chars
     print(string.format("  \"%s\",", words or ""))
   end
   print("  NULL\n};\n\n")
