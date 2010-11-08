@@ -144,7 +144,7 @@ void TopWindow::CreateLanguageMenu()
     case SCLEX_CSS:
     case SCLEX_HTML:
     case SCLEX_MARKDOWN:
-    {
+    case SCLEX_TXT2TAGS: {
       mp=(compare(ls->name,"docbook")==0)?tex_langmenu:html_langmenu;
       break;
     }
@@ -183,7 +183,8 @@ void TopWindow::CreateLanguageMenu()
     }
     case SCLEX_ASM:
     case SCLEX_VHDL:
-    case SCLEX_VERILOG:{
+    case SCLEX_VERILOG:
+    case SCLEX_A68K: {
       mp=asm_langmenu;
       break;
     }
