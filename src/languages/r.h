@@ -18,7 +18,7 @@ static StyleDef r_style[] = {
 
 
 static const char* r_words[]= {
-  "",
+  "if else repeat while function for in next break TRUE FALSE NULL NA Inf NaN",
   "",
   "",
   "",

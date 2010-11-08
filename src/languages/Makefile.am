@@ -1,4 +1,5 @@
 noinst_HEADERS=\
+a68k.h \
 ada.h \
 asm.h \
 bash.h \
@@ -40,6 +41,7 @@ smalltalk.h \
 sql.h \
 tcl.h \
 tex.h \
+txt2tags.h \
 verilog.h \
 vhdl.h \
 xml.h

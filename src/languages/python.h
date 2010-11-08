@@ -22,13 +22,13 @@ static StyleDef python_style[] = {
 
 
 static const char* python_words[]= {
-  "",
+  "and as assert break class continue def del elif else except exec finally for from global if import in is lambda None not or pass print raise return try while with yield",
   "",
   NULL
 };
 
 
-static const char* python_mask = "";
+static const char* python_mask = "*.py";
 
 
 static const char* python_apps = "python";

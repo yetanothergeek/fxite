@@ -40,12 +40,12 @@ static StyleDef ruby_style[] = {
 
 
 static const char* ruby_words[]= {
-  "",
+  "__FILE__ and def end in or self unless __LINE__ begin defined? ensure module redo super until BEGIN break do false next rescue then when END case else for nil retry true while alias class elsif if not return undef yield",
   NULL
 };
 
 
-static const char* ruby_mask = "";
+static const char* ruby_mask = "*.rb";
 
 
 static const char* ruby_apps = "ruby";

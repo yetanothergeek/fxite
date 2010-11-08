@@ -41,7 +41,7 @@ static const char* css_words[]= {
 };
 
 
-static const char* css_mask = "";
+static const char* css_mask = "*.css";
 
 
 static const char* css_apps = "";

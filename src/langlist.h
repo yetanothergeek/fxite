@@ -1,5 +1,6 @@
 #include "./languages/html.h"
 #include "./languages/cpp.h"
+#include "./languages/a68k.h"
 #include "./languages/ada.h"
 #include "./languages/asm.h"
 #include "./languages/bash.h"
@@ -39,11 +40,13 @@
 #include "./languages/sql.h"
 #include "./languages/tcl.h"
 #include "./languages/tex.h"
+#include "./languages/txt2tags.h"
 #include "./languages/verilog.h"
 #include "./languages/vhdl.h"
 #include "./languages/xml.h"
 
 LangStyle languages[]={
+  LangA68k,
   LangAda,
   LangAsm,
   LangBash,
@@ -85,6 +88,7 @@ LangStyle languages[]={
   LangSQL,
   LangTCL,
   LangTeX,
+  LangTxt2tags,
   LangVerilog,
   LangVHDL,
   LangXML,
