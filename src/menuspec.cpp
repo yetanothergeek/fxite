@@ -61,6 +61,7 @@ static MenuSpec menu_specs[] = {
   {TW::ID_CLOSEALL,         "FileCloseAll",    _("Close All"),          _("close all"),    "Ctrl+Shift+W", 'm', {NULL}},
   {TW::ID_INSERT_FILE,      "FileInsert",      _("&Insert file..."),    _("insert file"),  "",             'm', {NULL}},
   {TW::ID_LOAD_TAGS,        "FileLoadTags",    _("Load ta&gs file..."), _("load tags"),    "",             'm', {NULL}},
+  {TW::ID_SELECT_DIR,       "FileSelectDir",   _("&Working Directory..."),_("work dir"),   "",             'm', {NULL}},
   {TW::ID_QUIT,             "FileQuit",        _("&Quit"),              _("quit"),         QUIT_CMD,       'm', {NULL}},
   {TW::ID_UNDO,             "EditUndo",        _("&Undo"),              _("undo"),         "Ctrl+Z",       'm', {NULL}},
   {TW::ID_REDO,             "EditRedo",        _("&Redo"),              _("redo"),         "Ctrl+Shift+Z", 'm', {NULL}},

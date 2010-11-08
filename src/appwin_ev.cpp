@@ -75,6 +75,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_SAVEALL,onFileSaveAll),
   TWMAPFUNC(ID_SAVECOPY,onFileSaveACopy),
   TWMAPFUNC(ID_NEW,onFileNew),
+  TWMAPFUNC(ID_SELECT_DIR,onSelectDir),
   TWMAPFUNC(ID_QUIT,onQuit),
   TWMAPFUNC(ID_UNDO,onUndo),
   TWMAPFUNC(ID_REDO,onRedo),
@@ -1005,6 +1006,19 @@ long TopWindow::onFileSaveAs(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onFileNew(FXObject*o, FXSelector sel, void*p )
 {
   NewFile(true);
+  return 1;
+}
+
+
+
+long TopWindow::onSelectDir(FXObject*o, FXSelector sel, void*p)
+{
+  FXDirDialog dlg(this, _("Set Working Directory"));
+  dlg.setHeight(420);
+  dlg.setDirectory(FXSystem::getCurrentDirectory()+PATHSEP);
+  if (dlg.execute(PLACEMENT_OWNER)) {
+    FXSystem::setCurrentDirectory(dlg.getDirectory());
+  }
   return 1;
 }
 

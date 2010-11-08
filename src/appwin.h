@@ -216,6 +216,7 @@ public:
   long onFileSaveAll(    FXObject*o, FXSelector sel, void*p );
   long onFileSaveACopy(  FXObject*o, FXSelector sel, void*p );
   long onFileNew(        FXObject*o, FXSelector sel, void*p );
+  long onSelectDir(      FXObject*o, FXSelector sel, void*p );
   long onQuit(           FXObject*o, FXSelector sel, void*p );
   long onScintilla(      FXObject*o, FXSelector sel, void*p );
   long onCloseTab(       FXObject*o, FXSelector sel, void*p );
@@ -310,6 +311,7 @@ public:
     ID_SAVEAS,
     ID_SAVEALL,
     ID_SAVECOPY,
+    ID_SELECT_DIR,
     ID_QUIT,
     ID_UNDO,
     ID_REDO,

@@ -298,6 +298,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(filemenu,ID_LOAD_TAGS);
   unloadtagsmenu=new FXMenuCascade(filemenu,_("&Unload tags file"),NULL,(new SubMenuPane(filemenu)));
   unloadtagsmenu->disable();
+  MkMnuCmd(filemenu,ID_SELECT_DIR);
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_QUIT);
 
