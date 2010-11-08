@@ -38,7 +38,7 @@
 To add a new menu command:
   1. Declare an event handler and an ID_* enum value in "appwin.h"
   2. Map the method to the enum value in the TopWindowMap[] in "appwin_ev.cpp"
-  3. Implement the event handler in "appwin_ev.h"
+  3. Implement the event handler in "appwin_ev.cpp"
   4. Add a new menu specification to the menu_specs[] list in "menuspec.cpp".
   5. Add a new menu item in CreateMenus() in "appwin_mnu.cpp" ( using MkMnuCmd() MkMnuChk() or MkMnuRad() )
 */
