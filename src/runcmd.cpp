@@ -108,11 +108,30 @@ FXint CmdIO::error(const char*msg)
 
 
 
+bool CmdIO::checkCurrDir()
+{
+  if (FXSystem::setCurrentDirectory(FXSystem::getCurrentDirectory())) {
+    return true;
+  } else {
+    return FXMessageBox::warning(win, MBOX_YES_NO, _("Shell Command"),
+      "%s:\n\n%s\n%s\n%s\n\n%s",
+      _("Command warning"),
+      _("Unable to determine current working directory."),
+      _("This can cause problems with some external commands."),
+      _("A new working directory can be selected via the \"File\" menu."),
+      _("Cancel command?")
+    ) == MBOX_CLICKED_NO;
+  }
+}
+
+
+
 bool CmdIO::filter(const char *command, const FXString &input, FXString &output, bool*canceler)
 {
   SendString=input.text();
   remaining=SendString.length();
   _list=NULL;
+  if (!checkCurrDir()) { return false; }
   bool success=run(command,canceler);
   if (canceler && *canceler) {
     return false;
@@ -129,6 +148,7 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
 
 bool CmdIO::list(const char *command, FXList *lines, bool*canceler) {
   _list=lines;
+  if (!checkCurrDir()) { return false; }
   return run(command,canceler);
 }
 

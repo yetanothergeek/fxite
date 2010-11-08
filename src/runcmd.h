@@ -45,6 +45,7 @@ private:
   FXDECLARE(CmdIO);
   FXint childPid;
   bool excess();
+  bool checkCurrDir();
 public:
   long onData(FXObject*o,FXSelector sel,void*p);
   long onTimer(FXObject*o,FXSelector sel,void*p);
