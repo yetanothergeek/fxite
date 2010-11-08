@@ -298,14 +298,15 @@ static int pickfile(lua_State*L)
         break;
       }
       case 2: {
-        dlg.setSelectMode(SELECTFILE_DIRECTORY);
-        dlg.setTitle(_("Select Directory"));
+        FXDirDialog dir(main_window, _("Select Directory"));
+        dir.setHeight(420);
         if ( FXStat::exists(path) && !FXStat::isDirectory(path) ) {
-          dlg.setFilename(FXPath::directory(path));
+          dir.setDirectory(FXPath::directory(path));
         } else {
-          dlg.setFilename(FXSystem::getCurrentDirectory()+PATHSEP);
+          dir.setDirectory(FXSystem::getCurrentDirectory()+PATHSEP);
         }
-        rv=dlg.execute(PLACEMENT_OWNER);
+        rv=dir.execute(PLACEMENT_OWNER);
+        if (rv) { dlg.setFilename(dir.getDirectory()); } // Pass result to file dialog.
         break;
       }
     }
