@@ -199,8 +199,12 @@ void TopWindow::SaveClipboard()
   if (clipsci) {
     FXuchar* cb_data=NULL;
     FXuint len=0;
-    if (getDNDData(FROM_CLIPBOARD, FXWindow::textType, cb_data, len) && cb_data && *cb_data) {
-      clipsci->sendString(SCI_COPYTEXT,len,cb_data);
+    FXDragType types[]={textType,utf8Type,stringType,0};
+    for (FXDragType *dt=types; *dt; dt++) {
+      if (getDNDData(FROM_CLIPBOARD, *dt, cb_data, len) && cb_data && *cb_data) {
+        clipsci->sendString(SCI_COPYTEXT,len,cb_data);
+        break;
+      }
     }
   }
 }
