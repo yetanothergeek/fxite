@@ -38,6 +38,7 @@ private:
   FXint error(const char*msg);
   void appendLine(FXString&s);
   bool run(const char *command, bool*command_timeout);
+  bool checkCurrDir();
 #ifdef WIN32
   FXival childPid;
   FXInputHandle StdIN_Rd, StdOUT_Wr, StdERR_Wr;
@@ -45,7 +46,6 @@ private:
   FXDECLARE(CmdIO);
   FXint childPid;
   bool excess();
-  bool checkCurrDir();
 public:
   long onData(FXObject*o,FXSelector sel,void*p);
   long onTimer(FXObject*o,FXSelector sel,void*p);
