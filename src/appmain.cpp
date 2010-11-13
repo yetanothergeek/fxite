@@ -420,11 +420,20 @@ static void usage(const char*prog)
 #define _WIN32_IE 0x0400
 #include <shlobj.h>
 #include <sys/stat.h>
+
 bool IsDir(const FXString &dn)
 {
+  if (dn.empty()) { return false; }
   struct stat st;
-  return ( (stat(dn.text(),&st)==0) && S_ISDIR(st.st_mode) );
+  if (strchr("/\\", dn[dn.length()-1])) { 
+    FXString tmp=dn.text();
+    tmp.trunc(dn.length()-1);
+    return ( (stat(tmp.text(),&st)==0) && S_ISDIR(st.st_mode) );
+  } else {
+    return ( (stat(dn.text(),&st)==0) && S_ISDIR(st.st_mode) );
+  }
 }
+
 
 bool IsWin9x()
 {
