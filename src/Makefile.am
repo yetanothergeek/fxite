@@ -10,7 +10,8 @@ fxite_SOURCES=\
   histbox.cpp lang.cpp luacmds.cpp luafuncs.cpp macro.cpp prefdlg.cpp prefs.cpp readtags.c \
   recorder.cpp scidoc.cpp search.cpp shmenu.cpp sl.c doctabs.cpp tagread.cpp scisrch.cpp \
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
-  run_w32.cpp run_unx.cpp menuspec.cpp isutf8.c winshcut.c filterdlg.cpp listdlls.c luafx.cpp
+  run_w32.cpp run_unx.cpp menuspec.cpp isutf8.c winshcut.c filterdlg.cpp listdlls.c luafx.cpp \
+  migration.cpp
 
 noinst_HEADERS=\
   appmain.h appwin.h runcmd.h export.h filer.h help.h helptext.h help_lua.h histbox.h lang.h \

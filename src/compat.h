@@ -47,3 +47,12 @@ FXbool LocaleIsUTF8();
 #endif
 
 
+#if ((FOX_MAJOR>1) || (FOX_MINOR>=7)) && !defined(WIN32)
+# define FXITE_CHECK_XDG_CONFIG
+# define use_xdg_config() \
+            ((fxversion[0]>1) || (fxversion[1]>7) || ((fxversion[1]==7) && (fxversion[2]>=23)))
+#else
+# ifdef FXITE_CHECK_XDG_CONFIG
+#  undef FXITE_CHECK_XDG_CONFIG
+# endif
+#endif

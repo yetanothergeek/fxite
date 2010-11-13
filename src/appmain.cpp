@@ -162,7 +162,6 @@ bool AppClass::InitClient()
 {
   dde_string="";
   ClientParse();
-  sock_name=FXPath::name(sock_name);
   sock_name.prepend(APP_NAME);
   FXMainWindow*tmpwin=new FXMainWindow(this,EXE_NAME"_tmpwin");
   tmpwin->getParent()->create();
@@ -439,42 +438,88 @@ static char display_opt[]="-display";
 #endif
 
 
+void AppClass::CreatePathOrDie(const FXString &dirname)
+{
+  FXString dn="";
+  FXint n=dirname.contains(PATHSEP);
+  dn.append(PATHSEP);
+  for (FXint i=1; i<=n; i++) {
+    dn.append(dirname.section(PATHSEP,i));
+    if (!(IsDir(dn)||FXDir::create(dn,FXIO::OwnerFull))) {
+      FXString msg= strerror(errno);
+      fxwarning("\n%s: %s:\n    %s\n(%s)\n\n",
+         getArgv()[0],
+         _("FATAL: Failed to create directory path"),
+         dn.text(), msg.text()
+      );
+      create();
+      FXMessageBox::error(this, MBOX_OK, _(APP_NAME" error"), "%s:\n\n    %s\n\n(%s)\n\n",
+      _("FATAL: Failed to create directory path"),
+      dn.text(), msg.text()
+      );
+      destroy();
+      fflush(stderr);
+      ::exit(EXIT_FAILURE);
+    }
+    dn.append(PATHSEP);
+  }
+}
+
+
+
+#ifdef FXITE_CHECK_XDG_CONFIG
+
+extern void MigrateConfigToXDG(FXApp*a, const FXString &src, const FXString &dst, FXString &errors);
+
+
+void AppClass::CreateConfigDir()
+{
+  migration_errors="";
+  FXString old_config=FXSystem::getHomeDirectory()+ PATHSEP+ ".foxrc"+ PATHSEP+ getVendorName();
+  FXString xdg_config="";
+  if (use_xdg_config()) {
+    xdg_config=getenv("XDG_CONFIG_HOME");
+    if (xdg_config.empty()) {
+      xdg_config=FXSystem::getHomeDirectory()+ PATHSEP+ ".config";
+    } else {
+      xdg_config=FXPath::simplify(FXPath::absolute(xdg_config));
+    }
+    CreatePathOrDie(xdg_config);
+    xdg_config += PATHSEP + getVendorName();
+    MigrateConfigToXDG(this,
+      FXPath::directory(old_config), FXPath::directory(xdg_config), migration_errors);
+    configdir=xdg_config.text();
+  } else {
+    configdir=old_config.text();
+  }
+  configdir=FXPath::simplify(FXPath::absolute(configdir));
+  configdir.append( PATHSEP );
+  CreatePathOrDie(configdir);
+}
+
+#else // old config directory location...
+
+void AppClass::CreateConfigDir()
+{
+# ifdef WIN32
+  configdir=FXSystem::getHomeDirectory()+ PATHSEP+ "foxrc"+ PATHSEP+ getVendorName()+ PATHSEP;
+  configdir.substitute('/',PATHSEP,true);
+# else
+  configdir=FXSystem::getHomeDirectory()+ PATHSEP+ ".foxrc"+ PATHSEP+ getVendorName()+ PATHSEP;
+# endif
+  CreatePathOrDie(configdir);
+}
+
+#endif
+
+
 
 void AppClass::init(int& argc, char** argv, bool connect)
 {
   FXApp::init(argc,argv,connect);
   is_server=false;
-  configdir=FXSystem::getHomeDirectory();
-  FXDir::create(configdir,FXIO::OwnerFull);
-  configdir.append(PATHSEP);
-#ifdef WIN32
-  const char *path_parts[]={ "foxrc", "", "servers",  NULL };
-  configdir.substitute('/',PATHSEP,true);
-#else
-  const char *path_parts[]={ ".foxrc", "", "servers",  NULL };
-#endif
-  FXint i;
-
-  for (i=0; path_parts[i]; i++) {
-    FXString parts=path_parts[i][0]?path_parts[i]:getVendorName().text();
-    parts.append(PATHSEP);
-    FXint nseps=parts.contains(PATHSEP);
-    FXint j;
-    for (j=0;j<nseps;j++) {
-      configdir.append(parts.section(PATHSEP,j));
-      if (!(IsDir(configdir)||FXDir::create(configdir,FXIO::OwnerFull))) {
-        fxwarning("\n%s: %s:\n    %s\n(%s)\n\n",
-           FXPath::name(getArgv()[0]).text(),
-           _("FATAL: Failed to create directory path"),
-           configdir.text(), strerror(errno)
-         );
-        flush(stderr);
-        ::exit(EXIT_FAILURE);
-      }
-      configdir.append(PATHSEP);
-    }
-  }
-  for ( i=1; i<getArgc(); i++) {
+  CreateConfigDir();
+  for (FXint i=1; i<getArgc(); i++) {
     const char *arg=getArgv()[i];
     if (argv[i][0]=='-') {
       switch (arg[1]) {
@@ -534,20 +579,14 @@ void AppClass::init(int& argc, char** argv, bool connect)
     if (c==255) { break; }
   }
   server_name.lower();
-  sock_name.prepend(configdir.text());
-  configdir=FXPath::directory(configdir);
-  configdir=FXPath::directory(configdir);
-  configdir.append(PATHSEP);
-  sessionfile=configdir.text();
-  sessionfile.append("sessions");
-  if (!(IsDir(sessionfile)||FXDir::create(sessionfile,FXIO::OwnerFull))) {
-    fxwarning("\n%s: %s:\n    %s\n\n",
-       FXPath::name(getArgv()[0]).text(), _("FATAL: Failed to create directory path"), sessionfile.text());
-    flush(stderr);
-    ::exit(EXIT_FAILURE);
-  }
-  sessionfile.append(PATHSEP);
-  sessionfile.append(FXPath::name(sock_name));
+  sessionfile=configdir+"sessions"+PATHSEP;
+  CreatePathOrDie(sessionfile);
+  sessionfile.append(sock_name);
+#ifndef WIN32
+  FXString serverdir=configdir+"servers"+PATHSEP;
+  CreatePathOrDie(serverdir);
+  sock_name.prepend(serverdir);
+#endif
   if ( !InitClient() ) { InitServer(); }
   while (srv_commands[0]=='\n') { srv_commands.erase(0,1); }
 }

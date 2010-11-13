@@ -45,6 +45,8 @@ private:
   FXString server_name;
   void ClientParse();
   void ExecuteClientRequest();
+  void CreatePathOrDie(const FXString &dirname);
+  void CreateConfigDir();
 #ifdef WIN32
   FXString dde_string;
   virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
@@ -80,5 +82,8 @@ public:
   const FXString &SocketName() { return sock_name; }
   const FXString &ServerName() { return server_name; }
   FXint run() { srv_commands=""; return FXApp::run(); }
+#ifdef FXITE_CHECK_XDG_CONFIG
+  FXString migration_errors;
+#endif
 };
 
