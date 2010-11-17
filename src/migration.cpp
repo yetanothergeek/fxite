@@ -142,6 +142,7 @@ void MigrateConfigToXDG(FXApp*a, const FXString &src, const FXString &dst, FXStr
         errors.prepend(_("Settings migration messages:\n"));
         errors.prepend("================================\n");
       }
+      a->reg().read();
       return;
     }
     case MBOX_CLICKED_NO: { return; }
