@@ -229,6 +229,7 @@ bool FileFiltersDlg::editItem()
   ClipTextField*mask=new ClipTextField(&dlg,64);
   mask->setText(txt.section('\t',1));
   new FXLabel(&dlg, " ");
+  dlg.create();
   desc->setFocus();
   if (dlg.execute(PLACEMENT_SCREEN)) {
     FXString sdesc=desc->getText();
