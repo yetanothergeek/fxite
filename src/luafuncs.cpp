@@ -1266,6 +1266,14 @@ static int lexer(lua_State* L)
 
 
 
+static int configdir(lua_State* L)
+{
+  lua_pushstring(L,((AppClass*)(tw->getApp()))->ConfigDir().text());
+  return 1;
+}
+
+
+
 static const struct luaL_reg fxte_funcs[] = {
   {"seltext", seltext},
   {"text", text},
@@ -1305,6 +1313,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"scintilla", scintilla},
   {"scrollpos", scrollpos},
   {"lexer", lexer},
+  {"configdir", configdir},
   {NULL, NULL}
 };
 

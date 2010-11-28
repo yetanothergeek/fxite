@@ -73,6 +73,7 @@
 @@@scintilla@@@ -- Low-level access to the editor widget.
 @@@pid@@@ -- Process ID of the editor.
 @@@window@@@ -- Top-level window ID of the editor.
+@@@configdir@@@ -- Current configuration directory.
 
 
 %%%Dialog functions%%%
@@ -750,6 +751,12 @@ Returns the process ID of the editor.
 ===__MOD__.window()
 ===
 Returns the window ID of the editor's top-level window.
+
+
+###configdir###
+===__MOD__.configdir()
+===
+Returns the full path to the current configuration directory.
 
 
 ###choose###
