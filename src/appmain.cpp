@@ -20,6 +20,7 @@
 #include <csignal>
 #ifdef WIN32
 # include <windows.h>
+# include <ctype.h>
 #else
 # include <sys/socket.h>
 # include <sys/un.h>
@@ -451,6 +452,12 @@ void AppClass::CreatePathOrDie(const FXString &dirname)
 {
   FXString dn="";
   FXint n=dirname.contains(PATHSEP);
+#ifdef WIN32
+  if ((dirname[1]==':') && isalpha(dirname[0])) {
+    dn.append(dirname[0]);
+    dn.append(':');
+  }
+#endif
   dn.append(PATHSEP);
   for (FXint i=1; i<=n; i++) {
     dn.append(dirname.section(PATHSEP,i));
