@@ -20,7 +20,7 @@
 #include "compat.h"
 
 
-#ifdef FXITE_CHECK_XDG_CONFIG
+#ifndef FOX_1_6
 
 // Some strategy to transfer configuration settings from ~/.foxrc to ~/.config
 
@@ -39,6 +39,11 @@ static void AppendError(FXString &errors, const char*err, const FXString &filena
 #define Error(e,f) AppendError(errors,e,f)
 
 
+# ifdef WIN32
+#  define DoStat FXStat::statFile
+# else
+#  define DoStat FXStat::statLink
+# endif
 
 static void copyConfigFiles(const FXString& srcfile,const FXString& dstfile, FXString &errors,FXint level)
 {
@@ -46,13 +51,19 @@ static void copyConfigFiles(const FXString& srcfile,const FXString& dstfile, FXS
     FXString name,linkname;
     FXStat srcstat;
     FXStat dststat;
-    if (FXStat::statLink(srcfile,srcstat)) {
-      if (FXStat::statLink(dstfile,dststat)) {
+    if (DoStat(srcfile,srcstat)) {
+      if (DoStat(dstfile,dststat)) {
         errno=0;
         Error(_("File exists"), dstfile);
         return;
       }
       if (srcstat.isDirectory()) {
+# ifdef WIN32
+        if ((level==2) && (FXPath::name(srcfile)=="servers")) {
+          FXDir::remove(srcfile);
+          return;
+        }
+# endif
         if (!dststat.isDirectory()) {
           if (!FXDir::create(dstfile,srcstat.mode()|FXIO::OwnerWrite)) {
              Error(_("Create failed"), dstfile);
@@ -71,9 +82,11 @@ static void copyConfigFiles(const FXString& srcfile,const FXString& dstfile, FXS
         return;
       }
       FXString newname=dstfile.text();
+# ifndef WIN32
       if ((level==2) && ((FXPath::name(srcfile)=="settings")||(FXPath::name(srcfile)=="styles"))) {
         newname+=".rc";
       }
+# endif
       if (srcstat.isFile()) {
         if (!FXFile::copy(srcfile,newname,false)) {
           Error(_("Copy failed"), srcfile);
@@ -109,7 +122,7 @@ static void copyConfigFiles(const FXString& srcfile,const FXString& dstfile, FXS
 
 
 
-void MigrateConfigToXDG(FXApp*a, const FXString &src, const FXString &dst, FXString &errors)
+void MigrateConfigDir(FXApp*a, const FXString &src, const FXString &dst, FXString &errors)
 {
   if (!FXStat::isDirectory(src)) { return; }
   if (FXStat::isDirectory(dst)) { return; }
@@ -120,9 +133,11 @@ void MigrateConfigToXDG(FXApp*a, const FXString &src, const FXString &dst, FXStr
     "\n"
     "The location of the "APP_NAME" configuration directory has changed.\n"
     "\n"
+#ifndef WIN32
     "This is due to changes in the FOX toolkit, in accordance with\n"
     "the freedesktop.org  \"XDG base directory specification\".\n"
     "\n"
+#endif
     "Migration options:\n"
     " Click  [ Yes ]  to automatically copy your old settings (recommended).\n"
     " Click  [ No ]  to create a new configuration.\n"

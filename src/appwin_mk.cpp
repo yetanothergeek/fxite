@@ -1241,7 +1241,7 @@ void TopWindow::create()
   SaveTicks=0;
   a->addTimeout(this,ID_TIMER,ONE_SECOND,NULL);
   general_info->setY(6);
-#ifdef FXITE_CHECK_XDG_CONFIG
+#ifndef FOX_1_6
   if (!a->migration_errors.empty()) {
     NewFile(false);
     SciDoc*sci=ControlDoc();

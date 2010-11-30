@@ -443,6 +443,76 @@ bool IsWin9x()
   ::GetVersionEx(&OSversion);
   return (OSversion.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS);
 }
+
+static FXString GetRegKey(HKEY hive, LPCSTR path, LPCSTR value) {
+  HKEY hKey;
+  LONG err;
+  LPBYTE data=NULL;
+  DWORD size;
+  if (RegOpenKeyExA(hive,path,0,KEY_READ,&hKey)==ERROR_SUCCESS) {
+    err=RegQueryValueExA(hKey,value,NULL,NULL,NULL,&size);
+    if(err==ERROR_SUCCESS) {
+      data=(LPBYTE)calloc(size,1);
+      err=RegQueryValueExA(hKey,value,NULL,NULL,data,&size);
+    }
+    RegCloseKey(hKey);
+    if (err==ERROR_SUCCESS) {
+      FXString rv=(FXchar*)data;
+      free(data);
+      return rv; // FXString((FXchar*)data);
+    }
+  }
+  return FXString::null;
+}
+
+#define GetShellFolder(shellfolder) \
+  (GetRegKey( \
+    HKEY_CURRENT_USER, \
+    "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", \
+    shellfolder \
+  ))
+
+
+static void GetAppDataDir(FXString &AppDataDir)
+{
+  AppDataDir=FXString::null;
+  if (IsWin9x()) {
+    FXString CurrentUser=FXString::null;
+    DWORD size=0;
+    TCHAR* lpBuffer;
+    GetUserNameA(NULL,&size);
+    lpBuffer=(TCHAR*)calloc(size+1,sizeof(TCHAR));
+    if ( GetUserNameA(lpBuffer,&size) ) {
+      CurrentUser=(FXchar*)lpBuffer;
+    }
+    free(lpBuffer);
+    if (!CurrentUser.empty()) {
+      FXString ProfileList="Software\\Microsoft\\Windows\\CurrentVersion\\ProfileList\\"+CurrentUser;
+      FXString ProfileImagePath=GetRegKey(HKEY_LOCAL_MACHINE,ProfileList.text(), "ProfileImagePath");
+      if (!ProfileImagePath.empty()) {
+        if (FXStat::isDirectory(ProfileImagePath)) {
+          AppDataDir=ProfileImagePath+PATHSEP+"Application Data";
+        }
+      }
+    }
+  } else {
+    FXString AppData=GetShellFolder("AppData");
+    if (!AppData.empty()) {
+      AppDataDir=AppData.text();
+    }
+  }
+  if (AppDataDir.empty()) {
+    TCHAR strPath[MAX_PATH];
+    if (SHGetSpecialFolderPath(0,strPath,CSIDL_APPDATA,FALSE)) {
+      AppDataDir=(FXchar*)strPath;
+    } else {
+      AppDataDir="C:\\";
+    }
+  }
+  AppDataDir.substitute('/', PATHSEP, true);
+  AppDataDir=FXPath::simplify(FXPath::absolute(AppDataDir));
+}
+
 #else
 static char display_opt[]="-display";
 #endif
@@ -481,13 +551,63 @@ void AppClass::CreatePathOrDie(const FXString &dirname)
   }
 }
 
+#ifdef FOX_1_6
+
+// Old FOX-1.6 config directory location...
+
+void AppClass::CreateConfigDir()
+{
+  configdir=FXSystem::getHomeDirectory()+ PATHSEP+ ".foxrc"+ PATHSEP+ getVendorName()+ PATHSEP;
+  CreatePathOrDie(configdir);
+}
 
 
-#ifdef FXITE_CHECK_XDG_CONFIG
+#else
 
-extern void MigrateConfigToXDG(FXApp*a, const FXString &src, const FXString &dst, FXString &errors);
+extern void MigrateConfigDir(FXApp*a, const FXString &src, const FXString &dst, FXString &errors);
 
+# ifdef WIN32
 
+// New Win32 config directory location...
+void AppClass::CreateConfigDir()
+{
+  configdir=reg().getUserDirectory()+PATHSEP+getVendorName();
+  configdir.substitute('/',PATHSEP,true);
+  FXString oldconfig=FXString::null;
+  FXString newconfig=FXPath::directory(configdir);
+  const char*config_tail=PATHSEPSTRING "foxrc" PATHSEPSTRING "fxite";
+  if (IsWin9x()) {
+    if (!IsDir(newconfig)) {
+      FXString homedir_cfg=FXSystem::getEnvironment("HOME");
+      if (!homedir_cfg.empty()) { 
+        homedir_cfg+=config_tail;
+        homedir_cfg.substitute('/',PATHSEP,true);
+      }
+      if (IsDir(homedir_cfg)) {
+        oldconfig=homedir_cfg;
+      } else {
+        FXString mydocs_cfg=GetShellFolder("Personal")+config_tail;
+        if (IsDir(mydocs_cfg)) {
+          oldconfig=mydocs_cfg;
+        }
+      }
+    }
+  } else {
+    oldconfig=FXSystem::getEnvironment("USERPROFILE");
+    if (!oldconfig.empty()) {
+      oldconfig+=config_tail;
+    }
+  }
+  if (!oldconfig.empty()) {
+    MigrateConfigDir(this, oldconfig, newconfig, migration_errors);
+  }
+  configdir.append(PATHSEP);
+  CreatePathOrDie(configdir);
+}
+
+# else
+
+// New FOX-1.7 XDG config directory location...
 void AppClass::CreateConfigDir()
 {
   migration_errors="";
@@ -502,7 +622,7 @@ void AppClass::CreateConfigDir()
     }
     CreatePathOrDie(xdg_config);
     xdg_config += PATHSEP + getVendorName();
-    MigrateConfigToXDG(this,
+    MigrateConfigDir(this,
       FXPath::directory(old_config), FXPath::directory(xdg_config), migration_errors);
     configdir=xdg_config.text();
   } else {
@@ -513,26 +633,28 @@ void AppClass::CreateConfigDir()
   CreatePathOrDie(configdir);
 }
 
-#else // old config directory location...
+# endif // OS
 
-void AppClass::CreateConfigDir()
-{
-# ifdef WIN32
-  configdir=FXSystem::getHomeDirectory()+ PATHSEP+ "foxrc"+ PATHSEP+ getVendorName()+ PATHSEP;
-  configdir.substitute('/',PATHSEP,true);
-# else
-  configdir=FXSystem::getHomeDirectory()+ PATHSEP+ ".foxrc"+ PATHSEP+ getVendorName()+ PATHSEP;
-# endif
-  CreatePathOrDie(configdir);
-}
-
-#endif
+#endif // FOX Version
 
 
 
 void AppClass::init(int& argc, char** argv, bool connect)
 {
+#ifdef WIN32
+  FXString AppDataDir;
+  GetAppDataDir(AppDataDir);
+  reg().setUserDirectory(AppDataDir);
+  reg().setAsciiMode(true);
   FXApp::init(argc,argv,connect);
+  reg().setUserDirectory(AppDataDir);
+  reg().read();
+#else
+  for (int i=1; i<argc; i++) {
+    if (argv[i] && (strcmp(argv[i],"-d")==0)) { argv[i]=display_opt; }
+  }
+  FXApp::init(argc,argv,connect);
+#endif
   is_server=false;
   CreateConfigDir();
   for (FXint i=1; i<getArgc(); i++) {
@@ -710,23 +832,6 @@ int main(int argc, char *argv[])
   FXString cfg_name="";
   if (!get_config_name(argc,argv,cfg_name)) { exit(1); }
   AppClass app("settings", cfg_name);
-#ifdef WIN32
-  // FXRegistry ascii mode on windows depends on USERPROFILE env, but Win98 doesn't set it
-  FXString userprofile=FXSystem::getEnvironment("USERPROFILE");
-  if (userprofile.empty()) {
-    TCHAR strPath[MAX_PATH];
-    if (SHGetSpecialFolderPath(0,strPath,CSIDL_APPDATA,FALSE)) {
-      userprofile=FXPath::directory(strPath);
-    }
-  }
-  userprofile.substitute('/', PATHSEP, true);
-  FXSystem::setEnvironment("USERPROFILE", userprofile);
-  app.reg().setAsciiMode(true);
-#else
-  for (int i=1; i<argc; i++) {
-    if (argv[i] && (strcmp(argv[i],"-d")==0)) { argv[i]=display_opt; }
-  }
-#endif
   app.init(argc,argv);
   if ( app.IsServer() ) {
 

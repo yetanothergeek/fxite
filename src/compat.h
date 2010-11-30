@@ -47,12 +47,16 @@ FXbool LocaleIsUTF8();
 #endif
 
 
-#if ((FOX_MAJOR>1) || (FOX_MINOR>=7)) && !defined(WIN32)
-# define FXITE_CHECK_XDG_CONFIG
+#if defined(FOX_1_6) || defined(WIN32)
+# define use_xdg_config() (0)
+#else
 # define use_xdg_config() \
             ((fxversion[0]>1) || (fxversion[1]>7) || ((fxversion[1]==7) && (fxversion[2]>=23)))
-#else
-# ifdef FXITE_CHECK_XDG_CONFIG
-#  undef FXITE_CHECK_XDG_CONFIG
+#endif
+
+#ifdef WIN32
+# if (FOX_MAJOR<2) && ( (FOX_MINOR<7) || ((FOX_MINOR==7)&&(FOX_LEVEL<24)) )
+#  error *** Building FXiTe for Windows requires at least FOX-1.7.24 ***
 # endif
 #endif
+

@@ -566,9 +566,7 @@ Settings::Settings(FXMainWindow*w)
   style_reg=new FXSettings();
   app=w->getApp();
   style_file=((AppClass*)app)->ConfigDir()+STYLE_FILE;
-#ifdef FXITE_CHECK_XDG_CONFIG
   if (use_xdg_config()) { style_file.append(".rc"); }
-#endif
 
 #ifdef FOX_1_6
   // Fox-1.6 will choke reading string entries > 2000 chars, so rewrite

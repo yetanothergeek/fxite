@@ -82,7 +82,7 @@ public:
   const FXString &SocketName() { return sock_name; }
   const FXString &ServerName() { return server_name; }
   FXint run() { srv_commands=""; return FXApp::run(); }
-#ifdef FXITE_CHECK_XDG_CONFIG
+#ifndef FOX_1_6
   FXString migration_errors;
 #endif
 };
