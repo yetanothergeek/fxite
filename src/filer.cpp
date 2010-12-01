@@ -169,7 +169,15 @@ public:
       return filenames;
     }
     FXString getFilename() {
-      return filenames ? (*filenames) : FXFileDialog::getFilename();
+      if (getSelectMode()==SELECTFILE_ANY) {
+        FXString fn=FXFileDialog::getFilename();
+        if (FileDialogs::ReadShortcut(getShell(), fn)) {
+          FXFileDialog::setFilename(fn);
+        }
+        return FXFileDialog::getFilename();
+      } else {
+        return filenames ? (*filenames) : FXFileDialog::getFilename();
+      }
     }
     FXuint execute(FXuint placement=PLACEMENT_CURSOR) {
       DeleteFilenames();
@@ -178,6 +186,9 @@ public:
         filenames = FXFileDialog::getFilenames();
         own_filenames=true;
         if (filenames) {
+          if (getSelectMode()!=SELECTFILE_MULTIPLE) {
+            filenames[0]=FXFileDialog::getFilename();
+          }
           FixupShortcuts(getShell(), filenames);
           if (FXStat::isDirectory(filenames->text())) {
             setFilename("*");
