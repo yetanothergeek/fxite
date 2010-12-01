@@ -523,7 +523,10 @@ const char* SystemErrorStr()
       FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
       NULL, code, MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), lpMsgBuf, sizeof(lpMsgBuf), NULL);
   lpMsgBuf[sizeof(lpMsgBuf)-1]=0;
-  for (char*p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
+  char *p;
+  for (p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
+  p=strrchr((char*)lpMsgBuf, '\n');
+  if ( p && (*(p+1)=='\0')) { *p='\0'; }
   return (const char*)lpMsgBuf;
 }
 
