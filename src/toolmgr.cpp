@@ -618,7 +618,7 @@ bool ToolsDialog::SaveChanges()
             tree->PrevItem()->hasItems()?_("folder"):_("file"),
             _("from"), oldpath.text(),
             _("to"), newpath.text(),
-            strerror(errno));
+            SystemErrorStr());
       }
     }
   }
@@ -669,7 +669,7 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
           if (!FXDir::remove(remove_file)) {
             FXMessageBox::error(this, MBOX_OK, _("Delete failed"), "%s:\n%s\n%s\n",
               _("Unable to remove directory"),
-              remove_file.text(), strerror(errno)
+              remove_file.text(), SystemErrorStr()
             );
             return 1;
           }
@@ -688,7 +688,7 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
         {
           if (!FXFile::remove(remove_file)) {
             FXMessageBox::error(this, MBOX_OK, _("Delete failed"), "%s:\n%s\n\n%s\n",
-              _("Unable to delete file"), remove_file.text(), strerror(errno)
+              _("Unable to delete file"), remove_file.text(), SystemErrorStr()
             );
             return 1;
           }
@@ -748,7 +748,7 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
            srcname.text(),
           _("to"),
            dstname.text(),
-           strerror(errno));
+           SystemErrorStr());
         }
       }
     }

@@ -24,6 +24,7 @@
 
 #include "shmenu.h"
 #include "appwin.h"
+#include "compat.h"
 
 #include "intl.h"
 #include "tooltree.h"
@@ -187,7 +188,7 @@ void ToolsTree::MakeDummyMenu(FXTreeItem*parent_item)
   if (!FXDir::create(tmp)) {
     FXMessageBox::error(getShell(), MBOX_OK, _("File error"), "%s:\n%s\n\n%s",
       _("Failed to create temporary directory"),
-      tmp.text(), strerror(errno)
+      tmp.text(), SystemErrorStr()
     );
     dummy_item=NULL;
     return;
@@ -247,7 +248,7 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
   if (!FXFile::create(tmp,perm)) {
     FXMessageBox::error(getShell(), MBOX_OK, _("File error"), "%s:\n%s\n\n%s",
       _("Failed to create temporary file"),
-      tmp.text(), strerror(errno)
+      tmp.text(), SystemErrorStr()
     );
     dummy_item=NULL;
     return;

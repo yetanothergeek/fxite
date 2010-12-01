@@ -603,7 +603,7 @@ Settings::Settings(FXMainWindow*w)
   if ( (FXStat::exists(style_file)) && (!style_reg->parseFile(style_file, true))) {
     FXMessageBox::error(app,MBOX_OK,
       _("Configuration error"), "%s \n%s\n%s", _("Failed to read settings from"),
-      style_file.text(), strerror(errno)
+      style_file.text(), SystemErrorStr()
     );
   }
   ReadInt(ShowStatusBar,true);
@@ -820,7 +820,7 @@ Settings::~Settings()
   if (!style_reg->unparseFile(style_file)) {
     FXMessageBox::error(app,MBOX_OK,
       _("Configuration error"), "%s \n%s\n%s", _("Failed to save settings to"),
-      style_file.text(), strerror(errno)
+      style_file.text(), SystemErrorStr()
     );
   }
   delete style_reg;

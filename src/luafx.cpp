@@ -40,7 +40,31 @@ static FXWindow*main_window=NULL;
 
 static const char*default_title;
 
+#ifdef WIN32
 
+#include <windows.h>
+
+static const char* SystemErrorStr(DWORD *e=NULL)
+{
+  DWORD code=e?*e:GetLastError();
+  static TCHAR lpMsgBuf[512];
+  lpMsgBuf[0]=0;
+  FormatMessage(
+      FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL, code, MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), lpMsgBuf, sizeof(lpMsgBuf), NULL);
+  lpMsgBuf[sizeof(lpMsgBuf)-1]=0;
+  for (char*p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
+  return (const char*)lpMsgBuf;
+}
+
+#else
+
+static const char* SystemErrorStr(int *e=NULL)
+{
+  return strerror(e?*e:errno);
+}
+
+#endif
 
 static int ArgErrFmt(lua_State *L, int numarg, const char *fmt, ...)
 {
@@ -408,7 +432,7 @@ static int _stat(lua_State* L)
     return 1;
   }
   lua_pushnil(L);
-  lua_pushstring(L, strerror(errno));
+  lua_pushstring(L, SystemErrorStr());
   return 2;
 }
 
@@ -427,7 +451,7 @@ static int wkdir(lua_State* L)
       return 1;
     } else {
       lua_pushboolean(L, false);
-      lua_pushstring(L, strerror(errno));
+      lua_pushstring(L, SystemErrorStr());
       return 2;
     }
   }
@@ -450,7 +474,7 @@ static int mkdir(lua_State* L)
       dirs.append(parts.section(PATHSEP,i));
       if (!(FXStat::isDirectory(dirs)||FXDir::create(dirs,FXIO::OwnerFull))) {
         lua_pushboolean(L, false);
-        lua_pushstring(L, strerror(errno));
+        lua_pushstring(L, SystemErrorStr());
         return 2;
       }
       dirs.append(PATHSEP);
@@ -463,7 +487,7 @@ static int mkdir(lua_State* L)
       return 1;
     } else {
       lua_pushboolean(L, false);
-      lua_pushstring(L, strerror(errno));
+      lua_pushstring(L, SystemErrorStr());
       return 2;
     }
   }
@@ -508,9 +532,13 @@ static int dirlist(lua_State* L)
   const char*dn=luaL_optstring(L,1, ".");
   FXDir *dir=new FXDir(dn);
   if (!dir->isOpen()) {
+#ifdef WIN32
+    DWORD e=GetLastError();
+#else
     int e=errno;
+#endif
     delete dir;
-    return luaL_argerror(L,1,strerror(e));
+    return luaL_argerror(L,1,SystemErrorStr(&e));
   }
   lua_pushlightuserdata(L,dir);
   lua_pushcclosure(L,&dirlist_closure,1);

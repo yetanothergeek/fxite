@@ -26,6 +26,7 @@
 #include "scidoc.h"
 #include "export.h"
 #include "prefs.h"
+#include "compat.h"
 
 #include "intl.h"
 #include "filer.h"
@@ -283,7 +284,7 @@ bool FileDialogs::Export(SciDoc*sci,
       if (fclose(fp)==0) { return true; }
     }
     FXMessageBox::error(sci->getShell(),MBOX_OK,
-      _("Export error"), "%s:\n%s\n\n%s", _("Failed to save file"), saveName.text(), strerror(errno));
+      _("Export error"), "%s:\n%s\n\n%s", _("Failed to save file"), saveName.text(), SystemErrorStr());
   }
   return false;
 }

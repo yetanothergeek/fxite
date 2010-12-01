@@ -32,7 +32,7 @@
 static void AppendError(FXString &errors, const char*err, const FXString &filename) 
 {
   FXString tmp;
-  tmp.format("\n%s (%s): %s", err, strerror(errno), filename.text());
+  tmp.format("\n%s (%s): %s", err, SystemErrorStr(), filename.text());
   errors+=tmp;
 }
 

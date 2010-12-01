@@ -56,7 +56,7 @@ bool BackupMgr::MakePath(const FXString& path)
   for (i=1;i<nseps;i++) {
     dirs.append(parts.section(PATHSEP,i));
     if (!(IsDir(dirs)||FXDir::create(dirs,FXIO::OwnerFull))) {
-      lasterror=strerror(errno);
+      lasterror=SystemErrorStr();
       ErrorMessage(_("Failed to create backup directory"), dirs);
       return false;
     }

@@ -36,6 +36,7 @@ FXbool LocaleIsUTF8();
 #ifdef WIN32
 # define NULL_FILE "NUL"
   bool IsWin9x();
+  const char* SystemErrorStr();
 # if 1
   bool IsDir(const FXString &dn);
 # else
@@ -44,6 +45,7 @@ FXbool LocaleIsUTF8();
 #else
 # define NULL_FILE "/dev/null"
 # define IsDir(dn) (FXStat::isDirectory(dn))
+# define SystemErrorStr() (strerror(errno))
 #endif
 
 

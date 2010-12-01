@@ -249,7 +249,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
             "%s:\n%s\n%s",
              _("Failed to create the file"),
              fn.text(),
-             strerror(errno));
+             SystemErrorStr());
            return false;
          }
        }
@@ -960,10 +960,10 @@ FXbool TopWindow::close(FXbool notify)
        FXival wrote=0;
        wrote=fh.writeBlock(session_data.text(),session_data.length());
        if (!(fh.close() && (wrote==session_data.length()))) {
-         fxwarning(_(EXE_NAME": Could not save %s (%s)"), GetApp()->SessionFile().text(), strerror(errno));
+         fxwarning(_(EXE_NAME": Could not save %s (%s)"), GetApp()->SessionFile().text(), SystemErrorStr());
        }
      } else {
-       fxwarning(_(EXE_NAME": Could not open %s for writing (%s)"), GetApp()->SessionFile().text(), strerror(errno));
+       fxwarning(_(EXE_NAME": Could not open %s for writing (%s)"), GetApp()->SessionFile().text(), SystemErrorStr());
      }
      session_data="";
   }

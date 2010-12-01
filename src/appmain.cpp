@@ -212,7 +212,7 @@ static int create_socket(const char *filename, bool listening)
 
   sock = socket(PF_LOCAL, SOCK_DGRAM, 0);
   if (sock < 0) {
-    fxwarning(_("Error calling %s function: %s\n"), "socket", strerror(errno));
+    fxwarning(_("Error calling %s function: %s\n"), "socket", SystemErrorStr());
     exit(EXIT_FAILURE);
   }
 
@@ -223,7 +223,7 @@ static int create_socket(const char *filename, bool listening)
   size = SUN_LEN(&sa);
   if (listening) {
     if ( bind(sock, (struct sockaddr*)&sa, size) < 0 ) {
-      fxwarning(_("Error calling %s function: %s\n"), "bind", strerror(errno));
+      fxwarning(_("Error calling %s function: %s\n"), "bind", SystemErrorStr());
       exit(EXIT_FAILURE);
     }
   } else {
@@ -232,7 +232,7 @@ static int create_socket(const char *filename, bool listening)
         close(sock);
         return -1; // Stale socket, returning -1 tells us to delete it (see below).
       } else {
-        fxwarning(_("Error calling %s function: %s\n"), "connect", strerror(errno));
+        fxwarning(_("Error calling %s function: %s\n"), "connect", SystemErrorStr());
         exit(EXIT_FAILURE);
       }
     }
@@ -513,6 +513,20 @@ static void GetAppDataDir(FXString &AppDataDir)
   AppDataDir=FXPath::simplify(FXPath::absolute(AppDataDir));
 }
 
+
+const char* SystemErrorStr()
+{
+  DWORD code=GetLastError();
+  static TCHAR lpMsgBuf[512];
+  lpMsgBuf[0]=0;
+  FormatMessage(
+      FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL, code, MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), lpMsgBuf, sizeof(lpMsgBuf), NULL);
+  lpMsgBuf[sizeof(lpMsgBuf)-1]=0;
+  for (char*p=(char*)lpMsgBuf; *p; p++) { if (*p=='\r') { *p=' '; } }
+  return (const char*)lpMsgBuf;
+}
+
 #else
 static char display_opt[]="-display";
 #endif
@@ -532,7 +546,7 @@ void AppClass::CreatePathOrDie(const FXString &dirname)
   for (FXint i=1; i<=n; i++) {
     dn.append(dirname.section(PATHSEP,i));
     if (!(IsDir(dn)||FXDir::create(dn,FXIO::OwnerFull))) {
-      FXString msg= strerror(errno);
+      FXString msg=SystemErrorStr();
       fxwarning("\n%s: %s:\n    %s\n(%s)\n\n",
          getArgv()[0],
          _("FATAL: Failed to create directory path"),

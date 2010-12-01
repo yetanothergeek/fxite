@@ -204,7 +204,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       break;
     }
     case 'F': { // Failure, could not read the file.
-      _lasterror=strerror(errno);
+      _lasterror=SystemErrorStr();
       return false;
       break;
     }
@@ -230,7 +230,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       memset(buf,0,BUFSIZE);
       FXival n=fh.readBlock(buf,BUFSIZE-1);
       if (n<0) {
-        _lasterror=strerror(errno);
+        _lasterror=SystemErrorStr();
         rv=false;
         break;
       }
@@ -265,7 +265,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     }
     if (ro) { sendMessage(SCI_SETREADONLY,1,0); }
   } else {
-    _lasterror=strerror(errno);
+    _lasterror=SystemErrorStr();
     rv=false;
   }
   _loading=false;
@@ -302,7 +302,7 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
       return true;
     }
   }
-  _lasterror=strerror(errno);
+  _lasterror=SystemErrorStr();
   return false;
 }
 
@@ -934,7 +934,7 @@ int SciDoc::Stale() {
   if (_filename.empty()) { return 0; }
   FXStat info;
   if (!FXStat::statFile(_filename,info)) {
-     _lasterror=strerror(errno);
+     _lasterror=SystemErrorStr();
     return 2;
   }
   return ((info.modified() != _filetime))?1:0;
