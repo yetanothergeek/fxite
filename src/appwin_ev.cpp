@@ -1434,10 +1434,16 @@ long TopWindow::onOutlistPopup(FXObject*o, FXSelector sel, void*p)
     case ID_OUTLIST_COPY: {
       FXint i;
       FXString outclip="";
+      FXString newline="\n";
+      switch (prefs->DefaultFileFormat) {
+        case 0: { newline="\r\n"; break; }
+        case 1: { newline="\r";   break; }
+        case 2: { newline="\n";   break; }
+      }
       for (i=0; i<count; i++) {
         if (outlist->isItemSelected(i)) {
           outclip.append(outlist->getItemText(i));
-          outclip.append('\n');
+          outclip.append(newline);
         }
       }
       ControlDoc()->sendString(SCI_COPYTEXT,outclip.length(), outclip.text());
