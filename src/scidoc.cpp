@@ -276,7 +276,11 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
 
 bool SciDoc::SaveToFile(const char*filename, bool as_itself)
 {
+#ifdef WIN32
+  FXFile fh(filename, FXIO::WriteOnly|FXIO::Truncate|((FXStat::exists(filename))?0:FXIO::Create));
+#else
   FXFile fh(filename, FXIO::Writing);
+#endif
   _lasterror="";
   if (fh.isOpen()) {
     FXint len=sendMessage(SCI_GETLENGTH,0,0);
