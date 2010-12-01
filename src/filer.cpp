@@ -398,6 +398,7 @@ bool FileDialogs::GetOpenTagFilename(SciDoc*sci, FXString &filename)
   MyFileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_("Tag Files (TAGS,tags)\nAll Files (*)"));
   dlg.setDirectory(path);
+  dlg.setSelectMode(SELECTFILE_EXISTING);
   if (dlg.execute(PLACEMENT_OWNER)) {
     filename=dlg.getFilename().text();
   } else filename="";
