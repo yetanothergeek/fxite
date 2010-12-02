@@ -1,5 +1,5 @@
---- ../fox-1.7.20.orig/lib/FXFile.cpp	2009-06-24 23:39:57.000000000 -0500
-+++ ./lib/FXFile.cpp	2009-10-14 10:51:55.000000000 -0500
+--- ../fox-1.7.25.orig/lib/FXFile.cpp	2010-11-10 19:44:10.000000000 -0600
++++ ./lib/FXFile.cpp	2010-11-26 12:47:15.000000000 -0600
 @@ -389,14 +389,19 @@
  FXbool FXFile::rename(const FXString& srcfile,const FXString& dstfile){
    if(srcfile!=dstfile){

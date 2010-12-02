@@ -1,0 +1,15 @@
+--- ../fox-1.7.25.orig/lib/FXFileList.cpp	2010-09-01 21:34:53.000000000 -0500
++++ ./lib/FXFileList.cpp	2010-12-02 04:59:56.000000000 -0600
+@@ -1496,7 +1496,11 @@
+ 
+   // Assume not a link
+   islink=false;
+-
++#ifdef WIN32
++  if ((directory.length()==3) && (directory[1]==':') && (directory[2]=='\\')) {
++     directory.trunc(2);
++  }
++#endif
+   // Get directory stream pointer
+   if(dir.open(directory)){
+ 

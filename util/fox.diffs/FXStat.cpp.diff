@@ -1,5 +1,5 @@
---- ../fox-1.7.20.orig/lib/FXStat.cpp	2009-06-24 23:39:58.000000000 -0500
-+++ ./lib/FXStat.cpp	2009-10-13 18:53:19.000000000 -0500
+--- ../fox-1.7.25.orig/lib/FXStat.cpp	2010-09-01 21:34:53.000000000 -0500
++++ ./lib/FXStat.cpp	2010-12-02 04:31:47.000000000 -0600
 @@ -202,7 +202,7 @@
    info.fileIndex=0;
    info.fileSize=0;
@@ -9,7 +9,27 @@
  #ifdef UNICODE
      TCHAR buffer[MAXPATHLEN];
      HANDLE hfile;
-@@ -265,14 +265,16 @@
+@@ -261,18 +261,36 @@
+ #else
+     const FXTime seconds=1000000000;
+     struct stat data;
++#ifdef WIN32
++    if (strchr("/\\", file[file.length()-1])) {
++      FXString tmpname=file;
++      while ((!tmpname.empty()) && strchr("/\\", tmpname[tmpname.length()-1])) {
++        tmpname.trunc(tmpname.length()-1);
++      }
++      if ((tmpname.length()==2) && Ascii::isLetter(tmpname[0]) && (tmpname[1]==':')) {
++        tmpname+=PATHSEPSTRING;
++      }
++      if(tmpname.empty() || (::stat(tmpname.text(),&data)!=0)) { return false; }
++    } else {
++      if (::stat(file.text(),&data)!=0) { return false; }
++    }
++    {
++#else
+     if(::stat(file.text(),&data)==0){
++#endif
        info.modeFlags=(data.st_mode&0777);
        if(S_ISDIR(data.st_mode)) info.modeFlags|=FXIO::Directory;
        if(S_ISREG(data.st_mode)) info.modeFlags|=FXIO::File;
@@ -27,7 +47,7 @@
        info.userNumber=data.st_uid;
        info.groupNumber=data.st_gid;
        info.linkCount=data.st_nlink;
-@@ -479,7 +481,7 @@
+@@ -479,7 +497,7 @@
  // Return true if file exists
  FXbool FXStat::exists(const FXString& file){
    if(!file.empty()){
