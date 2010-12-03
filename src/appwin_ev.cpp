@@ -997,7 +997,11 @@ long TopWindow::onFileSave(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onFileSaveAs(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=ControlDoc();
-  filedlgs->SaveFileAs(sci);
+  FXString orig=sci->Filename();
+  if (filedlgs->SaveFileAs(sci)) {
+    if (!orig.empty()) { recent_files->prepend(orig); }
+    recent_files->remove(sci->Filename());
+  }
   return 1;
 }
 
