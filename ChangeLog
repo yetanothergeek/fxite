@@ -1,3 +1,45 @@
+2010-12-03
+  * Bump version to 0.7.
+  * Prevent running multiline commands from Tools menu input dialogs.
+  * Improved automatic sizing of custom dialogs.
+  * Updates and tweaks to FOX patches for Win9x compatibility.
+  * Respect newline format when copying from output pane to clipboard.
+  * Allow for manually-edited filename in file dialogs on Win32.
+  * Make sure file exists when loading "tags" file.
+  * Improve error reporting on MS-Windows.
+
+
+2010-11-30
+  * Fixed saving of "hidden" files on MS-Windows.
+  * New configuration directory and migration for MS-Windows.
+  * Added scripting function to return current configuration directory.
+  * Adjust window size according to screen size on first run.
+  * Fixed a serious crash bug with Fox-1.6 when editing file filters.
+  * Moved configuration directory from ~/.foxrc to XDG_CONFIG_HOME.
+
+
+2010-11-08
+  * Added "a68k" and "txt2tags" to language menu.
+  * Preserve clipboard data when closing a document that "owns" the clipboard.
+  * Check for valid working directory before running external command.
+  * Use tree-style dialog for pickfile() scripting function "dir" mode.
+  * Add menu command to change working directory.
+  * Improve handling of whitespace when parsing "shabang" line.
+  * Fix for strndup() portability issue for FreeBSD etc.
+  * Updated FXScintilla to version 2.22.0 (git 75b260a).
+
+
+2010-07-02
+  * Implemented four missing SCI_DEL* functions in macro recorder.
+  * Use "edge" instead of "line" for mode name in fxite.delete() function.
+  * Expanded functionality for the fxite.delete() function.
+  * Fix for format warning on 64 bit systems.
+
+
+2010-06-30
+  * VERSION 0.6 RELEASE.
+
+
 2010-06-22
   * Check for -v or -h command line options before initializing display.
   * Added the capability to use custom window icons.
