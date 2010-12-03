@@ -131,12 +131,8 @@ int FxAsqWin::Run(FxAsqItem**results)
 {
   Results=NULL;
   dlg->create();
-  FXint hgt=btnbox->getHeight()+userbox->getHeight();
-  dlg->setHeight(hgt);
-  FXint bbw=btnbox->getWidth();
-  FXint ubw=userbox->getWidth();
-  dlg->setWidth(ubw>bbw?ubw:bbw);
-
+  dlg->setWidth(dlg->getDefaultWidth());
+  dlg->setHeight(dlg->getDefaultHeight());
   for (FXint i=keylist.first(); i<=keylist.last(); i=keylist.next(i))
   {
     focused_btn=-1; // Focusing a button doesn't make much sense for interactive dialogs.
