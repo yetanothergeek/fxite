@@ -1364,6 +1364,19 @@ long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
 
 
 
+static bool AvoidMultiLineCommand(TopWindow*w, const FXString &cmd)
+{
+  if (cmd.contains('\n')) {
+    FXMessageBox::error(w, MBOX_OK, _("Command Error"),
+      _("Multiline commands are not supported."));
+    return false;
+  } else { 
+    return true;
+  }
+}
+
+
+
 long TopWindow::onFilterSel(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc *sci=FocusedDoc();
@@ -1379,11 +1392,14 @@ long TopWindow::onFilterSel(FXObject*o, FXSelector sel, void*p)
   }
   dlg->setNumColumns(48);
   if ( dlg->execute(PLACEMENT_OWNER) ) {
-    if ( save_first && (!SaveAll(true)) ) { return 1; }
     FXString cmd=dlg->getText();
-    FXString input="";
-    if (is_filter) { sci->GetSelText(input); }
-    FilterSelection(sci, cmd, input);
+    if (AvoidMultiLineCommand(this, cmd)) {
+      if ( (!save_first) || SaveAll(true) ) { 
+        FXString input="";
+        if (is_filter) { sci->GetSelText(input); }
+        FilterSelection(sci, cmd, input);
+      }
+    }
   }
   delete dlg;
   ClosedDialog();
@@ -1406,10 +1422,13 @@ long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
   HistBox *dlg= new HistBox(this, _("Run command"), _("Command:"), "Commands");
   dlg->setNumColumns(48);
   if ( dlg->execute(PLACEMENT_OWNER) ) {
-    if ( prefs->SaveBeforeExecCmd && (!SaveAll(true)) ) { return 1; }
     FXString cmd=dlg->getText();
-    ClosedDialog();
-    RunCommand(sci,cmd);
+    if (AvoidMultiLineCommand(this,cmd)) {
+      if ( (!prefs->SaveBeforeExecCmd) || SaveAll(true) ) {
+        ClosedDialog();
+        RunCommand(sci,cmd);
+      }
+    }
   } else {
     ClosedDialog();
   }
