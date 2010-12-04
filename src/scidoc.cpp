@@ -299,6 +299,7 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
         _filetime=FXStat::modified(_filename);
         sendMessage(SCI_SETSAVEPOINT,0,0);
       }
+      DoStaleTest(true);
       return true;
     }
   }
