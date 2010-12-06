@@ -368,7 +368,25 @@ long TopWindow::onOpenSelected(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc* sci=FocusedDoc();
   FXString filename="";
+  FXString line="";
+#ifndef WIN32
+  FXuchar*xsel=NULL;
+  FXuint xlen=0;
+  FXDragType types[] = { textType, utf8Type, stringType, 0 };
+  for ( FXDragType*type=types; *type; type++ ) {
+    if (getDNDData(FROM_SELECTION,*type, xsel, xlen) && xsel && *xsel) {
+      FXuchar*eol=(FXuchar*)memchr(xsel,'\n', xlen);
+      FXuint n = eol ? (eol-xsel) : xlen;
+      filename.assign((FXchar*)xsel,n);
+      filename=filename.simplify();
+      if (!FXStat::exists(filename.contains(':')?filename.section(':',0):filename)) { filename=""; }
+      break;
+    }
+    if ( filename.empty() ) { sci->GetSelText(filename); }
+  }
+#else
   sci->GetSelText(filename);
+#endif
   if (filename.empty()) { // Even if nothing is selected, look around for something that might be a filename...
     long max=sci->GetTextLength();
     if (max<=0) { return 1; }
@@ -390,17 +408,42 @@ long TopWindow::onOpenSelected(FXObject*o, FXSelector sel, void*p)
     range.lpstrText=(char*)calloc(len+1,1);
     sci->sendMessage(SCI_GETTEXTRANGE,0,reinterpret_cast<sptr_t>(&range));
     filename=range.lpstrText;
-    delete range.lpstrText;
+    free(range.lpstrText);
   }
   if (filename.empty()) { return 1; } // fail silently if we didn't find a phrase
+#ifdef WIN32
+  FXint colons=filename.contains(':');
+  if (FXPath::isAbsolute(filename)) {
+    if (colons>1) {
+      line=filename.section(':',2);
+      filename=filename.section(':',0,2);
+    }
+  } else {
+    if (colons>0) {
+      line=filename.section(':',1) ;
+      filename=filename.section(':',0);
+    }
+  }
+#else
+  if (filename.contains(':')) {
+    line=filename.section(':',1) ;
+    filename=filename.section(':',0);
+  }
+#endif
+  for (FXint i=0; i<line.length(); i++) {
+    if (!Ascii::isDigit(line[i])) {
+      line="";
+      break;
+    }
+  }
   if (FXStat::exists(filename)) {
-    OpenFile(filename.text(),NULL,false,true);
+    OpenFile(filename.text(),line.text(),false,true);
     return 1;
   } else {
     if (!(FXPath::isAbsolute(filename)||sci->Filename().empty())) {
       FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
       if (FXStat::exists(fullpath)) {
-        OpenFile(fullpath.text(),NULL,false,true);
+        OpenFile(fullpath.text(),line.text(),false,true);
         return 1;
       }
     }
