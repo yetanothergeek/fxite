@@ -284,11 +284,13 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
   _lasterror="";
   if (fh.isOpen()) {
     FXbool en=isEnabled();
+    FXbool hf=hasFocus();  
     if (en) { disable(); }
     FXint len=sendMessage(SCI_GETLENGTH,0,0);
     const char*buf=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
     FXival wrote=fh.writeBlock(buf,len);
     if (en) { enable(); }
+    if (hf) { setFocus(); }
     if (fh.close() && (wrote==len)) {
       if (as_itself) {
         if (_filename.empty() && !getLanguage()) {
