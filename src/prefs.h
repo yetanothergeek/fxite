@@ -24,9 +24,10 @@ Steps to adding a new preference:
   3. Be sure the ID_* is picked up by the SettingsMap macros in prefs.cpp
   4. Add a case to the switch statement in Settings::onChangeSetting to catch the new selector.
   5. Add a call in Settings::Settings to read your setting from the registry (or default value).
-  6  Add a call in Settings::~Settings to save your setting to the registry.
-  7. Add an adjustment widget to one of the tabs in PrefsDialog::Make*Tab() and set its target and selector, or...
-  8. In lieu of steps 2,3,4,7 you could add an item to the View menu and control the preference from there.
+  6. Add a call in Settings::~Settings to save your setting to the registry.
+  7. Add the variable name (as a string) to the appropriate *_keys[] array in prefs.cpp.
+  8. Add an adjustment widget to one of the tabs in PrefsDialog::Make*Tab() and set its target and selector, or...
+  9. In lieu of steps 2,3,4,8 you could add an item to the View menu and control the preference from there.
 */
 
 
