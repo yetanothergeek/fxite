@@ -1404,7 +1404,9 @@ long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
     sci->TabWidth(tab_width);
     sci->UseTabs(use_tabs);
   } else {
+    sci->TabWidth(sci->UseTabs()?prefs->TabWidth:prefs->IndentWidth);
     sci->sendMessage(msg,0,0);
+    sci->TabWidth(prefs->TabWidth);
   }
   return 1;
 }

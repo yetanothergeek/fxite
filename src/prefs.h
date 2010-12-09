@@ -111,6 +111,7 @@ public:
   FXint SearchOptions;
   FXlong ZoomFactor;
   FXint TabWidth;
+  FXint IndentWidth;
   FXint CaretWidth;
   FXint SmoothScroll;
   FXint WheelLines;
@@ -159,6 +160,7 @@ public:
     ID_SET_SHABANGS,
     ID_SET_MAX_FILES,
     ID_SET_TAB_WIDTH,
+    ID_SET_INDENT_WIDTH,
     ID_SET_CARET_WIDTH,
     ID_SET_WHEEL_LINES,
     ID_SET_SPLIT_VIEW,

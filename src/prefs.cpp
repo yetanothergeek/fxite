@@ -72,7 +72,12 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 {
   switch FXSELID(sel) {
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
-    case ID_TOGGLE_USE_TABS:    { UseTabs = !UseTabs; break; }
+    case ID_TOGGLE_USE_TABS:    { 
+      FXSpinner*spin=(FXSpinner*)(((FXCheckButton*)o)->getUserData());
+      UseTabs = !UseTabs; 
+      if (UseTabs) { spin->disable(); } else { spin->enable(); }
+      break;
+    }
     case ID_TOGGLE_BRACE_MATCH: { BraceMatch = !BraceMatch; break; }
     case ID_TOGGLE_ASK_CLOSE_MULTI_MENU: { PromptCloseMultiMenu = !PromptCloseMultiMenu; break; }
     case ID_TOGGLE_ASK_CLOSE_MULTI_EXIT: { PromptCloseMultiExit = !PromptCloseMultiExit; break; }
@@ -129,6 +134,12 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       FXSpinner*spin=(FXSpinner*)o;
       TabWidth=spin->getValue();
       LIMIT_RANGE(TabWidth,1,16);
+      break;
+    }
+    case ID_SET_INDENT_WIDTH: {
+      FXSpinner*spin=(FXSpinner*)o;
+      IndentWidth=spin->getValue();
+      LIMIT_RANGE(IndentWidth,1,16);
       break;
     }
     case ID_SET_CARET_WIDTH: {
@@ -446,6 +457,7 @@ static const char* edit_keys[] = {
   "SearchVerbose",
   "SearchOptions",
   "TabWidth",
+  "IndentWidth",
   "CaretWidth",
   "SmoothScroll",
   "WheelLines",
@@ -619,6 +631,7 @@ Settings::Settings(FXMainWindow*w)
   ReadInt(UseTabs,true);
   ReadInt(CaretPastEOL,false);
   ReadIntRng(TabWidth,4,1,16);
+  ReadIntRng(IndentWidth,TabWidth,1,16);
   ReadIntRng(CaretWidth,1,1,3);
   ReadIntRng(RightEdgeColumn,80,1,1024);
   ReadInt(ShowRightEdge,false);
@@ -770,6 +783,7 @@ Settings::~Settings()
   WriteInt(UseTabs);
   WriteInt(CaretPastEOL);
   WriteInt(TabWidth);
+  WriteInt(IndentWidth);
   WriteInt(CaretWidth);
   WriteInt(RightEdgeColumn);
   WriteInt(ShowRightEdge);
