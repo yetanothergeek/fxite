@@ -95,11 +95,16 @@ SciDoc::~SciDoc()
 long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
 {
   FXEvent*ev=(FXEvent*)p;
-  if ((ev->state & CONTROLMASK) && (ev->code==KEY_Tab) && (sendMessage(SCI_GETUSETABS, 0, 0)==0)) {
-    sendString(SCI_ADDTEXT, 1, "\t");
-    return 1;
-  } else {
-    return FXScintilla::onKeyPress(o,sel,p);
+  switch (ev->code) {
+    case KEY_Tab: { // Ctrl+Tab forces a tab when "UseTabs" is off
+      if ((ev->state & CONTROLMASK) && (sendMessage(SCI_GETUSETABS, 0, 0)==0)) {
+        sendString(SCI_ADDTEXT, 1, "\t");
+        return 1;
+      } // else fall through...
+    }
+    default: {
+      return FXScintilla::onKeyPress(o,sel,p);
+    }
   }
 }
 
