@@ -62,6 +62,7 @@ protected:
   inline bool IsBrace(long &pos);
   void GetSelection(CharacterRange &crange);
   bool DoLoadFromFile(const char*filename,bool insert=false);
+  void AdjustHScroll();
 public:
   SciDoc*Master() { return (SciDoc*)getPrev(); }
   SciDoc*Slave() { return (SciDoc*)getNext(); }

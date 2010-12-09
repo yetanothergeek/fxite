@@ -164,6 +164,27 @@ void SciDoc::SetEolModeFromContent()
 
 
 
+void SciDoc::AdjustHScroll()
+{
+  FXint linecount=sendMessage(SCI_GETLINECOUNT,0,0);
+  FXint widest=0;
+  FXint line=0;
+  for (FXint i=0; i<linecount; i++) {
+    FXint w=sendMessage(SCI_LINELENGTH,i,0);
+    if (w>widest) {
+      widest=w;
+      line=i;
+    }
+  }
+  FXint pos=sendMessage(SCI_GETLINEENDPOSITION,line,0);
+  FXint x=sendMessage(SCI_POINTXFROMPOSITION,0,pos);
+  if (sendMessage(SCI_GETSCROLLWIDTH,0,0)<x) { 
+    sendMessage(SCI_SETSCROLLWIDTH,x,0);
+  }
+}
+
+
+
 extern "C" {
   char get_file_encoding(const char*filename);
 }
@@ -283,6 +304,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
         SetEolModeFromContent();
         sendMessage(SCI_EMPTYUNDOBUFFER,0,0);
       }
+      AdjustHScroll();
     }
     if (ro) { sendMessage(SCI_SETREADONLY,1,0); }
   } else {
