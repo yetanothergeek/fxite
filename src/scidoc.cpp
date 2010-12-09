@@ -96,6 +96,12 @@ long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
 {
   FXEvent*ev=(FXEvent*)p;
   switch (ev->code) {
+    case KEY_Page_Up:
+    case KEY_Page_Down: {
+      long ret=FXScintilla::onKeyPress(o,sel,p);
+      sendMessage(SCI_SCROLLCARET,0,0);
+      return ret;
+    }
     case KEY_Tab: { // Ctrl+Tab forces a tab when "UseTabs" is off
       if ((ev->state & CONTROLMASK) && (sendMessage(SCI_GETUSETABS, 0, 0)==0)) {
         sendString(SCI_ADDTEXT, 1, "\t");
