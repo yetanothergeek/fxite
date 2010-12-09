@@ -116,6 +116,15 @@ long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
 
 
 
+void SciDoc::moveContents(FXint x,FXint y)
+{
+  FXScintilla::moveContents(x,y);
+  FXint sw=sendMessage(SCI_GETSCROLLWIDTH,0,0);
+  horizontal->setRange(sw);
+}
+
+
+
 void SciDoc::SetEolModeFromContent()
 {
   char*contents=(char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
