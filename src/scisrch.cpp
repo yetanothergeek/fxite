@@ -41,6 +41,7 @@ void SciSearch::SelectTarget(bool forward)
   } else {
     SciMsg(SCI_SETSEL, SciMsg(SCI_GETTARGETEND,0,0),   SciMsg(SCI_GETTARGETSTART,0,0) );
   }
+  SciMsg(SCI_SETXOFFSET,0,0);
   SciMsg(SCI_SCROLLCARET,0,0);
 }
 
