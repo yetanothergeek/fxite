@@ -80,7 +80,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   sendMessage(SCI_SETSCROLLWIDTH,4000,0);
   sendMessage(SCI_SETEDGECOLOUR,HexToRGB("#FF0000"),0);
   sendMessage(SCI_SETEOLMODE,Settings::instance()->DefaultFileFormat,0);
-  sendMessage(SCI_SETXCARETPOLICY,CARET_SLOP|CARET_STRICT,8);
+  sendMessage(SCI_SETXCARETPOLICY,CARET_SLOP,8);
 }
 
 
