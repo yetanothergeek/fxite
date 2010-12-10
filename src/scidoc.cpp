@@ -76,6 +76,10 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
     sendMessage(SCI_ASSIGNCMDKEY,(*c)+(SCMOD_CTRL<<16)+(SCMOD_SHIFT<<16),0);
   }
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME,SCI_HOME);
+  sendMessage(SCI_ASSIGNCMDKEY,SCK_DELETE+(SCMOD_CTRL<<16), 0);
+  sendMessage(SCI_ASSIGNCMDKEY,SCK_DELETE+(SCMOD_CTRL<<16)+(SCMOD_SHIFT<<16), 0);
+  sendMessage(SCI_ASSIGNCMDKEY,SCK_BACK+(SCMOD_CTRL<<16),   0);
+  sendMessage(SCI_ASSIGNCMDKEY,SCK_BACK+(SCMOD_CTRL<<16)+(SCMOD_SHIFT<<16), 0);
   sendMessage(SCI_SETSCROLLWIDTHTRACKING,true,0);
   sendMessage(SCI_SETSCROLLWIDTH,4000,0);
   sendMessage(SCI_SETEDGECOLOUR,HexToRGB("#FF0000"),0);

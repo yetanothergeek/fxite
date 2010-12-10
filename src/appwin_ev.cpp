@@ -82,6 +82,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_CUT,onCut),
   TWMAPFUNC(ID_COPY,onCopy),
   TWMAPFUNC(ID_PASTE,onPaste),
+  TWMAPFUNCS(ID_DEL_WORD_LEFT,ID_DEL_LINE_RIGHT,onDeleteChunk),
   TWMAPFUNC(ID_FIND,onFind),
   TWMAPFUNC(ID_FINDNEXT,onFindNext),
   TWMAPFUNC(ID_FINDPREV,onFindPrev),
@@ -1150,6 +1151,22 @@ long TopWindow::onPaste(FXObject*o, FXSelector sel, void*p)
     sci->sendMessage(SCI_PASTE,0,0);
     sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
   }
+  return 1;
+}
+
+
+
+long TopWindow::onDeleteChunk(FXObject*o, FXSelector sel, void*p)
+{
+  FXint cmd=0;
+  switch (FXSELID(sel)) {
+    case ID_DEL_WORD_LEFT:  { cmd=SCI_DELWORDLEFT;  break; }
+    case ID_DEL_WORD_RIGHT: { cmd=SCI_DELWORDRIGHT; break; }
+    case ID_DEL_LINE_LEFT:  { cmd=SCI_DELLINELEFT;  break; }
+    case ID_DEL_LINE_RIGHT: { cmd=SCI_DELLINERIGHT; break; }
+    default: return 1;
+  }
+  DOC_SEND(cmd);
   return 1;
 }
 

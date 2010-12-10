@@ -312,6 +312,15 @@ void TopWindow::CreateMenus()
   MkMnuCmd(editmenu,ID_CUT);
   MkMnuCmd(editmenu,ID_COPY);
   MkMnuCmd(editmenu,ID_PASTE);
+
+  editdeletemenu=new SubMenuPane(this);
+  NewCascade(editmenu,_("&Delete"),NULL,editdeletemenu);
+
+  MkMnuCmd(editdeletemenu,ID_DEL_WORD_LEFT);
+  MkMnuCmd(editdeletemenu,ID_DEL_WORD_RIGHT);
+  MkMnuCmd(editdeletemenu,ID_DEL_LINE_LEFT);
+  MkMnuCmd(editdeletemenu,ID_DEL_LINE_RIGHT);
+
   new FXMenuSeparator(editmenu, 0);
   MkMnuCmd(editmenu,ID_TOLOWER);
   MkMnuCmd(editmenu,ID_TOUPPER);
@@ -490,6 +499,7 @@ void TopWindow::DeleteMenus()
   delete tabordermenu;
   delete tabsidemenu;
   delete tabwidthmenu;
+  delete editdeletemenu;
   delete editindentmenu;
   delete editmenu;
   delete searchselectmenu;

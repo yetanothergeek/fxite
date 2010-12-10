@@ -78,6 +78,7 @@ private:
   TopMenuPane* toolsmenu;
   TopMenuPane* docmenu;
   TopMenuPane* helpmenu;
+  FXMenuPane* editdeletemenu;
   FXMenuPane* editindentmenu;
   FXMenuCheck* linenums_chk;
   FXMenuCheck* toolbar_chk;
@@ -226,6 +227,7 @@ public:
   long onCut(            FXObject*o, FXSelector sel, void*p );
   long onCopy(           FXObject*o, FXSelector sel, void*p );
   long onPaste(          FXObject*o, FXSelector sel, void*p );
+  long onDeleteChunk(    FXObject*o, FXSelector sel, void*p );
   long onFind(           FXObject*o, FXSelector sel, void*p );
   long onFindNext(       FXObject*o, FXSelector sel, void*p );
   long onFindPrev(       FXObject*o, FXSelector sel, void*p );
@@ -318,6 +320,10 @@ public:
     ID_CUT,
     ID_COPY,
     ID_PASTE,
+    ID_DEL_WORD_LEFT,
+    ID_DEL_WORD_RIGHT,
+    ID_DEL_LINE_LEFT,
+    ID_DEL_LINE_RIGHT,
     ID_SHOW_STATUSBAR,
     ID_FIND,
     ID_FINDNEXT,
