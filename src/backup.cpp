@@ -24,7 +24,6 @@
 #include <FXScintilla.h>
 
 
-#include "appmain.h"
 #include "scidoc.h"
 #include "compat.h"
 
@@ -34,11 +33,11 @@
 
 #define ErrorMessage(fmt, fn) \
 { \
-  if (((FXMainWindow*)app->MainWin())->shown()) { \
-    FXMessageBox::error((FXMainWindow*)app->MainWin(), \
+  if (mainwin->shown()) { \
+    FXMessageBox::error(mainwin, \
       MBOX_OK, _("Autosave Error"), "%s:\n%s\n(%s)", fmt,fn.text(), lasterror.text()); \
   } else { \
-    FXMessageBox::error(app, \
+    FXMessageBox::error(FXApp::instance(), \
       MBOX_OK, _("Autosave Error"), "%s:\n%s\n(%s)", fmt, fn.text(), lasterror.text()); \
   } \
 }
@@ -67,10 +66,10 @@ bool BackupMgr::MakePath(const FXString& path)
 
 
 
-BackupMgr::BackupMgr()
+BackupMgr::BackupMgr(FXMainWindow*w, const FXString &configdir)
 {
-  app=(AppClass*)FXApp::instance();
-  backupdir=app->ConfigDir();
+  mainwin=w;
+  backupdir=configdir;
   backupdir=FXPath::directory(backupdir);
   backupdir=FXPath::directory(backupdir);
   backupdir.append(PATHSEP);

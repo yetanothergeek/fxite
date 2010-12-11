@@ -19,14 +19,14 @@ class AppClass;
 
 class BackupMgr: public FXObject {
 private:
-  AppClass*app;
+  FXMainWindow*mainwin;
   bool MakePath(const FXString& path);
   FXString lasterror;
   FXString backupdir;
   void RemoveBackup(const FXString&filename);
 
 public:
-  BackupMgr();
+  BackupMgr(FXMainWindow*w, const FXString &configdir);
   bool SaveBackup(SciDoc*sci);
   void RemoveBackup(SciDoc*sci);
   const FXString &LastError();

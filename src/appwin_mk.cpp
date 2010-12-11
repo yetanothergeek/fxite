@@ -117,7 +117,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   filedlgs=new FileDialogs(this,ID_FILE_SAVED);
   filedlgs->patterns(prefs->FileFilters);
 
-  backups=new BackupMgr();
+  backups=new BackupMgr(this, GetApp()->ConfigDir());
 
   outpop=new FXMenuPane(outlist);
   new FXMenuCommand(outpop,_("Select &All"),NULL,this,ID_OUTLIST_ASEL);
