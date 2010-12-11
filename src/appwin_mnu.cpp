@@ -27,7 +27,6 @@
 #include <lua.h>
 
 #include "intl.h"
-#include "appmain.h"
 #include "scidoc.h"
 #include "prefs.h"
 #include "shmenu.h"
@@ -35,6 +34,7 @@
 #include "menuspec.h"
 #include "fxasq.h"
 #include "compat.h"
+#include "appname.h"
 #include "appwin.h"
 
 #define TEST_SOMETHING 0
@@ -70,7 +70,7 @@ public:
   TopMenuPane(FXComposite*o):FXMenuPane(o) {}
   long onCmdUnpost(FXObject*o, FXSelector sel, void*p ){
     long rv=FXMenuPane::onCmdUnpost(o,sel,p);
-    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
+    getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
     return rv;
   }
 };
@@ -423,25 +423,25 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(toolsmenu, 0);
 
   FXString scriptdir;
-  scriptdir.format("%s%s", GetApp()->ConfigDir().text(), "tools");
+  scriptdir.format("%s%s", ConfigDir().text(), "tools");
   FXDir::create(scriptdir);
 
-  scriptdir.format("%s%s%c%s", GetApp()->ConfigDir().text(), "tools", PATHSEP, "commands");
+  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "commands");
   FXDir::create(scriptdir);
   usercmdmenu=new UserMenu(toolsmenu, _("&Commands"), scriptdir, this, ID_USER_COMMAND, usercmdflags);
   usercmdmenu->helpText(_("Commands: Execute a command and send its output to the output pane."));
 
-  scriptdir.format("%s%s%c%s", GetApp()->ConfigDir().text(), "tools", PATHSEP, "filters");
+  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "filters");
   FXDir::create(scriptdir);
   userfiltermenu=new UserMenu(toolsmenu, _("&Filters"), scriptdir, this, ID_USER_FILTER);
   userfiltermenu->helpText(_("Filters: Pipe selected text to a command and replace with its output."));
 
-  scriptdir.format("%s%s%c%s", GetApp()->ConfigDir().text(), "tools", PATHSEP, "snippets");
+  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "snippets");
   FXDir::create(scriptdir);
   usersnipmenu=new UserMenu(toolsmenu, _("&Snippets"), scriptdir, this, ID_USER_SNIPPET,usersnipflags);
   usersnipmenu->helpText(_("Snippets: Insert the text of a file or the output of a command."));
 
-  scriptdir.format("%s%s%c%s", GetApp()->ConfigDir().text(), "tools", PATHSEP, "macros");
+  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "macros");
   FXDir::create(scriptdir);
   usermacromenu=new UserMenu(toolsmenu, _("&Macros"), scriptdir, this, ID_USER_MACRO);
   usermacromenu->helpText(_("Macros: Execute a Lua macro using the built-in interpreter."));
@@ -759,7 +759,7 @@ public:
       FXButton(p,text,NULL,tgt,sel,FRAME_RAISED|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0) {}
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
     long rv=FXButton::onLeftBtnRelease(o,sel,p);
-    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
+    getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
     return rv;
   }
 };
@@ -782,7 +782,7 @@ public:
                         FRAME_RAISED|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE,0,0,24,24,2,2,0,0) {}
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
     long rv=FXToggleButton::onLeftBtnRelease(o,sel,p);
-    getApp()->addChore(GetApp()->MainWin(),TopWindow::ID_FOCUS_DOC,NULL);
+    getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
     return rv;
   }
 };

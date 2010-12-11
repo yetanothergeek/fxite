@@ -32,7 +32,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
 #include <SciLexer.h>
 #include <FXScintilla.h>
 
-#include "appmain.h"
+#include "appname.h"
 #include "scidoc.h"
 #include "prefs.h"
 #include "lang.h"

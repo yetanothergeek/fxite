@@ -21,7 +21,7 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appmain.h"
+#include "appname.h"
 #include "appwin.h"
 #include "luacmds.h"
 #include "luafuncs.h"

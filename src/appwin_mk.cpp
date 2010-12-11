@@ -25,6 +25,7 @@
 #include <FXScintilla.h>
 
 #include "compat.h"
+#include "appname.h"
 #include "appmain.h"
 #include "scidoc.h"
 #include "filer.h"
@@ -51,17 +52,25 @@
 
 
 static bool topwin_closing = false;
+static TopWindow* global_top_window_instance=NULL;
+
 
 bool TopWindow::Closing() { return topwin_closing; }
 
+TopWindow* TopWindow::instance() { return global_top_window_instance; }
+
+const FXString& TopWindow::ConfigDir() { return ((AppClass*)(FXApp::instance()))->ConfigDir(); }
+
+
+#define SessionFile() (((AppClass*)getApp())->SessionFile())
 
 TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
 {
-  ((AppClass*)a)->MainWin(this);
+  FXASSERT(!global_top_window_instance);
   StyleDef*sd=GetStyleFromId(Settings::globalStyle(), STYLE_CALLTIP);
   RgbToHex(getApp()->getTipbackColor(), sd->bg);
   RgbToHex(getApp()->getTipforeColor(), sd->fg);
-  prefs=new Settings(this);
+  prefs=new Settings(this, ConfigDir());
 
   need_status=0;
   SciDoc::DefaultStyles(prefs->Styles());
@@ -117,7 +126,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   filedlgs=new FileDialogs(this,ID_FILE_SAVED);
   filedlgs->patterns(prefs->FileFilters);
 
-  backups=new BackupMgr(this, GetApp()->ConfigDir());
+  backups=new BackupMgr(this, ConfigDir());
 
   outpop=new FXMenuPane(outlist);
   new FXMenuCommand(outpop,_("Select &All"),NULL,this,ID_OUTLIST_ASEL);
@@ -180,6 +189,7 @@ TopWindow::~TopWindow()
   delete getIcon();
   delete getMiniIcon();
   delete toolbar_font;
+  global_top_window_instance=NULL;
 }
 
 
@@ -446,7 +456,7 @@ bool TopWindow::RunHookScript(const char*hookname)
   static bool running_hook_script=false;
   FXString hook;
   if (running_hook_script) { return false; }
-  hook.format("%s%s%c%s%c%s.lua", GetApp()->ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, hookname);
+  hook.format("%s%s%c%s%c%s.lua", ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, hookname);
   if (FXStat::isFile(hook)) {
    bool rv;
    running_hook_script=true;
@@ -955,15 +965,15 @@ FXbool TopWindow::close(FXbool notify)
   }
 
   if (!session_data.empty()) {
-     FXFile fh(GetApp()->SessionFile(), FXIO::Writing);
+     FXFile fh(SessionFile(), FXIO::Writing);
      if (fh.isOpen()) {
        FXival wrote=0;
        wrote=fh.writeBlock(session_data.text(),session_data.length());
        if (!(fh.close() && (wrote==session_data.length()))) {
-         fxwarning(_(EXE_NAME": Could not save %s (%s)"), GetApp()->SessionFile().text(), SystemErrorStr());
+         fxwarning(_(EXE_NAME": Could not save %s (%s)"), SessionFile().text(), SystemErrorStr());
        }
      } else {
-       fxwarning(_(EXE_NAME": Could not open %s for writing (%s)"), GetApp()->SessionFile().text(), SystemErrorStr());
+       fxwarning(_(EXE_NAME": Could not open %s for writing (%s)"), SessionFile().text(), SystemErrorStr());
      }
      session_data="";
   }
@@ -1032,7 +1042,7 @@ void TopWindow::ParseCommands(FXString &commands)
               session_restored=true;
               FXString sessionname;
               FXival count;
-              FXFile fh(GetApp()->SessionFile(), FXIO::Reading);
+              FXFile fh(SessionFile(), FXIO::Reading);
               if (fh.isOpen()) {
                 session_data.length(fh.size());
                 count=fh.readBlock((void*)(session_data.text()),fh.size());
@@ -1200,7 +1210,7 @@ const
 
 void TopWindow::create()
 {
-  AppClass* a=GetApp();
+  AppClass* a=(AppClass*)getApp();
   a->setWheelLines(prefs->WheelLines);
   position(prefs->Left, prefs->Top,prefs->Width,prefs->Height);
 
@@ -1212,7 +1222,7 @@ void TopWindow::create()
   show(prefs->placement);
 
   FXIcon*ico=NULL;
-  FXString icon_file=GetApp()->ConfigDir()+"icon.xpm";
+  FXString icon_file=ConfigDir()+"icon.xpm";
   if (FXStat::isFile(icon_file)) {
     FXFileStream*icon_strm=new FXFileStream();
     if (icon_strm->open(icon_file.text(),FXStreamLoad)) {
@@ -1231,14 +1241,14 @@ void TopWindow::create()
   if (!ico) { ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP); }
   ico->create();
   setIcon(ico);
-  SetupXAtoms(this, ((AppClass*)(getApp()))->ServerName().text());
+  SetupXAtoms(this, a->ServerName().text());
   if (prefs->Maximize) { maximize(); }
   FXFont fnt(a, prefs->FontName, prefs->FontSize/10);
   GetFontDescription(prefs->fontdesc,&fnt);
   outpop->create();
   recent_files->create();
   unloadtagsmenu->create();
-  save_hook.format("%s%s%c%s%c%s.lua", GetApp()->ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, "saved");
+  save_hook.format("%s%s%c%s%c%s.lua", ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, "saved");
   RunHookScript("startup");
   ParseCommands(a->Commands());
   if (tabbook->numChildren()==0) { NewFile(false); }

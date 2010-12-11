@@ -17,7 +17,7 @@ noinst_HEADERS=\
   appmain.h appwin.h runcmd.h export.h filer.h help.h helptext.h help_lua.h histbox.h lang.h \
   luacmds.h luafuncs.h macro.h prefdlg.h prefs.h readtags.h recorder.h scidoc.h scisrch.h search.h \
   shmenu.h sl.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
-  fxasq_lua.h luasci.h intl.h compat.h menuspec.h filterdlg.h listdlls.h luafx.h
+  fxasq_lua.h luasci.h intl.h compat.h menuspec.h filterdlg.h listdlls.h luafx.h appname.h
 
 
 EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt help_lua.txt

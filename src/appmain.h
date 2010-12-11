@@ -17,20 +17,6 @@
 */
 
 
-
-#ifndef VERSION
-# define VERSION "0.0.0"
-#endif
-
-
-
-#define EXE_NAME "fxite"
-#define APP_VENDOR EXE_NAME
-#define APP_NAME "FXiTe"
-#define GetApp() ((AppClass*)getApp())
-#define AppClass FXiTe
-
-
 class TopWindow;
 class Server;
 

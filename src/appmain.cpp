@@ -33,6 +33,7 @@
 
 #include <fx.h>
 
+#include "appname.h"
 #include "compat.h"
 #include "appwin.h"
 

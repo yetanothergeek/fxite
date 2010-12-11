@@ -19,7 +19,7 @@
 #include <cctype>
 
 #include <fx.h>
-#include "appmain.h"
+#include "appname.h"
 #include "appwin.h"
 #include "lang.h"
 
@@ -335,7 +335,7 @@ void MenuMgr::PurgeTBarCmds()
         if (toolbar_buttons[j]==spec->sel) { toolbar_buttons[j]=0; }
       }
       // If any toolbar button holds a reference to this spec, make sure we set it to NULL...
-      ((AppClass*)(FXApp::instance()))->MainWin()->ForEachToolbarButton(RemoveTBarBtnDataCB,spec);
+      TopWindow::instance()->ForEachToolbarButton(RemoveTBarBtnDataCB,spec);
       delete spec;
       custom_commands[i]=NULL;
     }
@@ -369,7 +369,7 @@ void MenuMgr::GetTBarBtnTip(MenuSpec*spec, FXString &tip)
     tip=spec->ms_mc->getText();
     if (spec->type=='u') {
       tip=(const char*)spec->ms_mc->getUserData();
-      tip.erase(0,((AppClass*)(FXApp::instance()))->ConfigDir().length());
+      tip.erase(0,TopWindow::ConfigDir().length());
       FXString path=FXPath::directory(tip);
 #ifdef WIN32
       path.substitute(PATHSEP,'/');
@@ -478,7 +478,7 @@ void MenuMgr::RemoveTBarUsrCmd(MenuSpec*spec)
     if (custom_commands[i]==spec) {
       custom_commands[i]=NULL;
       // If any toolbar button holds a reference to this spec, make sure we set it to NULL...
-      ((AppClass*)(FXApp::instance()))->MainWin()->ForEachToolbarButton(RemoveTBarBtnDataCB,spec);
+      TopWindow::instance()->ForEachToolbarButton(RemoveTBarBtnDataCB,spec);
     }
   }
   if (spec->btn_txt) free((char*)spec->btn_txt);

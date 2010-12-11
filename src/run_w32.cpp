@@ -25,7 +25,8 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appmain.h"
+#include "appname.h"
+#include "appwin.h"
 
 #include "listdlls.h"
 
@@ -233,7 +234,7 @@ bool CmdIO::run(const char *command, bool*canceler)
   } else {   // Create only input pipe, use temp files for stdout and stderr...
     if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
     if (!SetupHandle(stdinFD)) { CleanupAndReturn("setting up stdin", false); }
-    const char*cfgdir=(const char*)((AppClass*)app)->ConfigDir().text();
+    const char*cfgdir=TopWindow::ConfigDir().text();
     if (!GetTempFileName(cfgdir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
     if (!GetTempFileName(cfgdir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }
     StdOUT_Wr=CreateFile(TempOut,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);

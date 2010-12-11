@@ -25,7 +25,7 @@
 #include "sl.h"
 
 #include "compat.h"
-#include "appmain.h"
+#include "appname.h"
 #include "macro.h"
 
 #include "intl.h"

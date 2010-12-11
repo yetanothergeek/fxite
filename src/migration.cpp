@@ -26,7 +26,7 @@
 
 #include "intl.h"
 #include <errno.h>
-#include "appmain.h"
+#include "appname.h"
 
 
 static void AppendError(FXString &errors, const char*err, const FXString &filename) 

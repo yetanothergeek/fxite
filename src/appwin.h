@@ -451,5 +451,7 @@ public:
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
   FXID GetActiveWindow();
   void AdjustIndent(SciDoc*sci,char ch);
+  static TopWindow* instance();
+  static const FXString& ConfigDir();
 };
 

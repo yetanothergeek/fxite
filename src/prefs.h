@@ -60,7 +60,7 @@ class Settings: public FXObject {
   StyleDef *styles;
   Settings() {}
 public:
-  Settings(FXMainWindow*w);
+  Settings(FXMainWindow* w, const FXString& configdir);
   ~Settings();
 
   FXulong ShowStatusBar:1;

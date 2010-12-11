@@ -34,7 +34,6 @@
 #include "doctabs.h"
 #include "filer.h"
 #include "prefs.h"
-#include "appmain.h"
 #include "scisrch.h"
 #include "luasci.h"
 
@@ -1268,7 +1267,7 @@ static int lexer(lua_State* L)
 
 static int configdir(lua_State* L)
 {
-  lua_pushstring(L,((AppClass*)(tw->getApp()))->ConfigDir().text());
+  lua_pushstring(L,tw->ConfigDir().text());
   return 1;
 }
 

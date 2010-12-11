@@ -24,7 +24,6 @@
 #include <FXScintilla.h>
 
 #include "compat.h"
-#include "appmain.h"
 #include "scidoc.h"
 #include "lang.h"
 #include "search.h"
@@ -569,7 +568,7 @@ static FXint ReadRegInt(FXRegistry *reg, const char*key, FXint def, FXint min=0,
 #endif
 
 
-Settings::Settings(FXMainWindow*w)
+Settings::Settings(FXMainWindow*w, const FXString &configdir)
 {
   FXASSERT(!global_settings_instance);
   global_settings_instance=this;
@@ -577,7 +576,7 @@ Settings::Settings(FXMainWindow*w)
   reg=&(w->getApp()->reg());
   style_reg=new FXSettings();
   app=w->getApp();
-  style_file=((AppClass*)app)->ConfigDir()+STYLE_FILE;
+  style_file=configdir+STYLE_FILE;
   if (use_xdg_config()) { style_file.append(".rc"); }
 
 #ifdef FOX_1_6
