@@ -410,7 +410,7 @@ public:
   FXApp* getApp() const { return (FXApp*)FXMainWindow::getApp(); }
   bool OpenFile(const char*caption, const char*rowcol, bool readonly, bool hooked);
   bool NewFile(bool hooked);
-  void ParseCommands(const FXString &commands);
+  void ParseCommands(FXString &commands);
   bool CloseFile(bool close_last, bool hooked);
   bool CloseAll(bool close_last);
   bool IsMacroCancelled();

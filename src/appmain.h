@@ -76,7 +76,7 @@ public:
   void exit(FXint code);
   virtual void init(int& argc,char** argv,bool connect=TRUE);
   bool IsServer() { return is_server; }
-  const FXString &Commands() { return srv_commands; }
+  FXString &Commands() { return srv_commands; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
   const FXString &SocketName() { return sock_name; }

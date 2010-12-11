@@ -54,22 +54,7 @@ FXIMPLEMENT(FXiTe,FXApp,AppMap,ARRAYNUMBER(AppMap));
 
 
 void AppClass::ExecuteClientRequest() {
-  bool quiet=false;
-  if (compare(cli_commands,"-q\n",2)==0) {
-    quiet=true;
-    cli_commands=cli_commands.erase(0,3);
-  }
-  if (cli_commands.contains("\n-q\n")) {
-    quiet=true;
-    cli_commands=cli_commands.substitute("\n-q\n","\n",true);
-  }
-  if (!quiet) {
-    mainwin->hide();
-    mainwin->show();
-    runWhileEvents();
-  }
   mainwin->ParseCommands(cli_commands);
-  cli_commands="";
 }
 
 

@@ -989,7 +989,7 @@ FXbool TopWindow::close(FXbool notify)
 
 
 
-void TopWindow::ParseCommands(const FXString &commands)
+void TopWindow::ParseCommands(FXString &commands)
 {
   FXString sect="";
   FXString rowcol="";
@@ -999,6 +999,11 @@ void TopWindow::ParseCommands(const FXString &commands)
   bool macopt=false;
   bool session_restored=false;
   int i=0;
+  if (!((compare(commands,"-q\n",2)==0) || (commands.contains("\n-q\n")))) {
+    hide();
+    show();
+    getApp()->runWhileEvents();
+  }
   while (1) {
     sect=commands.section('\n',i++);
     if (sect.empty()) { break; }
@@ -1033,7 +1038,6 @@ void TopWindow::ParseCommands(const FXString &commands)
                 count=fh.readBlock((void*)(session_data.text()),fh.size());
                 fh.close();
                 ParseCommands(session_data);
-                session_data="";
               }
             }
             break;
@@ -1086,6 +1090,7 @@ void TopWindow::ParseCommands(const FXString &commands)
       }
     }
   }
+  commands=FXString::null;
 }
 
 
