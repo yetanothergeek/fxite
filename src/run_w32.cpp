@@ -26,7 +26,6 @@
 
 #include "compat.h"
 #include "appmain.h"
-#include "appwin.h"
 
 #include "listdlls.h"
 
