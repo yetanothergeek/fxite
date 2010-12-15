@@ -34,7 +34,7 @@ private:
   void CreatePathOrDie(const FXString &dirname);
   void CreateConfigDir();
 #ifdef WIN32
-  FXString SendToServer;
+  FXString SentToServer;
   virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
 #else
   int sock_fd;

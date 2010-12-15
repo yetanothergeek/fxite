@@ -101,15 +101,15 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
           // We are the client, and the server acknowledged out initial request...
           server_id=wParam;
           char* lpCommand;
-          hCommand = GlobalAlloc(GMEM_MOVEABLE, SendToServer.length()+1);
+          hCommand = GlobalAlloc(GMEM_MOVEABLE, SentToServer.length()+1);
           if (!hCommand) {break;}
           lpCommand = (char*)GlobalLock(hCommand);
           if (!lpCommand) {
             GlobalFree(hCommand);
             break;
           }
-          strncpy(lpCommand,SendToServer.text(),SendToServer.length());
-          lpCommand[SendToServer.length()]='\0';
+          strncpy(lpCommand,SentToServer.text(),SentToServer.length());
+          lpCommand[SentToServer.length()]='\0';
           GlobalUnlock(hCommand);
           if (PostMessage((HWND)server_id,WM_DDE_EXECUTE,tmpwin_id,PackDDElParam(WM_DDE_EXECUTE,0,(UINT)hCommand))) {
             found_server=true;
@@ -147,7 +147,7 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
 
 bool AppClass::InitClient()
 {
-  SendToServer="";
+  SentToServer="";
   ClientParse();
   sock_name.prepend(APP_NAME);
   FXMainWindow*tmpwin=new FXMainWindow(this,EXE_NAME"_tmpwin");
@@ -279,7 +279,7 @@ long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 
 
 #ifdef WIN32
-# define AppendToServer(s,n) SendToServer.append(s)
+# define AppendToServer(s,n) SentToServer.append(s)
 #else
 # define AppendToServer(s,n) write(sock_fd,s,n);
 #endif
