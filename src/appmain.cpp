@@ -147,23 +147,22 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
 
 bool AppClass::InitClient()
 {
-  SentToServer="";
   ClientParse();
   sock_name.prepend(APP_NAME);
-  FXMainWindow*tmpwin=new FXMainWindow(this,EXE_NAME"_tmpwin");
-  tmpwin->getParent()->create();
-  tmpwin->create();
-  tmpwin_id=(WPARAM)tmpwin->id();
+  FXMainWindow tmpwin(this,EXE_NAME"_tmpwin");
+  create();
+  tmpwin.create();
+  tmpwin_id=(WPARAM)tmpwin.id();
   MakeAtoms();
-  SendMessage((HWND)HWND_BROADCAST,WM_DDE_INITIATE,(WPARAM)tmpwin->id(),atoms);
+  SendMessage((HWND)HWND_BROADCAST,WM_DDE_INITIATE,tmpwin_id,atoms);
   for (FXint i=0; i<5; i++) {
     runWhileEvents();
     if (found_server) break;
     fxsleep(100000);
   }
   KillAtoms();
-  tmpwin->destroy();
-  delete tmpwin;
+  tmpwin.destroy();
+  SentToServer=FXString::null;
   return found_server;
 }
 
