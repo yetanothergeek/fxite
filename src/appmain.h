@@ -67,7 +67,6 @@ public:
   const FXString &SessionFile() { return sessionfile; }
   const FXString &SocketName() { return sock_name; }
   const FXString &ServerName() { return server_name; }
-  FXint run() { srv_commands=""; return FXApp::run(); }
 #ifndef FOX_1_6
   FXString migration_errors;
 #endif
