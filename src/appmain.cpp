@@ -176,8 +176,7 @@ long AppClass::onSocketRead(FXObject*o,FXSelector sel,void*p)
   char buf[bufsize];
   bool eod=false;
   while (1) {
-    memset(buf,0,sizeof(buf));
-    len=read(sock_fd,buf,sizeof(buf)-1);
+    len=read(sock_fd,buf,bufsize);
     if (len>0) {
       ReceivedFromClient.append(buf, len);
     }
