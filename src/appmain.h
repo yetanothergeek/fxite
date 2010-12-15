@@ -34,7 +34,6 @@ private:
   void CreatePathOrDie(const FXString &dirname);
   void CreateConfigDir();
 #ifdef WIN32
-  FXString SentToServer;
   virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
 #else
   int sock_fd;
@@ -44,6 +43,7 @@ private:
   bool InitServer();
   FXString ServerCmdLineArgs;
   FXString ReceivedFromClient;
+  FXString SentToServer;
   FXString configdir;
   FXString sessionfile;
 public:
@@ -65,7 +65,6 @@ public:
   FXString &Commands() { return ServerCmdLineArgs; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
-  const FXString &SocketName() { return sock_name; }
   const FXString &ServerName() { return server_name; }
 #ifndef FOX_1_6
   FXString migration_errors;

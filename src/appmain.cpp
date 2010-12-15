@@ -228,21 +228,34 @@ static int create_socket(const char *filename, bool listening)
 
 bool AppClass::InitClient()
 {
+  ClientParse();
   FXStat st;
+  bool found_server=false;
   if ( FXStat::statFile(sock_name, st) && st.isSocket() ) {
     sock_fd=create_socket(sock_name.text(), false);
-    if (sock_fd<0) {
-      // Probably a stale socket from a previous crash -
-      // So remove it, and try server mode instead.
+    if (sock_fd>=0) {
+      const char*p=SentToServer.text();
+      FXint rem=SentToServer.length()+1;
+      while (rem>0) {
+        ssize_t wrote=write(sock_fd,(const void*)p,rem>1024?1024:rem);
+        if (wrote>=0) {
+          rem-=wrote;
+          p+=wrote;
+        } else {
+          break;
+        }
+      }
+      close(sock_fd);
+      found_server=true;
+    } else {
+      // The socket exists, but the connection failed!
+      // Probably a stale socket from a previous incomplete shutdown -
+      // So remove the socket, and try server mode instead.
       FXFile::remove(sock_name);
-      return false;
     }
-    ClientParse();
-    close(sock_fd);
-    return true;
-  } else {
-    return false;
   }
+  SentToServer=FXString::null;
+  return found_server;
 }
 
 
@@ -276,15 +289,11 @@ long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 
 
 
-#ifdef WIN32
-# define AppendToServer(s,n) SentToServer.append(s)
-#else
-# define AppendToServer(s,n) write(sock_fd,s,n);
-#endif
 void AppClass::ClientParse()
 {
   bool skip_next=false;
   bool is_macro=false;
+  SentToServer=FXString::null;
   for (FXint i=1; i<getArgc(); i++) {
     if (skip_next) {
       skip_next=false;
@@ -296,7 +305,7 @@ void AppClass::ClientParse()
       if ( (arg[0]=='-') && (arg[1]=='e') ) { is_macro=true; }
       if ( (!strchr("-+",arg[0])) && FXStat::exists(arg) && FXStat::isFile(arg) ) {
         FXString filename=FXPath::absolute(arg);
-        AppendToServer(filename.text(),filename.length());
+        SentToServer.append(filename.text());
       } else {
         if ( (arg[0]=='-') && (strchr("cs", arg[1])) ) {
           if ( arglen == 2 ) {
@@ -305,22 +314,22 @@ void AppClass::ClientParse()
           }
         } else {
           if ( (strchr("-+",arg[0])) ) {
-            AppendToServer(arg,arglen);
+            SentToServer.append(arg);
           } else {
             if (is_macro) {
-              AppendToServer(arg,arglen);
+              SentToServer.append(arg);
               is_macro=false;
             } else {
               FXString filename=FXPath::absolute(arg);
-              AppendToServer(filename.text(),filename.length());
+              SentToServer.append(filename.text());
             }
           }
         }
       }
-      AppendToServer("\n", 1);
+      SentToServer.append("\n");
     }
   }
-  AppendToServer("\n\n", 2);
+  SentToServer.append("\n\n");
 }
 
 
