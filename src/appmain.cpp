@@ -354,6 +354,7 @@ bool AppClass::InitServer()
   }
   while (srv_commands.contains("\n\n")) { srv_commands.substitute("\n\n", "\n", true); }
   srv_commands.append("\n\n");
+  while (srv_commands[0]=='\n') { srv_commands.erase(0,1); }
 
 #ifdef WIN32
   MakeAtoms();
@@ -729,7 +730,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
   sock_name.prepend(serverdir);
 #endif
   if ( !InitClient() ) { InitServer(); }
-  while (srv_commands[0]=='\n') { srv_commands.erase(0,1); }
 }
 
 
