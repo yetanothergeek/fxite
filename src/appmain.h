@@ -34,7 +34,7 @@ private:
   void CreatePathOrDie(const FXString &dirname);
   void CreateConfigDir();
 #ifdef WIN32
-  FXString dde_string;
+  FXString SendToServer;
   virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
 #else
   int sock_fd;
@@ -42,8 +42,8 @@ private:
   bool is_server;
   bool InitClient();
   bool InitServer();
-  FXString srv_commands;
-  FXString cli_commands;
+  FXString ServerCmdLineArgs;
+  FXString ReceivedFromClient;
   FXString configdir;
   FXString sessionfile;
 public:
@@ -62,7 +62,7 @@ public:
   void exit(FXint code);
   virtual void init(int& argc,char** argv,bool connect=TRUE);
   bool IsServer() { return is_server; }
-  FXString &Commands() { return srv_commands; }
+  FXString &Commands() { return ServerCmdLineArgs; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
   const FXString &SocketName() { return sock_name; }

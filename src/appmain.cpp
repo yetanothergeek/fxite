@@ -55,7 +55,7 @@ FXIMPLEMENT(FXiTe,FXApp,AppMap,ARRAYNUMBER(AppMap));
 
 
 void AppClass::ExecuteClientRequest() {
-  mainwin->ParseCommands(cli_commands);
+  mainwin->ParseCommands(ReceivedFromClient);
 }
 
 
@@ -101,15 +101,15 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
           // We are the client, and the server acknowledged out initial request...
           server_id=wParam;
           char* lpCommand;
-          hCommand = GlobalAlloc(GMEM_MOVEABLE, dde_string.length()+1);
+          hCommand = GlobalAlloc(GMEM_MOVEABLE, SendToServer.length()+1);
           if (!hCommand) {break;}
           lpCommand = (char*)GlobalLock(hCommand);
           if (!lpCommand) {
             GlobalFree(hCommand);
             break;
           }
-          strncpy(lpCommand,dde_string.text(),dde_string.length());
-          lpCommand[dde_string.length()]='\0';
+          strncpy(lpCommand,SendToServer.text(),SendToServer.length());
+          lpCommand[SendToServer.length()]='\0';
           GlobalUnlock(hCommand);
           if (PostMessage((HWND)server_id,WM_DDE_EXECUTE,tmpwin_id,PackDDElParam(WM_DDE_EXECUTE,0,(UINT)hCommand))) {
             found_server=true;
@@ -131,7 +131,7 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
         UINT uiLo;
         char* puiHi;
         if (UnpackDDElParam(WM_DDE_EXECUTE,lParam,(PUINT)&uiLo,(PUINT)&puiHi)) {
-          cli_commands=(char*)GlobalLock((void*)puiHi);
+          ReceivedFromClient=(char*)GlobalLock((void*)puiHi);
           ExecuteClientRequest();
           SendMessage((HWND)wParam, WM_DDE_ACK, (WPARAM)mainwin->id(), lParam);
         }
@@ -147,7 +147,7 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
 
 bool AppClass::InitClient()
 {
-  dde_string="";
+  SendToServer="";
   ClientParse();
   sock_name.prepend(APP_NAME);
   FXMainWindow*tmpwin=new FXMainWindow(this,EXE_NAME"_tmpwin");
@@ -179,7 +179,7 @@ long AppClass::onSocketRead(FXObject*o,FXSelector sel,void*p)
     memset(buf,0,sizeof(buf));
     len=read(sock_fd,buf,sizeof(buf)-1);
     if (len>0) {
-      cli_commands.append(buf, len);
+      ReceivedFromClient.append(buf, len);
     }
     eod=strstr(buf,"\n\n")?true:false;
     if ( eod || (len<(bufsize-1)) ) { break; }
@@ -279,7 +279,7 @@ long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 
 
 #ifdef WIN32
-# define AppendToServer(s,n) dde_string.append(s)
+# define AppendToServer(s,n) SendToServer.append(s)
 #else
 # define AppendToServer(s,n) write(sock_fd,s,n);
 #endif
@@ -343,18 +343,18 @@ bool AppClass::InitServer()
     if (arglen)  {
       if ((arg[0]!='-') && (arg[0]!='+') && FXStat::exists(arg) && FXStat::isFile(arg)) {
         FXString filename=FXPath::absolute(arg);
-        srv_commands.append(filename.text());
+        ServerCmdLineArgs.append(filename.text());
       } else {
         if ( (arg[0]=='-') && ((arg[1]=='s')||(arg[1]=='c')) ) {
           if ( arglen == 2 ) { skip_next=true; }
-        } else { srv_commands.append(arg); }
+        } else { ServerCmdLineArgs.append(arg); }
       }
-      srv_commands.append('\n');
+      ServerCmdLineArgs.append('\n');
     }
   }
-  while (srv_commands.contains("\n\n")) { srv_commands.substitute("\n\n", "\n", true); }
-  srv_commands.append("\n\n");
-  while (srv_commands[0]=='\n') { srv_commands.erase(0,1); }
+  while (ServerCmdLineArgs.contains("\n\n")) { ServerCmdLineArgs.substitute("\n\n", "\n", true); }
+  ServerCmdLineArgs.append("\n\n");
+  while (ServerCmdLineArgs[0]=='\n') { ServerCmdLineArgs.erase(0,1); }
 
 #ifdef WIN32
   MakeAtoms();
