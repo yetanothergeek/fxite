@@ -179,7 +179,7 @@ long AppClass::onSocketRead(FXObject*o,FXSelector sel,void*p)
     memset(buf,0,sizeof(buf));
     len=read(sock_fd,buf,sizeof(buf)-1);
     if (len>0) {
-      cli_commands.append(buf);
+      cli_commands.append(buf, len);
     }
     eod=strstr(buf,"\n\n")?true:false;
     if ( eod || (len<(bufsize-1)) ) { break; }
