@@ -40,9 +40,8 @@ private:
 #endif
   bool InitClient();
   bool InitServer();
-  FXString ServerCmdLineArgs;
   FXString ReceivedFromClient;
-  FXString SentToServer;
+  FXString commands;
   FXString configdir;
   FXString sessionfile;
 public:
@@ -60,7 +59,7 @@ public:
   TopWindow*MainWin() { return mainwin; }
   void exit(FXint code);
   virtual void init(int& argc,char** argv,bool connect=TRUE);
-  FXString &Commands() { return ServerCmdLineArgs; }
+  FXString &Commands() { return commands; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
   const FXString &ServerName() { return server_name; }

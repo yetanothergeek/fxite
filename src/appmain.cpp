@@ -101,15 +101,15 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
           // We are the client, and the server acknowledged out initial request...
           server_id=wParam;
           char* lpCommand;
-          hCommand = GlobalAlloc(GMEM_MOVEABLE, SentToServer.length()+1);
+          hCommand = GlobalAlloc(GMEM_MOVEABLE, commands.length()+1);
           if (!hCommand) {break;}
           lpCommand = (char*)GlobalLock(hCommand);
           if (!lpCommand) {
             GlobalFree(hCommand);
             break;
           }
-          strncpy(lpCommand,SentToServer.text(),SentToServer.length());
-          lpCommand[SentToServer.length()]='\0';
+          strncpy(lpCommand,commands.text(),commands.length());
+          lpCommand[commands.length()]='\0';
           GlobalUnlock(hCommand);
           if (PostMessage((HWND)server_id,WM_DDE_EXECUTE,tmpwin_id,PackDDElParam(WM_DDE_EXECUTE,0,(UINT)hCommand))) {
             found_server=true;
@@ -162,7 +162,6 @@ bool AppClass::InitClient()
   }
   KillAtoms();
   tmpwin.destroy();
-  SentToServer=FXString::null;
   return found_server;
 }
 
@@ -234,8 +233,8 @@ bool AppClass::InitClient()
   if ( FXStat::statFile(sock_name, st) && st.isSocket() ) {
     sock_fd=create_socket(sock_name.text(), false);
     if (sock_fd>=0) {
-      const char*p=SentToServer.text();
-      FXint rem=SentToServer.length()+1;
+      const char*p=commands.text();
+      FXint rem=commands.length()+1;
       while (rem>0) {
         ssize_t wrote=write(sock_fd,(const void*)p,rem>1024?1024:rem);
         if (wrote>=0) {
@@ -254,7 +253,6 @@ bool AppClass::InitClient()
       FXFile::remove(sock_name);
     }
   }
-  SentToServer=FXString::null;
   return found_server;
 }
 
@@ -293,7 +291,7 @@ void AppClass::ClientParse()
 {
   bool skip_next=false;
   bool is_macro=false;
-  SentToServer=FXString::null;
+  commands=FXString::null;
   for (FXint i=1; i<getArgc(); i++) {
     if (skip_next) {
       skip_next=false;
@@ -305,7 +303,7 @@ void AppClass::ClientParse()
       if ( (arg[0]=='-') && (arg[1]=='e') ) { is_macro=true; }
       if ( (!strchr("-+",arg[0])) && FXStat::exists(arg) && FXStat::isFile(arg) ) {
         FXString filename=FXPath::absolute(arg);
-        SentToServer.append(filename.text());
+        commands.append(filename.text());
       } else {
         if ( (arg[0]=='-') && (strchr("cs", arg[1])) ) {
           if ( arglen == 2 ) {
@@ -314,22 +312,22 @@ void AppClass::ClientParse()
           }
         } else {
           if ( (strchr("-+",arg[0])) ) {
-            SentToServer.append(arg);
+            commands.append(arg);
           } else {
             if (is_macro) {
-              SentToServer.append(arg);
+              commands.append(arg);
               is_macro=false;
             } else {
               FXString filename=FXPath::absolute(arg);
-              SentToServer.append(filename.text());
+              commands.append(filename.text());
             }
           }
         }
       }
-      SentToServer.append("\n");
+      commands.append("\n");
     }
   }
-  SentToServer.append("\n\n");
+  commands.append("\n\n");
 }
 
 
@@ -337,31 +335,6 @@ void AppClass::ClientParse()
 
 bool AppClass::InitServer()
 {
-  bool skip_next=false;
-  int i;
-  for (i=1; i<getArgc(); i++) {
-    if (skip_next) {
-      skip_next=false;
-      continue;
-    }
-    const char *arg=getArgv()[i];
-    FXuint arglen=arg?strlen(arg):0;
-    if (arglen)  {
-      if ((arg[0]!='-') && (arg[0]!='+') && FXStat::exists(arg) && FXStat::isFile(arg)) {
-        FXString filename=FXPath::absolute(arg);
-        ServerCmdLineArgs.append(filename.text());
-      } else {
-        if ( (arg[0]=='-') && ((arg[1]=='s')||(arg[1]=='c')) ) {
-          if ( arglen == 2 ) { skip_next=true; }
-        } else { ServerCmdLineArgs.append(arg); }
-      }
-      ServerCmdLineArgs.append('\n');
-    }
-  }
-  while (ServerCmdLineArgs.contains("\n\n")) { ServerCmdLineArgs.substitute("\n\n", "\n", true); }
-  ServerCmdLineArgs.append("\n\n");
-  while (ServerCmdLineArgs[0]=='\n') { ServerCmdLineArgs.erase(0,1); }
-
 #ifdef WIN32
   MakeAtoms();
 #else
