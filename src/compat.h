@@ -37,11 +37,9 @@ FXbool LocaleIsUTF8();
 # define NULL_FILE "NUL"
   bool IsWin9x();
   const char* SystemErrorStr();
-# if 1
   bool IsDir(const FXString &dn);
-# else
-# define IsDir(dn) (FXStat::isDirectory(dn))
-# endif
+  void GetAppDataDir(FXString &AppDataDir);
+  FXString GetShellFolder(const char*shellfolder);
 #else
 # define NULL_FILE "/dev/null"
 # define IsDir(dn) (FXStat::isDirectory(dn))
