@@ -147,7 +147,6 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
 
 bool AppClass::InitClient()
 {
-  ClientParse();
   sock_name.prepend(APP_NAME);
   FXMainWindow tmpwin(this,EXE_NAME"_tmpwin");
   create();
@@ -227,7 +226,6 @@ static int create_socket(const char *filename, bool listening)
 
 bool AppClass::InitClient()
 {
-  ClientParse();
   FXStat st;
   bool found_server=false;
   if ( FXStat::statFile(sock_name, st) && st.isSocket() ) {
@@ -287,7 +285,7 @@ long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 
 
 
-void AppClass::ClientParse()
+void AppClass::ParseCommandLine()
 {
   bool skip_next=false;
   bool is_macro=false;
@@ -594,6 +592,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
   CreatePathOrDie(serverdir);
   sock_name.prepend(serverdir);
 #endif
+  ParseCommandLine();
   if (InitClient()) {
     destroy();
     ::exit(0);

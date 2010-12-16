@@ -29,7 +29,7 @@ private:
   AppClass() {}
   FXString sock_name;
   FXString server_name;
-  void ClientParse();
+  void ParseCommandLine();
   void ExecuteClientRequest();
   void CreatePathOrDie(const FXString &dirname);
   void CreateConfigDir();
