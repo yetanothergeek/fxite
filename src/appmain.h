@@ -38,7 +38,6 @@ private:
 #else
   int sock_fd;
 #endif
-  bool is_server;
   bool InitClient();
   bool InitServer();
   FXString ServerCmdLineArgs;
@@ -61,7 +60,6 @@ public:
   TopWindow*MainWin() { return mainwin; }
   void exit(FXint code);
   virtual void init(int& argc,char** argv,bool connect=TRUE);
-  bool IsServer() { return is_server; }
   FXString &Commands() { return ServerCmdLineArgs; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }

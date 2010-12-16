@@ -337,7 +337,6 @@ void AppClass::ClientParse()
 
 bool AppClass::InitServer()
 {
-  is_server=true;
   bool skip_next=false;
   int i;
   for (i=1; i<getArgc(); i++) {
@@ -553,7 +552,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
   }
   FXApp::init(argc,argv,connect);
 #endif
-  is_server=false;
   CreateConfigDir();
   for (FXint i=1; i<getArgc(); i++) {
     const char *arg=getArgv()[i];
@@ -623,20 +621,21 @@ void AppClass::init(int& argc, char** argv, bool connect)
   CreatePathOrDie(serverdir);
   sock_name.prepend(serverdir);
 #endif
-  if ( !InitClient() ) { InitServer(); }
+  if (InitClient()) {
+    destroy();
+    ::exit(0);
+  } else { InitServer(); }
 }
 
 
 
 void AppClass::exit(FXint code)
 {
-  if (is_server) {
 #ifdef WIN32
     KillAtoms();
 #else
     FXFile::remove(sock_name);
 #endif
-  }
   FXApp::exit(code);
 }
 
@@ -730,7 +729,6 @@ int main(int argc, char *argv[])
   if (!get_config_name(argc,argv,cfg_name)) { exit(1); }
   AppClass app("settings", cfg_name);
   app.init(argc,argv);
-  if ( app.IsServer() ) {
 
 #if defined(WIN32) && !defined(FOX_1_6)
     app.setToolTipTime(2000000000);
@@ -749,6 +747,5 @@ int main(int argc, char *argv[])
     stdin=fopen(NULL_FILE, "r");
 #endif
     return app.run();
-  }
 }
 
