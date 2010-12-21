@@ -37,225 +37,20 @@
 #include "compat.h"
 #include "appwin.h"
 
+#include "interproc.h"
+
 #include "intl.h"
 #include "appmain.h"
-
 
 
 FXDEFMAP(AppClass) AppMap[]={
   FXMAPFUNC(SEL_SIGNAL,  AppClass::ID_CLOSEALL,    AppClass::onCmdCloseAll),
   FXMAPFUNC(SEL_COMMAND, AppClass::ID_CLOSEALL,    AppClass::onCmdCloseAll),
-#ifndef WIN32
-  FXMAPFUNC(SEL_IO_READ, AppClass::ID_SOCKET_READ, AppClass::onSocketRead)
-#endif
+  FXMAPFUNC(SEL_COMMAND, AppClass::ID_IPC_EXEC,    AppClass::onIpcExec),
 };
 
 
 FXIMPLEMENT(FXiTe,FXApp,AppMap,ARRAYNUMBER(AppMap));
-
-
-void AppClass::ExecuteClientRequest() {
-  mainwin->ParseCommands(ReceivedFromClient);
-}
-
-
-
-#ifdef WIN32 // For MS-Windows, we use the old-fashioned DDE for client/server communications...
-
-
-# define MakeAtoms() \
-    atomApplication=GlobalAddAtom((LPSTR) sock_name.text()); \
-    atomTopic=GlobalAddAtom((LPSTR) szTopic); \
-    atoms=MAKELONG(atomApplication,atomTopic);
-
-#define KillAtoms() \
-    if (atomApplication) { GlobalDeleteAtom(atomApplication); } \
-    if (atomTopic) { GlobalDeleteAtom(atomTopic); }
-
-
-static const char *szTopic=EXE_NAME"_TopicName";
-static ATOM atomApplication=0;
-static ATOM atomTopic=0;
-static LPARAM atoms=0;
-static WPARAM client_id=0;
-static WPARAM server_id=0;
-static WPARAM tmpwin_id=0;
-static HGLOBAL hCommand=NULL;
-static bool found_server=false;
-
-
-long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
-{
-  switch (iMsg) {
-    case  WM_DDE_INITIATE: {
-      if (mainwin && (wParam!=client_id)&&(LOWORD(lParam)==atomApplication)&&(HIWORD(lParam)==atomTopic)) {
-         // We are the server, one of our clients wants to connect...
-        client_id=wParam;
-        SendMessage((HWND)client_id, WM_DDE_ACK, (WPARAM)mainwin->id(), atoms);
-      }
-      break;
-    }
-    case WM_DDE_ACK: {
-      if (!mainwin) {
-        if ((LOWORD(lParam)==atomApplication)&&(HIWORD(lParam)==atomTopic)) {
-          // We are the client, and the server acknowledged out initial request...
-          server_id=wParam;
-          char* lpCommand;
-          hCommand = GlobalAlloc(GMEM_MOVEABLE, commands.length()+1);
-          if (!hCommand) {break;}
-          lpCommand = (char*)GlobalLock(hCommand);
-          if (!lpCommand) {
-            GlobalFree(hCommand);
-            break;
-          }
-          strncpy(lpCommand,commands.text(),commands.length());
-          lpCommand[commands.length()]='\0';
-          GlobalUnlock(hCommand);
-          if (PostMessage((HWND)server_id,WM_DDE_EXECUTE,tmpwin_id,PackDDElParam(WM_DDE_EXECUTE,0,(UINT)hCommand))) {
-            found_server=true;
-          } else {
-            GlobalFree(hCommand);
-            FreeDDElParam(WM_DDE_EXECUTE, (LPARAM)hCommand);
-          }
-        } else if (hCommand && (lParam==(LPARAM)hCommand)) {
-          // We are the client, and the server has completed processing our commands...
-          GlobalFree(hCommand);
-          FreeDDElParam(WM_DDE_EXECUTE, (LPARAM)hCommand);
-        }
-      }
-      break;
-    }
-    case WM_DDE_EXECUTE:{
-      if (mainwin&&client_id&&(wParam==client_id)) {
-        // We are the server, and the client sent us something to do...
-        UINT uiLo;
-        char* puiHi;
-        if (UnpackDDElParam(WM_DDE_EXECUTE,lParam,(PUINT)&uiLo,(PUINT)&puiHi)) {
-          ReceivedFromClient=(char*)GlobalLock((void*)puiHi);
-          ExecuteClientRequest();
-          SendMessage((HWND)wParam, WM_DDE_ACK, (WPARAM)mainwin->id(), lParam);
-        }
-      }
-      break;
-    }
-  }
-  // Process all events through the default handler...
-  return FXApp::dispatchEvent(hwnd,iMsg,wParam,lParam);
-}
-
-
-
-bool AppClass::InitClient()
-{
-  sock_name.prepend(APP_NAME);
-  FXMainWindow tmpwin(this,EXE_NAME"_tmpwin");
-  create();
-  tmpwin.create();
-  tmpwin_id=(WPARAM)tmpwin.id();
-  MakeAtoms();
-  SendMessage((HWND)HWND_BROADCAST,WM_DDE_INITIATE,tmpwin_id,atoms);
-  for (FXint i=0; i<5; i++) {
-    runWhileEvents();
-    if (found_server) break;
-    fxsleep(100000);
-  }
-  KillAtoms();
-  tmpwin.destroy();
-  return found_server;
-}
-
-#else // For X11, we use a UNIX socket for client/server communications...
-
-long AppClass::onSocketRead(FXObject*o,FXSelector sel,void*p)
-{
-  static const ssize_t bufsize=1024;
-  ssize_t len;
-  char buf[bufsize];
-  bool eod=false;
-  while (1) {
-    len=read(sock_fd,buf,bufsize);
-    if (len>0) {
-      ReceivedFromClient.append(buf, len);
-    }
-    eod=strstr(buf,"\n\n")?true:false;
-    if ( eod || (len<(bufsize-1)) ) { break; }
-  }
-  if (eod) { ExecuteClientRequest(); }
-  return 1;
-}
-
-
-
-static int create_socket(const char *filename, bool listening)
-{
-  struct sockaddr_un sa;
-  int sock;
-  size_t size;
-
-  sock = socket(PF_LOCAL, SOCK_DGRAM, 0);
-  if (sock < 0) {
-    fxwarning(_("Error calling %s function: %s\n"), "socket", SystemErrorStr());
-    exit(EXIT_FAILURE);
-  }
-
-  sa.sun_family = AF_LOCAL;
-  strncpy(sa.sun_path, filename, sizeof(sa.sun_path));
-  sa.sun_path[sizeof(sa.sun_path) - 1] = '\0';
-
-  size = SUN_LEN(&sa);
-  if (listening) {
-    if ( bind(sock, (struct sockaddr*)&sa, size) < 0 ) {
-      fxwarning(_("Error calling %s function: %s\n"), "bind", SystemErrorStr());
-      exit(EXIT_FAILURE);
-    }
-  } else {
-    if ( connect(sock, (struct sockaddr*)&sa, size) < 0 ) {
-      if ( errno==ECONNREFUSED ) {
-        close(sock);
-        return -1; // Stale socket, returning -1 tells us to delete it (see below).
-      } else {
-        fxwarning(_("Error calling %s function: %s\n"), "connect", SystemErrorStr());
-        exit(EXIT_FAILURE);
-      }
-    }
-  }
-  return sock;
-}
-
-
-
-bool AppClass::InitClient()
-{
-  FXStat st;
-  bool found_server=false;
-  if ( FXStat::statFile(sock_name, st) && st.isSocket() ) {
-    sock_fd=create_socket(sock_name.text(), false);
-    if (sock_fd>=0) {
-      const char*p=commands.text();
-      FXint rem=commands.length()+1;
-      while (rem>0) {
-        ssize_t wrote=write(sock_fd,(const void*)p,rem>1024?1024:rem);
-        if (wrote>=0) {
-          rem-=wrote;
-          p+=wrote;
-        } else {
-          break;
-        }
-      }
-      close(sock_fd);
-      found_server=true;
-    } else {
-      // The socket exists, but the connection failed!
-      // Probably a stale socket from a previous incomplete shutdown -
-      // So remove the socket, and try server mode instead.
-      FXFile::remove(sock_name);
-    }
-  }
-  return found_server;
-}
-
-
-#endif
 
 
 
@@ -263,6 +58,7 @@ AppClass::AppClass(const FXString& name, const FXString& title):FXApp(name,title
 {
   mainwin=NULL;
   quitting=false;
+  commands=FXString::null;
 //  addSignal(SIGINT,  this, App::ID_CLOSEALL);
 #ifndef WIN32
   addSignal(SIGQUIT, this, AppClass::ID_CLOSEALL);
@@ -330,17 +126,13 @@ void AppClass::ParseCommandLine()
 
 
 
-
-bool AppClass::InitServer()
+long AppClass::onIpcExec(FXObject*o, FXSelector sel, void*p)
 {
-#ifdef WIN32
-  MakeAtoms();
-#else
-  sock_fd=create_socket(sock_name.text(), true);
-  AddInput(sock_fd,INPUT_READ,this,ID_SOCKET_READ);
-#endif
-  return true;
+  mainwin->ParseCommands(*((FXString*)p));
+  return 1;
 }
+
+
 
 static const char* helptext[]= {
   "",
@@ -381,7 +173,13 @@ static void usage(const char*prog)
 
 
 
-#ifndef WIN32
+#ifdef WIN32
+long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
+{
+  ipc->dispatchEvent(hwnd,iMsg,wParam,lParam);
+  return FXApp::dispatchEvent(hwnd,iMsg,wParam,lParam);
+}
+#else
 static char display_opt[]="-display";
 #endif
 
@@ -587,27 +385,45 @@ void AppClass::init(int& argc, char** argv, bool connect)
   sessionfile=configdir+"sessions"+PATHSEP;
   CreatePathOrDie(sessionfile);
   sessionfile.append(sock_name);
-#ifndef WIN32
+#ifdef WIN32
+  sock_name.prepend(APP_NAME"_");
+#else
   FXString serverdir=configdir+"servers"+PATHSEP;
   CreatePathOrDie(serverdir);
   sock_name.prepend(serverdir);
 #endif
   ParseCommandLine();
-  if (InitClient()) {
+  ipc=new InterProc(this, sock_name);
+  if (ipc->ClientSend(NULL, commands)) {
+    delete ipc;
     destroy();
     ::exit(0);
-  } else { InitServer(); }
+  } else {
+#if defined(WIN32) && !defined(FOX_1_6)
+    setToolTipTime(2000000000);
+    setToolTipPause(250000000);
+    FXToolTip* tips=new FXToolTip(this,0);
+    tips->create();
+#else
+    new FXToolTip(this,0);
+#endif
+    mainwin=new TopWindow(this);
+    create();
+    mainwin->create();
+    ipc->StartServer(mainwin, this,ID_IPC_EXEC);
+#ifndef WIN32
+    fclose(stdin);
+    stdin=fopen(NULL_FILE, "r");
+#endif
+  }
 }
 
 
 
 void AppClass::exit(FXint code)
 {
-#ifdef WIN32
-    KillAtoms();
-#else
-    FXFile::remove(sock_name);
-#endif
+  ipc->StopServer();
+  delete ipc;
   FXApp::exit(code);
 }
 
@@ -687,7 +503,6 @@ static void check_info_args(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-
 #ifdef ENABLE_NLS
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
@@ -701,23 +516,6 @@ int main(int argc, char *argv[])
   if (!get_config_name(argc,argv,cfg_name)) { exit(1); }
   AppClass app("settings", cfg_name);
   app.init(argc,argv);
-
-#if defined(WIN32) && !defined(FOX_1_6)
-    app.setToolTipTime(2000000000);
-    app.setToolTipPause(250000000);
-    FXToolTip* tips=new FXToolTip(&app,0);
-    tips->create();
-#else
-    new FXToolTip(&app,0);
-#endif
-
-    app.create();
-    app.MainWin(new TopWindow(&app));
-    app.MainWin()->create();
-#ifndef WIN32
-    fclose(stdin);
-    stdin=fopen(NULL_FILE, "r");
-#endif
-    return app.run();
+  return app.run();
 }
 

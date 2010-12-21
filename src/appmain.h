@@ -19,7 +19,7 @@
 
 class TopWindow;
 class Server;
-
+class InterProc;
 
 class AppClass: public FXApp {
   FXDECLARE(AppClass);
@@ -30,33 +30,24 @@ private:
   FXString sock_name;
   FXString server_name;
   void ParseCommandLine();
-  void ExecuteClientRequest();
   void CreatePathOrDie(const FXString &dirname);
   void CreateConfigDir();
+  InterProc *ipc;
 #ifdef WIN32
   virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
-#else
-  int sock_fd;
 #endif
-  bool InitClient();
-  bool InitServer();
-  FXString ReceivedFromClient;
   FXString commands;
   FXString configdir;
   FXString sessionfile;
 public:
   enum{
     ID_CLOSEALL=FXApp::ID_LAST,
-    ID_SOCKET_READ,
+    ID_IPC_EXEC,
     ID_LAST
   };
   long onCmdCloseAll(FXObject*o,FXSelector sel,void*p);
-#ifndef WIN32
-  long onSocketRead(FXObject*o,FXSelector sel,void*p);
-#endif
+  long onIpcExec(FXObject*o,FXSelector sel,void*p);
   AppClass(const FXString& name, const FXString& title);
-  void MainWin(TopWindow*w) { mainwin=w; }
-  TopWindow*MainWin() { return mainwin; }
   void exit(FXint code);
   virtual void init(int& argc,char** argv,bool connect=TRUE);
   FXString &Commands() { return commands; }
