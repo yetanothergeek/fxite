@@ -313,7 +313,7 @@ FXIMPLEMENT(InterProc,FXObject,InterProcMap,ARRAYNUMBER(InterProcMap));
 
 static int SocketFailure(const char*func)
 {
-  fxwarning(_("Error calling %s function: %s\n"), func, strerror(errno));
+  fxwarning(_("Error calling %s() function: %s.\n"), func, strerror(errno));
   exit(EXIT_FAILURE);
   return -2;
 }
