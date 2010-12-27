@@ -25,6 +25,7 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include <sys/un.h>
+#include <sys/stat.h>
 #endif
 
 
@@ -370,7 +371,16 @@ static int CreateSocket(const char *filename, bool listening)
   sa.sun_path[sizeof(sa.sun_path) - 1] = '\0';
   size = SUN_LEN(&sa);
   if (listening) {
-    unlink(filename);
+    struct stat st;
+    if (stat(filename,&st)==0) {
+      if (unlink(filename)!=0) {
+        return SocketFailure("unlink");
+      }
+    } else {
+      if (errno!=ENOENT) {
+        return SocketFailure("stat");
+      }
+    }
     if ( bind(sock, (struct sockaddr*)&sa, size) < 0 ) { return SocketFailure("bind"); }
     if ( listen(sock,32) < 0 ) { return SocketFailure("listen"); }
   } else {
