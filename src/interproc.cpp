@@ -375,7 +375,7 @@ static int CreateSocket(const char *filename, bool listening)
     if ( listen(sock,32) < 0 ) { return SocketFailure("listen"); }
   } else {
     if ( connect(sock, (struct sockaddr*)&sa, size) < 0 ) {
-      if ( errno==ECONNREFUSED ) {
+      if ( errno==ECONNREFUSED || errno==EACCES ) {
         close(sock);
         return -1;
       } else {
