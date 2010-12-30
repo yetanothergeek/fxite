@@ -72,6 +72,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   RgbToHex(getApp()->getTipforeColor(), sd->fg);
   prefs=new Settings(this, ConfigDir());
 
+  active_widget=NULL;
   need_status=0;
   SciDoc::DefaultStyles(prefs->Styles());
   CreateMenus();
