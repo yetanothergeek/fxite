@@ -409,7 +409,7 @@ bool InterProc::ClientSend(FXTopWindow *client, const FXString &data)
       const char*p=data.text();
       FXint rem=data.length();
       while (rem>0) {
-        ssize_t wrote=write(write_fd,(const void*)p,rem>1024?1024:rem);
+        ssize_t wrote=write(write_fd,(const void*)p,rem);
         if (wrote>=0) {
           rem-=wrote;
           p+=wrote;
