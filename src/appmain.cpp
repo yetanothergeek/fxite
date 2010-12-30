@@ -72,6 +72,9 @@ AppClass::AppClass(const FXString& name, const FXString& title):FXApp(name,title
 
 long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 {
+#ifndef WIN32
+  if (((FXival)p)==SIGPIPE) { return 1; }
+#endif
   if (quitting) { return 1; }
   quitting=true;
   mainwin->close();
