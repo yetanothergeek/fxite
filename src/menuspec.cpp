@@ -629,12 +629,11 @@ void MenuMgr::WriteMenuSpecs(FXRegistry*reg, const char* keys_sect)
 void MenuMgr::ReadToolbarButtons(FXRegistry*reg, const char* tbar_sect)
 {
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
-    if (toolbar_buttons[i]==TopWindow::ID_LAST) { break; }
     char keyname[32];
     memset(keyname,0, sizeof(keyname));
     snprintf(keyname,sizeof(keyname)-1,"Button_%d", i+1);
     MenuSpec*spec=MenuMgr::LookupMenu(toolbar_buttons[i]);
-    const FXchar *keyval=reg->readStringEntry(tbar_sect,keyname,spec->pref);
+    const FXchar *keyval=reg->readStringEntry(tbar_sect,keyname,spec?spec->pref:"");
     spec=LookupMenuByPref(keyval);
     if (spec) {
       toolbar_buttons[i]=spec->sel;
