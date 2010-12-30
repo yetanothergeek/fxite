@@ -492,6 +492,7 @@ static void FreeTBarUsrCmds() {
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
    MenuSpec*spec=custom_commands[i];
    if (spec) {
+     custom_commands[i]=NULL;
      if (spec->btn_txt) free((char*)spec->btn_txt);
      delete spec;
    }
