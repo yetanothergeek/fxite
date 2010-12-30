@@ -12,7 +12,7 @@ http://www.nedit.org/
 SL - A small and efficient linked list library is used in a
 few places where lightweight and sortable lists were needed.
 Copyright (C) 2003-2005 Stig Brautaset.
-http://stig.brautaset.org/
+http://code.google.com/p/libsimplelist/
 
 
 The module containing functions for reading tag files was 
