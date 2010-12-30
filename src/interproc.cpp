@@ -407,7 +407,7 @@ bool InterProc::ClientSend(FXTopWindow *client, const FXString &data)
     write_fd=CreateSocket(sock_name.text(), false);
     if (write_fd>=0) {
       const char*p=data.text();
-      FXint rem=data.length()+1;
+      FXint rem=data.length();
       while (rem>0) {
         ssize_t wrote=write(write_fd,(const void*)p,rem>1024?1024:rem);
         if (wrote>=0) {
