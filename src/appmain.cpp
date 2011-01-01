@@ -415,7 +415,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
 #endif
     mainwin=new TopWindow(this);
     create();
-    mainwin->create();
     ipc->StartServer(mainwin, this,ID_IPC_EXEC);
 #ifndef WIN32
     fclose(stdin);
