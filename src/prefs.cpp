@@ -585,8 +585,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   if (FXStat::exists(style_file)) {
     FXFile style_fh(style_file,FXIO::Reading);
     if (style_fh.isOpen()) {
-      FXString style_data;
-      style_data.length(style_fh.size()+1);
+      FXString style_data('\0', style_fh.size()+1);
       style_fh.readBlock((char*)style_data.text(), style_fh.size());
       style_fh.close();
       FXint n=style_data.contains(ENDLINE);
