@@ -62,6 +62,8 @@ public:
   long onPopupClick   ( FXObject* sender, FXSelector sel, void* p );
   DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts);
   ~DocTabs();
+  virtual void create();
+  virtual void destroy();
 
   DocTab*NewTab(FXString text);
   DocTab*ActiveTab();

@@ -64,6 +64,22 @@ long DocTabs::onTabPopupMenu( FXObject* sender, FXSelector sel, void* p )
 
 
 
+void DocTabs::create()
+{
+  FXTabBook::create();
+  bold_font->create();
+}
+
+
+
+void DocTabs::destroy()
+{
+  bold_font->destroy();
+  FXTabBook::destroy();
+}
+
+
+
 DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   FXTabBook(p,trg,sel,opts,0,0,0,0,0,0,0,0)
 {
@@ -72,7 +88,6 @@ DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   GetFontDescription(desc,normal_font);
   desc.weight=FXFont::Bold;
   bold_font=new FXFont(a,desc);
-  bold_font->create();
   hot_fg=a->getSelforeColor();
   hot_bg=a->getSelbackColor();
   cold_fg=a->getForeColor();
