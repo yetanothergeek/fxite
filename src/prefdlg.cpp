@@ -709,6 +709,7 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
       } else {
         tbar_avail_items->clearItems();
         for (spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
+          if (spec->sel==TopWindow::ID_KILL_COMMAND) { continue; }
           if (tbar_used_items->findItemByData((void*)spec)<0) {
             tbar_avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
           }
