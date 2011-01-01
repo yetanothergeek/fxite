@@ -426,11 +426,15 @@ void AppClass::init(int& argc, char** argv, bool connect)
 
 
 
+extern "C" { int ini_sort(const char *filename); }
+
+
 void AppClass::exit(FXint code)
 {
   ipc->StopServer();
   delete ipc;
   FXApp::exit(code);
+  ini_sort(settingsfile.text());
 }
 
 

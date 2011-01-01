@@ -740,6 +740,9 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
 
 
 
+extern "C" { void ini_sort(const char *filename); }
+
+
 Settings::~Settings()
 {
   LangStyle*ls;
@@ -837,6 +840,7 @@ Settings::~Settings()
     );
   }
   delete style_reg;
+  ini_sort(style_file.text());
   global_settings_instance=NULL;
 }
 
