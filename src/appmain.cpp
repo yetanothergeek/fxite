@@ -388,12 +388,15 @@ void AppClass::init(int& argc, char** argv, bool connect)
   sessionfile=configdir+"sessions"+PATHSEP;
   CreatePathOrDie(sessionfile);
   sessionfile.append(sock_name);
+  settingsfile=configdir+"settings";
 #ifdef WIN32
   sock_name.prepend(APP_NAME"_");
+  settingsfile.append(".ini");
 #else
   FXString serverdir=configdir+"servers"+PATHSEP;
   CreatePathOrDie(serverdir);
   sock_name.prepend(serverdir);
+  if (use_xdg_config()) { settingsfile.append(".rc"); }
 #endif
   ParseCommandLine();
   ipc=new InterProc(this, sock_name);

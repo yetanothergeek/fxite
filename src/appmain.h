@@ -39,6 +39,7 @@ private:
   FXString commands;
   FXString configdir;
   FXString sessionfile;
+  FXString settingsfile;
 public:
   enum{
     ID_CLOSEALL=FXApp::ID_LAST,
@@ -53,6 +54,7 @@ public:
   FXString &Commands() { return commands; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
+  const FXString &SettingsFile() { return settingsfile; }
   const FXString &ServerName() { return server_name; }
 #ifndef FOX_1_6
   FXString migration_errors;
