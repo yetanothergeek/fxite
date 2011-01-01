@@ -453,5 +453,6 @@ public:
   void AdjustIndent(SciDoc*sci,char ch);
   static TopWindow* instance();
   static const FXString& ConfigDir();
+  static const FXString &Connector();
 };
 

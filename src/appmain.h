@@ -56,6 +56,7 @@ public:
   const FXString &SessionFile() { return sessionfile; }
   const FXString &SettingsFile() { return settingsfile; }
   const FXString &ServerName() { return server_name; }
+  const FXString &Connector() { return sock_name; }
 #ifndef FOX_1_6
   FXString migration_errors;
 #endif

@@ -61,6 +61,7 @@ TopWindow* TopWindow::instance() { return global_top_window_instance; }
 
 const FXString& TopWindow::ConfigDir() { return ((AppClass*)(FXApp::instance()))->ConfigDir(); }
 
+const FXString& TopWindow::Connector() { return ((AppClass*)(FXApp::instance()))->Connector(); }
 
 #define SessionFile() (((AppClass*)getApp())->SessionFile())
 
