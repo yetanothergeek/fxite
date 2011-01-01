@@ -176,8 +176,8 @@ Shift modifiers on accelerator keys, like [Shift]Ctrl+O.
 %%%Menu Accelerators%%%
 Pressing the key combinations shown on the right of the menu items is a \
 shortcut for selecting the menu item with the mouse.  
-Menu Mnemonics
 
+%%%Menu Mnemonics%%%
 Pressing the %%%[Alt]%%% key in combination with one of the underlined \
 characters in the menu bar pulls down that menu.  Once the menu is pulled \
 down, typing the underlined characters in a menu item (still holding the Alt \
