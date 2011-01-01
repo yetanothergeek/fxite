@@ -1272,6 +1272,29 @@ static int configdir(lua_State* L)
 }
 
 
+#ifdef WIN32
+# include <windows.h>
+#endif
+
+#include "interproc.h"
+
+
+static int ipc(lua_State* L)
+{
+  if (lua_gettop(L)==0) {
+    lua_pushstring(L,tw->Connector().text());
+  } else {
+    size_t len=0;
+    const char*cmd=luaL_checklstring(L,1,&len);
+    const char*conn=luaL_checkstring(L,2);
+    const char*topic=luaL_optstring(L,3,NULL);
+    FXString cmdstr(cmd,len);
+    InterProc ip(tw->getApp(),conn,topic);
+    lua_pushboolean(L,ip.ClientSend(NULL,cmdstr));
+  }
+  return 1;
+}
+
 
 static const struct luaL_reg fxte_funcs[] = {
   {"seltext", seltext},
@@ -1313,6 +1336,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"scrollpos", scrollpos},
   {"lexer", lexer},
   {"configdir", configdir},
+  {"ipc", ipc},
   {NULL, NULL}
 };
 

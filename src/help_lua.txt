@@ -74,6 +74,7 @@
 @@@pid@@@ -- Process ID of the editor.
 @@@window@@@ -- Top-level window ID of the editor.
 @@@configdir@@@ -- Current configuration directory.
+@@@ipc@@@ -- Inter-process communication.
 
 
 %%%Dialog functions%%%
@@ -757,6 +758,30 @@ Returns the window ID of the editor's top-level window.
 ===__MOD__.configdir()
 ===
 Returns the full path to the current configuration directory.
+
+
+###ipc###
+===__MOD__.ipc([command, server [, topic]])
+===
+When called with no arguments, returns a string representing the name of a "connector" object \
+that external applications can use to communicate with the editor. On Linux and other UNIX-style \
+systems, this is the full path and filename of the UNIX domain socket where the editor is \
+listening.  On MS-Windows, it returns a prefix that can be used to send a DDE command string. \
+For example, if the prefix is %%%"FXiTe_DEFAULT"%%% then the editor can be contacted by sending \
+a DDE_INITIATE message with a server name of %%%"FXiTe_DEFAULT_Application"%%% and a topic name of \
+%%%"FXiTe_DEFAULT_Topic"%%%.
+
+When called with arguments, it will attempt to send the %%%command%%% string to an external \
+application. For Linux/UNIX, the %%%server%%% argument should be the name of a UNIX domain \
+socket where the external program is listening (the %%%topic%%% argument is not required and \
+will be ignored). For MS-Windows, the %%%server%%% argument should be the name of a DDE-enabled \
+application that understands the specified %%%topic%%%. Returns %%%true%%% if the external \
+application was contacted, or %%%false%%% otherwise. (This does not necessarily mean that \
+the command was successfully processed.)
+
+This function should currently be considered ///experimental///, in the future it may be used to \
+communicate with other programs such as a debugger or code navigator.
+
 
 
 ###choose###
