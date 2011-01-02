@@ -370,7 +370,7 @@ void DocTabs::setTabStyle(FXuint style)
       TabOrientation=TAB_RIGHT;
       break;
   }
-  ForEachTab(OrientTabsCB, &TabOrientation);
+  ForEachTab(OrientTabsCB, &TabOrientation, false);
 }
 
 
