@@ -1397,7 +1397,7 @@ image named ==="icon.xpm"===  and place it in the configuration directory, for e
 ###Embedded Scripting Engine###
 
 __APP__ features a built-in script interpreter using the %%%Lua%%% programming language. \
-Lua scripts may written from scratch or recorded using the editor's macro recording feature. \
+Lua scripts may be written from scratch or recorded using the editor's macro recording feature. \
 These scripts can then be added to the %%%Tools%%% menu for easy access, or used as an event \
 hook that is triggered when certain actions occur in the editor. Lua code can also \
 be executed directly from the command line, using the ===-e=== option followed by a \
@@ -1418,7 +1418,7 @@ vast amount of information available online. For starters, here are a few links:
 ///The official reference manual:///
 ===    http://www.lua.org/manual/5.1/===
 ///The "unofficial" Lua FAQ:///
-===    http://batbytes.com/luafaq===
+===    http://www.luafaq.org/===
 ///The Lua short reference "cheat sheet":///
 ===    http://lua-users.org/wiki/LuaShortReference===
 ///The slightly outdated (but still excellent) online book:///
