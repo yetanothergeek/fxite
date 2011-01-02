@@ -328,7 +328,7 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   selText.Set(dest, len, CodePage(), 0, isRectangular, false);
   pdoc->BeginUndoAction();
 
-  if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
+  if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(multiPasteMode == SC_MULTIPASTE_EACH); }
 
   SelectionPosition selStart = sel.IsRectangular() ?
 	  sel.Rectangular().Start() :
