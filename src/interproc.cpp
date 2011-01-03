@@ -273,7 +273,10 @@ bool InterProc::ClientSend(FXTopWindow *client, const FXString &data)
 
 void InterProc::StartServer(FXTopWindow *win, FXObject*trg, FXSelector sel)
 {
-  LocalServerID=win?(WPARAM)(win->id()):0;
+  if (win) {
+    if (!win->id()) { win->create(); }
+    LocalServerID=(WPARAM)(win->id());
+  } else LocalServerID=0;
   if (!LocalServerID) {
     fxerror(_("%s: invalid window parameter.\n"), getClassName());
   }
