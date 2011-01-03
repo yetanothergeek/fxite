@@ -620,6 +620,7 @@ void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
 
 void MenuMgr::WriteMenuSpecs(FXRegistry*reg, const char* keys_sect)
 {
+  reg->deleteSection(keys_sect);
   for (MenuSpec*spec=menu_specs; spec->sel!=TopWindow::ID_LAST; spec++) {
     reg->writeStringEntry(keys_sect,spec->pref,spec->accel);
   }
