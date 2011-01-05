@@ -50,13 +50,12 @@ can reverse any  modifications that you make.  __APP__ does not change the disk 
 you are editing until you tell it to %%%Save%%%. 
 
 %%%Editing an Existing File%%%
-To open an existing file, choose %%%Open File%%% from the %%%File%%% menu. \
-Select the file  that you want to open in the pop-up dialog that appears and \
-click on %%%OK%%%.  To open several files at the same time, choose \
-%%%Open Files%%% from the %%%File%%% menu, and hold the %%%[Ctrl]%%% key down \
-while clicking on the desired files with the mouse. Note that the single \
-file dialog also supports manually typing a filename into the dialog, but this \
-will not work in the dialog for multiple files.
+To open an existing file, choose %%%Open Files%%% from the %%%File%%% menu. \
+Select the file that you want to open in the pop-up dialog that appears and \
+click on %%%OK%%%.  To open several files at the same time, enable multi-file mode by toggling the \
+%%%"M"%%% button in the upper right corner of the dialog, then hold the %%%[Ctrl]%%% key down \
+while clicking on the desired files with the mouse. Note that you can manually type or paste a \
+filename into the dialog when in single-file mode, but not in multi-file mode.
 
 %%%Creating a New File%%%
 If you already have an empty (Untitled) window displayed, just begin typing in \

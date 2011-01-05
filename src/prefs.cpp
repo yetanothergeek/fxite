@@ -496,6 +496,7 @@ static const char* main_keys[] = {
   "DefaultToSbcs",
   "KeepFileFilter",
   "FileFilterIndex",
+  "FileOpenMulti",
   NULL
 };
 
@@ -661,6 +662,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   } else {
     FileFilterIndex=0;
   }
+  ReadInt(FileOpenMulti,false);
   ReadInt(WrapToolbar,true);
   ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
 
@@ -819,6 +821,7 @@ Settings::~Settings()
   WriteInt(DefaultToSbcs);
   WriteInt(KeepFileFilter);
   WriteInt(FileFilterIndex);
+  WriteInt(FileOpenMulti);
 
   if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
   char dtp[2]={DocTabPosition,'\0'};

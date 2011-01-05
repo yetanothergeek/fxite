@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <fx.h>
+#include <fxkeys.h>
 #include <Scintilla.h>
 #include <FXScintilla.h>
 
@@ -27,6 +28,7 @@
 #include "export.h"
 #include "prefs.h"
 #include "compat.h"
+#include "filedlg.h"
 
 #include "intl.h"
 #include "filer.h"
@@ -43,86 +45,12 @@ FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel):FXObject()
   message=sel;
 }
 
-
 #ifdef WIN32
-extern "C" {
-  int ReadShortcut(char **dst, const char*src);
-}
-
-
-// True if file extension is '*.lnk'
-#define IsLinkExt(s) (FXPath::extension(s).lower()=="lnk")
-
-
-/*
-  Read the Windows shortcut (*.lnk) file passed in as "filename".
-  If the filename does not end with the *.lnk extension, returns
-  true, the filename parameter is unchanged.
-  If the link cannot be read (e.g. corrupted file) it displays an
-  error dialog describing the reason for the failure and returns
-  false, the filename parameter is unchanged.
-  If reading of the link is successful, it returns true and the
-  "filename" parameter is modified and will contain the name of
-  the file that the shortcut points to.
-*/
 bool FileDialogs::ReadShortcut(FXWindow*w, FXString &filename)
 {
-  bool rv=true;
-  if (IsLinkExt(filename)) {
-    char*tmp=NULL;
-     if (::ReadShortcut(&tmp, filename.text())) {
-      filename=FXPath::simplify(FXPath::absolute(tmp));
-    } else {
-      FXMessageBox::error(w,MBOX_OK,_("Error in shortcut"),"%s\n%s",filename.text(),tmp);
-      rv=false;
-    }
-    free(tmp);
-  }
-  return rv;
-}
-
-
-
-/*
-  Fox doesn't automatically handle MS-Windows shortcut files, so...
-  Iterate through each filename in the file dialog's getFilenames() list,
-  if any of them are shortcut (*.lnk) files, dereference the link and
-  make the string point to the "real" disk file. If we have multiple files,
-  remove any links that point to a directory. But if we only have one string
-  in the list, and the string is a link pointing to a directory, we will
-  dereference it so the dialog can change into that folder.
-*/
-static void FixupShortcuts(FXWindow*w, FXString* filenames) {
-  if (!filenames) return;
-  FXString* fn;
-  FXString* tail=filenames;
-  FXuint count=0;
-  for (fn=filenames; !fn->empty(); fn++) {
-    if (IsLinkExt(*fn)) {
-      char*tmp=NULL;
-      if (ReadShortcut(&tmp, fn->text())) {
-        *fn=tmp;
-      } else {
-        FXMessageBox::error(w,MBOX_OK,_("Error in shortcut"),"%s\n%s",fn->text(),tmp);
-      }
-      free(tmp);
-    }
-    tail=fn;
-    count++;
-  }
-  if (count>1) {
-    for (fn=filenames; !fn->empty(); fn++) {
-      if (FXStat::isDirectory(*fn)) {
-        *fn=tail->text();
-        *tail="";
-        tail--;
-      }
-    }
-  }
+  return FileDlg::ReadShortcut(w,filename);
 }
 #endif
-
-
 
 static void GetPathForDlg(SciDoc*sci, FXString &path)
 {
@@ -138,81 +66,6 @@ static void GetPathForDlg(SciDoc*sci, FXString &path)
 
 
 
-/*
-  A curious behavior of Fox's FileDialog is that you cannot manually enter a filename
-  and have it returned, instead the file *must* be selected from the list box.
-  As a workaround, our subclass exposes the FXTextField where the name is entered.
-  Note that this trick will NOT work with SELECTFILE_MULTIPLE!
-*/
-class MySelector: public FXFileSelector {
-  public:
-    FXTextField*txtfld() { return filename; }
-};
-
-
-
-class MyFileDlg: public FXFileDialog {
-#ifdef WIN32
-private:
-  FXString*filenames;
-  bool own_filenames;
-  void DeleteFilenames() {
-    if (filenames&&own_filenames) {
-      delete[] filenames;
-      filenames=NULL;
-    }
-  }
-public:
-    ~MyFileDlg() { DeleteFilenames(); }
-    FXString*getFilenames() {
-      own_filenames=false;
-      return filenames;
-    }
-    FXString getFilename() {
-      if (getSelectMode()==SELECTFILE_ANY) {
-        FXString fn=FXFileDialog::getFilename();
-        if (FileDialogs::ReadShortcut(getShell(), fn)) {
-          FXFileDialog::setFilename(fn);
-        }
-        return FXFileDialog::getFilename();
-      } else {
-        return filenames ? (*filenames) : FXFileDialog::getFilename();
-      }
-    }
-    FXuint execute(FXuint placement=PLACEMENT_CURSOR) {
-      DeleteFilenames();
-      FXuint rv=FXFileDialog::execute(placement);
-      if (rv) {
-        filenames = FXFileDialog::getFilenames();
-        own_filenames=true;
-        if (filenames) {
-          if (getSelectMode()!=SELECTFILE_MULTIPLE) {
-            filenames[0]=FXFileDialog::getFilename();
-          }
-          FixupShortcuts(getShell(), filenames);
-          if (FXStat::isDirectory(filenames->text())) {
-            setFilename("*");
-            filenames->append("\\.");
-            setDirectory(filenames->text());
-            DeleteFilenames();
-            return execute(placement);
-          }
-        }
-      }
-      return rv;
-    }
-    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) {
-      filenames=NULL;
-    }
-#else
-  public:
-    MyFileDlg(FXWindow*win, const FXString&caption):FXFileDialog(win,caption) {}
-#endif
-  public:
-    FXTextField* txtfld() { return ((MySelector*)filebox)->txtfld(); }
-};
-
-
 #define prefs Settings::instance()
 
 bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
@@ -220,11 +73,10 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   FXString result="";
   FXString path;
   GetPathForDlg(sci,path);
-  MyFileDlg dlg(sci->getShell(),_("Save file as"));
+  FileDlg dlg(sci->getShell(),_("Save file as"));
   dlg.setPatternList(_patterns);
   dlg.setCurrentPattern(prefs->FileFilterIndex);
   dlg.setDirectory(path);
-  dlg.txtfld()->setFocus();
   if (dlg.execute(PLACEMENT_OWNER)) {
     result=dlg.getFilename();
     prefs->FileFilterIndex=prefs->KeepFileFilter?dlg.getCurrentPattern():0;
@@ -256,7 +108,7 @@ bool FileDialogs::Export(SciDoc*sci,
   if (filename) {
     saveName=filename;
   } else {
-    MyFileDlg dlg(sci->getShell(),title);
+    FileDlg dlg(sci->getShell(),title);
     if (sci->Filename().empty()) {
       path=FXSystem::getCurrentDirectory();
       tmp=_("Untitled");
@@ -274,7 +126,6 @@ bool FileDialogs::Export(SciDoc*sci,
 #endif
     dlg.setPatternList(patts);
     dlg.setDirectory(path);
-    dlg.txtfld()->setFocus();
     if (dlg.execute(PLACEMENT_OWNER)) {
       saveName=dlg.getFilename();
     }
@@ -364,37 +215,25 @@ bool FileDialogs::TryClose(SciDoc*sci, const char*alt)
 
 bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
 {
-  const char* caption=multi?_("Open multiple files"):_("Select file to open");
+  const char* caption=multi?_("Select files to open"):_("Select file to open");
   FXString path="";
   GetPathForDlg(sci,path);
-  MyFileDlg dlg(sci->getShell(), caption);
+  FileDlg dlg(sci->getShell(), caption, multi);
   dlg.setPatternList(_patterns);
   dlg.setCurrentPattern(prefs->FileFilterIndex);
   dlg.setDirectory(path);
-  if (multi) { // Give some indication that the user can't manually enter file names in multi mode.
-    FXColor bgcolor=sci->getApp()->getBaseColor();
-    FXLabel*label=(FXLabel*)dlg.txtfld()->getPrev();
-    if (label && (strcmp(label->getClassName(),"FXLabel")==0)) { label->setText(_("Selected :")); }
-    dlg.txtfld()->setEditable(false);
-    dlg.txtfld()->setBackColor(bgcolor);
-    dlg.txtfld()->setHiliteColor(bgcolor);
-    dlg.txtfld()->setShadowColor(bgcolor);
-    dlg.txtfld()->setBorderColor(bgcolor);
-    dlg.txtfld()->setTextColor(sci->getApp()->getForeColor());
-  }
-  dlg.setSelectMode(multi?SELECTFILE_MULTIPLE:SELECTFILE_EXISTING);
+  dlg.setSelectMode(multi&&prefs->FileOpenMulti?SELECTFILE_MULTIPLE:SELECTFILE_EXISTING);
   if (dlg.execute(PLACEMENT_OWNER)) {
     filenames=dlg.getFilenames();
-    if ( (!multi) && (!filenames) ) { // Maybe it's not selected, but still in the textfield.
-      FXString fn=dlg.txtfld()->getText();
-      if (!fn.empty()) {
-        if (!FXPath::isAbsolute(fn)) { fn.prepend(dlg.getDirectory() + PATHSEP); }
+    if ( (dlg.getSelectMode()==SELECTFILE_EXISTING) && (!filenames) ) {
+      if (!dlg.getFilename().empty()) {
         filenames=new FXString[2];
-        filenames[0]=fn.text();
+        filenames[0]=dlg.getFilename();
         filenames[1]="";
       } else { filenames=NULL; }
     }
     prefs->FileFilterIndex=prefs->KeepFileFilter?dlg.getCurrentPattern():0;
+    if (multi) { prefs->FileOpenMulti=dlg.MultiMode(); }
   } else { filenames=NULL; }
   return filenames!=NULL;
 }
@@ -406,7 +245,7 @@ bool FileDialogs::GetOpenTagFilename(SciDoc*sci, FXString &filename)
   const char* caption=_("Open tags file");
   FXString path="";
   GetPathForDlg(sci,path);
-  MyFileDlg dlg(sci->getShell(), caption);
+  FileDlg dlg(sci->getShell(), caption);
   dlg.setPatternList(_("Tag Files (TAGS,tags)\nAll Files (*)"));
   dlg.setDirectory(path);
   dlg.setSelectMode(SELECTFILE_EXISTING);

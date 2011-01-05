@@ -272,7 +272,6 @@ void TopWindow::CreateMenus()
   filemenu=new TopMenuPane(this);
   NewTitle(menubar,_("&File"),NULL,filemenu);
   MkMnuCmd(filemenu,ID_NEW);
-  MkMnuCmd(filemenu,ID_OPEN_FILE);
   MkMnuCmd(filemenu,ID_OPEN_FILES);
   openselmenu=MkMnuCmd(filemenu,ID_OPEN_SELECTED);
   recent_files=new HistMenu(filemenu, _("Open pre&vious"), "RecentFiles", this, ID_OPEN_PREVIOUS);

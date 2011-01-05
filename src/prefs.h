@@ -94,6 +94,7 @@ public:
 
   FXulong DefaultToAscii:1;
   FXulong DefaultToSbcs:1;
+  FXulong FileOpenMulti:1;
 
   FXint AutoIndent;
   FXint FileFilterIndex;

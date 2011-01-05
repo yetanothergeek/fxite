@@ -66,7 +66,6 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_TAB_SWITCHED,onSwitchTabs),
   TWMAPFUNC(ID_TAB_ACTIVATE,onTabActivate),
   TWMAPFUNCS(ID_TAB_NEXT,ID_TAB_PREV,onNextTab),
-  TWMAPFUNC(ID_OPEN_FILE, onFileOpen),
   TWMAPFUNC(ID_OPEN_FILES, onFileOpen),
   TWMAPFUNC(ID_CLOSE, onCloseTab),
   TWMAPFUNC(ID_CLOSEALL, onCloseAll),
@@ -982,7 +981,7 @@ long TopWindow::onTabActivate(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onFileOpen(FXObject*o,FXSelector sel,void*p)
 {
   FXString* filenames=NULL;
-  if (filedlgs->GetOpenFilenames(FocusedDoc(),filenames,FXSELID(sel)==ID_OPEN_FILES)) {
+  if (filedlgs->GetOpenFilenames(FocusedDoc(),filenames,true)) {
     FXString* filename;
     for (filename=filenames; !filename->empty(); filename++) { OpenFile(filename->text(),NULL,false,true); }
     delete[] filenames;
