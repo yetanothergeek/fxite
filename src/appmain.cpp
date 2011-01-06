@@ -414,7 +414,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
     new FXToolTip(this,0);
 #endif
     mainwin=new TopWindow(this);
-    create();
+    if (getRootWindow() && getRootWindow()->id()) { mainwin->create(); } else { create(); }
     ipc->StartServer(mainwin, this,ID_IPC_EXEC);
 #ifndef WIN32
     fclose(stdin);
