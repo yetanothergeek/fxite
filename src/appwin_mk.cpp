@@ -960,7 +960,7 @@ FXbool TopWindow::close(FXbool notify)
   }
 
   session_data="";
-  RunHookScript("shutdown");
+  if (!RunHookScript("shutdown")) { return false; }
   if (!CloseAll(true)) {
     not_confirmed();
     FocusedDoc()->setFocus();
