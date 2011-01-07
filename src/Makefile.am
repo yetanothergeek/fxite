@@ -27,10 +27,14 @@ EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt 
 $(srcdir)/help.cpp: $(srcdir)/helptext.h $(srcdir)/help_lua.h
 
 $(srcdir)/helptext.h: $(srcdir)/helptext.txt
-	reswrap -o $@ $<
+	sed '{:q;N;s/\\\n//g;bq}' $< > $<.tmp
+	reswrap -o $@ $<.tmp
+	$(RM) $<.tmp
 
 $(srcdir)/help_lua.h: $(srcdir)/help_lua.txt
-	reswrap -o $@ $<
+	sed '{:q;N;s/\\\n//g;bq}' $< > $<.tmp
+	reswrap -o $@ $<.tmp
+	$(RM) $<.tmp
 
 # Inlining does not work for sl library!
 sl.o: $(srcdir)/sl.c $(srcdir)/sl.h

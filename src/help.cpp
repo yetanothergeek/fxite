@@ -276,16 +276,6 @@ void SciHelp::load(const char*txt, unsigned int size)
       content=(const char*)(sendMessage(SCI_GETCHARACTERPOINTER,0,0));
     }
   }
-  // Unwrap lines that end with a backslash...
-  FXRex unwrap_rx("\\\\\\n", REX_NORMAL|REX_NEWLINE);
-  content=(const char*)(sendMessage(SCI_GETCHARACTERPOINTER,0,0));
-  while (unwrap_rx.match(content,beg,end,REX_FORWARD,1)) {
-    sendMessage(SCI_SETTARGETSTART,beg[0],0);
-    sendMessage(SCI_SETTARGETEND,end[0],0);
-    sendString(SCI_REPLACETARGET,0,"");
-    content=(const char*)(sendMessage(SCI_GETCHARACTERPOINTER,0,0));
-  }
-
   // replace generic placeholders with the real names...
   for (const char**c=replacements; *c; c+=2) {
     replace(*c,*(c+1));
