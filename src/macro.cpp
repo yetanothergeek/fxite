@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -515,7 +515,6 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
       lua_remove(L, base); /* remove traceback function */
       if (0 == status) {
         PopKeepers(L);
-        status = lua_pcall(L, 0, 0, 0);
       } else {
         lua_gc(L, LUA_GCCOLLECT, 0); /* force garbage collection if error */
         show_error(L, si->script);
