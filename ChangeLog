@@ -1,3 +1,24 @@
+2011-01-08
+  * Remember previously-focused document when restoring session.
+  * Loading of help window text is slightly faster.
+  * Fixed a segfault when prompted to edit an error in the shutdown script.
+  * Merged "Open File" and "Open Files" into one dialog (Note the "M" button.)
+  * Improved keyboard navigation in file dialogs.
+  * Updated to Scintilla-2.23+.
+  * Sort the contents of configuration files for easier reading by humans.
+  * Fixed bug where toolbar settings were not properly restored. (Thanks, Igor)
+  * Isolated inter-process communication code, maybe useful for other projects.
+  * Straightened out some entangled header dependencies.
+  * Removed some application-specific dependencies from the backup manager class.
+  * Added edit menu items for extended deletion commands.
+  * Improved horizontal scrolling of long lines.
+  * Tab width and indent width can now be configured separately.
+  * Try X-selection and "filename:NN" format for "Open selected" command.
+  * Fixed a memory leak when saving files.
+  * Resume watching for external changes after saving a file.
+  * When saving file under a new name, add old name to recent files menu.
+
+
 2010-12-03
   * Bump version to 0.7.
   * Prevent running multiline commands from Tools menu input dialogs.
