@@ -124,6 +124,7 @@ public:
   FXint MaxFiles;
   FXint AutosaveInterval;
   FXint DefaultFileFormat;
+  FXString LastFocused;
 
   StyleDef *Styles() { return styles; }
 

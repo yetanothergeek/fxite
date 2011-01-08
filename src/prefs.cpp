@@ -474,6 +474,7 @@ static const char* geom_keys[] = {
   "Height",
   "OutputPaneHeight",
   "placement",
+  "LastFocused",
   NULL
 };
 
@@ -687,6 +688,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   LIMIT_RANGE(Width,160,Width);
   LIMIT_RANGE(Height,120,Height);
   ReadInt(Maximize,false);
+  ReadStr(LastFocused,"");
   ReadInt(FontSize,120);
 
   if (reg->existingEntry(edit_sect,"FontName")) {
@@ -816,6 +818,7 @@ Settings::~Settings()
   WriteInt(Width);
   WriteInt(Height);
   WriteInt(Maximize);
+  WriteStr(LastFocused);
   WriteInt(FontSize);
   WriteInt(DefaultToAscii);
   WriteInt(DefaultToSbcs);

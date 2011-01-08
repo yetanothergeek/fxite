@@ -961,8 +961,10 @@ FXbool TopWindow::close(FXbool notify)
 
   session_data="";
   if (!RunHookScript("shutdown")) { return false; }
+  prefs->LastFocused=FocusedDoc()->Filename();
   if (!CloseAll(true)) {
     not_confirmed();
+    prefs->LastFocused="";
     FocusedDoc()->setFocus();
     return false;
   }
@@ -1051,6 +1053,11 @@ void TopWindow::ParseCommands(FXString &commands)
                 count=fh.readBlock((void*)(session_data.text()),fh.size());
                 fh.close();
                 ParseCommands(session_data);
+                if (!prefs->LastFocused.empty()) {
+                  if (FXStat::isFile(prefs->LastFocused)) {
+                    OpenFile(prefs->LastFocused.text(), NULL, false, false);
+                  }
+                }
               }
             }
             break;
