@@ -103,7 +103,7 @@ class SciHelp: public FXScintilla {
 public:
   SciHelp(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, FXuint opts=LAYOUT_FILL, bool dark=false);
   ~SciHelp();
-  void load(const char*txt, unsigned int size);
+  void parse(const char*txt, unsigned int size);
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p);
   long onCommand(FXObject*o, FXSelector sel, void*p);
   FXTextField *srchbox;
@@ -237,7 +237,7 @@ static char*my_strndup(const char*src,int len)
 
 
 
-void SciHelp::load(const char*txt, unsigned int size)
+void SciHelp::parse(const char*txt, unsigned int size)
 {
   FXint beg[3]={0,0,0};
   FXint end[3]={0,0,0};
@@ -553,7 +553,7 @@ public:
         break;
       }
     }
-    if (sc->loaded!=todo) { sc->load(todo,len); }
+    if (sc->loaded!=todo) { sc->parse(todo,len); }
     sc->show();
     if (shown()) { hide(); }
     show(PLACEMENT_SCREEN);

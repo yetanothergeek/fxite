@@ -126,7 +126,7 @@ public:
   bool kept() { return keep_chk->getCheck(); }
   void AppendHist(const FXString& search,const FXString& replace,FXuint mode);
 
-  virtual FXuint execute(bool first_time);
+  FXuint DoExecute(bool first_time);
   virtual void create();
 
   enum {
@@ -310,7 +310,7 @@ void SciReplDlg::create()
 
 
 
-FXuint SciReplDlg::execute(bool first_time)
+FXuint SciReplDlg::DoExecute(bool first_time)
 {
   if (first_time) { setSearchText(""); }
   create();
@@ -443,7 +443,7 @@ bool SearchDialogs::ShowFindDialog(SciDoc*sci)
   find_dlg->setSearchMode(searchmode);
   bool initial=true;
   do {
-    code=find_dlg->execute(initial);
+    code=find_dlg->DoExecute(initial);
     searchstring=find_dlg->getSearchText();
     searchmode=find_dlg->getSearchMode();
     if (code==SciReplDlg::DONE) {
@@ -486,7 +486,7 @@ void SearchDialogs::ShowReplaceDialog(SciDoc*sci)
   bool initial=true;
   do {
     dlg.have_selection(sci->GetSelLength()>0);
-    code=dlg.execute(initial?PLACEMENT_OWNER:PLACEMENT_DEFAULT);
+    code=dlg.DoExecute(initial?PLACEMENT_OWNER:PLACEMENT_DEFAULT);
     initial=false;
     if (code!=SciReplDlg::DONE) {
       searchmode=dlg.getSearchMode();
