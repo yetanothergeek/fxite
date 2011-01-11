@@ -63,7 +63,7 @@ private:
   void Freeze(FXWindow*win, bool frozen);
   void ClosedDialog();
   static const char* DontFreezeMe();
-  bool CheckKillCommand(FXWindow*w, FXAccelTable*tbl);
+  bool IsCommandReady();
   void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
   void SyncToggleBtn(FXObject*o, FXSelector sel);
   void UpdateEolMenu(SciDoc*sci);
@@ -172,6 +172,7 @@ private:
   bool close_all_confirmed;
   bool kill_commands_confirmed;
   bool command_timeout;
+  bool command_busy;
   FXint need_status;
   void CreateToolbar();
   void CreateMenus();

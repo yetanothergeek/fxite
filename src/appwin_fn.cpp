@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -333,18 +333,25 @@ const char* TopWindow::DontFreezeMe()
 
 
 
-bool TopWindow::CheckKillCommand(FXWindow*w, FXAccelTable*tbl)
+bool TopWindow::IsCommandReady()
 {
-  if (tbl) { return true; }
-  FXMessageBox::error(w, MBOX_OK, _("Command support disabled"),
-    _("Support for running macros and external commands has been\n"
-      "disabled, because the interrupt key sequence is invalid.\n\n"
-      "To fix this, go to:\n"
-      "  Edit->Preferences->Keybindings\n"
-      "and enter a valid setting for \"%s\""),
-    MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND)->pref
-  );
-  return false;
+  if (command_busy) {
+    FXMessageBox::error(this, MBOX_OK, _("Command error"),
+      _("Multiple commands cannot be executed at the same time."));
+    return false;
+  }
+  if (!temp_accels) { 
+    FXMessageBox::error(this, MBOX_OK, _("Command support disabled"),
+      _("Support for running macros and external commands has been\n"
+        "disabled, because the interrupt key sequence is invalid.\n\n"
+        "To fix this, go to:\n"
+        "  Edit->Preferences->Keybindings\n"
+        "and enter a valid setting for \"%s\""),
+      MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND)->pref
+    );
+    return false;
+  }
+  return true;
 }
 
 

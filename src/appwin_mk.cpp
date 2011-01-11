@@ -76,6 +76,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
 
   active_widget=NULL;
   need_status=0;
+  command_busy=false;
   SciDoc::DefaultStyles(prefs->Styles());
   CreateMenus();
   new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
@@ -761,7 +762,8 @@ static void SetShellEnv(const char*file, long line)
 
 bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString &input)
 {
-  if (!CheckKillCommand(this,temp_accels)) { return false; }
+  if (!IsCommandReady()) { return false; }
+  command_busy=true;
   SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool rv=false;
   if (!cmd.empty()) {
@@ -783,6 +785,7 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
   }
   sci->setFocus();
   need_status=1;
+  command_busy=false;
   return rv;
 }
 
@@ -790,7 +793,8 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
 
 bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
 {
-  if (!CheckKillCommand(this,temp_accels)) { return false; }
+  if (!IsCommandReady()) { return false; }
+  command_busy=true;
   SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool success=false;
   if (!cmd.empty()) {
@@ -836,6 +840,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
   }
   if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
   need_status=1;
+  command_busy=false;
   return success;
 }
 
@@ -885,7 +890,8 @@ bool TopWindow::IsMacroCancelled()
 
 bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 {
-  if (!CheckKillCommand(this,temp_accels)) { return false; }
+  if (!IsCommandReady()) { return false; }
+  command_busy=true;
   if (!macros) { macros = new MacroRunner(this); }
   command_timeout=false;
   SetInfo(_("Running macro (press Ctrl+. to cancel)"), true);
@@ -900,6 +906,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
     if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
+  command_busy=false;
   return rv;
 }
 
