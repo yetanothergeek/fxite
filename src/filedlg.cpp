@@ -41,7 +41,7 @@ class FileSel: public FXFileSelector {
     MyDirBox* dbox() { return (MyDirBox*)dirbox; }
     FXButton *icobtn() {
       for (FXWindow*w=navbuttons->getFirst(); w; w=w->getNext()) {
-        if ( (strcmp(w->getClassName(), "FXButton")==0) && (((FXButton*)w)->getIcon()==iconsicon)) {
+        if ((dynamic_cast<FXButton*>(w)!=NULL) && (((FXButton*)w)->getIcon()==iconsicon)) {
           return (FXButton*)w;
         }
       }
@@ -68,10 +68,8 @@ class FileSel: public FXFileSelector {
         filename->setBorderColor(getApp()->getBorderColor());
         filename->setTextColor(getApp()->getForeColor());
       }
-      FXWindow*label=filename->getPrev();
-      if (label && (strcmp(label->getClassName(),"FXLabel")==0)) {
-         ((FXLabel*)label)->setText(label_text);
-       }
+      FXLabel*label=dynamic_cast<FXLabel*>(filename->getPrev());
+      if (label) { label->setText(label_text); }
     }
 };
 

@@ -1,6 +1,6 @@
 /*
   fxasq.cpp - "FoX: Ask Some Questions" is a class for creating query dialogs.
-  Copyright (c) 2007-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2007-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,14 +31,14 @@
 
 #define LISTBOX_OPTS FRAME_SUNKEN|FRAME_THICK|LISTBOX_NORMAL|LAYOUT_FILL_X
 
-#define IsThis(o,t) ( o && (strcmp(o->getClassName(),t)==0) )
+#define IsThis(o,t) ( dynamic_cast<t*>(o)!=NULL )
 
-static bool IsList(FXObject*o)  { return IsThis(o,"FXListBox"); }
-static bool IsRadio(FXObject*o) { return IsThis(o,"FXRadioButton"); }
-static bool IsGroup(FXObject*o) { return IsThis(o,"GroupBox"); }
-static bool IsCheck(FXObject*o) { return IsThis(o,"FXCheckButton"); }
-static bool IsTextField(FXObject*o) { return IsThis(o,"FXTextField"); }
-static bool IsTextArea(FXObject*o)  { return IsThis(o,"FXText"); }
+static bool IsList(FXObject*o)  { return IsThis(o,FXListBox); }
+static bool IsRadio(FXObject*o) { return IsThis(o,FXRadioButton); }
+static bool IsGroup(FXObject*o) { return IsThis(o,FXGroupBox); }
+static bool IsCheck(FXObject*o) { return IsThis(o,FXCheckButton); }
+static bool IsTextField(FXObject*o) { return IsThis(o,FXTextField); }
+static bool IsTextArea(FXObject*o)  { return IsThis(o,FXText); }
 
 
 class MyDialog: public FXDialogBox {
