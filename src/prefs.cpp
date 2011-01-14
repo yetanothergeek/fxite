@@ -774,6 +774,9 @@ Settings::~Settings()
   SaveStyle(style_reg, global_sect,&CaretLineStyle);
   SaveStyle(style_reg, global_sect,&RightMarginStyle);
 
+  reg->deleteSection(keys_sect);
+  reg->deleteSection(tbar_sect);
+
   WriteInt(ShowStatusBar);
   WriteInt(ShowWhiteSpace);
   WriteInt(ShowOutputPane);

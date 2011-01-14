@@ -619,7 +619,6 @@ void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
 
 void MenuMgr::WriteMenuSpecs(FXRegistry*reg, const char* keys_sect)
 {
-  reg->deleteSection(keys_sect);
   for (MenuSpec*spec=menu_specs; spec->sel!=TopWindow::ID_LAST; spec++) {
     reg->writeStringEntry(keys_sect,spec->pref,spec->accel);
   }
@@ -654,7 +653,6 @@ void MenuMgr::ReadToolbarButtons(FXRegistry*reg, const char* tbar_sect)
 
 void MenuMgr::WriteToolbarButtons(FXRegistry*reg, const char* tbar_section)
 {
-  reg->deleteSection(tbar_section);
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
     char keyname[32];
     memset(keyname,0, sizeof(keyname));
