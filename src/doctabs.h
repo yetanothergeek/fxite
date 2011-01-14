@@ -45,10 +45,6 @@ private:
   FXFont *normal_font;
   FXFont *bold_font;
   FXFontDesc desc;
-  FXColor hot_fg;
-  FXColor hot_bg;
-  FXColor cold_fg;
-  FXColor cold_bg;
   FXMenuPane*tab_popup;
 
   DocTabs(){}

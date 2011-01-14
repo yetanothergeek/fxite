@@ -88,10 +88,6 @@ DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   GetFontDescription(desc,normal_font);
   desc.weight=FXFont::Bold;
   bold_font=new FXFont(a,desc);
-  hot_fg=a->getSelforeColor();
-  hot_bg=a->getSelbackColor();
-  cold_fg=a->getForeColor();
-  cold_bg=a->getBaseColor();
   tab_popup=new FXMenuPane(this);
   new FXMenuCommand(tab_popup,_("&Close"),NULL,this,ID_POPUP_CLICK);
 }
@@ -108,11 +104,13 @@ DocTabs::~DocTabs()
 
 void DocTabs::setTabColor(DocTab*t, bool active)
 {
-  t->setBorderColor(active?hot_fg:cold_fg);
-  t->setShadowColor(active?hot_fg:cold_fg);
-  t->setHiliteColor(active?hot_fg:cold_fg);
-  t->setTextColor(active?hot_fg:cold_fg);
-  t->setBackColor(active?hot_bg:cold_bg);
+  FXColor fg=active?getApp()->getSelforeColor():getApp()->getForeColor();
+  FXColor bg=active?getApp()->getSelbackColor():getApp()->getBaseColor();
+  t->setBorderColor(fg);
+  t->setShadowColor(fg);
+  t->setHiliteColor(fg);
+  t->setTextColor(fg);
+  t->setBackColor(bg);
   t->setFont(active?bold_font:normal_font);
 }
 
