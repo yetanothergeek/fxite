@@ -100,28 +100,20 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   hsplit->setSplit(1,prefs->OutputPaneHeight);
   ShowOutputPane(prefs->ShowOutputPane);
 
-  FXColor clr=statusbar->getBaseColor();
-
   coords=new FXTextField(statusbar,12,NULL,FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  coords->setShadowColor(clr);
-  coords->setBackColor(clr);
   coords->setEditable(false);
 
   docname=new FXTextField(statusbar, 64, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  docname->setShadowColor(clr);
-  docname->setBackColor(clr);
   docname->setEditable(false);
 
   encname=new FXTextField(statusbar, 6, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  encname->setShadowColor(clr);
-  encname->setBackColor(clr);
   encname->setEditable(false);
 
   general_info=new FXLabel(statusbar, FXString::null, NULL,JUSTIFY_LEFT|LAYOUT_FIX_Y);
   general_info->setUserData((void*)DontFreezeMe());
-  general_info->setBackColor(HexToRGB("#FFFFCC"));
-  general_info->setTextColor(HexToRGB("#FF0000"));
   general_info->hide();
+
+  SetStatusBarColors();
 
   srchdlgs=new SearchDialogs(this);
   srchdlgs->searchstring="";

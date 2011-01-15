@@ -57,6 +57,8 @@ private:
   static void EnableFilterBtnCB(FXButton*btn, void*user_data);
   static void SetTBarBtnFontCB(FXButton*btn, void*user_data);
   static void ClearTBarBtnDataCB(FXButton*btn, void*user_data);
+  static void SetTBarBtnColorCB(FXButton*btn, void*user_data);
+  void SetToolbarColors();
   void UpdateToolbarWrap();
   bool IsDocValid(SciDoc*sci);
   void SetTabTag(SciDoc*sci, char mark, bool set);
@@ -197,6 +199,7 @@ private:
   void DoneSci(SciDoc*sci);
   void EnableUserFilters(bool enabled);
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
+  void SetStatusBarColors();
   FXString save_hook;
   FXHotKey killkey;
   FXString bookmarked_file;

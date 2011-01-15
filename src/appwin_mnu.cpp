@@ -837,6 +837,27 @@ void TopWindow::ClearTBarBtnDataCB(FXButton*btn, void*user_data)
 
 
 
+void TopWindow::SetTBarBtnColorCB(FXButton*btn, void*user_data)
+{
+  FXint*i=(FXint*)user_data;
+  btn->setBackColor(HexToRGB(MenuMgr::TBarColors(*i)));
+  btn->setTextColor(HexToRGB("#000000"));
+  btn->setHiliteColor(HexToRGB("#c0c0c0"));
+  btn->setShadowColor(FXRGB(0x00,0x00,0x00));
+  btn->setBorderColor(FXRGB(0x00,0x00,0x00));
+  (*i)++;
+}
+
+
+
+void TopWindow::SetToolbarColors()
+{
+  FXint i=0;
+  ForEachToolbarButton(SetTBarBtnColorCB,&i);
+}
+
+
+
 #define EngageBtn(s,t) ((t*)btn)->setState(s?((t*)btn)->getState()|STATE_ENGAGED:((t*)btn)->getState()&~STATE_ENGAGED)
 
 void TopWindow::UpdateToolbar()
@@ -881,8 +902,6 @@ void TopWindow::UpdateToolbar()
           case 'r': { EngageBtn(((FXMenuRadio*)(spec->ms_mc))->getCheck(),FXButton); break; }
         }
       }
-      btn->setBackColor(HexToRGB(MenuMgr::TBarColors(i)));
-      btn->setTextColor(HexToRGB("#000000"));
       FXString tip;
       MenuMgr::GetTBarBtnTip(spec,tip);
       btn->setTipText(tip);
@@ -891,6 +910,7 @@ void TopWindow::UpdateToolbar()
     }
   }
   ForEachToolbarButton(SetTBarBtnFontCB,this);
+  SetToolbarColors();
   toolbar_frm->layout();
   if (FocusedDoc()) { EnableUserFilters(FocusedDoc()->GetSelLength()>0); }
 }

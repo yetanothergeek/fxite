@@ -633,6 +633,22 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 
 
 
+void TopWindow::SetStatusBarColors()
+{
+  FXColor clr=statusbar->getBaseColor();
+  coords->setShadowColor(clr);
+  coords->setBackColor(clr);
+  coords->setEditable(false);
+  docname->setShadowColor(clr);
+  docname->setBackColor(clr);
+  encname->setShadowColor(clr);
+  encname->setBackColor(clr);
+  general_info->setBackColor(HexToRGB("#FFFFCC"));
+  general_info->setTextColor(HexToRGB("#FF0000"));
+}
+
+
+
 // Prints the names of the compiled-in lexers to stdout,
 // along with the number of word lists per lexer
 // ( Only used during development, to help with the

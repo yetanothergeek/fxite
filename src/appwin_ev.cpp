@@ -168,6 +168,7 @@ void TopWindow::ClosedDialog()
 long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 {
   prefs->InvertColors=!prefs->InvertColors;
+  SetToolbarColors();
   SciDoc*sci=ControlDoc();
   tabbook->ForEachTab(PrefsCB,NULL);
   CheckStyle(NULL,0,sci);
