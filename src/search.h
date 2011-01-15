@@ -67,6 +67,7 @@ public:
   void FindSelected(SciDoc*sci, bool forward);
   bool GoToSelected(SciDoc*sci);
   bool ShowGoToDialog(SciDoc*sci);
+  FXDialogBox*FindDialog() { return (FXDialogBox*)find_dlg; }
   SearchDialogs(FXWindow*shell);
   virtual ~SearchDialogs();
 };
