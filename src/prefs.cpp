@@ -73,8 +73,16 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
     case ID_TOGGLE_USE_TABS:    { 
       FXSpinner*spin=(FXSpinner*)(((FXCheckButton*)o)->getUserData());
-      UseTabs = !UseTabs; 
-      if (UseTabs) { spin->disable(); } else { spin->enable(); }
+      UseTabs = (bool)((FXival)p);
+      if (UseTabs) {
+        spin->disable();
+        spin->getNext()->disable();
+        spin->setTextColor(spin->getApp()->getBaseColor());
+      } else {
+        spin->enable();
+        spin->getNext()->enable();
+        spin->setTextColor(spin->getApp()->getForeColor());
+      }
       break;
     }
     case ID_TOGGLE_BRACE_MATCH: { BraceMatch = !BraceMatch; break; }

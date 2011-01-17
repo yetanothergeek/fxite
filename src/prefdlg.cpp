@@ -1110,23 +1110,21 @@ FXTabItem* PrefsDialog::MakeEditorTab()
   chk=new FXCheckButton(column, _("Highlight matching braces"), prefs, Settings::ID_TOGGLE_BRACE_MATCH);
   chk->setCheck(prefs->BraceMatch, FALSE);
 
+  chk=new FXCheckButton(column, _("Use tabs for indent"), prefs, Settings::ID_TOGGLE_USE_TABS);
+
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_TAB_WIDTH, SPIN_OPTS);
   spin->setValue(prefs->TabWidth);
   spin->setRange(1,16);
-  new FXLabel(spinframe, _("Tab width"));
+  (new FXLabel(spinframe, _("Tab width")))->setPadRight(16);
 
-  chk=new FXCheckButton(column, _("Use tabs for indent"), prefs, Settings::ID_TOGGLE_USE_TABS);
-  chk->setCheck(prefs->UseTabs, FALSE);
-
-  spinframe=new FXHorizontalFrame(column);
-  spinframe->setPadLeft(16);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_INDENT_WIDTH, SPIN_OPTS);
   spin->setValue(prefs->IndentWidth);
   spin->setRange(1,16);
   new FXLabel(spinframe, _("Indent width"));
-  if (prefs->UseTabs) { spin->disable(); }
+
   chk->setUserData((void*)spin);
+  chk->setCheck(prefs->UseTabs, TRUE);
   
   new FXHorizontalSeparator(column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
   new FXLabel(column, _("Default search options:"));
