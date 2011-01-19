@@ -842,9 +842,9 @@ void TopWindow::SetTBarBtnColorCB(FXButton*btn, void*user_data)
   FXint*i=(FXint*)user_data;
   btn->setBackColor(HexToRGB(MenuMgr::TBarColors(*i)));
   btn->setTextColor(HexToRGB("#000000"));
-  btn->setHiliteColor(HexToRGB("#c0c0c0"));
-  btn->setShadowColor(FXRGB(0x00,0x00,0x00));
-  btn->setBorderColor(FXRGB(0x00,0x00,0x00));
+  btn->setHiliteColor(makeHiliteColor(btn->getBackColor()));
+  btn->setShadowColor(makeShadowColor(btn->getBackColor()));
+  btn->setBorderColor(btn->getShadowColor());
   (*i)++;
 }
 
