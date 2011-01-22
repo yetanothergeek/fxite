@@ -755,7 +755,7 @@ class ToolBarBtn: public FXButton {
   ToolBarBtn(){}
 public:
   ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
-      FXButton(p,text,NULL,tgt,sel,FRAME_RAISED|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0) {}
+      FXButton(p,text,NULL,tgt,sel,FRAME_NONE|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0) {}
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
     long rv=FXButton::onLeftBtnRelease(o,sel,p);
     getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
@@ -778,7 +778,7 @@ class ToolBarTogBtn: public FXToggleButton {
 public:
   ToolBarTogBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
       FXToggleButton( p,text,text,NULL,NULL,tgt,sel,
-                        FRAME_RAISED|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE,0,0,24,24,2,2,0,0) {}
+                        FRAME_RAISED|FRAME_THICK|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE,0,0,24,24,2,2,0,0) {}
   long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
     long rv=FXToggleButton::onLeftBtnRelease(o,sel,p);
     getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);

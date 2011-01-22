@@ -56,8 +56,10 @@ void TopWindow::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
       FXButton*btn=(FXButton*)spec->ms_mc->getUserData();
       if (btn) {
         if (curr==i) {
+          btn->setFrameStyle(btn->getFrameStyle()|FRAME_THICK|FRAME_RAISED);
           btn->setState(btn->getState()|STATE_ENGAGED);
         } else {
+          btn->setFrameStyle(FRAME_NONE);
           btn->setState(btn->getState()&~STATE_ENGAGED);
         }
       }
