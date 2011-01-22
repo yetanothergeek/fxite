@@ -116,6 +116,19 @@ void DocTabs::setTabColor(DocTab*t, bool active)
 
 
 
+void DocTabs::SetFont(FXFont*fnt)
+{
+  normal_font=fnt;
+  GetFontDescription(desc,normal_font);
+  desc.weight=FXFont::Bold;
+  bold_font->destroy();
+  bold_font->setFontDesc(desc);
+  bold_font->create();
+  UpdateTabs();
+}
+
+
+
 void DocTabs::UpdateTabs()
 {
   bool istab;

@@ -81,6 +81,7 @@ public:
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
   FXint Count() { return numChildren()/2; }
+  void SetFont(FXFont*fnt);
   enum {
     ID_TAB_POPUP_MENU=FXTabBook::ID_LAST,
     ID_POPUP_CLICK,
