@@ -913,6 +913,13 @@ void TopWindow::UpdateToolbar()
   SetToolbarColors();
   toolbar_frm->layout();
   if (FocusedDoc()) { EnableUserFilters(FocusedDoc()->GetSelLength()>0); }
+  switch (prefs->DocTabPosition) {
+    case 'T': RadioUpdate(ID_TABS_TOP,    ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'B': RadioUpdate(ID_TABS_BOTTOM, ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'L': RadioUpdate(ID_TABS_LEFT,   ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'R': RadioUpdate(ID_TABS_RIGHT,  ID_TABS_TOP, ID_TABS_RIGHT); break;
+  }
+  RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
 }
 
 
