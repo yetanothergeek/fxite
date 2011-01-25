@@ -1390,9 +1390,8 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
   if (Theme::changed() & ThemeChangedColors) {
     Theme::apply(this);
     Theme::apply(srchdlgs->FindDialog());
-    delete tips;
-    tips=new FXToolTip(getApp(),0);
-    tips->create();
+    tips->setBackColor(getApp()->getTipbackColor());
+    tips->setTextColor(getApp()->getTipforeColor());
     SetStatusBarColors();
   }
   if (Theme::changed() & ThemeChangedFont) {
