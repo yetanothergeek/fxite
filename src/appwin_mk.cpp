@@ -70,6 +70,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   FXASSERT(!global_top_window_instance);
   global_top_window_instance=this;
   StyleDef*sd=GetStyleFromId(Settings::globalStyle(), STYLE_CALLTIP);
+  tips=new FXToolTip(getApp(),0);
   RgbToHex(getApp()->getTipbackColor(), sd->bg);
   RgbToHex(getApp()->getTipforeColor(), sd->fg);
   prefs=new Settings(this, ConfigDir());
@@ -1228,6 +1229,7 @@ void TopWindow::create()
 
   FXMainWindow::create();
 
+  tips->create();
   show(prefs->placement);
 
   FXIcon*ico=NULL;

@@ -408,10 +408,6 @@ void AppClass::init(int& argc, char** argv, bool connect)
 #if defined(WIN32) && !defined(FOX_1_6)
     setToolTipTime(2000000000);
     setToolTipPause(250000000);
-    FXToolTip* tips=new FXToolTip(this,0);
-    tips->create();
-#else
-    new FXToolTip(this,0);
 #endif
     mainwin=new TopWindow(this);
     if (getRootWindow() && getRootWindow()->id()) { mainwin->create(); } else { create(); }

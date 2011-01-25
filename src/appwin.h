@@ -72,6 +72,7 @@ private:
   static void SetMenuEnabled(FXMenuCommand*mnu, bool enabled);
   SciDoc*clipsci;
   SciDoc*recording;
+  FXToolTip* tips;
   FXMenuBar*  menubar;
   TopMenuPane* filemenu;
   TopMenuPane* editmenu;
