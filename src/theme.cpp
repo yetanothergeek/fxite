@@ -647,7 +647,7 @@ long ThemeGUI::onSelectTheme(FXObject*o, FXSelector sel, void*p)
   }
   current_theme=ac->name;
   SetDemoColors();
-  if (sel) {
+  if (id()) {
     what_changed |= ThemeChangedColors;
   }
   return 1;
