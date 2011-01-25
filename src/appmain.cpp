@@ -38,6 +38,7 @@
 #include "appwin.h"
 
 #include "interproc.h"
+#include "theme.h"
 
 #include "intl.h"
 #include "appmain.h"
@@ -324,6 +325,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
   }
   FXApp::init(argc,argv,connect);
 #endif
+  Theme::init();
   CreateConfigDir();
   for (FXint i=1; i<getArgc(); i++) {
     const char *arg=getArgv()[i];
@@ -428,6 +430,7 @@ void AppClass::exit(FXint code)
 {
   ipc->StopServer();
   delete ipc;
+  Theme::done();
   FXApp::exit(code);
   ini_sort(settingsfile.text());
 }

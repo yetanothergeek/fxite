@@ -40,6 +40,7 @@ class Accessor;
 #include "tooltree.h"
 #include "menuspec.h"
 #include "filterdlg.h"
+#include "theme.h"
 
 #include "intl.h"
 #include "prefdlg.h"
@@ -640,6 +641,7 @@ static FXuint changed_toolbar = ToolbarUnchanged;
 
 FXuint PrefsDialog::ChangedToolbar()
 {
+  if (Theme::changed() & ThemeChangedFont) { changed_toolbar |= ToolbarChangedFont; }
   return changed_toolbar;
 }
 
@@ -1161,6 +1163,14 @@ void PrefsDialog::MakeEditorTab()
 
 
 
+void PrefsDialog::MakeThemeTab()
+{
+  new FXTabItem(tabs,_("theme"));
+  Theme::MakeThemeGUI(tabs);
+}
+
+
+
 long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 {
   whichtab=(FXival)p;
@@ -1220,6 +1230,7 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
   MakeSyntaxTab();
   MakeKeybindingsTab();
   MakeToolbarTab();
+  MakeThemeTab();
   tabs->setCurrent(whichtab,true);
   tabs->childAtIndex(whichtab*2)->setFocus();
   setIcon(w->getIcon());

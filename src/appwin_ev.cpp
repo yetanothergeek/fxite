@@ -43,6 +43,7 @@
 #include "toolmgr.h"
 #include "backup.h"
 #include "menuspec.h"
+#include "theme.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -1386,6 +1387,21 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     toolbar_frm->getParent()->layout();
   }
   filedlgs->patterns(prefs->FileFilters);
+  if (Theme::changed() & ThemeChangedColors) {
+    Theme::apply(this);
+    Theme::apply(srchdlgs->FindDialog());
+    delete tips;
+    tips=new FXToolTip(getApp(),0);
+    tips->create();
+    SetStatusBarColors();
+  }
+  if (Theme::changed() & ThemeChangedFont) {
+    tabbook->SetFont(getApp()->getNormalFont());
+  } else {
+    tabbook->ActivateTab(tabbook->ActiveTab());
+  }
+  SetToolbarColors();
+  EnableUserFilters(FocusedDoc()->GetSelLength());
   return 1;
 }
 
