@@ -47,7 +47,7 @@ To add a new menu command:
 #define TW TopWindow
 static MenuSpec menu_specs[] = {
   {TW::ID_NEW,              "FileNew",         _("&New"),               _("new file"),     "Ctrl+N",       'm', {NULL}},
-  {TW::ID_OPEN_FILES,       "FileOpenFile",    _("Open &Files..."),     _("open files"),   "Ctrl+O",       'm', {NULL}},
+  {TW::ID_OPEN_FILES,       "FileOpenFile",    _("&Open Files..."),     _("open files"),   "Ctrl+O",       'm', {NULL}},
   {TW::ID_OPEN_SELECTED,    "FileOpenSel",     _("Open Selecte&d"),     _("open sel"),     "Ctrl+Y",       'm', {NULL}},
   {TW::ID_SAVE,             "FileSave",        _("&Save"),              _("save file"),    "Ctrl+S",       'm', {NULL}},
   {TW::ID_SAVEAS,           "FileSaveAs",      _("Save &As..."),        _("save as"),      "Ctrl+Shift+S", 'm', {NULL}},
