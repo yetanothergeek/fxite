@@ -764,9 +764,9 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
 
 
 
-FXTabItem* PrefsDialog::MakeToolbarTab()
+void PrefsDialog::MakeToolbarTab()
 {
-  FXTabItem* tab=new FXTabItem(tabs,_("toolbar"));
+  new FXTabItem(tabs,_("toolbar"));
   FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   FXVerticalFrame* left_column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
   FXVerticalFrame* mid_column=new FXVerticalFrame(frame,FRAME_NONE|LAYOUT_CENTER_Y|PACK_UNIFORM_WIDTH);
@@ -826,14 +826,13 @@ FXTabItem* PrefsDialog::MakeToolbarTab()
   tbar_avail_items->selectItem(0);
   if (tbar_used_items->getNumItems()) { tbar_used_items->selectItem(0); }
   onToolbarEdit(NULL,0,NULL);
-  return tab;
 }
 
 
 
-FXTabItem* PrefsDialog::MakeKeybindingsTab()
+void PrefsDialog::MakeKeybindingsTab()
 {
-  FXTabItem*tab=new FXTabItem(tabs,_("keybindings"));
+  new FXTabItem(tabs,_("keybindings"));
   FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   acclist=new FXIconList(frame,
     this,ID_ACCEL_EDIT,FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|ICONLIST_BROWSESELECT);
@@ -847,7 +846,6 @@ FXTabItem* PrefsDialog::MakeKeybindingsTab()
     acclist->appendItem(new KBindListItem(txt, NULL, NULL, (void*)spec));
   }
   acclist->selectItem(0);
-  return tab;
 }
 
 
@@ -865,9 +863,9 @@ static ColorName rainbow[] = {
 
 
 
-FXTabItem* PrefsDialog::MakeSyntaxTab()
+void PrefsDialog::MakeSyntaxTab()
 {
-  FXTabItem*tab=new FXTabItem(tabs,_("syntax"));
+  new FXTabItem(tabs,_("syntax"));
   FXHorizontalFrame *frame;
   FXVerticalFrame *left_column;
   FXVerticalFrame *right_column;
@@ -927,7 +925,6 @@ FXTabItem* PrefsDialog::MakeSyntaxTab()
     HexToRGB(rainbow[i]),NULL,0,FRAME_NONE|COLORWELL_OPAQUEONLY|COLORWELL_SOURCEONLY|COLORWELL_NORMAL,0,0,0,0,0,0,0,0);
   }
   onLangSwitch(langlist,FXSEL(SEL_COMMAND,ID_LANG_SWITCH), (void*)whichlang);
-  return tab;
 }
 
 
@@ -952,9 +949,9 @@ long PrefsDialog::onFiltersEdit(FXObject*o,FXSelector sel,void*p)
 
 
 
-FXTabItem* PrefsDialog::MakeGeneralTab()
+void PrefsDialog::MakeGeneralTab()
 {
-  FXTabItem* tab=new FXTabItem(tabs,_("general"));
+  new FXTabItem(tabs,_("general"));
   FXHorizontalFrame* hframe;
   FXVerticalFrame* vframe;
   FXVerticalFrame* left_column;
@@ -1044,14 +1041,13 @@ FXTabItem* PrefsDialog::MakeGeneralTab()
   spin->setRange(1,32);
   new FXLabel(hframe, _("Mouse wheel acceleration."));
 
-  return tab;
 }
 
 
 
-FXTabItem* PrefsDialog::MakeEditorTab()
+void PrefsDialog::MakeEditorTab()
 {
-  FXTabItem*tab=new FXTabItem(tabs,_("editor"));
+  new FXTabItem(tabs,_("editor"));
   FXHorizontalFrame *frame;
   FXVerticalFrame *column;
   FXHorizontalFrame *spinframe;
@@ -1161,7 +1157,6 @@ FXTabItem* PrefsDialog::MakeEditorTab()
                           prefs, Settings::ID_TOGGLE_VIEW_WHITESPACE_EOL);
   chk->setCheck(prefs->WhitespaceShowsEOL, FALSE);
   chk->setPadLeft(6);
-  return tab;
 }
 
 
@@ -1220,11 +1215,11 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
 
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   tabs=new FXTabBook(this, this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
-  GeneralTab=MakeGeneralTab();
-  EditorTab=MakeEditorTab();
-  SyntaxTab=MakeSyntaxTab();
-  KeybindingsTab=MakeKeybindingsTab();
-  ToolbarTab=MakeToolbarTab();
+  MakeGeneralTab();
+  MakeEditorTab();
+  MakeSyntaxTab();
+  MakeKeybindingsTab();
+  MakeToolbarTab();
   tabs->setCurrent(whichtab,true);
   tabs->childAtIndex(whichtab*2)->setFocus();
   setIcon(w->getIcon());

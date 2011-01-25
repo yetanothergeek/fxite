@@ -25,11 +25,6 @@ private:
   FXDECLARE(PrefsDialog)
   PrefsDialog(){}
   friend class StyleEdit;
-  FXTabItem*GeneralTab;
-  FXTabItem*EditorTab;
-  FXTabItem*SyntaxTab;
-  FXTabItem*KeybindingsTab;
-  FXTabItem*ToolbarTab;
   FXTabBook*tabs;
   Settings*prefs;
   FXListBox *langlist;
@@ -57,11 +52,11 @@ private:
   FXList*   tbar_avail_items;
   FXList*   tbar_used_items;
 
-  FXTabItem* MakeSyntaxTab();
-  FXTabItem* MakeGeneralTab();
-  FXTabItem* MakeEditorTab();
-  FXTabItem* MakeKeybindingsTab();
-  FXTabItem* MakeToolbarTab();
+  void MakeSyntaxTab();
+  void MakeGeneralTab();
+  void MakeEditorTab();
+  void MakeKeybindingsTab();
+  void MakeToolbarTab();
   FXHorizontalFrame*style_hdr;
   FXLabel* hint_lab;
   FXMainWindow* main_win;
