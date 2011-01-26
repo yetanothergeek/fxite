@@ -272,7 +272,7 @@ long TopWindow::onTestSomething(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onConfigureTools( FXObject*o, FXSelector sel, void*p )
 {
   tooldlg=new ToolsDialog(this,UserMenus());
-  tooldlg->execute(PLACEMENT_OWNER);
+  tooldlg->execute(PLACEMENT_SCREEN);
   delete tooldlg;
   tooldlg=NULL;
   onRescanUserMenu(NULL,0,NULL);
