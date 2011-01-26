@@ -298,6 +298,14 @@ static int tools_rebuild_menu(lua_State* L)
 
 
 
+static int tools_customize_menu(lua_State* L)
+{
+  tw->onConfigureTools(NULL,0,NULL);
+  return 0;
+}
+
+
+
 static int view_language(lua_State* L)
 {
   const char*name=luaL_checkstring(L,1);
@@ -537,6 +545,7 @@ static const struct luaL_reg fxte_commands[] = {
   {"search_find_definition",    search_find_definition},
 
   {"tools_rebuild_menu",        tools_rebuild_menu},
+  {"tools_customize_menu",      tools_customize_menu},
 
   {"view_status",               view_status},
   {"view_line_numbers",         view_line_numbers},
