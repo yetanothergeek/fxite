@@ -816,7 +816,7 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   move_btn=new FXButton(move_panel, _("Mo&ve"),NULL, this, ID_MOVE_CLICK);
 
 
-  new_panel=new FXVerticalFrame(right_box,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
+  new_panel=new FXVerticalFrame(right_box,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_BOTTOM);
   new_panel->setVSpacing(0);
   strip=new FXHorizontalFrame(new_panel,LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
   new_menu_btn=new FXButton(strip, _("New group"), NULL, this, ID_NEW_MENU_CLICK,BUTTON_NORMAL|LAYOUT_FILL_X);
