@@ -58,6 +58,7 @@ private:
   FXListBox* move_list;
   FXButton* move_btn;
   FXLabel* helptext;
+  FXSplitter*split;
 
   void clear();
 

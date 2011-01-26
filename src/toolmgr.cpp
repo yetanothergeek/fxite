@@ -757,18 +757,17 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   FXDialogBox(win, _("Tools Manager"),DECOR_TITLE|DECOR_BORDER, 0,0,560,400)
 {
   FXVerticalFrame*vbox;
-  FXHorizontalFrame*ctrls;
   opts_panel=NULL;
   SetPad(this,0);
   vbox = new FXVerticalFrame(this,LAYOUT_FILL);
   SetPad(vbox,0);
 
-  ctrls = new FXHorizontalFrame(vbox,LAYOUT_FILL);
-  SetPad(ctrls,0);
+  split=new FXSplitter(vbox,LAYOUT_FILL|SPLITTER_REVERSED);
+
   FXint sxtnth=getWidth()/16;
-  left_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK,0,0,sxtnth*4);
+  left_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK,0,0,sxtnth*4);
   SetPad(left_box,0);
-  right_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH,0,0,sxtnth*9);
+  right_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH,0,0,sxtnth*9);
   SetPad(right_box,4);
 
   intro_lab=new FXLabel(right_box,intro_text,NULL, LABEL_NORMAL|JUSTIFY_LEFT);
