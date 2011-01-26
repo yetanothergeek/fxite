@@ -753,8 +753,20 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
 
 
 
+void ToolsDialog::create()
+{
+  FXDialogBox::create();
+  FXint disp_wdt=getApp()->getRootWindow()->getWidth()*0.875;
+  FXint ctrl_wdt=split->getSplit(1)*2;
+  setWidth(disp_wdt<ctrl_wdt?disp_wdt:ctrl_wdt);
+  FXint disp_hgt=getApp()->getRootWindow()->getHeight()*0.833;
+  if (getDefaultHeight()>disp_hgt) { setHeight(disp_hgt); }
+}
+
+
+
 ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
-  FXDialogBox(win, _("Tools Manager"),DECOR_TITLE|DECOR_BORDER, 0,0,560,400)
+  FXDialogBox(win, _("Tools Manager"),DECOR_TITLE|DECOR_BORDER)
 {
   FXVerticalFrame*vbox;
   opts_panel=NULL;
@@ -764,10 +776,9 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
 
   split=new FXSplitter(vbox,LAYOUT_FILL|SPLITTER_REVERSED);
 
-  FXint sxtnth=getWidth()/16;
-  left_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK,0,0,sxtnth*4);
+  left_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK);
   SetPad(left_box,0);
-  right_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH,0,0,sxtnth*9);
+  right_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH);
   SetPad(right_box,4);
 
   intro_lab=new FXLabel(right_box,intro_text,NULL, LABEL_NORMAL|JUSTIFY_LEFT);

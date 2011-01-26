@@ -71,6 +71,7 @@ private:
   FXuint GetPermsForItem(FXTreeItem *item=NULL);
 public:
   ToolsDialog(FXTopWindow*win, UserMenu**menus);
+  virtual void create();
   long onTreeListChanged(FXObject*o, FXSelector sel, void*p);
   long onTreeListAfterChanged(FXObject*o, FXSelector sel, void*p);
   long onAccelField(FXObject*o, FXSelector sel, void*p);
