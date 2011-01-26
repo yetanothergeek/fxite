@@ -27,7 +27,6 @@ private:
 
   ToolsTree* tree;
   FXVerticalFrame* left_box;
-  FXVerticalFrame* middle_box;
   FXVerticalFrame* right_box;
   FXVerticalFrame* name_panel;
   FXVerticalFrame* accel_panel;

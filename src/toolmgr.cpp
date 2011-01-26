@@ -182,7 +182,7 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
   helptext->setText(um->helptext);
   const char**opts=um->getFlags();
   if (opts) {
-    opts_panel=new FXVerticalFrame(middle_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
+    opts_panel=new FXVerticalFrame(right_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
     new FXLabel(opts_panel,_("&Options"));
     int i,n=0;
     for (i=0; opts[i]; i++) { n++; }
@@ -218,7 +218,7 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
       }
     }
     opts_panel->create();
-    opts_panel->reparent(middle_box,apply_btn->getParent());
+    opts_panel->reparent(right_box,apply_btn->getParent());
   }
 }
 
@@ -768,15 +768,12 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   FXint sxtnth=getWidth()/16;
   left_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK,0,0,sxtnth*4);
   SetPad(left_box,0);
-  middle_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH,0,0,sxtnth*9);
-  SetPad(middle_box,4);
-  right_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|LAYOUT_RIGHT,0,0,sxtnth*3);
+  right_box=new FXVerticalFrame(ctrls,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH,0,0,sxtnth*9);
   SetPad(right_box,4);
-  right_box->setWidth(getWidth()/6);
 
-  intro_lab=new FXLabel(middle_box,intro_text,NULL, LABEL_NORMAL|JUSTIFY_LEFT);
+  intro_lab=new FXLabel(right_box,intro_text,NULL, LABEL_NORMAL|JUSTIFY_LEFT);
 
-  name_panel=new FXVerticalFrame(middle_box,FRAME_NONE|LAYOUT_FILL_X);
+  name_panel=new FXVerticalFrame(right_box,FRAME_NONE|LAYOUT_FILL_X);
   props_lab=new FXLabel(name_panel, "",NULL, LAYOUT_FILL_X|JUSTIFY_CENTER_X);
   FXHorizontalFrame*strip;
 
@@ -793,7 +790,7 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   new FXLabel(strip,_("  E&xt'n"));
   extn_field=new ClipTextField(strip,4,this,TEXTFIELD_LIMITED|FRAME_SUNKEN|FRAME_THICK);
 
-  accel_panel=new FXVerticalFrame(middle_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
+  accel_panel=new FXVerticalFrame(right_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
   accel_panel->setVSpacing(0);
   strip=new FXHorizontalFrame(accel_panel,LAYOUT_FILL_X);
   new FXLabel(strip,_("Sh&ortcut key:"));
@@ -805,22 +802,22 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   alt_chk   = new FXCheckButton(strip,_("A&lt"),this,ID_MODIFIED);
   shift_chk = new FXCheckButton(strip,_("Shi&ft"),this,ID_MODIFIED);
 
-  change_panel=new FXHorizontalFrame(middle_box,LAYOUT_RIGHT|PACK_UNIFORM_WIDTH);
+  change_panel=new FXHorizontalFrame(right_box,LAYOUT_RIGHT|PACK_UNIFORM_WIDTH);
   apply_btn=new FXButton(change_panel,_(" &Save changes "), NULL, this, ID_APPLY_CLICK);
   reset_btn=new FXButton(change_panel,_(" &Undo changes "), NULL, this, ID_RESET_CLICK);
 
 
-  strip=new FXHorizontalFrame(middle_box,PACK_UNIFORM_WIDTH);
+  strip=new FXHorizontalFrame(right_box,PACK_UNIFORM_WIDTH);
   delete_btn=new FXButton(strip, _(" &Delete Item "), NULL, this, ID_DELETE_CLICK);
   edit_btn=new FXButton(strip, _(" Open in &editor "), NULL, this, ID_EDIT_CLICK);
 
-  move_panel=new FXHorizontalFrame(middle_box,FRAME_GROOVE|LAYOUT_FILL_X);
+  move_panel=new FXHorizontalFrame(right_box,FRAME_GROOVE|LAYOUT_FILL_X);
   move_lab=new FXLabel(move_panel,_("Move &to:"));
   move_list=new FXListBox(move_panel,this,ID_MOVELIST_CHOOSE,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X);
   move_btn=new FXButton(move_panel, _("Mo&ve"),NULL, this, ID_MOVE_CLICK);
 
 
-  new_panel=new FXVerticalFrame(middle_box,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
+  new_panel=new FXVerticalFrame(right_box,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_CENTER_Y);
   new_panel->setVSpacing(0);
   strip=new FXHorizontalFrame(new_panel,LAYOUT_FILL_X|PACK_UNIFORM_WIDTH);
   new_menu_btn=new FXButton(strip, _("New group"), NULL, this, ID_NEW_MENU_CLICK,BUTTON_NORMAL|LAYOUT_FILL_X);
