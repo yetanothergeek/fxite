@@ -226,7 +226,7 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
       break;
     }
     default: {
-      ext="txt";
+      ext=(perm & FXIO::OwnerExec)?"exec.txt":"read.txt";
     }
   }
   path.append(PATHSEP);
