@@ -169,6 +169,8 @@ void ToolsDialog::clear()
   menukey_list->clearItems();
   if (opts_panel) {delete opts_panel; }
   opts_panel=NULL;
+  opt_rad=NULL;
+  opt_chk=NULL;
   setModified(false);
 }
 
@@ -189,9 +191,9 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
       case 1:
       { break; }
       case 2: {
-        FXCheckButton*cb=new FXCheckButton(opts_panel,opts[1], this, ID_OPTCHOOSE);
-        cb->setUserData((void*)opts[0]);
-        cb->setCheck(strcmp(opts[0],flag.text())==0);
+        opt_chk=new FXCheckButton(opts_panel,opts[1], this, ID_OPTCHOOSE);
+        opt_chk->setUserData((void*)opts[0]);
+        opt_chk->setCheck(strcmp(opts[0],flag.text())==0);
         break;
       }
       default: {
@@ -200,17 +202,18 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
             FXRadioButton*rb=new FXRadioButton(opts_panel,opts[i+1], this, ID_OPTCHOOSE);
             rb->setUserData((void*)opts[i]);
             rb->setCheck(strcmp(opts[i],flag.text())==0);
+            if (!opt_rad) { opt_rad=rb; }
           }
         }
         bool have_check=false;
-        for (FXWindow*w=opts_panel->getFirst()->getNext(); w; w=w->getNext()) {
+        for (FXWindow*w=opt_rad; dynamic_cast<FXRadioButton*>(w); w=w->getNext()) {
            if (((FXRadioButton*)w)->getCheck()) {
              have_check=true;
              break;
            }
         }
         if (!have_check) {
-          ((FXRadioButton*)(opts_panel->getFirst()->getNext()))->setCheck(true);
+          opt_rad->setCheck(true);
         }
       }
     }
@@ -409,8 +412,8 @@ long ToolsDialog::onTreeListChanged(FXObject*o, FXSelector sel, void*p)
 
 long ToolsDialog::onChooseOpt(FXObject*o, FXSelector sel, void*p)
 {
-  if (opts_panel->numChildren()!=2) {
-    for (FXWindow*w=opts_panel->getFirst()->getNext(); w; w=w->getNext()) {
+  if (opt_rad) {
+    for (FXWindow*w=opt_rad; dynamic_cast<FXRadioButton*>(w); w=w->getNext()) {
       ((FXRadioButton*)w)->setCheck(w==o);
     }
   }
@@ -550,17 +553,15 @@ bool ToolsDialog::BuildName(FXString &path, bool isdir)
     path.append("@");
     path.append(unparseAccel(FXSEL(accel_state,accel_key)));
   }
-  if (opts_panel) {
-    if (opts_panel->numChildren()==2) {
-      path.append(".");
-      path.append((const char*)opts_panel->getFirst()->getNext()->getUserData());
-    } else {
-      for (FXWindow*w=opts_panel->getFirst()->getNext(); w; w=w->getNext()) {
-        if (((FXRadioButton*)w)->getCheck()) {
-          path.append(".");
-          path.append((const char*)(w->getUserData()));
-          break;
-        }
+  if (opt_chk && opt_chk->getCheck()) {
+    path.append(".");
+    path.append((const char*)opt_chk->getUserData());
+  } else if (opt_rad) {
+    for (FXWindow*w=opt_rad; dynamic_cast<FXRadioButton*>(w); w=w->getNext()) {
+      if (((FXRadioButton*)w)->getCheck()) {
+        path.append(".");
+        path.append((const char*)(w->getUserData()));
+        break;
       }
     }
   }
@@ -625,13 +626,7 @@ bool ToolsDialog::SaveChanges()
   return false;
 }
 
-#define IsExecSnippet() ( \
-  opts_panel && \
-  opts_panel->getFirst() && \
-  opts_panel->getFirst()->getNext() && \
-  (comparecase(kind,"snippets")==0) && \
-  !((FXRadioButton*)(opts_panel->getFirst()->getNext()))->getCheck() \
-)
+#define IsExecSnippet() ( (comparecase(kind,"snippets")==0) && opt_rad && (!opt_rad->getCheck()) )
 
 
 FXuint ToolsDialog::GetPermsForItem(FXTreeItem *item)

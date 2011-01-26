@@ -41,6 +41,8 @@ private:
   FXTextField* extn_field;
   FXListBox* menukey_list;
   FXTextField* accel_field;
+  FXCheckButton* opt_chk;
+  FXRadioButton* opt_rad;
   FXCheckButton* ctrl_chk;
   FXCheckButton* alt_chk;
   FXCheckButton* shift_chk;
