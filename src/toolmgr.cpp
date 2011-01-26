@@ -636,7 +636,7 @@ bool ToolsDialog::SaveChanges()
 
 FXuint ToolsDialog::GetPermsForItem(FXTreeItem *item)
 {
-  if ((item?item:tree->getCurrentItem())->hasItems()) {return FXIO::OwnerFull; }
+  if (item && item->hasItems()) { return FXIO::OwnerFull; }
   FXString kind=tree->GetUserMenu(item?item:tree->getCurrentItem())->getText();
   return ( (comparecase(kind,"commands")==0) || (comparecase(kind,"filters")==0)  || IsExecSnippet() )?
     FXIO::OwnerFull:FXIO::OwnerReadWrite;
