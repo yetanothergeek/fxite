@@ -1002,11 +1002,6 @@ replacement string.  This is done by inserting a ===\=== followed by a digit fro
 within the regular expression.  These expressions are numbered left-to-right \
 in order of their opening parentheses. 
 
-The capitalization of text inserted by the substitutions  can be altered by \
-preceding them with ===\U===, ===\u===, ===\L===, or ===\l===.  The \u and \l \
-modifiers change only the first character of the inserted entity, while \U and \L \
-change the entire entity to upper or lower case, respectively. 
-
 Regular expression substitution can be used to program automatic editing \
 operations.  For example, the following are search and replace strings to find \
 occurrences of the `C' language subroutine `get_x', reverse the first and \
