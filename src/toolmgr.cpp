@@ -776,10 +776,9 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
 
   split=new FXSplitter(vbox,LAYOUT_FILL|SPLITTER_REVERSED);
 
-  left_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK);
+  left_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
   SetPad(left_box,0);
-  right_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH);
-  SetPad(right_box,4);
+  right_box=new FXVerticalFrame(split,LAYOUT_FILL_Y|LAYOUT_FILL_Y|LAYOUT_FILL_X|FRAME_RAISED|FRAME_SUNKEN);
 
   intro_lab=new FXLabel(right_box,intro_text,NULL, LABEL_NORMAL|JUSTIFY_LEFT);
 
