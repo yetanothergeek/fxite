@@ -696,7 +696,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   LIMIT_RANGE(Width,160,Width);
   LIMIT_RANGE(Height,120,Height);
   ReadInt(Maximize,false);
-  ReadStr(LastFocused,"");
+  LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),"");
   ReadInt(FontSize,120);
 
   if (reg->existingEntry(edit_sect,"FontName")) {
@@ -829,7 +829,7 @@ Settings::~Settings()
   WriteInt(Width);
   WriteInt(Height);
   WriteInt(Maximize);
-  WriteStr(LastFocused);
+  reg->writeStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),LastFocused.text());
   WriteInt(FontSize);
   WriteInt(DefaultToAscii);
   WriteInt(DefaultToSbcs);

@@ -1055,7 +1055,7 @@ void TopWindow::ParseCommands(FXString &commands)
                 ParseCommands(session_data);
                 if (!prefs->LastFocused.empty()) {
                   if (FXStat::isFile(prefs->LastFocused)) {
-                    OpenFile(prefs->LastFocused.text(), NULL, false, false);
+                    tabbook->ForEachTab(FileAlreadyOpenCB,&prefs->LastFocused);
                   }
                 }
               }
