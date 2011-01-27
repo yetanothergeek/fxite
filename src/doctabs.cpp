@@ -217,6 +217,12 @@ FXWindow*DocTabs::ActiveView()
 DocTab*DocTabs::NewTab(FXString text)
 {
   DocTab*tab=new DocTab(this,text);
+  switch (getTabStyle()) {
+    case TABBOOK_TOPTABS:    { tab->setTabOrientation(TAB_TOP);    break; }
+    case TABBOOK_BOTTOMTABS: { tab->setTabOrientation(TAB_BOTTOM); break; }
+    case TABBOOK_LEFTTABS:   { tab->setTabOrientation(TAB_LEFT);   break; }
+    case TABBOOK_RIGHTTABS:  { tab->setTabOrientation(TAB_RIGHT);  break; }
+  }
   MySplitter*frame=new MySplitter(this,FRAME_RAISED|LAYOUT_FILL|SPLITTER_VERTICAL);
   if (shown()) {
     tab->create();
