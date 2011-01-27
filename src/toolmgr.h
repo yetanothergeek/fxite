@@ -29,8 +29,8 @@ private:
   FXVerticalFrame* left_box;
   FXVerticalFrame* right_box;
   FXVerticalFrame* name_panel;
-  FXVerticalFrame* accel_panel;
-  FXVerticalFrame* opts_panel;
+  FXGroupBox* accel_panel;
+  FXGroupBox* opts_panel;
   FXVerticalFrame* new_panel;
   FXHorizontalFrame* change_panel;
   FXHorizontalFrame* move_panel;

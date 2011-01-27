@@ -182,8 +182,7 @@ void ToolsDialog::create_options(FXTreeItem*item, const FXString &flag)
   helptext->setText(um->helptext);
   const char**opts=um->getFlags();
   if (opts) {
-    opts_panel=new FXVerticalFrame(right_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
-    new FXLabel(opts_panel,_("&Options"));
+    opts_panel=new FXGroupBox(right_box,"Options",FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
     int i,n=0;
     for (i=0; opts[i]; i++) { n++; }
     switch (n) {
@@ -799,10 +798,10 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   new FXLabel(strip,_("  E&xt'n"));
   extn_field=new ClipTextField(strip,4,this,TEXTFIELD_LIMITED|FRAME_SUNKEN|FRAME_THICK);
 
-  accel_panel=new FXVerticalFrame(right_box,FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X);
-  accel_panel->setVSpacing(0);
+  accel_panel=new FXGroupBox(right_box,"Shortcut",FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X);
+
   strip=new FXHorizontalFrame(accel_panel,LAYOUT_FILL_X);
-  new FXLabel(strip,_("Sh&ortcut key:"));
+  new FXLabel(strip,_("&Hot key:"));
   accel_field=new ClipTextField(strip,3,this,ID_ACCELFIELD,TEXTFIELD_LIMITED|FRAME_SUNKEN|FRAME_THICK);
 
 
