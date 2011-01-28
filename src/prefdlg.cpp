@@ -59,6 +59,7 @@ static const char* hint_list[] = {
   _("Drag a color square to FG/BG, or double-click FG/BG to edit"),
   _("Double-click an item to edit"),
   _("Edit toolbar buttons"),
+  _("User interface colors and font"),
   NULL
 };
 
