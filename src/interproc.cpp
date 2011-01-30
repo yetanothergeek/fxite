@@ -328,7 +328,9 @@ long InterProc::onSocketRead(FXObject*o,FXSelector sel,void*p)
 {
   switch (FXSELID(sel)) {
     case ID_SOCKET_ACCEPT: {
-      int read_fd=accept(listen_fd,NULL,NULL);
+      struct sockaddr_un sa;
+      socklen_t size=sizeof(sa);
+      int read_fd=accept(listen_fd,(struct sockaddr*)&sa,&size);
       if (read_fd==-1) {
         SocketFailure("accept");
         return 1;
@@ -369,7 +371,7 @@ static int CreateSocket(const char *filename, bool listening)
   size_t size;
   sock = socket(PF_LOCAL, SOCK_STREAM, 0);
   if (sock < 0) { return SocketFailure("socket"); }
-  sa.sun_family = AF_LOCAL;
+  sa.sun_family = AF_UNIX;
   strncpy(sa.sun_path, filename, sizeof(sa.sun_path));
   sa.sun_path[sizeof(sa.sun_path) - 1] = '\0';
   size = SUN_LEN(&sa);
