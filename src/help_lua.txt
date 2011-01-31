@@ -35,7 +35,7 @@
 
 
 %%%Text retrieval functions%%%
-@@@lines@@@ -- Itrate through the lines of the document.
+@@@lines@@@ -- Iterate through the lines of the document.
 @@@nlines@@@ -- Count the lines in the document.
 @@@nchars@@@ -- Count the characters in the document.
 @@@word@@@ -- Return the word at the cursor.
