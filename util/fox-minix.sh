@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This script will modify the FOX-1.7 sources, and build the
-# Fox library, along with a few Fox applications.
+# Fox library on MINIX, along with a few Fox applications.
 # Works for me with the 2011-01-26 snapshot, from:
 #   http://www.fox-toolkit.org/ftp/fox-snapshot.tar.gz
 #
