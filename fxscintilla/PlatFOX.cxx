@@ -1329,6 +1329,9 @@ double ElapsedTime::Duration(bool reset) {
 // Fox >= 1.2 has dynamic librarie handling
 
 
+#ifdef __minix
+  DynamicLibrary *DynamicLibrary::Load(const char *modulePath) { return NULL; }
+#else
 #include <FXDLL.h>
 
 #ifdef FOX_1_6
@@ -1392,6 +1395,7 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
   return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
 }
 
+#endif // __minix
 
 // ====================================================================
 // Platform

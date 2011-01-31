@@ -348,6 +348,12 @@ long InterProc::onSocketRead(FXObject*o,FXSelector sel,void*p)
       do {
         len=read(read_fd,buf,bufsize);
         if (len>0) { s->append(buf, len); }
+#ifdef __minix
+        if (s->contains("\n\n")) {
+          len=0;
+          break;
+        }
+#endif
       } while (len>0);
       if (len==0) {
         app->removeInput(read_fd,INPUT_READ);

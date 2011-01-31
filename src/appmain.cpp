@@ -414,7 +414,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
     mainwin=new TopWindow(this);
     if (getRootWindow() && getRootWindow()->id()) { mainwin->create(); } else { create(); }
     ipc->StartServer(mainwin, this,ID_IPC_EXEC);
-#ifndef WIN32
+#if !(defined(WIN32) || defined(__minix))
     fclose(stdin);
     stdin=fopen(NULL_FILE, "r");
 #endif
