@@ -5,10 +5,15 @@
 # Works for me with the 2011-01-26 snapshot, from:
 #   http://www.fox-toolkit.org/ftp/fox-snapshot.tar.gz
 #
+# Requires:
+#   autoconf, automake, bash, binutils, gcc, gettext-lib,
+#   gmake, gsed, libiconv, libtool, m4, pth, x11
+#
 # The script is intended to be run from inside the top-level FOX source directory.
 # By default it is configured to install in /usr/local, but you can change
 # the MY_PREFIX variable below to /usr/pkg or anywhere you like.
 # This script only builds stuff, the actual "make install" is up to you...
+
 
 
 MY_PREFIX="/usr/local"
