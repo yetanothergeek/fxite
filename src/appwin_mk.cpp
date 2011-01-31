@@ -747,8 +747,13 @@ static void SetShellEnv(const char*file, long line)
 {
   char linenum[8]="\0\0\0\0\0\0\0";
   snprintf(linenum,sizeof(linenum)-1, "%ld", line);
+#ifdef WIN32
   FXSystem::setEnvironment("l",linenum);
   FXSystem::setEnvironment("f",file);
+#else
+  setenv("l",linenum,1);
+  setenv("f",file,1);
+#endif
 }
 
 
