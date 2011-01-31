@@ -118,6 +118,16 @@ case $host_os in
     dnl #tell mingw where to find stuff
     FOX_LIBS="${srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid -mwindows"
   ;;
+  *minix*)
+    AC_DEFINE(_MINIX)
+    AC_DEFINE(_POSIX_SOURCE)
+    AC_DEFINE(LUA_USE_POSIX)
+    FOX_LIBS="${FOX_LIBS} -lX11 -lpthread"
+    if test "x$USE_NLS" = "xyes"
+    then
+      FOX_LIBS="${FOX_LIBS} -lintl -liconv"
+    fi
+  ;;
 esac
 
 
