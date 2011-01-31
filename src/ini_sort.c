@@ -74,6 +74,7 @@ static ssize_t getline(char **lineptr, size_t *n, FILE *f)
         } else { break; }
       }
       *lineptr=buf;
+      fseek(f,endpos,SEEK_SET);
       return size;
     } else {
       return 0;
