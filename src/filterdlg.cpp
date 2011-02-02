@@ -122,7 +122,7 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
     }
     case ID_DEFAULTS_CMD: {
       if (confirm(_("Restore defaults"), _("Restore application defaults?"))) {
-        setText(Settings::defaultFileFilters());
+        RestoreAppDefaults();
       }
       break;
     }
@@ -188,7 +188,7 @@ bool DescListDlg::editItem()
   FXString txt=items->getItemText(items->getCurrentItem());
   ClipTextField*desc_edit=new ClipTextField(&dlg,64);
   desc_edit->setText(txt.section('\t',0));
-  new FXLabel(&dlg, _("\nFile masks:   (separated by comma)"));
+  (new FXLabel(&dlg, caption, NULL, JUSTIFY_LEFT))->setPadTop(12);
   ClipTextField*item_edit=new ClipTextField(&dlg,64);
   item_edit->setText(txt.section('\t',1));
   new FXLabel(&dlg, " ");
@@ -202,13 +202,12 @@ bool DescListDlg::editItem()
       FXMessageBox::error(this, MBOX_OK, _("Error"), _("You must enter a description"));
       return editItem();
     }
-    for (const char*c=" \t()"; *c; c++ ) {
-      const char s[2]={*c,0};
-      sitem.substitute(s, "", true);
+    if (Verify(sitem)) {
+      items->setItemText(items->getCurrentItem(), sdesc+'\t'+sitem);
+      return true;
+    } else {
+      return editItem();
     }
-    txt.format("%s\t%s", sdesc.text(), sitem.text());
-    items->setItemText(items->getCurrentItem(), txt);
-    return true;
   } else {
     return false;
   }
@@ -216,13 +215,16 @@ bool DescListDlg::editItem()
 
 
 
-DescListDlg::DescListDlg(FXWindow* w, const FXString init):
-   FXDialogBox(w, _("File dialog filters"), DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
+DescListDlg::DescListDlg( FXWindow* w, const char*name, const FXString init,
+                          const char*hdr2, const char*howto):
+   FXDialogBox(w, name, DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
 {
   FXButton* accept_btn;
   FXButton* cancel_btn;
   FXButton* defaults_btn;
   FXButton* revert_btn;
+
+  caption=howto;
 
   setPadLeft(0);
   setPadTop(0);
@@ -254,7 +256,7 @@ DescListDlg::DescListDlg(FXWindow* w, const FXString init):
 
   items=new DescItemList(this, this, ID_LIST_SEL,FILTERLIST_OPTS);
   items->appendHeader(_("Description"));
-  items->appendHeader(_("File mask"));
+  items->appendHeader(hdr2);
   before=init;
   setText(init);
 }
@@ -280,7 +282,34 @@ void DescListDlg::create()
 
 
 
-void DescListDlg::setText(const FXString str)
+FileFiltersDlg::FileFiltersDlg(FXWindow* w, const FXString init):
+  DescListDlg( w, _("File dialog filters"), init, 
+               _("File mask"),_("File masks:   (separated by comma)"))
+{
+  setText(init);
+}
+
+
+
+bool FileFiltersDlg::Verify(FXString&item)
+{
+  for (const char*c=" \t()"; *c; c++ ) {
+    const char s[2]={*c,0};
+    item.substitute(s, "", true);
+  }
+  return true;
+}
+
+
+
+void FileFiltersDlg::RestoreAppDefaults()
+{
+  setText(Settings::defaultFileFilters()); 
+}
+
+
+
+void FileFiltersDlg::setText(const FXString str)
 {
   items->clearItems();
   FXString FileFilters=str;
@@ -301,7 +330,7 @@ void DescListDlg::setText(const FXString str)
 
 
 
-const FXString& DescListDlg::getText()
+const FXString& FileFiltersDlg::getText()
 {
   after="";
   for (FXint i=0; i<items->getNumItems(); i++) {

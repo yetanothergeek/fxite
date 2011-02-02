@@ -31,8 +31,11 @@ protected:
   FXButton*edit_btn;
   FXButton*delete_btn;
   FXButton*new_btn;
+  FXString caption;
   void enableButtons();
-  virtual void setText(const FXString str);
+  virtual void setText(const FXString str) {}
+  virtual bool Verify(FXString&item) { return true; }
+  virtual void RestoreAppDefaults() {}
 public:
   bool editItem();
   long onCommand(FXObject* sender,FXSelector sel,void *ptr);
@@ -48,9 +51,18 @@ public:
     ID_NEW_CMD,
     ID_LAST
   };
-  DescListDlg(FXWindow* w, const FXString init);
+  DescListDlg(FXWindow* w, const char*name, const FXString init, const char*hdr2, const char*howto);
   virtual void create();
-  virtual const FXString& getText();
+  virtual const FXString& getText() { return after; }
 };
 
-#define FileFiltersDlg DescListDlg
+
+class FileFiltersDlg: public DescListDlg {
+  virtual bool Verify(FXString&item);
+  virtual void setText(const FXString str);
+  virtual void RestoreAppDefaults();
+public:
+  virtual const FXString& getText();
+  FileFiltersDlg(FXWindow* w, const FXString init);
+};
+
