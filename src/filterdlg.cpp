@@ -67,7 +67,8 @@ class DescItemList: public FXIconList {
   FXIconList(p,tgt,sel,opts) {}
   long onDoubleClicked(FXObject* sender,FXSelector sel,void *ptr) {
     long rv=FXIconList::onDoubleClicked(sender,sel,ptr);
-    ((DescListDlg*)getShell())->editItem();
+    const FXString txt=getItemText(getCurrentItem());
+    ((DescListDlg*)getShell())->editItem(txt.section('\t',0),txt.section('\t',1));
     return rv;
   }
 };
@@ -143,7 +144,8 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
       break;
     }
     case ID_EDIT_CMD: {
-      editItem();
+      const FXString txt=items->getItemText(items->getCurrentItem());
+      editItem(txt.section('\t',0),txt.section('\t',1));
       return 1;
     }
     case ID_DELETE_CMD: {
@@ -156,7 +158,7 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
      if (icurr<0) { icurr=0; }
      items->insertItem(icurr,"");
      items->setCurrentItem(icurr);
-     if (!editItem()) {
+     if (!editItem(FXString::null,FXString::null)) {
        items->removeItem(icurr);
        if (icurr==items->getNumItems()) { icurr--; }
        items->setCurrentItem(icurr);
@@ -178,7 +180,7 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
 
 
 
-bool DescListDlg::editItem()
+bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focus_item)
 {
   FXDialogBox dlg(this,_("Edit item"));
   FXHorizontalFrame* btns=new FXHorizontalFrame(&dlg,BAR_OPTS);
@@ -193,20 +195,20 @@ bool DescListDlg::editItem()
   item_edit->setText(txt.section('\t',1));
   new FXLabel(&dlg, " ");
   dlg.create();
-  desc_edit->setFocus();
+  if (focus_item) { item_edit->setFocus(); } else { desc_edit->setFocus(); }
   if (dlg.execute(PLACEMENT_SCREEN)) {
     FXString sdesc=desc_edit->getText();
     sdesc.simplify();
     FXString sitem=item_edit->getText();
     if (sdesc.empty()) {
       FXMessageBox::error(this, MBOX_OK, _("Error"), _("You must enter a description"));
-      return editItem();
+      return editItem(sdesc,sitem);
     }
     if (Verify(sitem)) {
       items->setItemText(items->getCurrentItem(), sdesc+'\t'+sitem);
       return true;
     } else {
-      return editItem();
+      return editItem(sdesc,sitem,true);
     }
   } else {
     return false;

@@ -37,7 +37,7 @@ protected:
   virtual bool Verify(FXString&item) { return true; }
   virtual void RestoreAppDefaults() {}
 public:
-  bool editItem();
+  bool editItem(const FXString &desc, const FXString &item, bool focus_item=false);
   long onCommand(FXObject* sender,FXSelector sel,void *ptr);
   long onClose(FXObject* sender,FXSelector sel,void *ptr);
   enum{
