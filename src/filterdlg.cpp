@@ -152,6 +152,8 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
       items->removeItem(icurr);
       if (icurr==items->getNumItems()) { icurr--; }
       items->setCurrentItem(icurr);
+      items->layout();
+      if (items_max && (items->getNumRows()<items_max) ) { new_btn->enable(); }
       break;
     }
     case ID_NEW_CMD: {
@@ -163,6 +165,7 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
        if (icurr==items->getNumItems()) { icurr--; }
        items->setCurrentItem(icurr);
      }
+     if (items_max && (items->getNumRows()>=items_max) ) { new_btn->disable(); }
      break;
     }
     case ID_ACCEPT: {
@@ -179,6 +182,7 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
 }
 
 
+#define EDIT_OPTS(LIMITED) TEXTFIELD_NORMAL|(LIMITED?TEXTFIELD_LIMITED:0)
 
 bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focus_item)
 {
@@ -187,10 +191,12 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
   new FXButton(btns, _("&Accept"), NULL, &dlg, ID_ACCEPT, BTN_OPTS);
   new FXButton(btns, _("&Cancel"), NULL, &dlg, ID_CANCEL, BTN_OPTS);
   new FXLabel(&dlg, _("Description:"));
-  ClipTextField*desc_edit=new ClipTextField(&dlg,64);
+  ClipTextField*desc_edit;
+  ClipTextField*item_edit;
+  desc_edit=new ClipTextField(&dlg,desc_max_len?desc_max_len:64,NULL,0,EDIT_OPTS(desc_max_len));
   desc_edit->setText(desc);
   (new FXLabel(&dlg, caption, NULL, JUSTIFY_LEFT))->setPadTop(12);
-  ClipTextField*item_edit=new ClipTextField(&dlg,64);
+  item_edit=new ClipTextField(&dlg,item_max_len?item_max_len:64,NULL,0,EDIT_OPTS(item_max_len));
   item_edit->setText(item);
   new FXLabel(&dlg, " ");
   dlg.create();
@@ -217,8 +223,9 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
 
 
 
-DescListDlg::DescListDlg( FXWindow* w, const char*name, const FXString init,
-                          const char*hdr2, const char*howto):
+DescListDlg::DescListDlg( FXWindow* w, const char* name, const FXString init,
+                          const char*hdr2, const char*howto,
+                          int max_desc_len, int max_item_len, int max_items):
    FXDialogBox(w, name, DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
 {
   FXButton* accept_btn;
@@ -227,6 +234,9 @@ DescListDlg::DescListDlg( FXWindow* w, const char*name, const FXString init,
   FXButton* revert_btn;
 
   caption=howto;
+  desc_max_len=max_desc_len;
+  item_max_len=max_item_len;
+  items_max=max_items;
 
   setPadLeft(0);
   setPadTop(0);
@@ -279,6 +289,7 @@ void DescListDlg::create()
     lower_btn->disable();
     edit_btn->disable();
   }
+  if (items_max && (items->getNumRows()>=items_max) ) { new_btn->disable(); }
   show(PLACEMENT_SCREEN);
 }
 
