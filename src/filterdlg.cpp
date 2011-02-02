@@ -198,6 +198,10 @@ bool DescListDlg::editItem()
     FXString sdesc=desc_edit->getText();
     sdesc.simplify();
     FXString sitem=item_edit->getText();
+    if (sdesc.empty()) {
+      FXMessageBox::error(this, MBOX_OK, _("Error"), _("You must enter a description"));
+      return editItem();
+    }
     for (const char*c=" \t()"; *c; c++ ) {
       const char s[2]={*c,0};
       sitem.substitute(s, "", true);
