@@ -189,10 +189,10 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
   new FXLabel(&dlg, _("Description:"));
   FXString txt=items->getItemText(items->getCurrentItem());
   ClipTextField*desc_edit=new ClipTextField(&dlg,64);
-  desc_edit->setText(txt.section('\t',0));
+  desc_edit->setText(desc);
   (new FXLabel(&dlg, caption, NULL, JUSTIFY_LEFT))->setPadTop(12);
   ClipTextField*item_edit=new ClipTextField(&dlg,64);
-  item_edit->setText(txt.section('\t',1));
+  item_edit->setText(item);
   new FXLabel(&dlg, " ");
   dlg.create();
   if (focus_item) { item_edit->setFocus(); } else { desc_edit->setFocus(); }
