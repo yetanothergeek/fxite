@@ -27,6 +27,8 @@ FXbool LocaleIsUTF8();
 # define REX_NORMAL     FXRex::Normal
 # define REX_ICASE      FXRex::IgnoreCase
 # define REX_NOT_EMPTY  FXRex::NotEmpty
+# define REX_SYNTAX     FXRex::Syntax
+# define REGERR_OK      FXRex::ErrOK
 # define FXRexError     FXRex::Error
 # define FXIntVal(s,b) ((FXint)strtol(s.text(),NULL,b))
 # define LocaleIsUTF8() FXSystem::localeIsUTF8()
