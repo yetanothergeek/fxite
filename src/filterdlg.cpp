@@ -198,6 +198,7 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
   if (focus_item) { item_edit->setFocus(); } else { desc_edit->setFocus(); }
   if (dlg.execute(PLACEMENT_SCREEN)) {
     FXString sdesc=desc_edit->getText();
+    sdesc.substitute('\t', ' ', true);
     sdesc.simplify();
     FXString sitem=item_edit->getText();
     if (sdesc.empty()) {
