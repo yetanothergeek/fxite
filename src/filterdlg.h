@@ -19,13 +19,13 @@
 
 // Dialog box to modify preferences for the file dialog's filter list.
 
-class FileFiltersDlg: public FXDialogBox {
-  FXDECLARE(FileFiltersDlg)
+class DescListDlg: public FXDialogBox {
+  FXDECLARE(DescListDlg)
 protected:
-  FileFiltersDlg(){}
+  DescListDlg(){}
   FXString before;
   FXString after;
-  FXIconList*filters;
+  FXIconList*items;
   FXButton*raise_btn;
   FXButton*lower_btn;
   FXButton*edit_btn;
@@ -48,8 +48,9 @@ public:
     ID_NEW_CMD,
     ID_LAST
   };
-  FileFiltersDlg(FXWindow* w, const FXString init);
+  DescListDlg(FXWindow* w, const FXString init);
   virtual void create();
   const FXString& getText();
 };
 
+#define FileFiltersDlg DescListDlg

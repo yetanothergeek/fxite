@@ -32,12 +32,12 @@
   ((getText()==before)||confirm(_("Modified settings"),_("Discard changes and close dialog?")))
 
 #define ConfirmSaveChanges() \
-  ((getText()==before)||confirm(_("Modified settings"),_("Save filters and close dialog?")))
+  ((getText()==before)||confirm(_("Modified settings"),_("Save changes and close dialog?")))
 
 
 #define FILTERLIST_OPTS FRAME_SUNKEN | FRAME_THICK | ICONLIST_BROWSESELECT | LAYOUT_FILL
 
-#define FILE_FILTER_DLG_OPTS LAYOUT_FILL | LAYOUT_SIDE_BOTTOM \
+#define DESC_LIST_DLG_OPTS LAYOUT_FILL | LAYOUT_SIDE_BOTTOM \
   | DECOR_BORDER | DECOR_RESIZE | DECOR_TITLE
 
 #define BTN_OPTS FRAME_RAISED | FRAME_THICK | LAYOUT_CENTER_Y | LAYOUT_FILL_X
@@ -46,45 +46,44 @@
 
 
 
-
-FXDEFMAP(FileFiltersDlg) FileFiltersDlgMap[]={
-  FXMAPFUNC(SEL_COMMAND, FileFiltersDlg::ID_ACCEPT, FileFiltersDlg::onCommand),
-  FXMAPFUNC(SEL_COMMAND, FileFiltersDlg::ID_CANCEL, FileFiltersDlg::onCommand),
-  FXMAPFUNC(SEL_CLOSE,   0, FileFiltersDlg::onClose),
-  FXMAPFUNCS( SEL_COMMAND, FileFiltersDlg::ID_LIST_SEL,
-                FileFiltersDlg::ID_NEW_CMD, FileFiltersDlg::onCommand ),
+FXDEFMAP(DescListDlg) DescListDlgMap[]={
+  FXMAPFUNC(SEL_COMMAND, DescListDlg::ID_ACCEPT, DescListDlg::onCommand),
+  FXMAPFUNC(SEL_COMMAND, DescListDlg::ID_CANCEL, DescListDlg::onCommand),
+  FXMAPFUNC(SEL_CLOSE,   0, DescListDlg::onClose),
+  FXMAPFUNCS( SEL_COMMAND, DescListDlg::ID_LIST_SEL,
+                DescListDlg::ID_NEW_CMD, DescListDlg::onCommand ),
 };
 
-FXIMPLEMENT(FileFiltersDlg,FXDialogBox,FileFiltersDlgMap,ARRAYNUMBER(FileFiltersDlgMap))
+FXIMPLEMENT(DescListDlg,FXDialogBox,DescListDlgMap,ARRAYNUMBER(DescListDlgMap))
 
 
 
-class FileFilterList: public FXIconList {
-  FXDECLARE(FileFilterList)
+class DescItemList: public FXIconList {
+  FXDECLARE(DescItemList)
   protected:
-  FileFilterList(){}
+  DescItemList(){}
   public:
-  FileFilterList(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, FXuint opts=ICONLIST_NORMAL):
+  DescItemList(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, FXuint opts=ICONLIST_NORMAL):
   FXIconList(p,tgt,sel,opts) {}
   long onDoubleClicked(FXObject* sender,FXSelector sel,void *ptr) {
     long rv=FXIconList::onDoubleClicked(sender,sel,ptr);
-    ((FileFiltersDlg*)getShell())->editItem();
+    ((DescListDlg*)getShell())->editItem();
     return rv;
   }
 };
 
 
-FXDEFMAP(FileFilterList) FileFilterListMap[]={
-  FXMAPFUNC(SEL_DOUBLECLICKED, 0, FileFilterList::onDoubleClicked),
+FXDEFMAP(DescItemList) DescItemListMap[]={
+  FXMAPFUNC(SEL_DOUBLECLICKED, 0, DescItemList::onDoubleClicked),
 };
 
-FXIMPLEMENT(FileFilterList,FXIconList,FileFilterListMap,ARRAYNUMBER(FileFilterListMap))
+FXIMPLEMENT(DescItemList,FXIconList,DescItemListMap,ARRAYNUMBER(DescItemListMap))
 
 
 
-void FileFiltersDlg::setText(const FXString str)
+void DescListDlg::setText(const FXString str)
 {
-  filters->clearItems();
+  items->clearItems();
   FXString FileFilters=str;
   FileFilters.substitute('|', '\n', true);
   for (FXint i=0; i<FileFilters.contains('\n'); i++) {
@@ -97,17 +96,17 @@ void FileFiltersDlg::setText(const FXString str)
     mask.simplify();
     FXString txt;
     txt.format("%s\t%s", desc.text(), mask.text());
-    filters->appendItem(txt);
+    items->appendItem(txt);
   }
 }
 
 
 
-const FXString& FileFiltersDlg::getText()
+const FXString& DescListDlg::getText()
 {
   after="";
-  for (FXint i=0; i<filters->getNumItems(); i++) {
-    FXString item=filters->getItemText(i);
+  for (FXint i=0; i<items->getNumItems(); i++) {
+    FXString item=items->getItemText(i);
     FXString desc=item.section('\t',0);
     FXString mask=item.section('\t',1);
     item.format("%s (%s)|", desc.text(), mask.text());
@@ -118,10 +117,10 @@ const FXString& FileFiltersDlg::getText()
 
 
 
-void FileFiltersDlg::enableButtons()
+void DescListDlg::enableButtons()
 {
-  if (filters->getNumItems()>0) {
-    FXint icurr=filters->getCurrentItem();
+  if (items->getNumItems()>0) {
+    FXint icurr=items->getCurrentItem();
     delete_btn->enable();
     edit_btn->enable();
     raise_btn->enable();
@@ -129,7 +128,7 @@ void FileFiltersDlg::enableButtons()
     if (icurr==0) {
       raise_btn->disable();
     }
-    if (icurr==(filters->getNumItems()-1)) {
+    if (icurr==(items->getNumItems()-1)) {
       lower_btn->disable();
     }
   } else {
@@ -142,7 +141,7 @@ void FileFiltersDlg::enableButtons()
 
 
 
-long FileFiltersDlg::onClose(FXObject* sender,FXSelector sel,void *ptr)
+long DescListDlg::onClose(FXObject* sender,FXSelector sel,void *ptr)
 {
   if (ConfirmDiscardChanges()) { getApp()->stopModal(this,0); }
   return 1;
@@ -150,15 +149,15 @@ long FileFiltersDlg::onClose(FXObject* sender,FXSelector sel,void *ptr)
 
 
 
-long FileFiltersDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
+long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
 {
-  FXint icurr=filters->getCurrentItem();
+  FXint icurr=items->getCurrentItem();
   switch (FXSELID(sel)) {
     case ID_LIST_SEL: {
       break;
     }
     case ID_DEFAULTS_CMD: {
-      if (confirm(_("Restore defaults"), _("Restore application default filters?"))) {
+      if (confirm(_("Restore defaults"), _("Restore application defaults?"))) {
         setText(Settings::defaultFileFilters());
       }
       break;
@@ -170,13 +169,13 @@ long FileFiltersDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
       break;
     }
     case ID_RAISE_CMD: {
-      filters->moveItem(icurr,icurr-1);
-      filters->setCurrentItem(icurr-1);
+      items->moveItem(icurr,icurr-1);
+      items->setCurrentItem(icurr-1);
       break;
     }
     case ID_LOWER_CMD: {
-      filters->moveItem(icurr,icurr+1);
-      filters->setCurrentItem(icurr+1);
+      items->moveItem(icurr,icurr+1);
+      items->setCurrentItem(icurr+1);
       break;
     }
     case ID_EDIT_CMD: {
@@ -184,19 +183,19 @@ long FileFiltersDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
       return 1;
     }
     case ID_DELETE_CMD: {
-      filters->removeItem(icurr);
-      if (icurr==filters->getNumItems()) { icurr--; }
-      filters->setCurrentItem(icurr);
+      items->removeItem(icurr);
+      if (icurr==items->getNumItems()) { icurr--; }
+      items->setCurrentItem(icurr);
       break;
     }
     case ID_NEW_CMD: {
      if (icurr<0) { icurr=0; }
-     filters->insertItem(icurr,"");
-     filters->setCurrentItem(icurr);
+     items->insertItem(icurr,"");
+     items->setCurrentItem(icurr);
      if (!editItem()) {
-       filters->removeItem(icurr);
-       if (icurr==filters->getNumItems()) { icurr--; }
-       filters->setCurrentItem(icurr);
+       items->removeItem(icurr);
+       if (icurr==items->getNumItems()) { icurr--; }
+       items->setCurrentItem(icurr);
      }
      break;
     }
@@ -215,32 +214,32 @@ long FileFiltersDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
 
 
 
-bool FileFiltersDlg::editItem()
+bool DescListDlg::editItem()
 {
-  FXDialogBox dlg(this,_("Edit filter"));
+  FXDialogBox dlg(this,_("Edit item"));
   FXHorizontalFrame* btns=new FXHorizontalFrame(&dlg,BAR_OPTS);
   new FXButton(btns, _("&Accept"), NULL, &dlg, ID_ACCEPT, BTN_OPTS);
   new FXButton(btns, _("&Cancel"), NULL, &dlg, ID_CANCEL, BTN_OPTS);
   new FXLabel(&dlg, _("Description:"));
-  FXString txt=filters->getItemText(filters->getCurrentItem());
-  ClipTextField*desc=new ClipTextField(&dlg,64);
-  desc->setText(txt.section('\t',0));
+  FXString txt=items->getItemText(items->getCurrentItem());
+  ClipTextField*desc_edit=new ClipTextField(&dlg,64);
+  desc_edit->setText(txt.section('\t',0));
   new FXLabel(&dlg, _("\nFile masks:   (separated by comma)"));
-  ClipTextField*mask=new ClipTextField(&dlg,64);
-  mask->setText(txt.section('\t',1));
+  ClipTextField*item_edit=new ClipTextField(&dlg,64);
+  item_edit->setText(txt.section('\t',1));
   new FXLabel(&dlg, " ");
   dlg.create();
-  desc->setFocus();
+  desc_edit->setFocus();
   if (dlg.execute(PLACEMENT_SCREEN)) {
-    FXString sdesc=desc->getText();
+    FXString sdesc=desc_edit->getText();
     sdesc.simplify();
-    FXString smask=mask->getText();
+    FXString sitem=item_edit->getText();
     for (const char*c=" \t()"; *c; c++ ) {
       const char s[2]={*c,0};
-      smask.substitute(s, "", true);
+      sitem.substitute(s, "", true);
     }
-    txt.format("%s\t%s", sdesc.text(), smask.text());
-    filters->setItemText(filters->getCurrentItem(), txt);
+    txt.format("%s\t%s", sdesc.text(), sitem.text());
+    items->setItemText(items->getCurrentItem(), txt);
     return true;
   } else {
     return false;
@@ -249,8 +248,8 @@ bool FileFiltersDlg::editItem()
 
 
 
-FileFiltersDlg::FileFiltersDlg(FXWindow* w, const FXString init):
-   FXDialogBox(w, _("File dialog filters"), FILE_FILTER_DLG_OPTS, 0, 0, 480, 320)
+DescListDlg::DescListDlg(FXWindow* w, const FXString init):
+   FXDialogBox(w, _("File dialog filters"), DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
 {
   FXButton* accept_btn;
   FXButton* cancel_btn;
@@ -275,35 +274,35 @@ FileFiltersDlg::FileFiltersDlg(FXWindow* w, const FXString init):
   delete_btn = new FXButton(buttons2, _("&Delete"),  NULL, this, ID_DELETE_CMD, BTN_OPTS);
   new_btn    = new FXButton(buttons2, _("&New..."),  NULL, this, ID_NEW_CMD,    BTN_OPTS);
 
-  defaults_btn->setTipText( _("Restore filters to installation defaults"));
+  defaults_btn->setTipText( _("Restore items to installation defaults"));
   revert_btn->setTipText(   _("Undo all changes made in this dialog"));
   accept_btn->setTipText(   _("Save changes and close this dialog"));
   cancel_btn->setTipText(   _("Discard changes and close this dialog"));
-  raise_btn->setTipText(    _("Move selected filter upwards in the list"));
-  lower_btn->setTipText(    _("Move selected filter downwards in the list"));
-  edit_btn->setTipText(     _("Edit the selected filter"));
-  delete_btn->setTipText(   _("Delete the selected filter from the list"));
-  new_btn->setTipText(      _("Create a new filter"));
+  raise_btn->setTipText(    _("Move selected item upwards in the list"));
+  lower_btn->setTipText(    _("Move selected item downwards in the list"));
+  edit_btn->setTipText(     _("Edit the selected item"));
+  delete_btn->setTipText(   _("Delete the selected item from the list"));
+  new_btn->setTipText(      _("Create a new item"));
 
-  filters=new FileFilterList(this, this, ID_LIST_SEL,FILTERLIST_OPTS);
-  filters->appendHeader(_("Description"));
-  filters->appendHeader(_("File mask"));
+  items=new DescItemList(this, this, ID_LIST_SEL,FILTERLIST_OPTS);
+  items->appendHeader(_("Description"));
+  items->appendHeader(_("File mask"));
   before=init;
   setText(init);
 }
 
 
 
-void FileFiltersDlg::create()
+void DescListDlg::create()
 {
   FXDialogBox::create();
-  FXint one_third=(filters->getParent()->getWidth()/3);
-  filters->setHeaderSize(0, one_third);
-  filters->setHeaderSize(1, one_third*2);
+  FXint one_third=(items->getParent()->getWidth()/3);
+  items->setHeaderSize(0, one_third);
+  items->setHeaderSize(1, one_third*2);
   raise_btn->disable();
-  if (filters->getNumItems()>0) {
-    filters->setCurrentItem(0);
-    filters->selectItem(0);
+  if (items->getNumItems()>0) {
+    items->setCurrentItem(0);
+    items->selectItem(0);
   } else {
     lower_btn->disable();
     edit_btn->disable();
