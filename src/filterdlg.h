@@ -32,7 +32,7 @@ protected:
   FXButton*delete_btn;
   FXButton*new_btn;
   void enableButtons();
-  void setText(const FXString str);
+  virtual void setText(const FXString str);
 public:
   bool editItem();
   long onCommand(FXObject* sender,FXSelector sel,void *ptr);
@@ -50,7 +50,7 @@ public:
   };
   DescListDlg(FXWindow* w, const FXString init);
   virtual void create();
-  const FXString& getText();
+  virtual const FXString& getText();
 };
 
 #define FileFiltersDlg DescListDlg

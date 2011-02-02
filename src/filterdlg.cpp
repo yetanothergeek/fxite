@@ -81,42 +81,6 @@ FXIMPLEMENT(DescItemList,FXIconList,DescItemListMap,ARRAYNUMBER(DescItemListMap)
 
 
 
-void DescListDlg::setText(const FXString str)
-{
-  items->clearItems();
-  FXString FileFilters=str;
-  FileFilters.substitute('|', '\n', true);
-  for (FXint i=0; i<FileFilters.contains('\n'); i++) {
-    FXString sect=FileFilters.section('\n',i);
-    sect.simplify();
-    FXString desc=sect.section("(", 0);
-    FXString mask=sect.section("(", 1);
-    mask.substitute(")", "");
-    desc.simplify();
-    mask.simplify();
-    FXString txt;
-    txt.format("%s\t%s", desc.text(), mask.text());
-    items->appendItem(txt);
-  }
-}
-
-
-
-const FXString& DescListDlg::getText()
-{
-  after="";
-  for (FXint i=0; i<items->getNumItems(); i++) {
-    FXString item=items->getItemText(i);
-    FXString desc=item.section('\t',0);
-    FXString mask=item.section('\t',1);
-    item.format("%s (%s)|", desc.text(), mask.text());
-    after.append(item);
-  }
-  return after;
-}
-
-
-
 void DescListDlg::enableButtons()
 {
   if (items->getNumItems()>0) {
@@ -308,5 +272,41 @@ void DescListDlg::create()
     edit_btn->disable();
   }
   show(PLACEMENT_SCREEN);
+}
+
+
+
+void DescListDlg::setText(const FXString str)
+{
+  items->clearItems();
+  FXString FileFilters=str;
+  FileFilters.substitute('|', '\n', true);
+  for (FXint i=0; i<FileFilters.contains('\n'); i++) {
+    FXString sect=FileFilters.section('\n',i);
+    sect.simplify();
+    FXString desc=sect.section("(", 0);
+    FXString mask=sect.section("(", 1);
+    mask.substitute(")", "");
+    desc.simplify();
+    mask.simplify();
+    FXString txt;
+    txt.format("%s\t%s", desc.text(), mask.text());
+    items->appendItem(txt);
+  }
+}
+
+
+
+const FXString& DescListDlg::getText()
+{
+  after="";
+  for (FXint i=0; i<items->getNumItems(); i++) {
+    FXString item=items->getItemText(i);
+    FXString desc=item.section('\t',0);
+    FXString mask=item.section('\t',1);
+    item.format("%s (%s)|", desc.text(), mask.text());
+    after.append(item);
+  }
+  return after;
 }
 
