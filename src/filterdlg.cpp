@@ -187,7 +187,6 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
   new FXButton(btns, _("&Accept"), NULL, &dlg, ID_ACCEPT, BTN_OPTS);
   new FXButton(btns, _("&Cancel"), NULL, &dlg, ID_CANCEL, BTN_OPTS);
   new FXLabel(&dlg, _("Description:"));
-  FXString txt=items->getItemText(items->getCurrentItem());
   ClipTextField*desc_edit=new ClipTextField(&dlg,64);
   desc_edit->setText(desc);
   (new FXLabel(&dlg, caption, NULL, JUSTIFY_LEFT))->setPadTop(12);
