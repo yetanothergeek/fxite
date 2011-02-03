@@ -36,7 +36,7 @@ protected:
   FXButton*edit_btn;
   FXButton*delete_btn;
   FXButton*new_btn;
-  FXString caption;
+  FXString item_comment;
   void enableButtons();
   virtual void setText(const FXString str) {}
   virtual const FXString& getText() { return after; }
@@ -58,7 +58,8 @@ public:
     ID_LAST
   };
   DescListDlg( FXWindow* w, const char*name, const char*hdr2, 
-               const char*howto, int max_desc_len=0, int max_item_len=0, int max_items=0);
+               const char*howto, const char*intro=NULL, 
+               int max_desc_len=0, int max_item_len=0, int max_items=0);
   virtual void create();
 };
 

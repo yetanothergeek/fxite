@@ -25,9 +25,15 @@
 #include "prefdlg_ext.h"
 
 
+static const char*file_filter_intro=_("\
+Edit the list of wildcard masks (File Filters) that appear in \n\
+the drop-down box for File Open and File Save dialogs.\n\
+");
+
+
 FileFiltersDlg::FileFiltersDlg(FXWindow* w):
   DescListDlg( w, _("File dialog filters"), 
-               _("File mask"),_("File masks:   (separated by comma)"))
+               _("File mask"),_("File masks:   (separated by comma)"), file_filter_intro)
 {
   before=Settings::instance()->FileFilters;
   before.substitute('\n', '|', true);
@@ -99,9 +105,18 @@ FXuint FileFiltersDlg::execute(FXuint placement)
 
 
 
+static const char*errpat_intro=_("\
+A list of regular expressions used to parse file name and line number \n\
+information from compiler output, etc. Each expression uses two pairs \n\
+of capturing parenthesis: the first pair for the filename, and the second \n\
+pair for the line number. The expressions are tried in the order they \n\
+appear here, first one to match an existing file wins. \n\
+");
+
+
 ErrPatDlg::ErrPatDlg(FXWindow* w):
   DescListDlg(w, _("Output pane line matching patterns"), _("Regular Expression"),
-  _("Regular Expression:\n First capture is filename, second is line number"))
+  _("Regular Expression:\n First capture is filename, second is line number"), errpat_intro)
 {
   before.clear();
   ErrorPattern*ep= Settings::ErrorPatterns();

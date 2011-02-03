@@ -197,7 +197,7 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
   ClipTextField*item_edit;
   desc_edit=new ClipTextField(&dlg,desc_max_len?desc_max_len:64,NULL,0,EDIT_OPTS(desc_max_len));
   desc_edit->setText(desc);
-  (new FXLabel(&dlg, caption, NULL, JUSTIFY_LEFT))->setPadTop(12);
+  (new FXLabel(&dlg, item_comment, NULL, JUSTIFY_LEFT))->setPadTop(12);
   item_edit=new ClipTextField(&dlg,item_max_len?item_max_len:64,NULL,0,EDIT_OPTS(item_max_len));
   item_edit->setText(item);
   new FXLabel(&dlg, " ");
@@ -226,7 +226,7 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
 
 
 DescListDlg::DescListDlg( FXWindow* w, const char* name,
-                          const char*hdr2, const char*howto,
+                          const char*hdr2, const char*howto, const char*intro,
                           int max_desc_len, int max_item_len, int max_items):
    FXDialogBox(w, name, DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
 {
@@ -235,7 +235,7 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name,
   FXButton* defaults_btn;
   FXButton* revert_btn;
 
-  caption=howto;
+  item_comment=howto;
   desc_max_len=max_desc_len;
   item_max_len=max_item_len;
   items_max=max_items;
@@ -245,6 +245,13 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name,
   setPadRight(0);
   setPadBottom(0);
 
+  if (intro) { 
+    FXLabel* intro_label=new FXLabel(this,intro, NULL, JUSTIFY_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
+    intro_label->setPadLeft(4);
+    intro_label->setPadRight(4);
+    intro_label->setPadTop(4);
+    intro_label->setPadBottom(4);
+  }
   FXHorizontalFrame* buttons1=new FXHorizontalFrame(this,BAR_OPTS);
   defaults_btn = new FXButton(buttons1, _("De&faults"), NULL, this, ID_DEFAULTS_CMD, BTN_OPTS);
   revert_btn   = new FXButton(buttons1, _("Re&set"),    NULL, this, ID_REVERT_CMD,   BTN_OPTS);
