@@ -18,7 +18,6 @@
 
 
 #include <fx.h>
-#include "prefs.h"
 #include "histbox.h"
 
 #include "intl.h"
