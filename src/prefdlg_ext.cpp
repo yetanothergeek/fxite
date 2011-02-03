@@ -20,6 +20,7 @@
 #include "prefs.h"
 #include "desclistdlg.h"
 
+#include "compat.h"
 #include "intl.h"
 #include "prefdlg_ext.h"
 
@@ -83,5 +84,69 @@ const FXString& FileFiltersDlg::getText()
     after.append(item);
   }
   return after;
+}
+
+
+
+ErrPatDlg::ErrPatDlg(FXWindow* w, const FXString init, int max_desc_len, int max_item_len, int max_items):
+  DescListDlg(w, _("Output pane line matching patterns"), init, _("Regular Expression"),
+  _("Regular Expression:\n First capture is filename, second is line number"),
+  max_desc_len, max_item_len, max_items)
+{
+  setText(init);
+}
+
+
+
+void ErrPatDlg::setText(const FXString str)
+{
+  items->clearItems();
+  FXString Patterns=str;
+  for (FXint i=0; i<Patterns.contains('\n'); i++) {
+    items->appendItem(Patterns.section('\n',i));
+  }
+}
+
+
+
+const FXString& ErrPatDlg::getText()
+{
+  after=FXString::null;
+  for (FXint i=0; i<items->getNumItems(); i++) {
+    FXString item=items->getItemText(i)+'\n';
+    after+=item;
+  }
+  return after;
+}
+
+
+
+bool ErrPatDlg::Verify(FXString&item)
+{
+  FXRex *rx=new FXRex();
+  FXRexError err=rx->parse(item,REX_CAPTURE|REX_SYNTAX);
+  delete rx;
+  if (err!=REGERR_OK) {
+    FXMessageBox::error(this, MBOX_OK, _("Syntax error"), "%s:\n%s",
+        _("Error parsing regular expression"), FXRex::getError(err));
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+
+void ErrPatDlg::RestoreAppDefaults()
+{
+  FXString txt=FXString::null;
+  ErrorPattern*ep= Settings::DefaultErrorPatterns();
+  for (FXint i=0; i<Settings::MaxErrorPatterns(); i++) {
+    txt+=ep[i].id;
+    txt+='\t';
+    txt+=ep[i].pat;
+    txt+='\n';
+  }
+  setText(txt); 
 }
 

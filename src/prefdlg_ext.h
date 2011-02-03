@@ -28,3 +28,12 @@ public:
   FileFiltersDlg(FXWindow* w, const FXString init);
 };
 
+
+class ErrPatDlg: public DescListDlg {
+  virtual void setText(const FXString str);
+  virtual bool Verify(FXString&item);
+  virtual void RestoreAppDefaults();
+public:
+  virtual const FXString& getText();
+  ErrPatDlg(FXWindow* w, const FXString init, int max_desc_len, int max_item_len, int max_items);
+};
