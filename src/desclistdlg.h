@@ -63,15 +63,3 @@ public:
   virtual const FXString& getText() { return after; }
 };
 
-
-
-// Dialog box to modify preferences for the file dialog's filter list.
-class FileFiltersDlg: public DescListDlg {
-  virtual bool Verify(FXString&item);
-  virtual void setText(const FXString str);
-  virtual void RestoreAppDefaults();
-public:
-  virtual const FXString& getText();
-  FileFiltersDlg(FXWindow* w, const FXString init);
-};
-

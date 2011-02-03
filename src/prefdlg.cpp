@@ -40,6 +40,7 @@ class Accessor;
 #include "tooltree.h"
 #include "menuspec.h"
 #include "desclistdlg.h"
+#include "prefdlg_ext.h"
 #include "theme.h"
 
 #include "intl.h"
