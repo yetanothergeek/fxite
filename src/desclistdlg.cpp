@@ -83,6 +83,7 @@ FXIMPLEMENT(DescItemList,FXIconList,DescItemListMap,ARRAYNUMBER(DescItemListMap)
 
 void DescListDlg::enableButtons()
 {
+  items->layout();
   if (items->getNumItems()>0) {
     FXint icurr=items->getCurrentItem();
     delete_btn->enable();
@@ -100,6 +101,11 @@ void DescListDlg::enableButtons()
     edit_btn->disable();
     raise_btn->disable();
     lower_btn->disable();
+  }
+  if (items_max && (items->getNumRows()>=items_max) ) {
+    new_btn->disable();
+  } else {
+    new_btn->enable();
   }
 }
 
@@ -151,8 +157,6 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
       items->removeItem(icurr);
       if (icurr==items->getNumItems()) { icurr--; }
       items->setCurrentItem(icurr);
-      items->layout();
-      if (items_max && (items->getNumRows()<items_max) ) { new_btn->enable(); }
       break;
     }
     case ID_NEW_CMD: {
@@ -164,7 +168,6 @@ long DescListDlg::onCommand(FXObject*sender, FXSelector sel, void*ptr)
        if (icurr==items->getNumItems()) { icurr--; }
        items->setCurrentItem(icurr);
      }
-     if (items_max && (items->getNumRows()>=items_max) ) { new_btn->disable(); }
      break;
     }
     case ID_ACCEPT: {
@@ -279,15 +282,7 @@ void DescListDlg::create()
   FXint one_third=(items->getParent()->getWidth()/3);
   items->setHeaderSize(0, one_third);
   items->setHeaderSize(1, one_third*2);
-  raise_btn->disable();
-  if (items->getNumItems()>0) {
-    items->setCurrentItem(0);
-    items->selectItem(0);
-  } else {
-    lower_btn->disable();
-    edit_btn->disable();
-  }
-  if (items_max && (items->getNumRows()>=items_max) ) { new_btn->disable(); }
+  enableButtons();
   show(PLACEMENT_SCREEN);
 }
 
