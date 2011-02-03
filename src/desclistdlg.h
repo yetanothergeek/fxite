@@ -23,11 +23,10 @@
 // of the Verify(), RestoreAppDefaults(), setText() and getText() methods.
 class DescListDlg: public FXDialogBox {
   FXDECLARE(DescListDlg)
-private:
+protected:
   int desc_max_len;
   int item_max_len;
   int items_max;
-protected:
   DescListDlg(){}
   FXString before;
   FXString after;
@@ -40,6 +39,7 @@ protected:
   FXString caption;
   void enableButtons();
   virtual void setText(const FXString str) {}
+  virtual const FXString& getText() { return after; }
   virtual bool Verify(FXString&item) { return true; }
   virtual void RestoreAppDefaults() {}
 public:
@@ -57,9 +57,8 @@ public:
     ID_NEW_CMD,
     ID_LAST
   };
-  DescListDlg( FXWindow* w, const char*name, const FXString init, const char*hdr2, 
+  DescListDlg( FXWindow* w, const char*name, const char*hdr2, 
                const char*howto, int max_desc_len=0, int max_item_len=0, int max_items=0);
   virtual void create();
-  virtual const FXString& getText() { return after; }
 };
 

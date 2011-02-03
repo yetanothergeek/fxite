@@ -936,14 +936,7 @@ void PrefsDialog::MakeSyntaxTab()
 
 long PrefsDialog::onFiltersEdit(FXObject*o,FXSelector sel,void*p)
 {
-  FXString filters=prefs->FileFilters;
-  filters.substitute('\n', '|', true);
-  FileFiltersDlg dlg(this,filters);
-  if (dlg.execute(PLACEMENT_SCREEN)) {
-    filters=dlg.getText();
-    filters.substitute('|', '\n', true);
-    prefs->FileFilters=filters.text();
-  }
+  FileFiltersDlg(this).execute();
 #ifdef WIN32
   hide();
   show();
@@ -956,28 +949,12 @@ long PrefsDialog::onFiltersEdit(FXObject*o,FXSelector sel,void*p)
 
 long PrefsDialog::onErrPatsEdit(FXObject*o,FXSelector sel,void*p)
 {
-  FXString txt=FXString::null;
-  ErrorPattern*ep= prefs->ErrorPatterns();
-  for (FXint i=0; i<prefs->ErrorPatternCount(); i++) {
-    txt+=ep[i].id;
-    txt+='\t';
-    txt+=ep[i].pat;
-    txt+='\n';
-  }
-  ErrPatDlg dlg(this,txt, sizeof(ep->id)-1, sizeof(ep->pat)-1,prefs->MaxErrorPatterns());
-  if (dlg.execute(PLACEMENT_SCREEN)) {
-    txt=dlg.getText();
-    for (FXint i=0; (i<prefs->MaxErrorPatterns()); i++) {
-      if (i<txt.contains('\n')) {
-        FXString line=txt.section('\n',i);
-        strncpy(ep[i].id, line.section('\t',0).text(), sizeof(ep[i].id)-1);
-        strncpy(ep[i].pat, line.section('\t',1).text(), sizeof(ep[i].pat)-1);
-      } else {
-        ep[i].id[0]=0;
-        ep[i].pat[0]=0;
-      }
-    }
-  }
+  ErrPatDlg(this).execute();
+#ifdef WIN32
+  hide();
+  show();
+  ((FXWindow*)o)->setFocus();
+#endif
   return 1;
 }
 

@@ -222,7 +222,7 @@ bool DescListDlg::editItem(const FXString &desc, const FXString &item, bool focu
 
 
 
-DescListDlg::DescListDlg( FXWindow* w, const char* name, const FXString init,
+DescListDlg::DescListDlg( FXWindow* w, const char* name,
                           const char*hdr2, const char*howto,
                           int max_desc_len, int max_item_len, int max_items):
    FXDialogBox(w, name, DESC_LIST_DLG_OPTS, 0, 0, 480, 320)
@@ -268,8 +268,6 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name, const FXString init,
   items=new DescItemList(this, this, ID_LIST_SEL,FILTERLIST_OPTS);
   items->appendHeader(_("Description"));
   items->appendHeader(hdr2);
-  before=init;
-  setText(init);
 }
 
 
@@ -277,6 +275,7 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name, const FXString init,
 void DescListDlg::create()
 {
   FXDialogBox::create();
+  setText(before);
   FXint one_third=(items->getParent()->getWidth()/3);
   items->setHeaderSize(0, one_third);
   items->setHeaderSize(1, one_third*2);

@@ -20,20 +20,22 @@
 
 // Dialog box to modify preferences for the file dialog's filter list.
 class FileFiltersDlg: public DescListDlg {
-  virtual bool Verify(FXString&item);
   virtual void setText(const FXString str);
+  virtual const FXString& getText();
+  virtual bool Verify(FXString&item);
   virtual void RestoreAppDefaults();
 public:
-  virtual const FXString& getText();
-  FileFiltersDlg(FXWindow* w, const FXString init);
+  virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
+  FileFiltersDlg(FXWindow* w);
 };
 
 
 class ErrPatDlg: public DescListDlg {
   virtual void setText(const FXString str);
+  virtual const FXString& getText();
   virtual bool Verify(FXString&item);
   virtual void RestoreAppDefaults();
 public:
-  virtual const FXString& getText();
-  ErrPatDlg(FXWindow* w, const FXString init, int max_desc_len, int max_item_len, int max_items);
+  virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
+  ErrPatDlg(FXWindow* w);
 };

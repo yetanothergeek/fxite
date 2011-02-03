@@ -25,11 +25,12 @@
 #include "prefdlg_ext.h"
 
 
-FileFiltersDlg::FileFiltersDlg(FXWindow* w, const FXString init):
-  DescListDlg( w, _("File dialog filters"), init, 
+FileFiltersDlg::FileFiltersDlg(FXWindow* w):
+  DescListDlg( w, _("File dialog filters"), 
                _("File mask"),_("File masks:   (separated by comma)"))
 {
-  setText(init);
+  before=Settings::instance()->FileFilters;
+  before.substitute('\n', '|', true);
 }
 
 
@@ -84,12 +85,35 @@ const FXString& FileFiltersDlg::getText()
 
 
 
-ErrPatDlg::ErrPatDlg(FXWindow* w, const FXString init, int max_desc_len, int max_item_len, int max_items):
-  DescListDlg(w, _("Output pane line matching patterns"), init, _("Regular Expression"),
-  _("Regular Expression:\n First capture is filename, second is line number"),
-  max_desc_len, max_item_len, max_items)
+FXuint FileFiltersDlg::execute(FXuint placement)
 {
-  setText(init);
+  if (DescListDlg::execute(placement)) { 
+    FXString filters=getText();
+    filters.substitute('|', '\n', true);
+    Settings::instance()->FileFilters=filters.text();
+    return true;    
+  } else {
+    return false;
+  }
+}
+
+
+
+ErrPatDlg::ErrPatDlg(FXWindow* w):
+  DescListDlg(w, _("Output pane line matching patterns"), _("Regular Expression"),
+  _("Regular Expression:\n First capture is filename, second is line number"))
+{
+  before.clear();
+  ErrorPattern*ep= Settings::ErrorPatterns();
+  for (FXint i=0; i<Settings::ErrorPatternCount(); i++) {
+    before+=ep[i].id;
+    before+='\t';
+    before+=ep[i].pat;
+    before+='\n';
+  } 
+  desc_max_len=sizeof(ep->id)-1;
+  item_max_len=sizeof(ep->pat)-1;
+  items_max=Settings::MaxErrorPatterns();
 }
 
 
@@ -145,3 +169,25 @@ void ErrPatDlg::RestoreAppDefaults()
   setText(txt); 
 }
 
+
+
+FXuint ErrPatDlg::execute(FXuint placement)
+{
+  ErrorPattern *ep=Settings::ErrorPatterns();
+  if (DescListDlg::execute(placement)) { 
+    FXString txt=getText();
+    for (FXint i=0; (i<Settings::MaxErrorPatterns()); i++) {
+      if (i<txt.contains('\n')) {
+        FXString line=txt.section('\n',i);
+        strncpy(ep[i].id, line.section('\t',0).text(), sizeof(ep[i].id)-1);
+        strncpy(ep[i].pat, line.section('\t',1).text(), sizeof(ep[i].pat)-1);
+      } else {
+        ep[i].id[0]=0;
+        ep[i].pat[0]=0;
+      }
+    }
+    return true;    
+  } else {
+    return false;
+  }  
+}
