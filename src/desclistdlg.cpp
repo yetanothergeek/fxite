@@ -22,7 +22,7 @@
 #include "histbox.h"
 
 #include "intl.h"
-#include "filterdlg.h"
+#include "desclistdlg.h"
 
 
 #define confirm(cpn,msg) \
