@@ -75,6 +75,7 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_DOUBLECLICKED,PrefsDialog::ID_ACCEL_EDIT,PrefsDialog::onAccelEdit),
   FXMAPFUNC(SEL_KEYPRESS,PrefsDialog::ID_ACCEL_EDIT,PrefsDialog::onAccelEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_FILTERS_EDIT,PrefsDialog::onFiltersEdit),
+  FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_ERRPATS_EDIT,PrefsDialog::onErrPatsEdit),
   FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_TBAR_AVAIL_ITEMS,PrefsDialog::ID_TBAR_INSERT_CUSTOM,PrefsDialog::onToolbarEdit)
 };
 
@@ -953,6 +954,35 @@ long PrefsDialog::onFiltersEdit(FXObject*o,FXSelector sel,void*p)
 
 
 
+long PrefsDialog::onErrPatsEdit(FXObject*o,FXSelector sel,void*p)
+{
+  FXString txt=FXString::null;
+  ErrorPattern*ep= prefs->ErrorPatterns();
+  for (FXint i=0; i<prefs->ErrorPatternCount(); i++) {
+    txt+=ep[i].id;
+    txt+='\t';
+    txt+=ep[i].pat;
+    txt+='\n';
+  }
+  ErrPatDlg dlg(this,txt, sizeof(ep->id)-1, sizeof(ep->pat)-1,prefs->MaxErrorPatterns());
+  if (dlg.execute(PLACEMENT_SCREEN)) {
+    txt=dlg.getText();
+    for (FXint i=0; (i<prefs->MaxErrorPatterns()); i++) {
+      if (i<txt.contains('\n')) {
+        FXString line=txt.section('\n',i);
+        strncpy(ep[i].id, line.section('\t',0).text(), sizeof(ep[i].id)-1);
+        strncpy(ep[i].pat, line.section('\t',1).text(), sizeof(ep[i].pat)-1);
+      } else {
+        ep[i].id[0]=0;
+        ep[i].pat[0]=0;
+      }
+    }
+  }
+  return 1;
+}
+
+
+
 void PrefsDialog::MakeGeneralTab()
 {
   new FXTabItem(tabs,_("general"));
@@ -1045,6 +1075,7 @@ void PrefsDialog::MakeGeneralTab()
   spin->setRange(1,32);
   new FXLabel(hframe, _("Mouse wheel acceleration."));
 
+  new FXButton(right_column, _("Output pane line matching... "),NULL,this,ID_ERRPATS_EDIT,BUTTON_NORMAL|LAYOUT_CENTER_X|LAYOUT_BOTTOM);
 }
 
 
