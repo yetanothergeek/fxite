@@ -39,7 +39,7 @@ class Accessor;
 #include "histbox.h"
 #include "tooltree.h"
 #include "menuspec.h"
-#include "filterdlg.h"
+#include "desclistdlg.h"
 #include "theme.h"
 
 #include "intl.h"
