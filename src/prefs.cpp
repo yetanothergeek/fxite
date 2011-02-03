@@ -266,6 +266,86 @@ static StyleDef CaretStyle =       { "caret",       0,     "#000000", "#000000",
 
 
 
+static ErrorPattern DefaultErrPats[8] = {
+#ifdef __minix
+  { "^\"([^\\s\"]+)\",[^(]+(\\d+)",  "MINIX ACK" },
+#endif
+  { "([^\\s:]+):(\\d+)",             "GCC" },
+  { "([^\\s(]+)\\((\\d+)",           "FreePascal" },
+  {"",""},
+  {"",""},
+  {"",""},
+  {"",""},
+  {"",""},
+#ifndef __minix
+  {"",""},
+#endif
+};
+
+#define MAX_ERROR_PATTERNS ARRAYNUMBER(DefaultErrPats)
+
+static ErrorPattern UserErrorPatterns[MAX_ERROR_PATTERNS];
+
+static const char* errpats_sect="ErrorPatterns";
+
+ErrorPattern* Settings::ErrorPatterns() { return UserErrorPatterns; }
+
+ErrorPattern* Settings::DefaultErrorPatterns() { return DefaultErrPats; }
+
+int Settings::MaxErrorPatterns() { return (MAX_ERROR_PATTERNS); }
+
+
+static void ReadErrorPatterns(FXSettings*reg)
+{
+  char pat_key[]="Pattern_\0\0";
+  char id_key[]="Comment_\0\0";
+  memset(UserErrorPatterns,0,sizeof(ErrorPattern)*MAX_ERROR_PATTERNS);
+  if (reg->existingSection(errpats_sect)) {
+    FXRex *rx=new FXRex();
+    for (FXuint n=0;n<MAX_ERROR_PATTERNS; n++) {
+      pat_key[8] = id_key[8] = n+65;
+      FXString pat=reg->readStringEntry(errpats_sect,pat_key,"");
+      FXString id=reg->readStringEntry(errpats_sect,id_key,"");
+      if (!(id.empty()||pat.empty())) {
+        FXRexError err=rx->parse(pat,REX_CAPTURE|REX_SYNTAX);
+        if (err!=REGERR_OK) {
+          fxwarning("%s: %s\n", _("Error parsing regular expression"), FXRex::getError(err));
+        }
+        strncpy(UserErrorPatterns[n].pat, pat.text(), sizeof(UserErrorPatterns[n].pat)-1);
+        strncpy(UserErrorPatterns[n].id,  id.text(),  sizeof(UserErrorPatterns[n].id)-1);
+      }
+    }
+    delete rx;
+  } else {
+    memcpy(UserErrorPatterns,DefaultErrPats,sizeof(ErrorPattern)*MAX_ERROR_PATTERNS);
+  }
+}
+
+
+
+static void SaveErrorPatterns(FXSettings*reg)
+{
+  char pat_key[]="Pattern_\0\0";
+  char id_key[]="Comment_\0\0";
+  reg->deleteSection(errpats_sect);
+  for (int n=0;n<=9&&UserErrorPatterns[n].pat[0]; n++) {
+    pat_key[8] = id_key[8] = n+65;
+    reg->writeStringEntry(errpats_sect,pat_key,UserErrorPatterns[n].pat);
+    reg->writeStringEntry(errpats_sect,id_key,UserErrorPatterns[n].id);
+  }
+}
+
+
+
+int Settings::ErrorPatternCount()
+{
+  FXuint rv=0;
+  for (rv=0; rv<MAX_ERROR_PATTERNS && UserErrorPatterns[rv].pat[0]; rv++) { }
+  return rv;
+}
+
+
+
 static FXbool IsColor(const char*clr)
 {
   const char*p;
@@ -747,6 +827,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   styles=GlobalStyle;
   MenuMgr::ReadMenuSpecs(reg,keys_sect);
   MenuMgr::ReadToolbarButtons(reg,tbar_sect);
+  ReadErrorPatterns(reg);
 }
 
 
@@ -848,6 +929,7 @@ Settings::~Settings()
 
   MenuMgr::WriteMenuSpecs(reg,keys_sect);
   MenuMgr::WriteToolbarButtons(reg,tbar_sect);
+  SaveErrorPatterns(reg);
 
   if (!style_reg->unparseFile(style_file)) {
     FXMessageBox::error(app,MBOX_OK,

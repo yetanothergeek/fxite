@@ -48,6 +48,11 @@ typedef enum {
 } FileFilterPolicy;
 
 
+typedef struct _ErrorPattern {
+  char pat[64];
+  char id[32];
+} ErrorPattern;
+
 class Settings: public FXObject {
   FXDECLARE(Settings);
   static FXbool loaded;
@@ -136,6 +141,10 @@ public:
   static StyleDef *caretStyle();
   static const FXchar *defaultFileFilters();
 
+  static ErrorPattern* ErrorPatterns();
+  static ErrorPattern* DefaultErrorPatterns();
+  static int ErrorPatternCount();
+  static int MaxErrorPatterns();
   long onChangeSetting(FXObject*o, FXSelector sel, void*p);
 
   enum {

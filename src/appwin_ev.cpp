@@ -1587,22 +1587,27 @@ long TopWindow::onGoToError(FXObject*o, FXSelector sel, void*p)
     if (item) {
       FXString txt=item->getText();
       if (!txt.empty()) {
-        FXint begs[4]={0,0,0,0};
-        FXint ends[4]={0,0,0,0};
-        FXRex rx("([^\\s:]+):(\\d+)", REX_CAPTURE);
-        if (rx.match(txt,begs,ends,REX_FORWARD,3)) {
-          FXString filename = txt.mid(begs[1],ends[1]-begs[1]);
-          FXString linenum =  txt.mid(begs[2],ends[2]-begs[2]);
-          if (FXStat::isFile(filename)) {
-            OpenFile(filename.text(), linenum.text(),false,true);
-          } else {
-            SciDoc*sci=ControlDoc();
-            if (sci && (!sci->Filename().empty()) && (!FXPath::isAbsolute(filename))) {
-              filename=FXPath::name(filename);
-              filename.prepend(PATHSEP);
-              filename.prepend(FXPath::directory(sci->Filename()));
-              if (FXStat::isFile(filename)) {
-                OpenFile(filename.text(), linenum.text(),false,true);
+        ErrorPattern*pats=prefs->ErrorPatterns();
+        for (FXint i=0; i<prefs->ErrorPatternCount(); i++) {
+          FXint begs[4]={0,0,0,0};
+          FXint ends[4]={0,0,0,0};
+          FXRex rx(pats[i].pat, REX_CAPTURE);
+          if (rx.match(txt,begs,ends,REX_FORWARD,3)) {
+            FXString filename = txt.mid(begs[1],ends[1]-begs[1]);
+            FXString linenum =  txt.mid(begs[2],ends[2]-begs[2]);
+            if (FXStat::isFile(filename)) {
+              OpenFile(filename.text(), linenum.text(),false,true);
+              break;
+            } else {
+              SciDoc*sci=ControlDoc();
+              if (sci && (!sci->Filename().empty()) && (!FXPath::isAbsolute(filename))) {
+                filename=FXPath::name(filename);
+                filename.prepend(PATHSEP);
+                filename.prepend(FXPath::directory(sci->Filename()));
+                if (FXStat::isFile(filename)) {
+                  OpenFile(filename.text(), linenum.text(),false,true);
+                  break;
+                }
               }
             }
           }
