@@ -17,8 +17,10 @@
 */
 
 
-// Dialog box to modify preferences for the file dialog's filter list.
-
+// Dialog box that implements an editable list of items and descriptions.
+// Entries can be edited, re-ordered, reverted to previous state, or reverted
+// to application defaults. Each subclass should provide its own definition
+// of the Verify(), RestoreAppDefaults(), setText() and getText() methods.
 class DescListDlg: public FXDialogBox {
   FXDECLARE(DescListDlg)
 private:
@@ -62,6 +64,8 @@ public:
 };
 
 
+
+// Dialog box to modify preferences for the file dialog's filter list.
 class FileFiltersDlg: public DescListDlg {
   virtual bool Verify(FXString&item);
   virtual void setText(const FXString str);
