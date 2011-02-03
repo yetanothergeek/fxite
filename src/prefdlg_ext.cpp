@@ -63,11 +63,7 @@ void FileFiltersDlg::setText(const FXString str)
     FXString desc=sect.section("(", 0);
     FXString mask=sect.section("(", 1);
     mask.substitute(")", "");
-    desc.simplify();
-    mask.simplify();
-    FXString txt;
-    txt.format("%s\t%s", desc.text(), mask.text());
-    items->appendItem(txt);
+    items->appendItem(desc.simplify() + '\t' + mask.simplify());
   }
 }
 
@@ -75,13 +71,13 @@ void FileFiltersDlg::setText(const FXString str)
 
 const FXString& FileFiltersDlg::getText()
 {
-  after="";
+  after.clear();
   for (FXint i=0; i<items->getNumItems(); i++) {
     FXString item=items->getItemText(i);
     FXString desc=item.section('\t',0);
     FXString mask=item.section('\t',1);
     item.format("%s (%s)|", desc.text(), mask.text());
-    after.append(item);
+    after+=item;
   }
   return after;
 }
@@ -101,9 +97,8 @@ ErrPatDlg::ErrPatDlg(FXWindow* w, const FXString init, int max_desc_len, int max
 void ErrPatDlg::setText(const FXString str)
 {
   items->clearItems();
-  FXString Patterns=str;
-  for (FXint i=0; i<Patterns.contains('\n'); i++) {
-    items->appendItem(Patterns.section('\n',i));
+  for (FXint i=0; i<str.contains('\n'); i++) {
+    items->appendItem(str.section('\n',i));
   }
 }
 
@@ -111,7 +106,7 @@ void ErrPatDlg::setText(const FXString str)
 
 const FXString& ErrPatDlg::getText()
 {
-  after=FXString::null;
+  after.clear();
   for (FXint i=0; i<items->getNumItems(); i++) {
     FXString item=items->getItemText(i)+'\n';
     after+=item;
