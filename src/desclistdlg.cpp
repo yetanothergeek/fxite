@@ -290,13 +290,18 @@ void DescListDlg::create()
 {
   FXDialogBox::create();
   setText(before);
+  items->layout();
   if (intro_label) {
     FXint want_width=intro_label->getDefaultWidth()+intro_label->getPadRight()*2;
-    if (getDefaultWidth()>want_width) { want_width=getDefaultWidth(); }
-    FXint max_width=getApp()->getRootWindow()->getWidth()/0.833;
+    FXint items_want_width=items->getWidth()+items->verticalScrollBar()->getWidth()+8;
+    if (items_want_width>want_width) { want_width=items_want_width; }
+    FXint max_width=getApp()->getRootWindow()->getWidth();
     setWidth(want_width>max_width?max_width:want_width);
   }
-  FXint one_third=(items->getParent()->getWidth()/3);
+  FXint want_hgt=getHeight()+items->getItemHeight();
+  FXint max_hgt=getApp()->getRootWindow()->getHeight()*0.75;
+  setHeight(want_hgt>max_hgt?max_hgt:want_hgt);
+  FXint one_third=getWidth()/3;
   items->setHeaderSize(0, one_third);
   items->setHeaderSize(1, one_third*2);
   enableButtons();
