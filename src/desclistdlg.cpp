@@ -251,6 +251,8 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name,
     intro_label->setPadRight(4);
     intro_label->setPadTop(4);
     intro_label->setPadBottom(4);
+    intro_label->setTextColor(getApp()->getTipforeColor());
+    intro_label->setBackColor(getApp()->getTipbackColor());
   } else {
     intro_label=NULL;
   }
