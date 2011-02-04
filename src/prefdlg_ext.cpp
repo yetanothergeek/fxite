@@ -27,7 +27,7 @@
 
 static const char*file_filter_intro=_("\
 Edit the list of wildcard masks (File Filters) that appear in \n\
-the drop-down box for File Open and File Save dialogs.\n\
+the drop-down box for File Open and File Save dialogs.\
 ");
 
 
@@ -110,7 +110,7 @@ A list of regular expressions used to parse file name and line number \n\
 information from compiler output, etc. Each expression uses two pairs \n\
 of capturing parenthesis: the first pair for the filename, and the second \n\
 pair for the line number. The expressions are tried in the order they \n\
-appear here, first one to match an existing file wins. \n\
+appear here, first one to match an existing file wins.\
 ");
 
 
