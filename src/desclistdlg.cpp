@@ -246,11 +246,13 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name,
   setPadBottom(0);
 
   if (intro) { 
-    FXLabel* intro_label=new FXLabel(this,intro, NULL, JUSTIFY_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
+    intro_label=new FXLabel(this,intro, NULL, JUSTIFY_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
     intro_label->setPadLeft(4);
     intro_label->setPadRight(4);
     intro_label->setPadTop(4);
     intro_label->setPadBottom(4);
+  } else {
+    intro_label=NULL;
   }
   FXHorizontalFrame* buttons1=new FXHorizontalFrame(this,BAR_OPTS);
   defaults_btn = new FXButton(buttons1, _("De&faults"), NULL, this, ID_DEFAULTS_CMD, BTN_OPTS);
@@ -286,6 +288,12 @@ void DescListDlg::create()
 {
   FXDialogBox::create();
   setText(before);
+  if (intro_label) {
+    FXint want_width=intro_label->getDefaultWidth()+intro_label->getPadRight()*2;
+    if (getDefaultWidth()>want_width) { want_width=getDefaultWidth(); }
+    FXint max_width=getApp()->getRootWindow()->getWidth()/0.833;
+    setWidth(want_width>max_width?max_width:want_width);
+  }
   FXint one_third=(items->getParent()->getWidth()/3);
   items->setHeaderSize(0, one_third);
   items->setHeaderSize(1, one_third*2);

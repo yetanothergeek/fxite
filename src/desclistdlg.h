@@ -36,6 +36,7 @@ protected:
   FXButton*edit_btn;
   FXButton*delete_btn;
   FXButton*new_btn;
+  FXLabel* intro_label;
   FXString item_comment;
   void enableButtons();
   virtual void setText(const FXString str) {}
