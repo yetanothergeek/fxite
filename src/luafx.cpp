@@ -274,6 +274,7 @@ static int choose(lua_State*L) {
   list->setFocus();
   dlg.create();
   int want_width=list->getContentWidth()+list->verticalScrollBar()->getWidth()+dlg.getPadLeft()*2;
+  if (want_width<dlg.getDefaultWidth()) { want_width=dlg.getDefaultWidth(); }
   int max_width=main_window->getApp()->getRootWindow()->getWidth()*0.75;
   dlg.setWidth(want_width>max_width?max_width:want_width);
   if ( dlg.execute(PLACEMENT_OWNER) ) {
