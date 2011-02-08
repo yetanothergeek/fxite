@@ -201,6 +201,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int lastXChosen;
 	int lineAnchor;
 	int originalAnchorPos;
+	int wordSelectAnchorStartPos;
+	int wordSelectAnchorEndPos;
+	int wordSelectInitialCaretPos;
 	int targetStart;
 	int targetEnd;
 	int searchFlags;
@@ -480,7 +483,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool PositionInSelection(int pos);
 	bool PointInSelection(Point pt);
 	bool PointInSelMargin(Point pt);
+	Window::Cursor GetMarginCursor(Point pt);
 	void LineSelection(int lineCurrent_, int lineAnchor_);
+	void WordSelection(int pos);
 	void DwellEnd(bool mouseMoved);
 	void MouseLeave();
 	virtual void ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, bool alt);

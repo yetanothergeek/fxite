@@ -43,6 +43,7 @@ LexMPT.cxx \
 LexMagik.cxx \
 LexMarkdown.cxx \
 LexMetapost.cxx \
+LexModula.cxx \
 LexOthers.cxx \
 LexPB.cxx \
 LexPLM.cxx \
