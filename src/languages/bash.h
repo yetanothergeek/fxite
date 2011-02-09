@@ -25,7 +25,7 @@ static const char* bash_words[]= {
 };
 
 
-static const char* bash_mask = "*.sh|*.bsh|configure";
+static const char* bash_mask = "*.sh|*.bsh|configure|*.ksh";
 
 
 static const char* bash_apps = "ash|bash|dash|sh";
