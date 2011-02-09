@@ -395,11 +395,13 @@ column number separated by a colon or comma.  (e.g. Enter "100:12" for line 100 
 When you double-click an item in the ///output pane/// that contains properly \
 formatted filename and line number information, __APP__ will try to parse the \
 message line, and jump to that position in the specified file, opening that \
-file if required. (You can also do this with the "%%%Search->Go to error%%%" menu.)
+file if required. (You can also do this with the "%%%Search->Go to error%%%" menu.) \
+  By default, the regular expressions used to match the filename and line number should work \
+for error messages produced by ===gcc=== and other programs with similar output. You can also \
+define your own expressions to match the output of other tools by editing the list found under:
+%%%Edit->Preferences->general->Output pane line matching%%%.
 
-This works for example with the error messages produced by \
-gcc, and from html-tidy, when invoked with the "--gnu-emacs yes" option.
-(See the chapter on ///Shell Commands and Filters/// for more \
+(See the section on ///Shell Commands and Filters/// for more \
 information on capturing the output of external programs.)
 
 
