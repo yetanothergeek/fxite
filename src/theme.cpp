@@ -64,6 +64,16 @@ static FXuint what_changed=ThemeUnchanged;
 static FXString system_font="Sans,90";
 static FXString current_font="Sans,90";
 
+static const FXString GetActualFont(FXFont*fnt)
+{
+  FXString dst=fnt->getFont().section(',',1,5);
+  dst.prepend(',');
+  dst.prepend(fnt->getActualName());
+  return dst;
+}
+
+
+
 static void RegToApp()
 {
   FXApp*a=FXApp::instance();
@@ -82,11 +92,12 @@ static void RegToApp()
   a->setShadowColor(a->reg().readColorEntry(colors_sect,"Shadow",a->getShadowColor()));
   a->setTipbackColor(a->reg().readColorEntry(colors_sect,"Tipback",a->getTipbackColor()));
   a->setTipforeColor(a->reg().readColorEntry(colors_sect,"Tipfore",a->getTipforeColor()));
-  current_font=a->reg().readStringEntry(colors_sect,"Font",a->getNormalFont()->getFont().text());
+  current_font=a->reg().readStringEntry(colors_sect,"Font",system_font.text());
   if (current_font!=system_font) {
     a->getNormalFont()->destroy();
     a->getNormalFont()->setFont(current_font);
     a->getNormalFont()->create();
+    current_font=GetActualFont(a->getNormalFont());
   }
 }
 
@@ -107,7 +118,7 @@ static void AppToReg()
   a->reg().writeColorEntry(colors_sect,"Shadow",a->getShadowColor());
   a->reg().writeColorEntry(colors_sect,"Tipback",a->getTipbackColor());
   a->reg().writeColorEntry(colors_sect,"Tipfore",a->getTipforeColor());
-  a->reg().writeStringEntry(colors_sect,"Font", a->getNormalFont()->getFont().text());
+  a->reg().writeStringEntry(colors_sect,"Font", GetActualFont(a->getNormalFont()).text());
 }
 
 
@@ -348,9 +359,10 @@ static void SetCursorColor(FXWindow*w)
 void Theme::init()
 {
   GetColorsFromApp(&system_colors);
-  FXApp*a=FXApp::instance();
-  a->getNormalFont()->create();
-  system_font=a->getNormalFont()->getFont();
+  FXFont *fnt=FXApp::instance()->getNormalFont();
+  fnt->create();
+  system_font=GetActualFont(fnt);
+  current_font=system_font;
   memcpy(&custom_colors.base,&system_colors.base,sizeof(AppColors)-sizeof(char*));
   RegToApp();
 }
@@ -744,7 +756,7 @@ static void DlgGetFont(const FXFontDialog &dlg, FXString&dst)
   dlg.getFontSelection(fd);
   FXFont f(FXApp::instance(),fd);
   f.create();
-  dst=f.getFont();
+  dst=GetActualFont(&f);
   f.destroy();
 }
 
