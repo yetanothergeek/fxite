@@ -728,7 +728,7 @@ void ThemeGUI::SetFont(const FXString &fontname)
     FillThemeList();
     list->setCurrentItem(i);
     list->makeItemVisible(i);
-    list->create();
+    if (id()) { list->create(); }
     recalc();
     update();
     layout();
