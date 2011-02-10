@@ -786,6 +786,7 @@ long ThemeGUI::onToggleEnabled(FXObject*o, FXSelector sel, void*p)
   use_system_colors=(bool)((FXival)p);
   if (use_system_colors) {
     SetFont(system_font);
+    current_font=system_font;
     for (FXWindow*w=mtx->getFirst(); w; w=w->getNext()) {
       w->disable();
     }
