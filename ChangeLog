@@ -1,3 +1,20 @@
+2011-02-12
+  * Updated to Scintilla 2.24+ from HG 3534:73cb21344705.
+  * Added configurable settings for output pane error-matching expressions.
+  * Fixes to compile and run on MINIX.
+  * Improved portability of socket code.
+  * Handle last-focused document of session on a per-server basis.
+  * Fixed a probelm with oriented drawing of tabbook tabs.
+  * Removed invalid documentation about transforming case in regex substitution.
+  * Reworked sizing and layout of the tools dialog.
+  * Code clean-up for tools dialog.
+  * Fixed a bug in determining file permission for new tools.
+  * Added "theme" support (Customizable colors and fonts for GUI.)
+  * Made toolbar buttons look flat, unless they are toggled "on".
+  * Avoid running multiple macros and/or external commands at the same time.
+  * Renamed some accidentally overloaded virtual functions.
+
+
 2011-01-08
   * Remember previously-focused document when restoring session.
   * Loading of help window text is slightly faster.
