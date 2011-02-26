@@ -17,11 +17,11 @@ case "$(uname)" in
   *)
     case "$(pwd)" in
       *fxite*)
-         if [ -f fxscintilla/FXScintilla.h ] \
-          && [ -d src/languages ] \
-          && [ -f lua/Makefile.am ] \
-          && [ -f util/cleanup.sh ] \
-          && diff -q "${0}" util/cleanup.sh
+         if [ -f "./fxscintilla/FXScintilla.h" ] \
+          && [ -d "./src/languages" ] \
+          && [ -f "./lua/Makefile.am" ] \
+          && [ -f "./util/cleanup.sh" ] \
+          && diff -q "${0}" "./util/cleanup.sh"
          then
          :
          else
