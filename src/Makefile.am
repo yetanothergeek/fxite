@@ -27,12 +27,12 @@ EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt 
 $(srcdir)/help.cpp: $(srcdir)/helptext.h $(srcdir)/help_lua.h
 
 $(srcdir)/helptext.h: $(srcdir)/helptext.txt
-	sed '{:q;N;s/\\\n//g;bq}' $< > $<.tmp
+	awk '{if (/\\$$/) {sub(/\\$$/,""); printf("%s",$$0)} else {print}}' $< > $<.tmp
 	reswrap -o $@ $<.tmp
 	$(RM) $<.tmp
 
 $(srcdir)/help_lua.h: $(srcdir)/help_lua.txt
-	sed '{:q;N;s/\\\n//g;bq}' $< > $<.tmp
+	awk '{if (/\\$$/) {sub(/\\$$/,""); printf("%s",$$0)} else {print}}' $< > $<.tmp
 	reswrap -o $@ $<.tmp
 	$(RM) $<.tmp
 

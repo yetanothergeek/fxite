@@ -1,24 +1,49 @@
-#!/bin/bash
+#!/bin/sh
 
-abs=$(readlink -f "${0}")
-rel="./util/${0##*/}"
+case "$(uname)" in
+  Linux)
+    abs=$(readlink -f "${0}")
+    rel="./util/${0##*/}"
+    if [ -f "${rel}" ] && [ -f "${abs}" ] && [ $(stat -c "%i" ${abs}) -eq $(stat -c "%i" ${rel}) ]
+    then
+      unset abs
+      unset rel
+    else
+      dir=${abs%/*}
+      printf "***FATAL***\nWorking directory must be:\n  %s/\n" "${dir%/*}" 1>&2
+      exit 1
+    fi
+  ;;
+  *)
+    case "$(pwd)" in
+      *fxite*)
+         if [ -f fxscintilla/FXScintilla.h ] \
+          && [ -d src/languages ] \
+          && [ -f lua/Makefile.am ] \
+          && [ -f util/cleanup.sh ] \
+          && diff -q "${0}" util/cleanup.sh
+         then
+         :
+         else
+          echo "***FATAL***\nI do not recognize this directory structure." 1>&2
+          exit 1
+         fi
+      ;;
+      *)
+        echo "***FATAL***\nWorking directory name must match *fxite*" 1>&2
+        exit 1
+      ;;
+    esac
+  ;;
+esac
 
-if [ -f "${rel}" ] && [ -f "${abs}" ] && [ $(stat -c "%i" ${abs}) -eq $(stat -c "%i" ${rel}) ]
-then
-  unset abs
-  unset rel
-else
-  dir=${abs%/*}
-  printf "***FATAL***\nWorking directory must be:\n  %s/\n" "${dir%/*}" 1>&2
-  exit 1
-fi
-
-
-
-find "." -maxdepth 1 -type d -name 'fxite-*.*.*' | while read DIR
+for DIR in $(echo fxite-*.*)
 do
-  chmod +w $(find "${DIR}")
-  rm -r "${DIR}"
+  if [ -d "${DIR}" ]
+  then
+    chmod +w $(find "${DIR}")
+    rm -r "${DIR}"
+  fi
 done
 
 rm -f fxite-*.tar.gz
@@ -28,7 +53,7 @@ rm -f po/*.pot 'po/remove-potcdate.sed' 'po/POTFILES' 'aclocal.m4'
 rm -f 'configure' 'src/fxite' 'sl.obj' 'helptext.h' 'help_lua.h' 'tags' 'gmon.out'
 rm -f callgrind.out.[0-9]* *.log
 
-find  -name 'Makefile' \
+find . -name 'Makefile' \
   -or -name 'Makefile.in' \
   -or -name '*.o' \
   -or -name '*.lo' \
@@ -51,5 +76,5 @@ find  -name 'Makefile' \
   -or -name '*~' \
 | while read name
 do
-  rm -rf ${name}
+  rm -rf "${name}"
 done
