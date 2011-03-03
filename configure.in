@@ -111,8 +111,9 @@ case $host_os in
   *linux* )
     dnl #Tell Lua sources if we are on Linux
     AC_DEFINE(LUA_USE_LINUX)
-    dnl #Fedora-13 needs explicit libX11 and libdl, should be harmless otherwise
-    FOX_LIBS="${FOX_LIBS} -lX11 -ldl"
+    dnl #Fedora-13 needs explicit libdl, should be harmless otherwise
+    FOX_LIBS="${FOX_LIBS} -ldl"
+    PKG_CHECK_MODULES([X11],[x11])
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
@@ -122,10 +123,12 @@ case $host_os in
     AC_DEFINE(_MINIX)
     AC_DEFINE(_POSIX_SOURCE)
     AC_DEFINE(LUA_USE_POSIX)
-    FOX_LIBS="${FOX_LIBS} -lX11 -lpthread"
+    PKG_CHECK_MODULES([X11],[x11])
+    FOX_LIBS="${FOX_LIBS} -lpthread"
   ;;
   *freebsd*)
     AC_DEFINE(LUA_USE_POSIX)
+    PKG_CHECK_MODULES([X11],[x11])
   ;;
 esac
 
@@ -159,6 +162,9 @@ AC_SUBST(LUA_LIBS)
 
 AC_SUBST(FXSCINTILLA_CFLAGS)
 AC_SUBST(FXSCINTILLA_LIBS)
+
+AC_SUBST(X11_CFLAGS)
+AC_SUBST(X11_LIBS)
 
 
 AC_OUTPUT( Makefile fxscintilla/Makefile lua/Makefile src/Makefile src/languages/Makefile po/Makefile.in )
