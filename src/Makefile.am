@@ -5,6 +5,8 @@ DEFS += -DLOCALEDIR=\"$(localedir)\"
 
 bin_PROGRAMS=fxite
 
+fxite_LDFLAGS=$(FXSCINTILLA_LIBS) $(LUA_LIBS) $(LDFLAGS)
+
 fxite_SOURCES=\
   appmain.cpp appwin_ev.cpp appwin_mk.cpp appwin_mnu.cpp appwin_fn.cpp runcmd.cpp filer.cpp \
   histbox.cpp lang.cpp luacmds.cpp luafuncs.cpp macro.cpp prefdlg.cpp prefs.cpp readtags.c \
