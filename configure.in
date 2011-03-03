@@ -123,10 +123,6 @@ case $host_os in
     AC_DEFINE(_POSIX_SOURCE)
     AC_DEFINE(LUA_USE_POSIX)
     FOX_LIBS="${FOX_LIBS} -lX11 -lpthread"
-    if test "x$USE_NLS" = "xyes"
-    then
-      FOX_LIBS="${FOX_LIBS} -lintl -liconv"
-    fi
   ;;
   *freebsd*)
     AC_DEFINE(LUA_USE_POSIX)
