@@ -7,7 +7,7 @@ AC_SUBST([VERSION])
 AC_SUBST([PACKAGE])
 
 AM_INIT_AUTOMAKE([${PACKAGE}], ${VERSION} )
-# AM_PROG_LIBTOOL
+
 AM_GNU_GETTEXT([external])
 
 AC_PROG_CC
@@ -20,7 +20,7 @@ AC_HEADER_STDC
 dnl #Let pkgconfig handle FOX flags unless they are set in the environment
 if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
 then
-  PKG_CHECK_MODULES([FOX], [fox >= 1.7], 
+  PKG_CHECK_MODULES([FOX], [fox >= 1.7],
     [
       AC_MSG_RESULT([Found FOX-1.7 or newer])
       AC_DEFINE(FOX_1_7)
@@ -92,7 +92,7 @@ AC_ARG_WITH([system-lua],
   ,
   [
     dnl Use local copy of Lua
-    case "${srcdir}" in 
+    case "${srcdir}" in
       */*)
         LUA_CFLAGS="-I${srcdir}/lua"
       ;;
