@@ -128,6 +128,9 @@ case $host_os in
       FOX_LIBS="${FOX_LIBS} -lintl -liconv"
     fi
   ;;
+  *freebsd*)
+    AC_DEFINE(LUA_USE_POSIX)
+  ;;
 esac
 
 
