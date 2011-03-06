@@ -20,7 +20,21 @@ AC_HEADER_STDC
 dnl #Let pkgconfig handle FOX flags unless they are set in the environment
 if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
 then
-  PKG_CHECK_MODULES([FOX], [fox >= 1.7],
+  PKG_PROG_PKG_CONFIG()
+  FOX_PKG_NAME=fox
+  for L in fox18 fox17 fox
+  do
+    AC_MSG_CHECKING([for $L.pc])
+    if ${PKG_CONFIG} --exists ${L}
+    then
+      AC_MSG_RESULT([yes])
+      FOX_PKG_NAME=${L}
+      break
+    else
+      AC_MSG_RESULT([no])
+    fi
+  done
+  PKG_CHECK_MODULES([FOX], [${FOX_PKG_NAME} >= 1.7],
     [
       AC_MSG_RESULT([Found FOX-1.7 or newer])
       AC_DEFINE(FOX_1_7)
