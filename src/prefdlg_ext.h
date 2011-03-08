@@ -39,3 +39,15 @@ public:
   virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
   ErrPatDlg(FXWindow* w);
 };
+
+
+class SysIncDlg: public DescListDlg {
+  virtual void setText(const FXString str);
+  virtual const FXString& getText();
+  virtual bool Verify(FXString&item);
+  virtual void RestoreAppDefaults();
+  virtual bool Browse(FXString &text);
+public:
+  virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
+  SysIncDlg(FXWindow* w);
+};

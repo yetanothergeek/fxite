@@ -71,6 +71,7 @@ public:
   long onFiltersEdit(FXObject*o,FXSelector sel,void*p);
   long onToolbarEdit(FXObject*o,FXSelector sel,void*p);
   long onErrPatsEdit(FXObject*o,FXSelector sel,void*p);
+  long onSysIncsEdit(FXObject*o,FXSelector sel,void*p);
   enum {
     ID_SOMETHING=FXDialogBox::ID_LAST,
     ID_TAB_SWITCHED,
@@ -80,6 +81,7 @@ public:
     ID_ACCEL_EDIT,
     ID_FILTERS_EDIT,
     ID_ERRPATS_EDIT,
+    ID_SYSINCS_EDIT,
     ID_TBAR_AVAIL_ITEMS,
     ID_TBAR_USED_ITEMS,
     ID_TBAR_ITEM_INSERT,

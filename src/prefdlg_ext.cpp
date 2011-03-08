@@ -206,3 +206,89 @@ FXuint ErrPatDlg::execute(FXuint placement)
     return false;
   }  
 }
+
+
+
+static const char*sysinc_intro=_("\
+A list of directories where the \"Open Selected\" menu command will\n\
+look for C/C++ header files which are enclosed in <> brackets.\
+");
+
+
+SysIncDlg::SysIncDlg(FXWindow* w):
+  DescListDlg(w, _("System Include Directories"), _("Include Directories"),
+  _("Directory to search for C/C++ system headers"), sysinc_intro,-1,0,64,true)
+{
+  before.clear();
+  before=Settings::SystemIncludePaths();
+}
+
+
+
+void SysIncDlg::setText(const FXString str)
+{
+  items->clearItems();
+  for (FXint i=0; i<str.contains('\n'); i++) {
+    FXString sect=str.section('\n',i);
+    items->appendItem('\t' + sect.simplify());
+  }
+}
+
+
+
+const FXString& SysIncDlg::getText()
+{
+  after.clear();
+  for (FXint i=0; i<items->getNumItems(); i++) {
+    FXString item=items->getItemText(i)+'\n';
+    item.erase(0,1);
+    after+=item;
+  }
+  return after;
+}
+
+
+
+bool SysIncDlg::Verify(FXString&item)
+{
+  item.simplify();
+  if (item.empty()) {
+    FXMessageBox::error(this, MBOX_OK, _("Error"), _("Path must not be empty."));
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+
+void SysIncDlg::RestoreAppDefaults()
+{
+  setText(Settings::defaultSystemIncludePaths());
+}
+
+
+
+bool SysIncDlg::Browse(FXString &text)
+{
+  FXDirDialog dlg(this, _("Select include path"));
+  dlg.setDirectory(text);
+  if (dlg.execute()) {
+    text=dlg.getDirectory();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+
+FXuint SysIncDlg::execute(FXuint placement)
+{
+  if (DescListDlg::execute(placement)) { 
+    Settings::SystemIncludePaths(after);
+    return true;    
+  } else {
+    return false;
+  }  
+}

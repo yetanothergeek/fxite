@@ -76,6 +76,7 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_KEYPRESS,PrefsDialog::ID_ACCEL_EDIT,PrefsDialog::onAccelEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_FILTERS_EDIT,PrefsDialog::onFiltersEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_ERRPATS_EDIT,PrefsDialog::onErrPatsEdit),
+  FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_SYSINCS_EDIT,PrefsDialog::onSysIncsEdit),
   FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_TBAR_AVAIL_ITEMS,PrefsDialog::ID_TBAR_INSERT_CUSTOM,PrefsDialog::onToolbarEdit)
 };
 
@@ -960,6 +961,19 @@ long PrefsDialog::onErrPatsEdit(FXObject*o,FXSelector sel,void*p)
 
 
 
+long PrefsDialog::onSysIncsEdit(FXObject*o,FXSelector sel,void*p)
+{
+  SysIncDlg(this).execute();
+#ifdef WIN32
+  hide();
+  show();
+  ((FXWindow*)o)->setFocus();
+#endif
+  return 1;
+}
+
+
+
 void PrefsDialog::MakeGeneralTab()
 {
   new FXTabItem(tabs,_("general"));
@@ -1051,8 +1065,10 @@ void PrefsDialog::MakeGeneralTab()
   spin->setValue(prefs->WheelLines);
   spin->setRange(1,32);
   new FXLabel(hframe, _("Mouse wheel acceleration."));
-
-  new FXButton(right_column, _("Output pane line matching... "),NULL,this,ID_ERRPATS_EDIT,BUTTON_NORMAL|LAYOUT_CENTER_X|LAYOUT_BOTTOM);
+  right_column=new FXVerticalFrame(right_column,FRAME_NONE|PACK_UNIFORM_WIDTH|LAYOUT_CENTER_X|LAYOUT_BOTTOM);
+  right_column->setVSpacing(8);
+  new FXButton(right_column, _("System header locations... "),NULL,this,ID_SYSINCS_EDIT,BUTTON_NORMAL|LAYOUT_CENTER_X);
+  new FXButton(right_column, _("Output pane line matching... "),NULL,this,ID_ERRPATS_EDIT,BUTTON_NORMAL|LAYOUT_CENTER_X);
 }
 
 
