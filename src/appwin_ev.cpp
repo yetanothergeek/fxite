@@ -438,15 +438,51 @@ long TopWindow::onOpenSelected(FXObject*o, FXSelector sel, void*p)
       break;
     }
   }
-  if (FXStat::exists(filename)) {
-    OpenFile(filename.text(),line.text(),false,true);
-    return 1;
-  } else {
-    if (!(FXPath::isAbsolute(filename)||sci->Filename().empty())) {
-      FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
-      if (FXStat::exists(fullpath)) {
-        OpenFile(fullpath.text(),line.text(),false,true);
+  if (sci->sendMessage(SCI_GETLEXER,0,0)==SCLEX_CPP) {
+    if ( (filename[0]=='<') && (filename[filename.length()-1]=='>') ) {
+      filename.erase(0,1);
+      filename.trunc(filename.length()-1);
+      if (filename.empty()) { return 1; }
+    } else {
+      if (FXStat::exists(filename)) {
+        OpenFile(filename.text(),line.text(),false,true);
         return 1;
+      } else {
+        if (!(FXPath::isAbsolute(filename)||sci->Filename().empty())) {
+          FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
+          if (FXStat::exists(fullpath)) {
+            OpenFile(fullpath.text(),line.text(),false,true);
+            return 1;
+          }
+        }
+      }
+    }
+    if (FXPath::isAbsolute(filename)&&FXStat::exists(filename)) {
+      OpenFile(filename.text(),line.text(),false,true);
+      return 1;
+    } else {
+      for (FXint i=0; i<prefs->SystemIncludePaths().contains('\n'); i++) {
+        FXString fullpath=prefs->SystemIncludePaths().section('\n',i);
+        if (fullpath.empty()) { continue; }
+        fullpath+=PATHSEPSTRING;
+        fullpath+=filename;
+        if (FXStat::exists(fullpath)) {
+          OpenFile(fullpath.text(),line.text(),false,true);
+          return 1;
+        }
+      }
+    }
+  } else {
+    if (FXStat::exists(filename)) {
+      OpenFile(filename.text(),line.text(),false,true);
+      return 1;
+    } else {
+      if (!(FXPath::isAbsolute(filename)||sci->Filename().empty())) {
+        FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
+        if (FXStat::exists(fullpath)) {
+          OpenFile(fullpath.text(),line.text(),false,true);
+          return 1;
+        }
       }
     }
   }
