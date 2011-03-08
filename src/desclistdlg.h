@@ -27,6 +27,7 @@ protected:
   int desc_max_len;
   int item_max_len;
   int items_max;
+  bool has_browse_btn;
   DescListDlg(){}
   FXString before;
   FXString after;
@@ -43,10 +44,12 @@ protected:
   virtual const FXString& getText() { return after; }
   virtual bool Verify(FXString&item) { return true; }
   virtual void RestoreAppDefaults() {}
+  virtual bool Browse(FXString &text) { return false; }
 public:
   bool editItem(const FXString &desc, const FXString &item, bool focus_item=false);
   long onCommand(FXObject* sender,FXSelector sel,void *ptr);
   long onClose(FXObject* sender,FXSelector sel,void *ptr);
+  long onBrowse(FXObject* sender,FXSelector sel,void *ptr);
   enum{
     ID_LIST_SEL=FXDialogBox::ID_LAST,
     ID_DEFAULTS_CMD,
@@ -56,11 +59,14 @@ public:
     ID_EDIT_CMD,
     ID_DELETE_CMD,
     ID_NEW_CMD,
+    ID_BROWSE,
     ID_LAST
   };
+  // For max_desc_len, max_item_len, max_items: zero means unlimited.
+  // For max_desc_len: (-1) creates an item list only, no descriptions.
   DescListDlg( FXWindow* w, const char*name, const char*hdr2, 
                const char*howto, const char*intro=NULL, 
-               int max_desc_len=0, int max_item_len=0, int max_items=0);
+               int max_desc_len=0, int max_item_len=0, int max_items=0, bool browse_btn=false);
   virtual void create();
 };
 
