@@ -346,6 +346,84 @@ int Settings::ErrorPatternCount()
 
 
 
+static const char* sysincs_sect="SystemIncludes";
+
+#define MAX_SYSINC_PATHS 255
+
+
+static const FXchar* DefaultSysIncs = 
+  "/usr/include\n"
+#ifdef MINIX
+  "/usr/pkg/include\n"
+  "/usr/pkg/X11R6\n"
+#endif
+  "/usr/local/include\n"
+;
+
+
+static FXString SysIncs = FXString::null;
+
+
+
+const FXString Settings::defaultSystemIncludePaths()
+{
+  return DefaultSysIncs;
+}
+
+
+
+const FXString Settings::SystemIncludePaths()
+{
+  return SysIncs;
+}
+
+
+
+void Settings::SystemIncludePaths(const FXString paths)
+{
+  SysIncs=paths;
+}
+
+
+
+static void SaveSysIncPaths(FXSettings*reg)
+{
+  reg->deleteSection(sysincs_sect);
+  int n=SysIncs.contains('\n');
+  if (n>MAX_SYSINC_PATHS) { n=MAX_SYSINC_PATHS; }
+  for (int i=0; i<n; i++) {
+    const FXString value=SysIncs.section('\n',i);
+    if (!value.empty()) {
+      char key[16];
+      snprintf(key, sizeof(key)-1 ,"Path_%d", i+1);
+      reg->writeStringEntry(sysincs_sect,key,value.text());
+    }
+  }
+}
+
+
+
+static void ReadSysIncPaths(FXSettings*reg)
+{
+  SysIncs=FXString::null;
+  if (reg->existingSection(sysincs_sect)) {
+    for (int i=0; i<MAX_SYSINC_PATHS; i++) {
+      char key[16];
+      snprintf(key, sizeof(key)-1 ,"Path_%d", i+1);
+      if (reg->existingEntry(sysincs_sect,key)) { 
+        const char* value=reg->readStringEntry(sysincs_sect,key,NULL);
+        if (value && *value) {
+          SysIncs+=value;
+          SysIncs+='\n';
+        }
+      }
+    }
+  }
+  if (SysIncs.empty()) { SysIncs=DefaultSysIncs; }
+}
+
+
+
 static FXbool IsColor(const char*clr)
 {
   const char*p;
@@ -828,6 +906,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   MenuMgr::ReadMenuSpecs(reg,keys_sect);
   MenuMgr::ReadToolbarButtons(reg,tbar_sect);
   ReadErrorPatterns(reg);
+  ReadSysIncPaths(reg);
 }
 
 
@@ -930,6 +1009,7 @@ Settings::~Settings()
   MenuMgr::WriteMenuSpecs(reg,keys_sect);
   MenuMgr::WriteToolbarButtons(reg,tbar_sect);
   SaveErrorPatterns(reg);
+  SaveSysIncPaths(reg);
 
   if (!style_reg->unparseFile(style_file)) {
     FXMessageBox::error(app,MBOX_OK,

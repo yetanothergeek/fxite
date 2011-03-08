@@ -145,6 +145,10 @@ public:
   static ErrorPattern* DefaultErrorPatterns();
   static int ErrorPatternCount();
   static int MaxErrorPatterns();
+  static const FXString defaultSystemIncludePaths();
+  static const FXString SystemIncludePaths();
+  static void SystemIncludePaths(const FXString paths);
+
   long onChangeSetting(FXObject*o, FXSelector sel, void*p);
 
   enum {
