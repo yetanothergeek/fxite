@@ -746,7 +746,7 @@ void TopWindow::SetInfo(const char*msg, bool hide_docname)
 static void SetShellEnv(const char*file, long line)
 {
   char linenum[8]="\0\0\0\0\0\0\0";
-  snprintf(linenum,sizeof(linenum)-1, "%ld", line);
+  snprintf(linenum,sizeof(linenum)-1, "%ld", line+1);
 #ifdef WIN32
   FXSystem::setEnvironment("l",linenum);
   FXSystem::setEnvironment("f",file);
