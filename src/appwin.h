@@ -201,6 +201,7 @@ private:
   void EnableUserFilters(bool enabled);
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
   void SetStatusBarColors();
+  void OpenSelected();
   FXString save_hook;
   FXHotKey killkey;
   FXString bookmarked_file;

@@ -651,6 +651,183 @@ void TopWindow::SetStatusBarColors()
 
 
 
+// Check for an already-selected filename
+static void GetFilenameFromSelection(TopWindow*tw,SciDoc*sci, FXString &filename)
+{
+#ifdef WIN32
+  sci->GetSelText(filename);
+#else // On X11 platforms, try first to get a filename from the X-Selection
+  FXuchar*xsel=NULL;
+  FXuint xlen=0;
+  FXDragType types[] = { tw->textType, tw->utf8Type, tw->stringType, 0 };
+  for ( FXDragType*type=types; *type; type++ ) {
+    if (tw->getDNDData(FROM_SELECTION,*type, xsel, xlen) && xsel && *xsel) {
+      FXuchar*eol=(FXuchar*)memchr(xsel,'\n', xlen);
+      FXuint n = eol ? (eol-xsel) : xlen;
+      filename.assign((FXchar*)xsel,n);
+      filename=filename.simplify();
+      if (!FXStat::exists(filename.contains(':')?filename.section(':',0):filename)) { 
+        filename=FXString::null;
+      }
+      break;
+    }
+    if ( filename.empty() ) { sci->GetSelText(filename); }
+  }
+#endif
+}
+
+
+
+// Try to find a filename at the current position in the document.
+static bool GetFilenameAtCursor(SciDoc*sci, FXString &filename)
+{
+  long max=sci->GetTextLength();
+  if (max<=0) { return false; }
+  TextRange range;
+  memset(&range,0,sizeof(range));
+  range.chrg.cpMin=sci->GetCaretPos();
+  if ( (range.chrg.cpMin>0) && (sci->CharAt(range.chrg.cpMin)<='*') && (sci->CharAt(range.chrg.cpMin-1)>'*') ) {
+    // Caret is at the end of a phrase, back up one before looking for start...
+    range.chrg.cpMin--;
+  }
+  // Read backwards till we find the start of our phrase...
+  while ( (range.chrg.cpMin>0) && (sci->CharAt(range.chrg.cpMin)>'*') ) { range.chrg.cpMin--; }
+  if (sci->CharAt(range.chrg.cpMin)<='*') { range.chrg.cpMin++; }
+  range.chrg.cpMax=range.chrg.cpMin+1;
+  // Now read forward, looking for the end of our phrase...
+  while ( (range.chrg.cpMax<max) && (sci->CharAt(range.chrg.cpMax)>'*') ) { range.chrg.cpMax++; }
+  long len=range.chrg.cpMax-range.chrg.cpMin;
+  if (len<=0) { return false; }
+  range.lpstrText=(char*)calloc(len+1,1);
+  sci->sendMessage(SCI_GETTEXTRANGE,0,reinterpret_cast<sptr_t>(&range));
+  filename=range.lpstrText;
+  free(range.lpstrText);
+  return filename.empty()?false:true;
+}
+
+
+
+// Look for file: first in active document's directory; then in current working directory
+static bool OpenLocalIncludeFile(TopWindow*tw, SciDoc*sci, const FXString &filename, const FXString &line)
+{
+  if (!sci->Filename().empty()) {
+    FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
+    if (FXStat::exists(fullpath)) {
+      tw->OpenFile(fullpath.text(),line.text(),false,true);
+      return true;
+    }
+  }
+  if (FXStat::exists(filename)) {
+    tw->OpenFile(filename.text(),line.text(),false,true);
+    return true;
+  }
+  return false;
+}
+
+
+
+// Look for file in system include directories
+static bool OpenSystemIncludeFile(TopWindow*tw, SciDoc*sci, const FXString &filename, const FXString &line)
+{
+  const FXString paths=Settings::SystemIncludePaths();
+  for (FXint i=0; i<paths.contains('\n'); i++) {
+    FXString fullpath=paths.section('\n',i);
+    if (fullpath.empty()) { continue; }
+    fullpath+=PATHSEPSTRING;
+    fullpath+=filename;
+    if (FXStat::exists(fullpath)) {
+      tw->OpenFile(fullpath.text(),line.text(),false,true);
+      return true;
+    }
+  }
+  return false;
+}
+
+
+// Look for line number after filename in the form of FILE.EXT:NNN
+static void ParseLineNumberFromFilename(FXString &filename, FXString &line)
+{
+  #ifdef WIN32 // Ignore colon in drive spec on WIN32
+  FXint colons=filename.contains(':');
+  if (FXPath::isAbsolute(filename)) {
+    if (colons>1) {
+      line=filename.section(':',2);
+      filename=filename.section(':',0,2);
+    }
+  } else {
+    if (colons>0) {
+      line=filename.section(':',1) ;
+      filename=filename.section(':',0);
+    }
+  }
+#else
+  if (filename.contains(':')) {
+    line=filename.section(':',1) ;
+    filename=filename.section(':',0);
+  }
+#endif
+  for (FXint i=0; i<line.length(); i++) {
+    if (!Ascii::isDigit(line[i])) { // If it's not all digits, forget it.
+      line=FXString::null;
+      break;
+    }
+  }
+}
+
+
+
+void TopWindow::OpenSelected()
+{
+  SciDoc* sci=FocusedDoc();
+  FXString filename=FXString::null;
+  FXString line=FXString::null;
+  GetFilenameFromSelection(this,sci,filename);
+  if (filename.empty()) {
+    // Even if nothing is selected, look around for something that might be a filename...
+    if (!GetFilenameAtCursor(sci,filename)) { return; }
+  }
+  ParseLineNumberFromFilename(filename,line);
+  if (sci->sendMessage(SCI_GETLEXER,0,0)==SCLEX_CPP) {
+    bool syshdr=false;
+    if ( (filename[0]=='<') && (filename[filename.length()-1]=='>') ) {
+      filename.erase(0,1);
+      filename.trunc(filename.length()-1);
+      if (filename.empty()) { return; }
+      syshdr=true;
+    }
+    if (FXPath::isAbsolute(filename)&&FXStat::exists(filename)) {
+      OpenFile(filename.text(),line.text(),false,true);
+      return;
+    }
+    if (syshdr) {
+      if (OpenSystemIncludeFile(this,sci,filename,line)) { return; }
+      if (OpenLocalIncludeFile( this,sci,filename,line)) { return; }
+    } else {
+      if (OpenLocalIncludeFile( this,sci,filename,line)) { return; }
+      if (OpenSystemIncludeFile(this,sci,filename,line)) { return; }
+    }
+  } else {
+    if (FXStat::exists(filename)) {
+      OpenFile(filename.text(),line.text(),false,true);
+      return;
+    } else {
+      if ( (!FXPath::isAbsolute(filename)) && (!sci->Filename().empty()) ) {
+        FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
+        if (FXStat::exists(fullpath)) {
+          OpenFile(fullpath.text(),line.text(),false,true);
+          return;
+        }
+      }
+    }
+  }
+  // Looks like we failed - pretty up the filename so we can use it in an error message
+  filename=filename.section("\n",0);
+  filename.trunc(128);
+  FXMessageBox::error(this, MBOX_OK, _("File not found"), "%s:\n%s", _("Cannot find file"), filename.text());
+}
+
+
+
 // Prints the names of the compiled-in lexers to stdout,
 // along with the number of word lists per lexer
 // ( Only used during development, to help with the
