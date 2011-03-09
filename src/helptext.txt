@@ -474,14 +474,34 @@ highlighted string will not match a brace inside a comment, for instance.
 ###Opening Included Files###
 
 The %%%Open Selected%%% command in the %%%File%%% menu can be used to open \
-files which are mentioned in the current document, for example a C header \
-file from a ===#include=== statement. If any text is selected in the current \
-document when the command is activated, that text is assumed to be the name \
-of the file you want to open. If no text is currently selected, __APP__ will try \
-to deduce a filename from the text at the cursor postion. If the filename \
-does not contain a complete path specification, __APP__ searches for a file with \
-that name first in the working directory (usually the directory that __APP__ was \
-started from) and then in the same directory as the current file.
+a file whose name is mentioned in the current document, or selected in an \
+external application. In cases where the exact location of the file is not \
+obvious, __APP__ uses some heuristics to try and find the file:
+
+On X11 platforms, the primary X selection is queried first.  If it contains the \
+name of an existing file, that filename will be used.  In this case, the filename \
+must either be an absolute path, or a path relative to the current working directory.  \
+If the selection text does not contain the name of an existing file, it is ignored \
+and the current document is queried instead.
+
+If any text is selected in the current document, that text is assumed to be the \
+name of the file you want to open.  If no text is currently selected, __APP__ will \
+try to deduce a filename from the text at the current postion.
+
+If the current document is using a C or C++ based lexer, the file will be searched \
+for as if it were an ===#include=== file.  If the selected (or inferred) \
+text is enclosed in angle brackets ===<>=== the system include directories will be searched \
+first, otherwise __APP__ searches first in the same directory as the current file, \
+then in the current working directory, then in the system directories.  You can also \
+add additional search paths \
+using the dialog:
+  %%%Edit->Preferences->general->System header locations%%%
+
+For documents other than C or C++ files, the working directory is searched first, \
+followed by the directory containing the active document.
+
+Finally, a filename specification in the form of ===FILENAME:NN=== \
+will open ===FILENAME=== to line number ===NN===.
 
 
 ###Tabs vs Spaces###
