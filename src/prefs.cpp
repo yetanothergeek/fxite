@@ -353,7 +353,7 @@ static const char* sysincs_sect="SystemIncludes";
 
 static const FXchar* DefaultSysIncs = 
   "/usr/include\n"
-#ifdef MINIX
+#ifdef __minix
   "/usr/pkg/include\n"
   "/usr/pkg/X11R6\n"
 #endif
