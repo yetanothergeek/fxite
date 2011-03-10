@@ -1,3 +1,15 @@
+2011-03-09
+  * Made line number environment $l for external commands start at 1 not 0.
+  * Reworked "Open Selected" command, added GUI to configure include paths.
+  * Check some other possibile names for FOX pkg-config script.
+  * Use pkg-config for X11 flags.
+  * Use $(LIBINTL) linker flags from autoconf for libintl support.
+  * Define POSIX for Lua on FreeBSD: this enables io.popen()
+  * Put our paths to liblua and fxscintilla ahead of other linker paths.
+  * Removed invalid/unused Lua compiler source file.
+  * Portability fixes when bootstrapping the build process on non-Linux systems.
+
+
 2011-02-12
   * Updated to Scintilla 2.24+ from HG 3534:73cb21344705.
   * Added configurable settings for output pane error-matching expressions.
