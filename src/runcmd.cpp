@@ -134,8 +134,8 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
 
 
 
-bool CmdIO::list(const char *command, FXList *lines, bool*canceler) {
-  _list=lines;
+bool CmdIO::list(const char *command, FXList *outlist, bool*canceler) {
+  _list=outlist;
   if (!checkCurrDir()) { return false; }
   return run(command,canceler);
 }

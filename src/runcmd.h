@@ -64,7 +64,7 @@ public:
   CmdIO(FXMainWindow *window, const char*shellcmd="/bin/sh -c");
   virtual ~CmdIO();
   bool filter(const char *command, const FXString &input, FXString &output, bool*canceler=NULL);
-  bool list(const char *command, FXList *lines, bool*canceler=NULL);
+  bool list(const char *command, FXList *outlist, bool*canceler=NULL);
 
 };
 
