@@ -758,6 +758,14 @@ static void SetShellEnv(const char*file, long line)
 
 
 
+class MyCmdIO: public CmdIO {
+  virtual bool IsCancelled() { return ((TopWindow*)win)->IsMacroCancelled(); }
+public:
+  MyCmdIO(FXMainWindow *window, const char*shellcmd="/bin/sh -c"):CmdIO(window,shellcmd){}
+};
+
+
+
 bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString &input)
 {
   if (!IsCommandReady()) { return false; }
@@ -765,7 +773,7 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
   SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool rv=false;
   if (!cmd.empty()) {
-    CmdIO cmdio(this, prefs->ShellCommand.text());
+    MyCmdIO cmdio(this, prefs->ShellCommand.text());
     FXString output="";
     command_timeout=false;
     getApp()->beginWaitCursor();
@@ -796,7 +804,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
   SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool success=false;
   if (!cmd.empty()) {
-    CmdIO cmdio(this, prefs->ShellCommand.text());
+    MyCmdIO cmdio(this, prefs->ShellCommand.text());
     command_timeout=false;
     outlist->clearItems(true);
     update();

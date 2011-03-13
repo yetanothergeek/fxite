@@ -29,7 +29,6 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appwin.h"
 #include "intl.h"
 
 #include "runcmd.h"
@@ -54,7 +53,7 @@ FXIMPLEMENT(CmdIO,FXObject,CmdIOMap,ARRAYNUMBER(CmdIOMap));
 long CmdIO::onTimer(FXObject*o,FXSelector sel,void*p)
 {
   app->repaint();
-  if (!((TopWindow*)win)->IsMacroCancelled()) {
+  if (!IsCancelled()) {
     app->addTimeout(this,ID_TIMER,ONE_SECOND);
   }
   return 1;

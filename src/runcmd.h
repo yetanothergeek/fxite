@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -27,7 +27,6 @@ private:
   FXString RecvString;
   FXString ErrString;
   bool stdoutEOF,stderrEOF;
-  FXMainWindow* win;
   FXApp* app;
   char* _shellcmd;
   char* _shellarg;
@@ -39,6 +38,7 @@ private:
   void appendLine(FXString&s);
   bool run(const char *command, bool*command_timeout);
   bool checkCurrDir();
+  virtual bool IsCancelled() { return false; }
 #ifdef WIN32
   FXival childPid;
   FXInputHandle StdIN_Rd, StdOUT_Wr, StdERR_Wr;
@@ -58,6 +58,8 @@ public:
   };
 #endif
 
+protected:
+  FXMainWindow* win;
 public:
   CmdIO(FXMainWindow *window, const char*shellcmd="/bin/sh -c");
   virtual ~CmdIO();
