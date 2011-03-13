@@ -198,6 +198,7 @@ bool CmdIO::run(const char *command, bool*canceler)
       while (1) {
         app->runWhileEvents();
         FXuval rcvd=0;
+        ZeroMemory(buf,bufsize);
         BOOL ok = ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
