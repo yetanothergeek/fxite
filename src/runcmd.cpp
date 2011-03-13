@@ -65,14 +65,21 @@ CmdIO::~CmdIO()
 
 void CmdIO::appendLine(FXString&s)
 {
-  if (_list) {
+  if (_list||(target&&message)) {
     FXint nlines=s.contains('\n');
     FXString trailer=s.section('\n', nlines);
     s.trunc(s.length()-trailer.length());
-    s.substitute('\t', ' ');
-    s.substitute('\r', ' ');
-    _list->fillItems(s);
-    _list->makeItemVisible(_list->getNumItems()-1);
+    if (_list) {
+      s.substitute('\t', ' ');
+      s.substitute('\r', ' ');
+      _list->fillItems(s);
+      _list->makeItemVisible(_list->getNumItems()-1);
+    } else {
+      for (FXint i=0; i<nlines; i++) {
+        const FXString sect=s.section('\n',i);
+        target->handle(this, FXSEL(SEL_COMMAND,message), (void*)(&sect));
+      }
+    }
     s=trailer;
   }
 }
@@ -119,6 +126,8 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
   SendString=input.text();
   remaining=SendString.length();
   _list=NULL;
+  message=0;
+  target=NULL;
   if (!checkCurrDir()) { return false; }
   bool success=run(command,canceler);
   if (canceler && *canceler) {
@@ -136,6 +145,19 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
 
 bool CmdIO::list(const char *command, FXList *outlist, bool*canceler) {
   _list=outlist;
+  message=0;
+  target=NULL;
+  if (!checkCurrDir()) { return false; }
+  return run(command,canceler);
+}
+
+
+
+bool CmdIO::lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler)
+{
+  _list=NULL;
+  message=sel;
+  target=trg;
   if (!checkCurrDir()) { return false; }
   return run(command,canceler);
 }

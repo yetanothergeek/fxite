@@ -31,6 +31,8 @@ private:
   char* _shellcmd;
   char* _shellarg;
   FXList* _list;
+  FXObject* target;
+  FXSelector message;
   bool* _canceler;
   bool cleanup(bool rv);
   FXint warning(const char*msg);
@@ -65,6 +67,7 @@ public:
   virtual ~CmdIO();
   bool filter(const char *command, const FXString &input, FXString &output, bool*canceler=NULL);
   bool list(const char *command, FXList *outlist, bool*canceler=NULL);
+  bool lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler=NULL);
 
 };
 
