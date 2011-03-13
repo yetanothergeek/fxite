@@ -66,25 +66,14 @@ CmdIO::~CmdIO()
 void CmdIO::appendLine(FXString&s)
 {
   if (_list) {
-    FXint nl;
-    static FXString line;
-    FXListItem*item;
-    line="";
-    while (1) {
-      nl=s.find('\n');
-      if (nl<0) { break; }
-      if (nl>0) {
-        line.append(s.text(), nl);
-        line.substitute('\t', ' ');
-        line.substitute('\r', ' ');
-        item=new FXListItem(line);
-        _list->appendItem(item, true);
-        FXint gni=_list->getNumItems();
-        _list->makeItemVisible(gni-1);
-        line="";
-      }
-      s.erase(0,nl+1);
-    }
+    FXint nlines=s.contains('\n');
+    FXString trailer=s.section('\n', nlines);
+    s.trunc(s.length()-trailer.length());
+    s.substitute('\t', ' ');
+    s.substitute('\r', ' ');
+    _list->fillItems(s);
+    _list->makeItemVisible(_list->getNumItems()-1);
+    s=trailer;
   }
 }
 
