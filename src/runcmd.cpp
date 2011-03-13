@@ -20,7 +20,6 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appwin.h"
 #include "intl.h"
 #include "runcmd.h"
 
