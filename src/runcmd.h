@@ -34,6 +34,7 @@ private:
   FXObject* target;
   FXSelector message;
   bool* _canceler;
+  void* userdata;
   bool cleanup(bool rv);
   FXint warning(const char*msg);
   FXint error(const char*msg);
@@ -68,7 +69,8 @@ public:
   bool filter(const char *command, const FXString &input, FXString &output, bool*canceler=NULL);
   bool list(const char *command, FXList *outlist, bool*canceler=NULL);
   bool lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler=NULL);
-
+  void setUserData(void* p) { userdata=p; }
+  void *getUserData() { return userdata; }
 };
 
 
