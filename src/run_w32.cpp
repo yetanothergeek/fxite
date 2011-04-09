@@ -25,7 +25,6 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appwin.h"
 
 #include "listdlls.h"
 
@@ -170,6 +169,7 @@ bool CmdIO::run(const char *command, bool*canceler)
   FXString cmd=command;
   static const ssize_t bufsize=1024;
   char buf[bufsize];
+  char TempDir[MAX_PATH];
   char TempOut[MAX_PATH];
   char TempErr[MAX_PATH];
   ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
@@ -177,6 +177,7 @@ bool CmdIO::run(const char *command, bool*canceler)
   sa.bInheritHandle = TRUE;
   sa.lpSecurityDescriptor = NULL;
   DWORD exitcode=0;
+  ZeroMemory(TempDir,MAX_PATH);
   ZeroMemory(TempOut,MAX_PATH);
   ZeroMemory(TempErr,MAX_PATH);
   cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
@@ -234,9 +235,12 @@ bool CmdIO::run(const char *command, bool*canceler)
   } else {   // Create only input pipe, use temp files for stdout and stderr...
     if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
     if (!SetupHandle(stdinFD)) { CleanupAndReturn("setting up stdin", false); }
-    const char*cfgdir=TopWindow::ConfigDir().text();
-    if (!GetTempFileName(cfgdir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
-    if (!GetTempFileName(cfgdir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }
+    DWORD dwRetVal = GetTempPath(MAX_PATH, TempDir);
+    if ((dwRetVal==0)||(dwRetVal>MAX_PATH)) {
+      CleanupAndReturn("retrieving name of temporary directory", false); 
+    }
+    if (!GetTempFileName(TempDir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
+    if (!GetTempFileName(TempDir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }
     StdOUT_Wr=CreateFile(TempOut,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
     if (StdOUT_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stdout temp file", false); }
     StdERR_Wr=CreateFile(TempErr,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
