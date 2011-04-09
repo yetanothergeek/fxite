@@ -65,6 +65,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
 {
   static const ssize_t bufsize=1024;
   char buf[bufsize];
+  stack_level++;
   switch (FXSELID(sel)) {
     case ID_IO_STDIN:{
       if (remaining>0) {
@@ -97,7 +98,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
           break;
         }
         if (rcvd<bufsize) { break; }
-        app->runWhileEvents();
+        if (stack_level<1024) { app->runWhileEvents(); }
         if (excess()) { break; }
       }
       break;
@@ -120,12 +121,13 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
           break;
         }
         if (rcvd<bufsize) { break; }
-        app->runWhileEvents();
+        if (stack_level<1024) { app->runWhileEvents(); }
         if (excess()) { break; }
       }
       break;
     }
   }
+  stack_level--;
   return 1;
 }
 
@@ -225,6 +227,7 @@ bool CmdIO::run(const char *command, bool*canceler)
 {
   stdinFD = stdoutFD = stderrFD = 0;
   _canceler=canceler;
+  stack_level=0;
   app=(win->getApp());
   stdoutEOF=false;
   stderrEOF=false;

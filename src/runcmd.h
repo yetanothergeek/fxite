@@ -49,6 +49,7 @@ private:
   FXDECLARE(CmdIO);
   FXint childPid;
   bool excess();
+  FXint stack_level;
 public:
   long onData(FXObject*o,FXSelector sel,void*p);
   long onTimer(FXObject*o,FXSelector sel,void*p);
