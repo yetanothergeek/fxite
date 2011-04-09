@@ -63,7 +63,7 @@ CmdIO::~CmdIO()
 
 
 
-void CmdIO::appendLine(FXString&s)
+void CmdIO::appendLine(FXString&s, FXSelector selid)
 {
   if (_list||(target&&message)) {
     FXint nlines=s.contains('\n');
@@ -77,7 +77,7 @@ void CmdIO::appendLine(FXString&s)
     } else {
       for (FXint i=0; i<nlines; i++) {
         const FXString sect=s.section('\n',i);
-        target->handle(this, FXSEL(SEL_COMMAND,message), (void*)(&sect));
+        target->handle(this, FXSEL(selid,message), (void*)(&sect));
       }
     }
     s=trailer;

@@ -202,11 +202,11 @@ bool CmdIO::run(const char *command, bool*canceler)
         BOOL ok = ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
-          appendLine(ErrString);
+          appendLine(ErrString,SEL_IO_EXCEPT);
         } else {
           if (!ErrString.empty()) {
             ErrString.append('\n');
-            appendLine(ErrString);
+            appendLine(ErrString,SEL_IO_EXCEPT);
           }
           break;
         }
@@ -219,11 +219,11 @@ bool CmdIO::run(const char *command, bool*canceler)
         BOOL ok = ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
-          appendLine(RecvString);
+          appendLine(RecvString,SEL_IO_WRITE);
         } else {
           if (!RecvString.empty()) {
             RecvString.append('\n');
-            appendLine(RecvString);
+            appendLine(RecvString,SEL_IO_WRITE);
           }
           break;
         }
@@ -290,11 +290,11 @@ bool CmdIO::run(const char *command, bool*canceler)
         BOOL ok=ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
-          appendLine(RecvString);
+          appendLine(RecvString,SEL_IO_WRITE);
         } else {
           if (!RecvString.empty()) {
             RecvString.append('\n');
-            appendLine(RecvString);
+            appendLine(RecvString,SEL_IO_WRITE);
           }
           break;
         }
@@ -316,11 +316,11 @@ bool CmdIO::run(const char *command, bool*canceler)
         BOOL ok=ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
-          appendLine(ErrString);
+          appendLine(ErrString,SEL_IO_EXCEPT);
         } else {
           if (!ErrString.empty()) {
             ErrString.append('\n');
-            appendLine(ErrString);
+            appendLine(ErrString,SEL_IO_EXCEPT);
           }
           break;
         }

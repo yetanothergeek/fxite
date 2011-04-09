@@ -84,7 +84,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
         ssize_t rcvd=read(stdoutFD,buf,bufsize);
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
-          appendLine(RecvString);
+          appendLine(RecvString,SEL_IO_WRITE);
         }
         if (rcvd==0) {
           stdoutEOF=true;
@@ -92,7 +92,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
           app->removeInput(stdinFD, INPUT_WRITE);
           if (!RecvString.empty()) {
             RecvString.append('\n');
-            appendLine(RecvString);
+            appendLine(RecvString,SEL_IO_WRITE);
           }
           break;
         }
@@ -107,7 +107,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
         ssize_t rcvd=read(stderrFD,buf,bufsize);
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
-          appendLine(ErrString);
+          appendLine(ErrString,SEL_IO_EXCEPT);
         }
         if (rcvd==0) {
           stderrEOF=true;
@@ -115,7 +115,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
           app->removeInput(stdinFD, INPUT_WRITE);
           if (!ErrString.empty()) {
             ErrString.append('\n');
-            appendLine(ErrString);
+            appendLine(ErrString,SEL_IO_EXCEPT);
           }
           break;
         }

@@ -38,7 +38,7 @@ private:
   bool cleanup(bool rv);
   FXint warning(const char*msg);
   FXint error(const char*msg);
-  void appendLine(FXString&s);
+  void appendLine(FXString&s, FXSelector selid);
   bool run(const char *command, bool*command_timeout);
   bool checkCurrDir();
   virtual bool IsCancelled() { return false; }
