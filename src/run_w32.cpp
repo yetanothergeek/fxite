@@ -25,7 +25,6 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appname.h"
 #include "appwin.h"
 
 #include "listdlls.h"
@@ -111,7 +110,7 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
     if  (!myname[0]) { GetModuleFileName(NULL,myname,MAX_PATH); }
     if (strcasecmp(myname,exename)==0) { // Trying to execute myself results in a deadlock!
       FXMessageBox::error(win, MBOX_OK, _("Command error"), 
-        _(APP_NAME" is not able to launch itself."));
+        _("%s is not able to launch itself."), FXPath::title(exename).text());
       return 0;
     }
     FXString ext = cmdline[0]=='"'?cmdline.section('"',1):cmdline.section(' ',0);
