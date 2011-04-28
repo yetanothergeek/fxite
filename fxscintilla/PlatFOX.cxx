@@ -91,6 +91,12 @@ void Palette::Release() {
   entries = new ColourPair[size];
 }
 
+#if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
+# define RGBSWAP(rgb) FXRGB(FXBLUEVAL(rgb),FXGREENVAL(rgb),FXREDVAL(rgb))
+#else
+# define RGBSWAP(rgb)
+#endif
+
 // This method either adds a colour to the list of wanted colours (want==true)
 // or retrieves the allocated colour back to the ColourPair.
 // This is one method to make it easier to keep the code for wanting and retrieving in sync.
@@ -112,7 +118,7 @@ void Palette::WantFind(ColourPair &cp, bool want) {
       size = sizeNew;
     }
     entries[used].desired = cp.desired;
-    entries[used].allocated.Set(cp.desired.AsLong());
+    entries[used].allocated.Set(RGBSWAP(cp.desired.AsLong()));
     used++;
   } else {
     for (int i=0; i < used; i++) {
@@ -121,7 +127,7 @@ void Palette::WantFind(ColourPair &cp, bool want) {
         return;
       }
     }
-    cp.allocated.Set(cp.desired.AsLong());
+    cp.allocated.Set(RGBSWAP(cp.desired.AsLong()));
   }
 }
 

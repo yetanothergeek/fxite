@@ -1171,7 +1171,11 @@ void SetupXAtoms(FXTopWindow*win, const char*class_name)
     for (y=0; y<h; y++) {
       for (x=0; x<w; x++) {
         FXColor px=ico->getPixel(x,y);
+#if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
+        icon_buf[j++]=px?px:FXRGBA(255,255,255,0);
+#else
         icon_buf[j++]=px?FXRGB(FXBLUEVAL(px),FXGREENVAL(px),FXREDVAL(px)):FXRGBA(255,255,255,0);
+#endif
       }
     }
     XChangeProperty(d, win->id(), net_wm_icon, cardinal, 32,
