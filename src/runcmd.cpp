@@ -50,7 +50,8 @@ CmdIO::CmdIO(FXMainWindow *window, const char*shellcmd):FXObject()
   stdoutEOF=false;
   stderrEOF=false;
   app=window->getApp();
-  _list=NULL;
+  target=NULL;
+  message=0;
 }
 
 
@@ -65,18 +66,15 @@ CmdIO::~CmdIO()
 
 void CmdIO::appendLine(FXString&s, FXSelector selid)
 {
-  if (_list||(target&&message)) {
+  if (target&&message) {
     FXint nlines=s.contains('\n');
     FXString trailer=s.section('\n', nlines);
     s.trunc(s.length()-trailer.length());
-    if (_list) {
-      s.substitute('\t', ' ');
-      s.substitute('\r', ' ');
-      _list->fillItems(s);
-      _list->makeItemVisible(_list->getNumItems()-1);
+    if (multiline_mode) {
+      target->handle(this, FXSEL(selid,message), (void*)(&s));
     } else {
       for (FXint i=0; i<nlines; i++) {
-        const FXString sect=s.section('\n',i);
+        FXString sect=s.section('\n',i);
         target->handle(this, FXSEL(selid,message), (void*)(&sect));
       }
     }
@@ -125,7 +123,6 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
 {
   SendString=input.text();
   remaining=SendString.length();
-  _list=NULL;
   message=0;
   target=NULL;
   if (!checkCurrDir()) { return false; }
@@ -143,21 +140,11 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
 
 
 
-bool CmdIO::list(const char *command, FXList *outlist, bool*canceler) {
-  _list=outlist;
-  message=0;
-  target=NULL;
-  if (!checkCurrDir()) { return false; }
-  return run(command,canceler);
-}
-
-
-
-bool CmdIO::lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler)
+bool CmdIO::lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler, bool multiline)
 {
-  _list=NULL;
   message=sel;
   target=trg;
+  multiline_mode=multiline;
   if (!checkCurrDir()) { return false; }
   return run(command,canceler);
 }

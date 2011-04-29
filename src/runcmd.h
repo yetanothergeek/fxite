@@ -30,7 +30,7 @@ private:
   FXApp* app;
   char* _shellcmd;
   char* _shellarg;
-  FXList* _list;
+  bool  multiline_mode;
   FXObject* target;
   FXSelector message;
   bool* _canceler;
@@ -62,14 +62,14 @@ public:
   };
 #endif
 
+
 protected:
   FXMainWindow* win;
 public:
   CmdIO(FXMainWindow *window, const char*shellcmd="/bin/sh -c");
   virtual ~CmdIO();
   bool filter(const char *command, const FXString &input, FXString &output, bool*canceler=NULL);
-  bool list(const char *command, FXList *outlist, bool*canceler=NULL);
-  bool lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler=NULL);
+  bool lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler=NULL, bool multiline=false);
   void setUserData(void* p) { userdata=p; }
   void *getUserData() { return userdata; }
 };

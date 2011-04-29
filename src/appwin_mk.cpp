@@ -816,7 +816,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
     SetInfo(status.text(), true);
     DisableUI(true);
     getApp()->runWhileEvents();
-    success=cmdio.list(cmd.text(), outlist, &command_timeout);
+    success=cmdio.lines(cmd.text(), this, ID_CMDIO, &command_timeout, true);
     DisableUI(false);
     SetInfo("");
     getApp()->endWaitCursor();

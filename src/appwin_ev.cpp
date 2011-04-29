@@ -150,6 +150,8 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_FOCUSIN,0,TopWindow::onFocusIn),
   TWMAPSEL(SEL_COMMAND,ID_TEST_SOMETHING,onTestSomething),
   TWMAPSEL(SEL_CHORE,  ID_TEST_SOMETHING,onTestSomething),
+  FXMAPFUNC(SEL_IO_WRITE,TopWindow::ID_CMDIO,TopWindow::onCmdIO),
+  FXMAPFUNC(SEL_IO_EXCEPT,TopWindow::ID_CMDIO,TopWindow::onCmdIO),
 };
 
 
@@ -162,6 +164,18 @@ void TopWindow::ClosedDialog()
 {
   setFocus();
   FocusedDoc()->setFocus();
+}
+
+
+
+long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
+{
+  FXString*s=(FXString*)p;
+  s->substitute('\t', ' ');
+  s->substitute('\r', ' ');
+  outlist->fillItems(*s);
+  outlist->makeItemVisible(outlist->getNumItems()-1);
+  return 1;
 }
 
 

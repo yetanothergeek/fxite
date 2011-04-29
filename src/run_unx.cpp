@@ -80,7 +80,6 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
       break;
     }
     case ID_IO_STDOUT:{
-
       while (1) {
         ssize_t rcvd=read(stdoutFD,buf,bufsize);
         if (rcvd>0) {
