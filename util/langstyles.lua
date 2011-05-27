@@ -117,7 +117,8 @@ function print_words()
 
   local kwclasses = {
             "ada", "metapost", "metafun", "pascal", "spice", "primitives",
-            "macros", "tex", "etex", "latex", "pdflatex", "context" }
+            "macros", "tex", "etex", "latex", "pdflatex", "context",
+            "vendor", "pseudoclass", "pseudoelement" }
 
   for k,v in ipairs(kwclasses)
   do
@@ -132,6 +133,7 @@ function print_words()
   keywordclass.macros.latex={}
   keywordclass.macros.plain={}
   keywordclass.primitives.pdftex={}
+  keywordclass.pseudoelement.other="selection"
   ]]
   )
 
@@ -190,6 +192,7 @@ function print_words()
         line=line:gsub( "%.%.keywordclass%.primitives.pdftex%.%.","..keywordclass.primitives.pdftex.something..");
         line=line:gsub( "^keywordclass%.context%.all=", "keywordclass.context.all.something=");
         line=line:gsub( "keywordclass%.python%) ","keywordclass.python .. \"")
+        line=line:gsub( "%.prefixes%) filter\"$", ".prefixes .. \"filter\"")
         if line:find("%) \"$") and not line:find("\".*%) \"$")  then
           line=line:gsub("%) \"$", "")
         end

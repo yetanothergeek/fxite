@@ -3,7 +3,7 @@ PL/M 1
 SML 3
 a68k 6
 ada 1
-asm 6
+asm 8
 asn1 4
 asy 2
 bash 1
@@ -35,6 +35,7 @@ magiksf 6
 makefile 0
 markdown -1
 metapost 2
+modula 6
 null -1
 pascal 1
 perl 1
