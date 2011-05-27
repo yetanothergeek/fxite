@@ -94,7 +94,7 @@ void Palette::Release() {
 #if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
 # define RGBSWAP(rgb) FXRGB(FXBLUEVAL(rgb),FXGREENVAL(rgb),FXREDVAL(rgb))
 #else
-# define RGBSWAP(rgb)
+# define RGBSWAP(rgb) (rgb)
 #endif
 
 // This method either adds a colour to the list of wanted colours (want==true)
