@@ -29,6 +29,7 @@
 #include "./languages/makefile.h"
 #include "./languages/markdown.h"
 #include "./languages/metapost.h"
+#include "./languages/modula.h"
 #include "./languages/pascal.h"
 #include "./languages/perl.h"
 #include "./languages/properties.h"
@@ -77,6 +78,7 @@ LangStyle languages[]={
   LangMakeFile,
   LangMarkdown,
   LangMetapost,
+  LangModula,
   LangPascal,
   LangPerl,
   LangProperties,

@@ -30,6 +30,7 @@ lua.h \
 makefile.h \
 markdown.h \
 metapost.h \
+modula.h \
 pascal.h \
 perl.h \
 properties.h \
