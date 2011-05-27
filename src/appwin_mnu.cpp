@@ -137,6 +137,7 @@ void TopWindow::CreateLanguageMenu()
     case SCLEX_ERLANG:
     case SCLEX_LISP:
     case SCLEX_HASKELL:
+    case SCLEX_MODULA:
     case SCLEX_ADA: {
       mp=lgcy_langmenu;
       break;
