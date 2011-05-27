@@ -124,11 +124,11 @@ Scintilla.h \
 ScintillaBase.h \
 ScintillaWidget.h \
 Selection.h \
+SparseState.h \
 SplitVector.h \
 Style.h \
 StyleContext.h \
 UniConversion.h \
 ViewStyle.h \
 WordList.h \
-XPM.h \
-version.h
+XPM.h
