@@ -692,7 +692,8 @@ static bool GetFilenameAtCursor(SciDoc*sci, FXString &filename)
   }
   // Read backwards till we find the start of our phrase...
   while ( (range.chrg.cpMin>0) && (sci->CharAt(range.chrg.cpMin)>'*') ) { range.chrg.cpMin--; }
-  if (sci->CharAt(range.chrg.cpMin)<='*') { range.chrg.cpMin++; }
+  if ( (range.chrg.cpMin<max) && (sci->CharAt(range.chrg.cpMin)<='*') ) { range.chrg.cpMin++; }
+  if (range.chrg.cpMin>=max) { return false; }
   range.chrg.cpMax=range.chrg.cpMin+1;
   // Now read forward, looking for the end of our phrase...
   while ( (range.chrg.cpMax<max) && (sci->CharAt(range.chrg.cpMax)>'*') ) { range.chrg.cpMax++; }
