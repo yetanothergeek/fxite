@@ -149,7 +149,7 @@ static char get_stream_encoding(FILE *file) {
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
-      if (c >= 0x80) {
+      if ((result=='T') && (c >= 0x80)) {
         /* Can't be 7-bit, so it's either valid UTF-8, "extended" ASCII, or binary. */
         result='U';
       }
