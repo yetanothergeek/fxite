@@ -1062,7 +1062,7 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
   bool ctrl = (event->state & CONTROLMASK) != 0;
   bool alt = (event->state & ALTMASK) != 0;
   FXint len = event->text.length();
-  // Check for double-byte UTF-8 character
+  // Check for multi-byte UTF-8 character
   if ((_scint->pdoc->dbcsCodePage==SC_CP_UTF8)&&(len>1)&&(len<5) && !(ctrl||alt)) {
     if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
       _scint->MovePositionTo(_scint->CurrentPosition() + len);
