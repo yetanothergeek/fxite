@@ -1061,6 +1061,14 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
   bool shift = (event->state & SHIFTMASK) != 0;
   bool ctrl = (event->state & CONTROLMASK) != 0;
   bool alt = (event->state & ALTMASK) != 0;
+  FXint len = event->text.length();
+  // Check for double-byte UTF-8 character
+  if ((_scint->pdoc->dbcsCodePage==SC_CP_UTF8)&&(len>1)&&(len<5) && !(ctrl||alt)) {
+    if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
+      _scint->MovePositionTo(_scint->CurrentPosition() + len);
+    }
+    return 1;
+  }
   // <FIXME> Workaround for event->code doesn't hold the correct
   // KEY_xxx under WIN32
 #ifndef WIN32
