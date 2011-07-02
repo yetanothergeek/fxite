@@ -32,6 +32,9 @@ FXbool LocaleIsUTF8();
 # define FXRexError     FXRex::Error
 # define FXIntVal(s,b) ((FXint)strtol(s.text(),NULL,b))
 # define LocaleIsUTF8() FXSystem::localeIsUTF8()
+# if (FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>26)
+#  define fxgetpid() (FXProcess::current())
+# endif
 #endif
 
 

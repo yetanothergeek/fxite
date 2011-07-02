@@ -562,7 +562,14 @@ static int window(lua_State* L)
 
 static int pid(lua_State* L)
 {
+#if (FOX_MAJOR>1) || \
+    ( (FOX_MAJOR==1) && (FOX_MINOR>7) ) || \
+    ( (FOX_MAJOR==1) && (FOX_MINOR==7) && (FOX_LEVEL>26) )
+  lua_pushnumber(L,FXProcess::current());
+#else
   lua_pushnumber(L,fxgetpid());
+#endif
+  
   return(1);
 }
 

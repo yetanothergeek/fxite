@@ -10,7 +10,7 @@
 +# else
 +#  ifdef UNICODE
      FXnchar buffer[MAXPATHLEN];
-     utf2ncs(buffer,MAXPATHLEN,path.text(),path.length()+1);
+     utf2ncs(buffer,path.text(),MAXPATHLEN);
      return CreateDirectoryW(buffer,NULL)!=0;
 -#else
 +#  else
