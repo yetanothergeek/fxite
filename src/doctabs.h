@@ -42,9 +42,6 @@ class DocTabs: public FXTabBook {
   FXDECLARE(DocTabs);
 private:
   enum {MOVEUP,MOVEDOWN,MOVETOFIRST,MOVETOLAST};
-  FXFont *normal_font;
-  FXFont *bold_font;
-  FXFontDesc desc;
   FXMenuPane*tab_popup;
 
   DocTabs(){}
@@ -58,8 +55,6 @@ public:
   long onPopupClick   ( FXObject* sender, FXSelector sel, void* p );
   DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts);
   ~DocTabs();
-  virtual void create();
-  virtual void destroy();
 
   DocTab*NewTab(FXString text);
   DocTab*ActiveTab();
@@ -81,7 +76,6 @@ public:
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
   FXint Count() { return numChildren()/2; }
-  void SetFont(FXFont*fnt);
   enum {
     ID_TAB_POPUP_MENU=FXTabBook::ID_LAST,
     ID_POPUP_CLICK,

@@ -1324,11 +1324,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     tips->setTextColor(getApp()->getTipforeColor());
     SetStatusBarColors();
   }
-  if (Theme::changed() & ThemeChangedFont) {
-    tabbook->SetFont(getApp()->getNormalFont());
-  } else {
-    tabbook->ActivateTab(tabbook->ActiveTab());
-  }
+  tabbook->ActivateTab(tabbook->ActiveTab());
   SetToolbarColors();
   EnableUserFilters(FocusedDoc()->GetSelLength());
   return 1;
