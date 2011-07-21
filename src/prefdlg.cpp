@@ -999,8 +999,8 @@ void PrefsDialog::MakeGeneralTab()
   chk->setCheck(prefs->Autosave, FALSE);
   chk->setPadBottom(12);
   spin=new FXSpinner(hframe, 3, prefs, Settings::ID_SET_AUTOSAVE_INT,SPIN_OPTS);
-  spin->setValue(prefs->AutosaveInterval);
   spin->setRange(15,900);
+  spin->setValue(prefs->AutosaveInterval);
 
   new FXLabel(hframe, _(" seconds."));
   if (!chk->getCheck()) { spin->disable(); }
@@ -1062,8 +1062,8 @@ void PrefsDialog::MakeGeneralTab()
   hframe=new FXHorizontalFrame(right_column);
   hframe->setPadTop(12);
   spin=new FXSpinner(hframe, 2, prefs, Settings::ID_SET_WHEEL_LINES,SPIN_OPTS);
-  spin->setValue(prefs->WheelLines);
   spin->setRange(1,32);
+  spin->setValue(prefs->WheelLines);
   new FXLabel(hframe, _("Mouse wheel acceleration."));
   right_column=new FXVerticalFrame(right_column,FRAME_NONE|PACK_UNIFORM_WIDTH|LAYOUT_CENTER_X|LAYOUT_BOTTOM);
   right_column->setVSpacing(8);
@@ -1106,15 +1106,15 @@ void PrefsDialog::MakeEditorTab()
 
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_CARET_WIDTH, SPIN_OPTS);
-  spin->setValue(prefs->CaretWidth);
   spin->setRange(1,3);
+  spin->setValue(prefs->CaretWidth);
   new FXLabel(spinframe, _("Caret width"));
 
 
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 4, prefs, Settings::ID_SET_RIGHT_EDGE, SPIN_OPTS);
-  spin->setValue(prefs->RightEdgeColumn);
   spin->setRange(1,1024);
+  spin->setValue(prefs->RightEdgeColumn);
   new FXLabel(spinframe, _("Right Margin Indicator"));
 
 
@@ -1138,13 +1138,13 @@ void PrefsDialog::MakeEditorTab()
 
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_TAB_WIDTH, SPIN_OPTS);
-  spin->setValue(prefs->TabWidth);
   spin->setRange(1,16);
+  spin->setValue(prefs->TabWidth);
   (new FXLabel(spinframe, _("Tab width")))->setPadRight(16);
 
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_INDENT_WIDTH, SPIN_OPTS);
-  spin->setValue(prefs->IndentWidth);
   spin->setRange(1,16);
+  spin->setValue(prefs->IndentWidth);
   new FXLabel(spinframe, _("Indent width"));
 
   chk->setUserData((void*)spin);
