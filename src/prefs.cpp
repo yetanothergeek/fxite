@@ -839,14 +839,13 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadInt(Width,0);
   ReadInt(Height,0);
 
+  ScreenWidth=w->getApp()->getRootWindow()->getDefaultWidth();
+  ScreenHeight=w->getApp()->getRootWindow()->getDefaultHeight();
   if ((Width==0)&&(Height==0)) { // First run, size based on screen dimensions
-    FXRootWindow *rootwin=w->getApp()->getRootWindow();
-    if (rootwin) {
-      Width=rootwin->getWidth()*(4.0/5.0);
-      Height=rootwin->getHeight()*(3.0/4.0);
-      LIMIT_RANGE(Width,600,Width);
-      LIMIT_RANGE(Height,400,Height);
-    }
+    Width=ScreenWidth*(4.0/5.0);
+    Height=ScreenHeight*(3.0/4.0);
+    LIMIT_RANGE(Width,600,Width);
+    LIMIT_RANGE(Height,400,Height);
   }
 
   LIMIT_RANGE(Left,0,Left);

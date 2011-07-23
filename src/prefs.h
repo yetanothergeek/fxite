@@ -130,6 +130,8 @@ public:
   FXint AutosaveInterval;
   FXint DefaultFileFormat;
   FXString LastFocused;
+  FXint ScreenWidth;
+  FXint ScreenHeight;
 
   StyleDef *Styles() { return styles; }
 
