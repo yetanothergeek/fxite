@@ -244,6 +244,10 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   }
 
   if ((!fn.empty())&&(!FXStat::exists(fn))) {
+    for (FXint i=0; (i<1024) && (!getApp()->getFocusWindow()); i++) {
+      setFocus();
+      getApp()->runWhileEvents();
+    }
     if (FXMessageBox::question( this, MBOX_YES_NO, _("File not found"),
           "%s:\n%s\n %s",
           _("Can't find the file"),
