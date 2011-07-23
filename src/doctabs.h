@@ -23,12 +23,13 @@ class DocTab: public FXTabItem {
     DocTab(){}
     bool dnd_accept;
     FXCursor*defaultDragCursor;
+    FXString realtext;
   public:
     long onDnd(FXObject* sender,FXSelector sel, void*p);
     DocTab(FXTabBar*bar, const FXString&text);
     void setDefaultDragCursor(FXCursor*ddc) { defaultDragCursor=ddc; setDragCursor(ddc); }
     void setText(const FXString &text);
-    FXString getText() const { return getTipText(); }
+    FXString getText() const { return realtext; }
     enum {
       ID_DND=FXTabItem::ID_LAST,
       ID_LAST

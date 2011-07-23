@@ -614,6 +614,7 @@ DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,FXString::null)
 void DocTab::setText(const FXString &text)
 {
   FXint max_width=((DocTabs*)getParent())->MaxTabWidth();
+  realtext=text;
   if (max_width>0) {
     FXString shortened=text;
     while ((!shortened.empty()) && font->getTextWidth(shortened)>max_width) {
