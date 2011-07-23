@@ -67,6 +67,7 @@ long DocTabs::onTabPopupMenu( FXObject* sender, FXSelector sel, void* p )
 DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   FXTabBook(p,trg,sel,opts,0,0,0,0,0,0,0,0)
 {
+  tab_width_max=0;
   tab_popup=new FXMenuPane(this);
   new FXMenuCommand(tab_popup,_("&Close"),NULL,this,ID_POPUP_CLICK);
 }
@@ -143,6 +144,26 @@ void DocTabs::UpdateTabs()
     if ( (w=w->getNext()) && (w=w->getFirst()) ) { w->setFocus(); }
   }
 }
+
+
+
+bool DocTabs::UpdateTabWidths(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  tab->setText(tab->getText());
+  return true;
+}
+
+
+
+void DocTabs::MaxTabWidth(FXint w)
+{
+  if (w!=tab_width_max) {
+    tab_width_max=w;
+    ForEachTab(UpdateTabWidths,NULL,false);
+  }
+}
+
+
 
 void DocTabs::setCurrent(FXint i, FXbool notify)
 {
@@ -243,7 +264,7 @@ long DocTabs::onCmdOpenItem(FXObject* sender, FXSelector sel, void* p)
 
 
 void DocTabs::MoveTab(FXint how){
-  FXTabItem*tab=ActiveTab();
+  DocTab*tab=ActiveTab();
   if (!tab) { return; }
   FXWindow*page=tab->getNext();
   if (!page) { return; }
@@ -571,7 +592,7 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
 
 
 
-DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,text)
+DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,FXString::null)
 {
   FXApp*a=bar->getApp();
   if (!FxteDnDTabType) {
@@ -585,6 +606,23 @@ DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,text)
   ));
   setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
   dropEnable();
+  setText(text);
 }
 
+
+
+void DocTab::setText(const FXString &text)
+{
+  FXint max_width=((DocTabs*)getParent())->MaxTabWidth();
+  if (max_width>0) {
+    FXString shortened=text;
+    while ((!shortened.empty()) && font->getTextWidth(shortened)>max_width) {
+      shortened.trunc(shortened.length()-1);
+    }
+    FXTabItem::setText(shortened.length()==text.length()?shortened:shortened+"..");
+  } else {
+    FXTabItem::setText(text);
+  }
+  setTipText(&text[(text[0]=='*' || text[0]=='#')?1:0]);
+}
 

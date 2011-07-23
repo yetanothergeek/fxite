@@ -95,6 +95,7 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
     case 'R': { tabbook->setTabStyle(TABBOOK_RIGHTTABS); break; }
   }
   tabbook->setTabsCompact(prefs->DocTabsPacked);
+  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
 
   outputpane=new FXGroupBox(hsplit,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
   outlist=new FXList(outputpane,this,ID_OUTLIST_CLICK,LAYOUT_SIDE_TOP|LAYOUT_FILL);

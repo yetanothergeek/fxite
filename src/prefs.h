@@ -132,6 +132,7 @@ public:
   FXString LastFocused;
   FXint ScreenWidth;
   FXint ScreenHeight;
+  FXint TabTitleMaxWidth;
 
   StyleDef *Styles() { return styles; }
 
@@ -189,6 +190,7 @@ public:
     ID_SET_TOOLBAR_BTN_SIZE,
     ID_SET_SEARCH_OPTS,
     ID_SET_KEEP_FILE_FILTER,
+    ID_SET_TAB_TITLE_MAX_WIDTH,
     ID_SET_AUTO_INDENT,
     ID_LAST
   };
@@ -201,4 +203,5 @@ enum {
   ToolbarChangedFont   = 1<<1,
   ToolbarChangedWrap   = 1<<2
 };
+
 

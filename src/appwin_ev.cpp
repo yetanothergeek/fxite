@@ -1302,6 +1302,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
   prefdlg=NULL;
   ClosedDialog();
   SetSrchDlgsPrefs();
+  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
   tabbook->ForEachTab(PrefsCB, NULL);
   CheckStyle(NULL,0,ControlDoc());
   if ((prefs->WatchExternChanges||prefs->Autosave) && !getApp()->hasTimeout(this,ID_TIMER)) {

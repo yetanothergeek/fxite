@@ -27,6 +27,8 @@ class DocTab: public FXTabItem {
     long onDnd(FXObject* sender,FXSelector sel, void*p);
     DocTab(FXTabBar*bar, const FXString&text);
     void setDefaultDragCursor(FXCursor*ddc) { defaultDragCursor=ddc; setDragCursor(ddc); }
+    void setText(const FXString &text);
+    FXString getText() const { return getTipText(); }
     enum {
       ID_DND=FXTabItem::ID_LAST,
       ID_LAST
@@ -48,7 +50,8 @@ private:
   void setTabColor(DocTab*t, bool active);
   void UpdateTabs();
   void MoveTab(FXint how);
-
+  FXint tab_width_max;
+  static bool UpdateTabWidths(FXint index, DocTab*tab, FXWindow*page, void*user_data);
 public:
   long onCmdOpenItem  ( FXObject* sender, FXSelector sel, void* p );
   long onTabPopupMenu ( FXObject* sender, FXSelector sel, void* p );
@@ -76,11 +79,12 @@ public:
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
   FXint Count() { return numChildren()/2; }
+  FXint MaxTabWidth() { return tab_width_max; }
+  void MaxTabWidth(FXint w);
   enum {
     ID_TAB_POPUP_MENU=FXTabBook::ID_LAST,
     ID_POPUP_CLICK,
     ID_LAST
   };
 };
-
 

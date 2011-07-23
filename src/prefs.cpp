@@ -161,6 +161,11 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       LIMIT_RANGE(WheelLines,1,32);
       break;
     }
+    case ID_SET_TAB_TITLE_MAX_WIDTH: {
+      FXSpinner*spin=(FXSpinner*)o;
+      TabTitleMaxWidth=spin->getValue();
+      LIMIT_RANGE(TabTitleMaxWidth,0,ScreenWidth);
+    }
     case ID_SET_SEARCH_WRAP: {
       SearchWrap=(FXival)p;
       LIMIT_RANGE(SearchWrap,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
@@ -641,6 +646,7 @@ static const char* geom_keys[] = {
   "OutputPaneHeight",
   "placement",
   "LastFocused",
+  "TabTitleMaxWidth",
   NULL
 };
 
@@ -853,6 +859,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   LIMIT_RANGE(Width,160,Width);
   LIMIT_RANGE(Height,120,Height);
   ReadInt(Maximize,false);
+  ReadIntRng(TabTitleMaxWidth,ScreenWidth/6,0,ScreenWidth);
   LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),"");
   ReadInt(FontSize,120);
 
@@ -995,6 +1002,7 @@ Settings::~Settings()
   WriteInt(KeepFileFilter);
   WriteInt(FileFilterIndex);
   WriteInt(FileOpenMulti);
+  WriteInt(TabTitleMaxWidth);
 
   if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
   char dtp[2]={DocTabPosition,'\0'};

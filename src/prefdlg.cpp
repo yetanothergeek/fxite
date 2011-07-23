@@ -1059,12 +1059,21 @@ void PrefsDialog::MakeGeneralTab()
 #endif
 
   new FXHorizontalSeparator(right_column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
+
   hframe=new FXHorizontalFrame(right_column);
   hframe->setPadTop(12);
   spin=new FXSpinner(hframe, 2, prefs, Settings::ID_SET_WHEEL_LINES,SPIN_OPTS);
   spin->setRange(1,32);
   spin->setValue(prefs->WheelLines);
   new FXLabel(hframe, _("Mouse wheel acceleration."));
+
+  hframe=new FXHorizontalFrame(right_column);
+  hframe->setPadTop(12);
+  spin=new FXSpinner(hframe, 4, prefs, Settings::ID_SET_TAB_TITLE_MAX_WIDTH,SPIN_OPTS);
+  spin->setRange(0,prefs->ScreenWidth);
+  spin->setValue(prefs->TabTitleMaxWidth);
+  new FXLabel(hframe, _("Max width for tab titles.\n( in pixels;  0 = no limit. )"));
+
   right_column=new FXVerticalFrame(right_column,FRAME_NONE|PACK_UNIFORM_WIDTH|LAYOUT_CENTER_X|LAYOUT_BOTTOM);
   right_column->setVSpacing(8);
   new FXButton(right_column, _("System header locations... "),NULL,this,ID_SYSINCS_EDIT,BUTTON_NORMAL|LAYOUT_CENTER_X);
