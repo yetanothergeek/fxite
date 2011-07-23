@@ -29,6 +29,7 @@
 #include "prefs.h"
 #include "compat.h"
 #include "filedlg.h"
+#include "doctabs.h"
 
 #include "intl.h"
 #include "filer.h"
@@ -172,7 +173,7 @@ bool FileDialogs::SaveFile(SciDoc*sci, FXString filename, bool as_itself)
   if (filename.empty()) { return SaveFileAs(sci,as_itself); }
   if (sci->SaveToFile(filename.text(),as_itself)) {
     if (as_itself) {
-      ((FXTabItem*)(sci->getParent()->getPrev()))->setText(FXPath::name(filename));
+      ((DocTab*)(sci->getParent()->getPrev()))->setText(FXPath::name(filename));
     }
     if (target && message) { target->handle(this, FXSEL(SEL_COMMAND,message), (void*)sci); }
     return true;
@@ -276,7 +277,7 @@ bool FileDialogs::AskReload(SciDoc*sci) {
   }
   sci->sendMessage(SCI_GOTOPOS,pos,0);
   if (sci2) { sci2->sendMessage(SCI_GOTOPOS,pos2,0); }
-  FXTabItem*tab=(FXTabItem*)sci->getParent()->getPrev();
+  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
   tab->setText(FXPath::name(sci->Filename()));
   sci->DoStaleTest(true);
   return true;

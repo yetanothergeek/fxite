@@ -282,7 +282,7 @@ bool TopWindow::FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*u
 // Set or unset the '*' or '#' prefix of a tab's title...
 void TopWindow::SetTabTag(SciDoc*sci, char mark, bool set)
 {
-  FXTabItem*tab=(FXTabItem*)sci->getParent()->getPrev();
+  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
   if (set) {
     if (tab->getText()[0]!=mark) { tab->setText(tab->getText().prepend(mark)); }
   } else {

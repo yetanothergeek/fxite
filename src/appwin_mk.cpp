@@ -416,7 +416,7 @@ void TopWindow::DoneSci(SciDoc*sci)
 bool TopWindow::CloseFile(bool close_last, bool hooked)
 {
   FXint i=tabbook->getCurrent();
-  FXTabItem*tab=tabbook->ActiveTab();
+  DocTab*tab=tabbook->ActiveTab();
   SciDoc*sci=ControlDoc();
   if (!filedlgs->TryClose(sci,tab->getText().text())) { return false; }
   recent_files->prepend(sci->Filename());
@@ -669,7 +669,7 @@ void TopWindow::UpdateTitle(long line, long col)
 {
   SciDoc*sci=ControlDoc();
   if (sci) {
-    FXTabItem *tab=tabbook->ActiveTab();
+    DocTab *tab=tabbook->ActiveTab();
     LangStyle*ls=NULL;
     FXString s;
     s.format("%s  %s - %s", tab->getText().text(), FXPath::directory(sci->Filename()).text(), EXE_NAME);
