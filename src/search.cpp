@@ -128,6 +128,7 @@ public:
 
   FXuint DoExecute(bool first_time);
   virtual void create();
+  virtual void destroy();
 
   enum {
     ID_SCI_OPTS=FXDialogBox::ID_LAST,
@@ -306,6 +307,15 @@ void SciReplDlg::create()
 {
   FXDialogBox::create();
   srch_hist->setFocus();
+}
+
+
+
+void SciReplDlg::destroy()
+{
+  srch_hist->killSelection();
+  repl_hist->killSelection();
+  FXDialogBox::destroy();
 }
 
 
