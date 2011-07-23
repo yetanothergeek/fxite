@@ -185,7 +185,7 @@ bool TopWindow::ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_d
 
 
 
-/* Mark all open documents as needing thier settings updated. */
+/* Mark all open documents as needing their settings updated. */
 bool TopWindow::PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
   ((SciDoc*)page->getFirst())->NeedStyled(true);
