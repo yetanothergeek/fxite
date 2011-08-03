@@ -210,26 +210,26 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_SET_FILETYPES: {
-      FXTextField*tf=(FXTextField*)o;
-      LangStyle* ls=(LangStyle*)tf->getUserData();
+      FXInputDialog*dlg=(FXInputDialog*)o;
+      LangStyle* ls=(LangStyle*)dlg->getUserData();
       if (ls) {
         if (ls->mask) {
-          if (strcmp(ls->mask,tf->getText().text())==0) { break; }
+          if (strcmp(ls->mask,dlg->getText().text())==0) { break; }
           if ( ls->mallocs & (1<<30) ) { free(ls->mask); }
         }
-        ls->mask=strdup(tf->getText().text());
+        ls->mask=strdup(dlg->getText().text());
       }
       break;
     }
     case ID_SET_SHABANGS: {
-      FXTextField*tf=(FXTextField*)o;
-      LangStyle* ls=(LangStyle*)tf->getUserData();
+      FXInputDialog*dlg=(FXInputDialog*)o;
+      LangStyle* ls=(LangStyle*)dlg->getUserData();
       if (ls) {
         if (ls->apps) {
-          if (strcmp(ls->apps,tf->getText().text())==0) { break; }
+          if (strcmp(ls->apps,dlg->getText().text())==0) { break; }
           if ( ls->mallocs & (1<<29) ) { free(ls->apps); }
         }
-        ls->apps=strdup(tf->getText().text());
+        ls->apps=strdup(dlg->getText().text());
       }
       break;
     }

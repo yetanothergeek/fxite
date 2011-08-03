@@ -77,6 +77,7 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_FILTERS_EDIT,PrefsDialog::onFiltersEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_ERRPATS_EDIT,PrefsDialog::onErrPatsEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_SYSINCS_EDIT,PrefsDialog::onSysIncsEdit),
+  FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_EDIT_FILETYPES,PrefsDialog::ID_EDIT_SHABANGS,PrefsDialog::onSyntaxFiletypeEdit),
   FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_TBAR_AVAIL_ITEMS,PrefsDialog::ID_TBAR_INSERT_CUSTOM,PrefsDialog::onToolbarEdit)
 };
 
@@ -521,17 +522,13 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
   wordlist->clearItems();
   LangStyle* ls=(LangStyle*)list->getItemData(index);
   if (ls) {
-    wildcardlab->enable();
-    shabanglab->enable();
+    wildcardbtn->enable();
+    wildcardbtn->setUserData(ls);
+    shabangbtn->enable();
+    shabangbtn->setUserData(ls);
     kwordslab->enable();
-    wildcardbox->enable();
-    wildcardbox->setUserData(ls);
-    shabangbox->enable();
-    shabangbox->setUserData(ls);
     tabopts->enable();
     taboptlab->enable();
-    wildcardbox->setText(ls->mask?ls->mask:"");
-    shabangbox->setText(ls->apps?ls->apps:"");
     tabopts->setCurrentItem(ls->tabs);
     if (ls->words){
       char**words;
@@ -563,14 +560,10 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
     tabopts->setCurrentItem(0);
     tabopts->disable();
     taboptlab->disable();
-    wildcardbox->setText("");
-    wildcardbox->setUserData(NULL);
-    shabangbox->setText("");
-    shabangbox->setUserData(NULL);
-    wildcardbox->disable();
-    wildcardlab->disable();
-    shabangbox->disable();
-    shabanglab->disable();
+    wildcardbtn->setUserData(NULL);
+    wildcardbtn->disable();
+    shabangbtn->setUserData(NULL);
+    shabangbtn->disable();
     sd0=prefs->globalStyle();
   }
   FXWindow* w=style_pan->getParent();
@@ -869,6 +862,47 @@ static ColorName rainbow[] = {
 
 
 
+long PrefsDialog::onSyntaxFiletypeEdit(FXObject*o,FXSelector sel,void*p)
+{
+  ClipTextDialog *tb=NULL;
+  LangStyle*ls=(LangStyle*)((FXButton*)o)->getUserData();
+  FXString txt;
+  switch (FXSELID(sel)) {
+    case ID_EDIT_FILETYPES: {
+      txt.format( _(
+        "A list of wilcard masks, each separated by the pipe \"|\" symbol.\n"
+        "\n"
+        "Filenames that match one of these patterns will default to \"%s\" language.\n"
+      ), ls->name );
+      tb=new ClipTextDialog(this, _("Edit_filetypes"), txt);
+      tb->setText(ls->mask);
+      sel=FXSEL(SEL_COMMAND,Settings::ID_SET_FILETYPES);
+      break;
+    }
+    case ID_EDIT_SHABANGS: {
+      txt.format( _(
+        "A list of program names, each separated by the pipe \"|\" symbol.\n"
+        "\n"
+        "Files beginning with a #! interpreter directive containing any of\n"
+        "these program names will default to \"%s\" language.\n"
+      ), ls->name );
+      tb=new ClipTextDialog(this,_("Edit shabang apps"),txt);
+      tb->setText(ls->apps);
+      sel=FXSEL(SEL_COMMAND,Settings::ID_SET_SHABANGS);
+      break;
+    }
+  }
+  tb->setUserData(ls);
+  tb->setNumColumns(40);
+  if (tb->execute()) {
+    prefs->handle(tb,sel,NULL);
+  }
+  delete tb;
+  return 1;
+}
+
+
+
 void PrefsDialog::MakeSyntaxTab()
 {
   new FXTabItem(tabs,_("syntax"));
@@ -889,7 +923,7 @@ void PrefsDialog::MakeSyntaxTab()
   scroll=new FXScrollWindow(right_column,LAYOUT_FILL|HSCROLLING_OFF|VSCROLLING_ON|VSCROLLER_ALWAYS );
   MakeStylePan(scroll);
 
-  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL);
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X);
   new FXLabel(frame,_("language:"));
   langlist=new FXListBox(frame,this,ID_LANG_SWITCH,LIST_BOX_OPTS);
   StyleDef*sd;
@@ -902,20 +936,17 @@ void PrefsDialog::MakeSyntaxTab()
   }
   langlist->setNumVisible(langlist->getNumItems()>12?12:langlist->getNumItems());
   langlist->setCurrentItem(whichlang);
-
-  wildcardlab=new FXLabel(left_column,_("file types: e.g.    *.html|*.php|*.shtml"));
-  wildcardlab->setPadTop(8);
-  wildcardbox= new ClipTextField(left_column,24,prefs,Settings::ID_SET_FILETYPES,TEXTFIELD_NORMAL|LAYOUT_FILL_X);
-  shabanglab=new FXLabel(left_column,_("#! programs: e.g.    bash|sh|dash"));
-  shabanglab->setPadTop(8);
-  shabangbox=new ClipTextField(left_column,24,prefs,Settings::ID_SET_SHABANGS,TEXTFIELD_NORMAL|LAYOUT_FILL_X);
+  FXVerticalFrame*btns=new FXVerticalFrame(left_column,FRAME_NONE);
+  btns->setPadLeft(12);
+  wildcardbtn=new FXButton(btns,_("File types..."),NULL,this,ID_EDIT_FILETYPES,BUTTON_NORMAL|LAYOUT_FILL_X);
+  shabangbtn=new FXButton(btns,_("#! programs..."),NULL,this,ID_EDIT_SHABANGS,BUTTON_NORMAL|LAYOUT_FILL_X);
   kwordslab=new FXLabel(left_column,_("keywords:"));
-  kwordslab->setPadTop(8);
-  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL/*|PACK_UNIFORM*/);
+  kwordslab->setPadTop(4);
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X);
   wordlist=new FXListBox(frame,NULL,0,LIST_BOX_OPTS);
   wordbtn=new FXButton(frame, "...", NULL, this, ID_KWORD_EDIT);
 
-  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL);
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X);
   taboptlab=new FXLabel(frame,_("Use tabs:"));
   tabopts=new FXListBox(frame,this,ID_TABOPTS_SWITCH,LIST_BOX_OPTS);
   tabopts->appendItem(_("use default setting"));

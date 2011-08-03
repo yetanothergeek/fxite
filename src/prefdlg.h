@@ -29,11 +29,9 @@ private:
   Settings*prefs;
   FXListBox *langlist;
   FXIconList*acclist;
-  FXTextField* wildcardbox;
-  FXTextField* shabangbox;
   FXListBox *wordlist;
-  FXLabel *wildcardlab;
-  FXLabel *shabanglab;
+  FXButton *wildcardbtn;
+  FXButton *shabangbtn;
   FXLabel *kwordslab;
   FXLabel *taboptlab;
   FXListBox* tabopts;
@@ -72,6 +70,7 @@ public:
   long onToolbarEdit(FXObject*o,FXSelector sel,void*p);
   long onErrPatsEdit(FXObject*o,FXSelector sel,void*p);
   long onSysIncsEdit(FXObject*o,FXSelector sel,void*p);
+  long onSyntaxFiletypeEdit(FXObject*o,FXSelector sel,void*p);
   enum {
     ID_SOMETHING=FXDialogBox::ID_LAST,
     ID_TAB_SWITCHED,
@@ -89,6 +88,8 @@ public:
     ID_TBAR_ITEM_RAISE,
     ID_TBAR_ITEM_LOWER,
     ID_TBAR_INSERT_CUSTOM,
+    ID_EDIT_FILETYPES,
+    ID_EDIT_SHABANGS,
     ID_LAST
   };
   PrefsDialog(FXMainWindow* w, Settings* aprefs);
