@@ -42,6 +42,16 @@ public:
 
 
 
+
+/* A basic FXInputDialog with ClipTextField functionality. */
+class ClipTextDialog: public FXInputDialog {
+public:
+  ClipTextDialog(FXWindow* p, const FXString& caption,const FXString& label);
+};
+
+
+
+
 /* The "memory engine" for the objects below */
 class RegHistory;
 

@@ -400,3 +400,15 @@ HistBox::HistBox(FXWindow* p,
 
 
 
+
+ClipTextDialog::ClipTextDialog(FXWindow*p,const FXString&caption,const FXString&label):
+  FXInputDialog(p,caption,label)
+{
+  FXuint textopts=TEXTFIELD_ENTER_ONLY|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X;
+  FXComposite *entry=(FXComposite*)input->getParent();
+  FXint n=input->getNumColumns();
+  delete input;
+  input=new ClipTextField(entry,n,this,ID_ACCEPT,textopts,0,0,0,0, 8,8,4,4);
+}
+
+
