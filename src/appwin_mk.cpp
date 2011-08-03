@@ -1064,11 +1064,10 @@ void TopWindow::ParseCommands(FXString &commands)
             if (!session_restored) {
               session_restored=true;
               FXString sessionname;
-              FXival count;
               FXFile fh(SessionFile(), FXIO::Reading);
               if (fh.isOpen()) {
                 session_data.length(fh.size());
-                count=fh.readBlock((void*)(session_data.text()),fh.size());
+                fh.readBlock((void*)(session_data.text()),fh.size());
                 fh.close();
                 ParseCommands(session_data);
                 if (!prefs->LastFocused.empty()) {
