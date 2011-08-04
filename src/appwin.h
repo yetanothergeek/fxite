@@ -138,6 +138,7 @@ private:
   FXMenuCommand* playbackmenu;
   FXMenuCommand* showmacromenu;
   FXMenuCheck* readonlymenu;
+  FXMenuCheck* wordwrapmenu;
   FXVerticalFrame* vbox;
   FXHorizontalFrame* statusbar;
   FXTextField* coords;
@@ -267,6 +268,7 @@ public:
   long onReload(         FXObject*o, FXSelector sel, void*p );
   long onTimer(          FXObject*o, FXSelector sel, void*p );
   long onReadOnly(       FXObject*o, FXSelector sel, void*p );
+  long onWordWrap(       FXObject*o, FXSelector sel, void*p );
   long onLoadTags(       FXObject*o, FXSelector sel, void*p );
   long onUnloadTags(     FXObject*o, FXSelector sel, void*p );
   long onFindTag(        FXObject*o, FXSelector sel, void*p );
@@ -375,6 +377,7 @@ public:
     ID_RELOAD,
     ID_TIMER,
     ID_READONLY,
+    ID_WORDWRAP,
     ID_INSERT_FILE,
     ID_LOAD_TAGS,
     ID_UNLOAD_TAGS,

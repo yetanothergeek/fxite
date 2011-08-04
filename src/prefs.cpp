@@ -95,6 +95,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_TOGGLE_VIEW_WHITESPACE_EOL: { WhitespaceShowsEOL = !WhitespaceShowsEOL; break; }
     case ID_TOGGLE_ASCII_DEFAULT: { DefaultToAscii = !DefaultToAscii; break; }
     case ID_TOGGLE_SBCS_DEFAULT: { DefaultToSbcs = !DefaultToSbcs; break; }
+    case ID_TOGGLE_WORD_WRAP: { WordWrap = !WordWrap; break; }
     case ID_TOGGLE_WRAP_TOOLBAR: {
       WrapToolbar = !WrapToolbar;
       FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
@@ -677,6 +678,7 @@ static const char* main_keys[] = {
   "KeepFileFilter",
   "FileFilterIndex",
   "FileOpenMulti",
+  "WordWrap",
   NULL
 };
 
@@ -843,6 +845,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
     FileFilterIndex=0;
   }
   ReadInt(FileOpenMulti,false);
+  ReadInt(WordWrap,false);
   ReadInt(WrapToolbar,true);
   ReadIntRng(ToolbarButtonSize,1,0,2);// 0=small;  1=medium;  2=large
 
@@ -999,6 +1002,7 @@ Settings::~Settings()
   WriteInt(WhitespaceShowsEOL);
   WriteInt(DefaultFileFormat);
   WriteInt(WrapToolbar);
+  WriteInt(WordWrap);
   WriteInt(ToolbarButtonSize);
   WriteInt(Left);
   WriteInt(Top);

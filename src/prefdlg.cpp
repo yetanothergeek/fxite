@@ -1170,6 +1170,8 @@ void PrefsDialog::MakeEditorTab()
   spin->setValue(prefs->RightEdgeColumn);
   new FXLabel(spinframe, _("Right Margin Indicator"));
 
+  chk=new FXCheckButton(column,_("Turn line wrapping on by default"),prefs,Settings::ID_TOGGLE_WORD_WRAP);
+  chk->setCheck(prefs->WordWrap);
 
   spinframe=new FXHorizontalFrame(column);
   new FXLabel(spinframe, _("Split views:"));

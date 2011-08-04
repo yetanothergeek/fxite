@@ -78,6 +78,7 @@ static MenuSpec menu_specs[] = {
   {TW::ID_INDENT_FULL,      "EditTabIn",       _("&Indent right  "),    _("shift right"),  "Ctrl+Shift+)", 'm', {NULL}},
   {TW::ID_UNINDENT_FULL,    "EditUntab",       _("In&dent left   "),    _("shift left"),   "Ctrl+Shift+(", 'm', {NULL}},
   {TW::ID_READONLY,         "EditReadOnly",    _("Read Onl&y"),         _("read only"),    "",             'm', {NULL}},
+  {TW::ID_WORDWRAP,         "EditWordWrap",    _("Word Wr&ap"),         _("word wrap"),    "",             'm', {NULL}},
   {TW::ID_FMT_DOS,          "EditFmtDos",      _("&DOS [CR/LF]"),       _("dos"),          "",             'm', {NULL}},
   {TW::ID_FMT_MAC,          "EditFmtMac",      _("&Mac [CR]"),          _("mac"),          "",             'm', {NULL}},
   {TW::ID_FMT_UNIX,         "EditFmtUnix",     _("&Unix [LF]"),         _("unix"),         "",             'm', {NULL}},

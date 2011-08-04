@@ -115,6 +115,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_SET_LANGUAGE,onSetLanguage),
   TWMAPFUNC(ID_RELOAD,onReload),
   TWMAPFUNC(ID_READONLY,onReadOnly),
+  TWMAPFUNC(ID_WORDWRAP,onWordWrap),
   TWMAPFUNC(ID_LOAD_TAGS,onLoadTags),
   TWMAPFUNC(ID_UNLOAD_TAGS,onUnloadTags),
   TWMAPFUNC(ID_FIND_TAG,onFindTag),
@@ -672,6 +673,18 @@ bool TopWindow::SetReadOnly(SciDoc*sci, bool rdonly)
   SetTabLocked(sci,rdonly);
   need_status=32;
   return true;
+}
+
+
+
+long TopWindow::onWordWrap(FXObject*o, FXSelector sel, void*p)
+{
+  SciDoc*sci=ControlDoc();
+  sci->SetWordWrap(!sci->GetWordWrap());
+  wordwrapmenu->setCheck(sci->GetWordWrap());
+  SyncToggleBtn(o,sel);
+  sci->setFocus();
+  return 1;
 }
 
 

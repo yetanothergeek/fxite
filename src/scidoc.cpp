@@ -1027,6 +1027,7 @@ void SciDoc::SetSplit(FXint style)
     sci->GoToPos(GetCaretPos());
     sci->sendMessage(SCI_SETZOOM,sendMessage(SCI_GETZOOM,0,0),0);
     sci->SetShowEdge(GetShowEdge());
+    sci->SetWordWrap(GetWordWrap());
   }
 }
 
@@ -1117,5 +1118,20 @@ int SciDoc::GetPropertyInt(const char*key, int default_value)
 void SciDoc::TabWidth(int w) {
   if (_lang && (_lang->tabwidth>0)) { w=_lang->tabwidth; }
   sendMessage(SCI_SETTABWIDTH,(w<1)?1:(w>16)?16:w,0);
+}
+
+
+
+void SciDoc::SetWordWrap(bool on)
+{
+  sendMessage(SCI_SETWRAPMODE,on?SC_WRAP_WORD:SC_WRAP_NONE,0);
+  slave(SetWordWrap,on);  
+}
+
+
+
+bool SciDoc::GetWordWrap()
+{
+  return sendMessage(SCI_GETWRAPMODE,0,0)!=SC_WRAP_NONE;
 }
 

@@ -277,6 +277,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   sci->ShowLineNumbers(prefs->ShowLineNumbers);
   sci->ShowWhiteSpace(prefs->ShowWhiteSpace);
   sci->SetShowEdge(prefs->ShowRightEdge);
+  sci->SetWordWrap(prefs->WordWrap);
   SetSciDocPrefs(sci,prefs);
 
   sci->DoStaleTest(true);
@@ -698,6 +699,8 @@ void TopWindow::UpdateTitle(long line, long col)
     SetMenuEnabled(fmt_dos_mnu,!readonlymenu->getCheck());
     SetMenuEnabled(fmt_mac_mnu,!readonlymenu->getCheck());
     SetMenuEnabled(fmt_unx_mnu,!readonlymenu->getCheck());
+    wordwrapmenu->setCheck(sci->GetWordWrap());
+    SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
     docname->setText(sci->Filename().empty()?"":sci->Filename().text());
     encname->setText(sci->GetUTF8()?"UTF-8":"ASCII");
     char rowcol[16];

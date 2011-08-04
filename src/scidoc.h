@@ -179,6 +179,8 @@ public:
   void SetProperty(const char*key, const char*value);
   bool GetProperty(const FXString &key, FXString &value, bool expanded=false);
   int GetPropertyInt(const char*key, int default_value);
+  void SetWordWrap(bool on);
+  bool GetWordWrap();
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))

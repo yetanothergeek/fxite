@@ -335,6 +335,7 @@ void TopWindow::CreateMenus()
 
   new FXMenuSeparator(editmenu, 0);
   readonlymenu=MkMnuChk(editmenu,ID_READONLY,false);
+  wordwrapmenu=MkMnuChk(editmenu,ID_WORDWRAP,false);
 
   fileformatmenu=new SubMenuPane(this);
   fileformatcasc=NewCascade(editmenu,_("File &Format"),NULL,fileformatmenu);

@@ -100,6 +100,7 @@ public:
   FXulong DefaultToAscii:1;
   FXulong DefaultToSbcs:1;
   FXulong FileOpenMulti:1;
+  FXulong WordWrap:1;
 
   FXint AutoIndent;
   FXint FileFilterIndex;
@@ -170,6 +171,7 @@ public:
     ID_TOGGLE_WRAP_TOOLBAR,
     ID_TOGGLE_ASCII_DEFAULT,
     ID_TOGGLE_SBCS_DEFAULT,
+    ID_TOGGLE_WORD_WRAP,
     ID_SAVE_ON_FILTER_SEL,
     ID_SAVE_ON_INS_CMD,
     ID_SAVE_ON_EXEC_CMD,
