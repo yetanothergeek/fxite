@@ -143,6 +143,13 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       LIMIT_RANGE(TabWidth,1,16);
       break;
     }
+    case ID_SET_TAB_WIDTH_FOR_LANG: {
+      FXSpinner*spin=(FXSpinner*)o;
+      LangStyle*ls=(LangStyle*)spin->getUserData();
+      ls->tabwidth=spin->getValue();
+      LIMIT_RANGE(ls->tabwidth,0,16);
+      break;
+    }
     case ID_SET_INDENT_WIDTH: {
       FXSpinner*spin=(FXSpinner*)o;
       IndentWidth=spin->getValue();
@@ -907,6 +914,8 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
       ls->mallocs |= LANGSTYLE_APPS_ALLOCD;
     }
     ls->tabs=(TabPolicy)(style_reg->readIntEntry(ls->name,"TabPolicy", ls->tabs));
+    ls->tabwidth=style_reg->readIntEntry(ls->name,"TabWidth", 0);
+    LIMIT_RANGE(ls->tabwidth,0,16);
   }
   styles=GlobalStyle;
   MenuMgr::ReadMenuSpecs(reg,keys_sect);
@@ -929,6 +938,7 @@ Settings::~Settings()
     style_reg->writeStringEntry(ls->name,"FileMask",ls->mask?ls->mask:"");
     style_reg->writeStringEntry(ls->name,"ShebangApps",ls->apps?ls->apps:"");
     style_reg->writeIntEntry(ls->name,"TabPolicy", ls->tabs);
+    style_reg->writeIntEntry(ls->name,"TabWidth", ls->tabwidth);
     for (i=0; ls->words[i]; i++) {
       char key[32];
       snprintf(key, sizeof(key)-1, "words_%d", i+1);

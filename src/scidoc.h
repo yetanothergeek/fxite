@@ -147,7 +147,7 @@ public:
   void ShowWhiteSpace(bool showit);
 
   int TabWidth() { return sendMessage(SCI_GETTABWIDTH,0,0); }
-  void TabWidth(int w) { sendMessage(SCI_SETTABWIDTH,(w<1)?1:(w>16)?16:w,0); }
+  void TabWidth(int w);
   void ShowLineNumbers(bool showit);
   bool ShowLineNumbers() { return sendMessage(SCI_GETMARGINWIDTHN, 0, 0)?true:false; }
 

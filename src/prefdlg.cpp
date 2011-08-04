@@ -530,6 +530,10 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
     tabopts->enable();
     taboptlab->enable();
     tabopts->setCurrentItem(ls->tabs);
+    tabwidthspin->enable();
+    tabwidthspin->setUserData(ls);
+    tabwidthspin->setValue(ls->tabwidth);
+    tabwidthlab->enable();
     if (ls->words){
       char**words;
       const LexerModule*lm=Catalogue::Find(ls->id);
@@ -560,6 +564,9 @@ long PrefsDialog::onLangSwitch(FXObject*o,FXSelector sel,void*p)
     tabopts->setCurrentItem(0);
     tabopts->disable();
     taboptlab->disable();
+    tabwidthspin->setUserData(NULL);
+    tabwidthspin->disable();
+    tabwidthlab->disable();
     wildcardbtn->setUserData(NULL);
     wildcardbtn->disable();
     shabangbtn->setUserData(NULL);
@@ -954,6 +961,12 @@ void PrefsDialog::MakeSyntaxTab()
   tabopts->appendItem(_("never use tabs"));
   tabopts->appendItem(_("detect from content"));
   tabopts->setNumVisible(4);
+
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_SIDE_BOTTOM);
+  tabwidthspin=new FXSpinner(frame, 3, prefs, Settings::ID_SET_TAB_WIDTH_FOR_LANG,SPIN_OPTS);
+  tabwidthspin->setRange(0,16);
+  tabwidthspin->setValue(0);
+  tabwidthlab=new FXLabel(frame,"Tab width (zero to use default)");
 
   frame=new FXHorizontalFrame(vframe,FRAME_RAISED|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
 

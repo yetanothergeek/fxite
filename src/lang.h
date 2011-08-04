@@ -58,6 +58,7 @@ typedef struct _LangStyle
   char *apps;        // Pipe-delimited list of applications { mallocs bit is (1<<29) }
   FXuint mallocs;    // Bitmask to track which keyword lists are malloc'd
   TabPolicy tabs;   // How to determine use of tabs or spaces.
+  unsigned char tabwidth;  // Language-specific tab width ( or zero to use global setting. )
 } LangStyle;
 
 

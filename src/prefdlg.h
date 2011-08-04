@@ -35,6 +35,8 @@ private:
   FXLabel *kwordslab;
   FXLabel *taboptlab;
   FXListBox* tabopts;
+  FXSpinner* tabwidthspin;
+  FXLabel* tabwidthlab;
   FXButton*wordbtn;
   FXVerticalFrame* style_pan;
   FXScrollWindow*scroll;

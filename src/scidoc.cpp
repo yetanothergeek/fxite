@@ -570,11 +570,14 @@ void SciDoc::UpdateStyle()
         }
       }
     }
+    TabWidth(_lang->tabwidth>0?_lang->tabwidth:Settings::instance()->TabWidth);
     SetProperty("lexer.cpp.track.preprocessor","0");
     SetProperty("lexer.cpp.update.preprocessor","0");
   } else {
     sendMessage(SCI_SETLEXER, 0, 0);
     sendMessage(SCI_SETLEXERLANGUAGE, 0, 0);
+    UseTabs(Settings::instance()->UseTabs);
+    TabWidth(Settings::instance()->TabWidth);
   }
   sendMessage(SCI_COLOURISE,0,-1);
   if (Slave()) { Slave()->UpdateStyle(); }
@@ -1108,3 +1111,11 @@ int SciDoc::GetPropertyInt(const char*key, int default_value)
 {
   return sendMessage(SCI_GETPROPERTYINT, reinterpret_cast<long>(key), default_value);
 }
+
+
+
+void SciDoc::TabWidth(int w) {
+  if (_lang && (_lang->tabwidth>0)) { w=_lang->tabwidth; }
+  sendMessage(SCI_SETTABWIDTH,(w<1)?1:(w>16)?16:w,0);
+}
+
