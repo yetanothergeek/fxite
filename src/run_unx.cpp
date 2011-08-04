@@ -91,7 +91,7 @@ long CmdIO::onData(FXObject*o,FXSelector sel,void*p)
           app->removeInput(stdoutFD, INPUT_READ);
           app->removeInput(stdinFD, INPUT_WRITE);
           if (!RecvString.empty()) {
-            RecvString.append('\n');
+            if (ensure_final_newline) { RecvString.append('\n'); }
             appendLine(RecvString,SEL_IO_WRITE);
           }
           break;

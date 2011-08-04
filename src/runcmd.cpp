@@ -52,6 +52,7 @@ CmdIO::CmdIO(FXMainWindow *window, const char*shellcmd):FXObject()
   app=window->getApp();
   target=NULL;
   message=0;
+  ensure_final_newline=false;
 }
 
 
@@ -125,6 +126,7 @@ bool CmdIO::filter(const char *command, const FXString &input, FXString &output,
   remaining=SendString.length();
   message=0;
   target=NULL;
+  ensure_final_newline=false;
   if (!checkCurrDir()) { return false; }
   bool success=run(command,canceler);
   if (canceler && *canceler) {
@@ -145,6 +147,7 @@ bool CmdIO::lines(const char *command, FXObject *trg, FXSelector sel, bool*cance
   message=sel;
   target=trg;
   multiline_mode=multiline;
+  ensure_final_newline=true;
   if (!checkCurrDir()) { return false; }
   return run(command,canceler);
 }

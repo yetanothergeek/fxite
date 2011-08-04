@@ -222,7 +222,7 @@ bool CmdIO::run(const char *command, bool*canceler)
           appendLine(RecvString,SEL_IO_WRITE);
         } else {
           if (!RecvString.empty()) {
-            RecvString.append('\n');
+            if (ensure_final_newline) { RecvString.append('\n'); }
             appendLine(RecvString,SEL_IO_WRITE);
           }
           break;
@@ -296,7 +296,7 @@ bool CmdIO::run(const char *command, bool*canceler)
           appendLine(RecvString,SEL_IO_WRITE);
         } else {
           if (!RecvString.empty()) {
-            RecvString.append('\n');
+            if (ensure_final_newline) { RecvString.append('\n'); }
             appendLine(RecvString,SEL_IO_WRITE);
           }
           break;

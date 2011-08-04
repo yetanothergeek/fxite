@@ -31,6 +31,7 @@ private:
   char* _shellcmd;
   char* _shellarg;
   bool  multiline_mode;
+  bool ensure_final_newline;
   FXObject* target;
   FXSelector message;
   bool* _canceler;
