@@ -1353,9 +1353,9 @@ long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
   if (!sci) { return 0; }
   int selid=FXSELID(sel);
   long msg=((ID_INDENT_STEP==selid)||(ID_INDENT_FULL==selid))?SCI_TAB:SCI_BACKTAB;
+  int tab_width=sci->TabWidth();
   if ((ID_INDENT_STEP==selid)||(ID_UNINDENT_STEP==selid))
   {
-    int tab_width=sci->TabWidth();
     FXbool use_tabs=sci->UseTabs();
     sci->UseTabs(false);
     sci->TabWidth(1);
@@ -1363,9 +1363,9 @@ long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
     sci->TabWidth(tab_width);
     sci->UseTabs(use_tabs);
   } else {
-    sci->TabWidth(sci->UseTabs()?prefs->TabWidth:prefs->IndentWidth);
+    sci->TabWidth(sci->UseTabs()?tab_width:prefs->IndentWidth);
     sci->sendMessage(msg,0,0);
-    sci->TabWidth(prefs->TabWidth);
+    sci->TabWidth(tab_width);
   }
   return 1;
 }

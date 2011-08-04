@@ -587,6 +587,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
       }
       long prev_indent=sci->sendMessage(SCI_GETLINEINDENTATION, prev_line, 0);
       long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
+      int tab_width=sci->TabWidth();
       if (prefs->AutoIndent==AUTO_INDENT_SMART) {
         long prev_pos=pos-2;
         long eolmode=sci->sendMessage(SCI_GETEOLMODE,0,0);
@@ -599,7 +600,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
             sci->SetLineIndentation(line+1,prev_indent);
             sci->sendMessage(SCI_GOTOPOS,pos,0);
           }
-          prev_indent += sci->UseTabs()?prefs->TabWidth:prefs->IndentWidth;
+          prev_indent += sci->UseTabs()?tab_width:prefs->IndentWidth;
         }
       }
       if ( curr_indent < prev_indent ) {
@@ -611,7 +612,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
           sci->SetLineIndentation(line,prev_indent);
         }
         if (sci->UseTabs()||tmp_tab) {
-          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+(prev_indent/prefs->TabWidth));
+          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+(prev_indent/tab_width));
         }
       }
       break;
