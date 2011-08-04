@@ -870,11 +870,11 @@ long PrefsDialog::onSyntaxFiletypeEdit(FXObject*o,FXSelector sel,void*p)
   switch (FXSELID(sel)) {
     case ID_EDIT_FILETYPES: {
       txt.format( _(
-        "A list of wilcard masks, each separated by the pipe \"|\" symbol.\n"
+        "A list of wildcard masks, each separated by the pipe \"|\" symbol.\n"
         "\n"
-        "Filenames that match one of these patterns will default to \"%s\" language.\n"
+        "Filenames that match any of these patterns will default to \"%s\" language.\n"
       ), ls->name );
-      tb=new ClipTextDialog(this, _("Edit_filetypes"), txt);
+      tb=new ClipTextDialog(this, _("Edit file types"), txt);
       tb->setText(ls->mask);
       sel=FXSEL(SEL_COMMAND,Settings::ID_SET_FILETYPES);
       break;
@@ -941,12 +941,12 @@ void PrefsDialog::MakeSyntaxTab()
   wildcardbtn=new FXButton(btns,_("File types..."),NULL,this,ID_EDIT_FILETYPES,BUTTON_NORMAL|LAYOUT_FILL_X);
   shabangbtn=new FXButton(btns,_("#! programs..."),NULL,this,ID_EDIT_SHABANGS,BUTTON_NORMAL|LAYOUT_FILL_X);
   kwordslab=new FXLabel(left_column,_("keywords:"));
-  kwordslab->setPadTop(4);
-  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X);
+  kwordslab->setPadTop(12);
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL);
   wordlist=new FXListBox(frame,NULL,0,LIST_BOX_OPTS);
   wordbtn=new FXButton(frame, "...", NULL, this, ID_KWORD_EDIT);
 
-  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X);
+  frame=new FXHorizontalFrame(left_column,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_SIDE_BOTTOM);
   taboptlab=new FXLabel(frame,_("Use tabs:"));
   tabopts=new FXListBox(frame,this,ID_TABOPTS_SWITCH,LIST_BOX_OPTS);
   tabopts->appendItem(_("use default setting"));
