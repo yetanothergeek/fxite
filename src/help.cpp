@@ -68,6 +68,12 @@ static const char* phrases[] = {
 };
 
 
+#if ((FOX_MAJOR>1) || (FOX_MINOR>7) || ((FOX_MINOR==7) && (FOX_LEVEL>=23)))
+# define CONFIG_DIR_BASE_NAME ".config"
+#else
+# define CONFIG_DIR_BASE_NAME ".foxrc"
+#endif
+
 /*
   Instead of "hard-coding" these strings in hundreds of places in the text files,
   just use these generic "macros" - each regex placeholder will be replaced
@@ -77,6 +83,7 @@ static const char* replacements[] = {
   "\\<__APP__\\>",  APP_NAME,
   "\\<__EXE__\\>",  EXE_NAME,
   "\\<__MOD__\\>",  LUA_MODULE_NAME,
+  "\\<__CFG__\\>",  CONFIG_DIR_BASE_NAME,
   NULL,             NULL
 };
 

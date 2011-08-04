@@ -1191,7 +1191,7 @@ on the tools menu. This allows you to associate keyboard shortcuts to custom com
 cluttering up the menu.
 
 If you find managing your tools from the dialog is a bit too awkward, the items are stored in a \
-directory hierarchy under your  ===$HOME/.foxrc/__EXE__/<config-name>/tools/===  directory, and can be \
+directory hierarchy under your  ===$HOME/__CFG__/__EXE__/<config-name>/tools/===  directory, and can be \
 manipulated using your favorite file manager or terminal. The filenames stored there might look \
 a bit strange, since __APP__ uses the names as a sort of "metadata" for creating the menus and \
 executing the commands. In a nutshell, the syntax for the filenames goes something like this:
@@ -1233,7 +1233,7 @@ filename would do it:
 Hook functions are Lua scripts that execute whenever a certain event occurs in __APP__.
 
 The configuration directory contains the subdirectory:
-  ===$HOME/.foxrc/__EXE__/<config-name>/tools/hooks/===
+  ===$HOME/__CFG__/__EXE__/<config-name>/tools/hooks/===
 
 The ===hooks=== subdirectory can contain the following files:
 
@@ -1312,7 +1312,7 @@ the %%%Toolbar%%% option from the %%%View%%% menu.
 __APP__ is able to maintain periodic backups of the files you are editing so that you can \
 recover the file in the event of a problem such as a system crash, network failure, \
 X server crash, or even if __APP__ itself crashes.  These files are saved along with \
-their directory structure under the ===$HOME/.foxrc/__EXE__/backups.d/=== directory. To enable \
+their directory structure under the ===$HOME/__CFG__/__EXE__/backups.d/=== directory. To enable \
 this feature, check the "%%%Backup files%%%" option under the %%%general%%% tab of the \
 %%%Preferences%%% dialog, where you can also choose a backup interval between 15 seconds \
 to 15 minutes. Under most circumstances, the backup files are removed automatically whenever the \
@@ -1387,7 +1387,7 @@ option, for example:
 To re-use the settings you made in your original configuration, you could first make a copy \
 of the existing configuration from the command line:
 
-  ===cp -a ~/.foxrc/__EXE__/default ~/.foxrc/__EXE__/myconfig===
+  ===cp -a ~/__CFG__/__EXE__/default ~/__CFG__/__EXE__/myconfig===
 
 
 With some clever use of symbolic links, you should be able to share some aspects \
@@ -1407,7 +1407,7 @@ Configuration names must consist of only lowercase alphabet (%%%a-z%%%) and numb
 To help distinguish between multiple configurations running on the same desktop, it is possible \
 to have a distinct window icon for each configuration. To do this, create a 32x32 XPM \
 image named ==="icon.xpm"===  and place it in the configuration directory, for example:
-   ===~/.foxrc/__EXE__/myconfig/icon.xpm===
+   ===~/__CFG__/__EXE__/myconfig/icon.xpm===
 
 
 ###Embedded Scripting Engine###
