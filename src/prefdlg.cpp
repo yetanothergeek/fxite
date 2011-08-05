@@ -838,7 +838,7 @@ void PrefsDialog::MakeToolbarTab()
 
 void PrefsDialog::MakeKeybindingsTab()
 {
-  new FXTabItem(tabs,_("keybindings"));
+  new FXTabItem(tabs,_("keys"));
   FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
   acclist=new FXIconList(frame,
     this,ID_ACCEL_EDIT,FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|ICONLIST_BROWSESELECT);
