@@ -1140,6 +1140,10 @@ void SciDoc::TabWidth(int w) {
 void SciDoc::SetWordWrap(bool on)
 {
   sendMessage(SCI_SETWRAPMODE,on?SC_WRAP_WORD:SC_WRAP_NONE,0);
+  setScrollStyle(on?
+    ((getScrollStyle()&~HSCROLLER_ALWAYS)|HSCROLLER_NEVER):
+    ((getScrollStyle()&~HSCROLLER_NEVER)|HSCROLLER_ALWAYS)
+  )
   slave(SetWordWrap,on);  
 }
 
