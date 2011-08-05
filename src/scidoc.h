@@ -169,7 +169,7 @@ public:
 
   bool SmoothScroll() { return (getScrollStyle()&SCROLLERS_DONT_TRACK)==0; }
   void SmoothScroll(bool smooth) {
-    setScrollStyle(smooth?(getScrollStyle()&!SCROLLERS_DONT_TRACK):(getScrollStyle()|SCROLLERS_DONT_TRACK));
+    setScrollStyle(smooth?(getScrollStyle()&~SCROLLERS_DONT_TRACK):(getScrollStyle()|SCROLLERS_DONT_TRACK));
   }
   void SetSplit(FXint style);
   FXint GetSplit() { return splitter_style; }
