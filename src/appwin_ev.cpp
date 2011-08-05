@@ -1224,7 +1224,7 @@ long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
     z=(FXival)p;
    tabbook->ForEachTab(ZoomSpecCB, &z);
   }
-  if (sci) { prefs->ZoomFactor=sci->sendMessage(SCI_GETZOOM, 0, 0); }
+  if (sci) { prefs->ZoomFactor=sci->GetZoom(); }
   return 1;
 }
 

@@ -131,7 +131,7 @@ bool TopWindow::AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_dat
 bool TopWindow::ZoomStepCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
   SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->Zoom(*((int*)user_data));
+  sci->ZoomStep(*((int*)user_data));
   return true;
 }
 
@@ -141,7 +141,7 @@ bool TopWindow::ZoomStepCB(FXint index, DocTab*tab, FXWindow*page, void*user_dat
 bool TopWindow::ZoomSpecCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
   SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->sendMessage(SCI_SETZOOM,*((int*)user_data),0);
+  sci->SetZoom(*((int*)user_data));
   return true;
 }
 

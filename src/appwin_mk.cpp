@@ -278,6 +278,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   sci->ShowWhiteSpace(prefs->ShowWhiteSpace);
   sci->SetShowEdge(prefs->ShowRightEdge);
   sci->SetWordWrap(prefs->WordWrap);
+  sci->SetZoom(prefs->ZoomFactor);
   SetSciDocPrefs(sci,prefs);
 
   sci->DoStaleTest(true);

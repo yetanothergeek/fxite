@@ -859,7 +859,7 @@ void SciDoc::GoToPos(long pos)
 
 
 
-void SciDoc::Zoom(int direction)
+void SciDoc::ZoomStep(int direction)
 {
   long msg=SCI_SETZOOM;
   long val=0;
@@ -875,7 +875,22 @@ void SciDoc::Zoom(int direction)
 
   sendMessage(SCI_SCROLLCARET,0,0);
   if (ShowLineNumbers()) { ShowLineNumbers(true); }
-  slave(Zoom,direction);
+  slave(ZoomStep,direction);
+}
+
+
+
+void SciDoc::SetZoom(int zoom)
+{
+  sendMessage(SCI_SETZOOM,zoom,0);
+  slave(SetZoom,zoom);
+}
+
+
+
+int SciDoc::GetZoom()
+{
+  return sendMessage(SCI_GETZOOM,0,0);
 }
 
 

@@ -123,7 +123,9 @@ public:
   long GetCaretPos() { return sendMessage(SCI_GETCURRENTPOS,0,0); }
   long GetLineNumber() { return sendMessage(SCI_LINEFROMPOSITION, GetCaretPos(), 0); }
   long GetColumnNumber() { return sendMessage(SCI_GETCOLUMN, GetCaretPos(), 0); }
-  void Zoom(int direction);
+  void ZoomStep(int direction);
+  void SetZoom(int zoom);
+  int GetZoom();
   void CaretLineBG(const char*bgcolor);
   void CaretLineAlpha(const char*alpha); // <= This really screws up CaretLineBG()
   const char* CaretLineBG() {return _caretlinebg[0]?_caretlinebg:NULL; }
