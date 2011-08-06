@@ -36,10 +36,23 @@
 
 void SciSearch::SelectTarget(bool forward)
 {
+  long ts=SciMsg(SCI_GETTARGETSTART,0,0);
+  long te=SciMsg(SCI_GETTARGETEND,0,0);
+  if (sci->GetWordWrap()) {
+    SciMsg(SCI_GOTOLINE,SciMsg(SCI_LINEFROMPOSITION,ts,0),0);
+    if (forward) {
+      SciMsg(SCI_SETSEL, ts, te);
+    } else {
+      SciMsg(SCI_SETSEL, te, ts);
+    }
+    SciMsg(SCI_SETXOFFSET,0,0);
+    SciMsg(SCI_SCROLLCARET,0,0);
+    sci->getApp()->runWhileEvents();
+  }
   if (forward) {
-    SciMsg(SCI_SETSEL, SciMsg(SCI_GETTARGETSTART,0,0), SciMsg(SCI_GETTARGETEND,0,0) );
+    SciMsg(SCI_SETSEL, ts, te);
   } else {
-    SciMsg(SCI_SETSEL, SciMsg(SCI_GETTARGETEND,0,0),   SciMsg(SCI_GETTARGETSTART,0,0) );
+    SciMsg(SCI_SETSEL, te, ts);
   }
   SciMsg(SCI_SETXOFFSET,0,0);
   SciMsg(SCI_SCROLLCARET,0,0);
