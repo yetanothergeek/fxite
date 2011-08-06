@@ -1137,7 +1137,7 @@ void PrefsDialog::MakeEditorTab()
   FXListBox*list;
 
   frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
-  column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL|PACK_UNIFORM_HEIGHT);
+  column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
 
   spinframe=new FXHorizontalFrame(column);
   new FXLabel(spinframe, _("Auto indent:"));
@@ -1157,6 +1157,9 @@ void PrefsDialog::MakeEditorTab()
   chk=new FXCheckButton(column, _("Allow caret beyond end of line"), prefs, Settings::ID_TOGGLE_CARET_PAST_EOL);
   chk->setCheck(prefs->CaretPastEOL, FALSE);
 
+  chk=new FXCheckButton(column,_("Turn line wrapping on by default"),prefs,Settings::ID_TOGGLE_WORD_WRAP);
+  chk->setCheck(prefs->WordWrap);
+
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_CARET_WIDTH, SPIN_OPTS);
   spin->setRange(1,3);
@@ -1169,9 +1172,6 @@ void PrefsDialog::MakeEditorTab()
   spin->setRange(1,1024);
   spin->setValue(prefs->RightEdgeColumn);
   new FXLabel(spinframe, _("Right Margin Indicator"));
-
-  chk=new FXCheckButton(column,_("Turn line wrapping on by default"),prefs,Settings::ID_TOGGLE_WORD_WRAP);
-  chk->setCheck(prefs->WordWrap);
 
   spinframe=new FXHorizontalFrame(column);
   new FXLabel(spinframe, _("Split views:"));
