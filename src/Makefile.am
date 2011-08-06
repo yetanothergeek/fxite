@@ -5,6 +5,12 @@ DEFS += -DLOCALEDIR=\"$(localedir)\"
 
 bin_PROGRAMS=fxite
 
+utildir = $(datadir)/applications
+util_DATA = fxite.desktop
+
+icondir = $(prefix)/share/pixmaps
+icon_DATA = fxite.xpm
+
 fxite_LDFLAGS=$(FXSCINTILLA_LIBS) $(LUA_LIBS) $(LDFLAGS)
 
 fxite_SOURCES=\
@@ -23,7 +29,8 @@ noinst_HEADERS=\
   interproc.h filedlg.h theme.h prefdlg_ext.h
 
 
-EXTRA_DIST=icon32x32.xpm icon32x32.ico icon32x32.rc icon32x32.coff helptext.txt help_lua.txt
+EXTRA_DIST=fxite.xpm icon32x32.ico icon32x32.rc icon32x32.coff \
+  helptext.txt help_lua.txt fxite.desktop
 
 
 $(srcdir)/help.cpp: $(srcdir)/helptext.h $(srcdir)/help_lua.h
@@ -43,7 +50,7 @@ sl.o: $(srcdir)/sl.c $(srcdir)/sl.h
 	$(CC) $(CFLAGS) -c -fno-inline -o $@ $<
 
 
-$(srcdir)/icon32x32.ico: $(srcdir)/icon32x32.xpm
+$(srcdir)/icon32x32.ico: $(srcdir)/fxite.xpm
 	convert $< $@
 
 

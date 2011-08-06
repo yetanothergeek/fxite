@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+NoDisplay=false
+Name=FXiTe
+Exec=fxite %F
+Icon=fxite
+MimeType=text/plain
+Categories=TextEditor;Development
+GenericName=Text Editor
+Comment=The Free Extensible Text Editor

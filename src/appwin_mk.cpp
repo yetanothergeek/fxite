@@ -1240,7 +1240,7 @@ FXID TopWindow::GetActiveWindow()
 
 
 const
-#include "icon32x32.xpm"
+#include "fxite.xpm"
 
 
 void TopWindow::create()
