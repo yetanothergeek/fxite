@@ -81,6 +81,7 @@ public:
   FXulong DocTabsPacked:1;
   FXulong Maximize:1;
   FXulong SmartHome:1;
+  FXulong WrapAwareHomeEnd:1;
 
   FXulong BraceMatch:1;
   FXulong UseTabs:1;
@@ -157,6 +158,7 @@ public:
 
   enum {
     ID_TOGGLE_SMART_HOME,
+    ID_TOGGLE_WRAP_AWARE,
     ID_TOGGLE_USE_TABS,
     ID_TOGGLE_BRACE_MATCH,
     ID_TOGGLE_ASK_CLOSE_MULTI_EXIT,

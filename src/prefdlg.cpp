@@ -1160,6 +1160,9 @@ void PrefsDialog::MakeEditorTab()
   chk=new FXCheckButton(column,_("Turn line wrapping on by default"),prefs,Settings::ID_TOGGLE_WORD_WRAP);
   chk->setCheck(prefs->WordWrap);
 
+  chk=new FXCheckButton(column, _("Wrap-aware home/end keys"), prefs, Settings::ID_TOGGLE_WRAP_AWARE);
+  chk->setCheck(prefs->WrapAwareHomeEnd, FALSE);
+
   spinframe=new FXHorizontalFrame(column);
   spin=new FXSpinner(spinframe, 2, prefs, Settings::ID_SET_CARET_WIDTH, SPIN_OPTS);
   spin->setRange(1,3);

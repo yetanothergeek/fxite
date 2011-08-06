@@ -201,6 +201,7 @@ void TopWindow::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
   sci->RightMarginBG(prefs->rightmarginStyle()->bg);
   sci->CaretWidth(prefs->CaretWidth);
   sci->SmartHome(prefs->SmartHome);
+  sci->SetWrapAware(prefs->WrapAwareHomeEnd);
   sci->SmoothScroll(prefs->SmoothScroll);
   sci->TabWidth(prefs->TabWidth);
   sci->UseTabs(prefs->UseTabs);

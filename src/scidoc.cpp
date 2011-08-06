@@ -60,6 +60,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   _utf8=false;
   need_styled=false;
   need_backup=false;
+  smart_home=false;
   _lang=NULL;
   _filetime=0;
   splitter_style=SPLIT_NONE;
@@ -1050,6 +1051,7 @@ void SciDoc::SetSplit(FXint style)
 
 void SciDoc::SmartHome(bool smart)
 {
+  smart_home=smart;
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME,smart?SCI_VCHOME:SCI_HOME);
   sendMessage(SCI_ASSIGNCMDKEY,SCK_HOME+(SCMOD_SHIFT<<16),smart?SCI_VCHOMEEXTEND:SCI_HOMEEXTEND);
   sendMessage(SCI_ASSIGNCMDKEY,
@@ -1143,7 +1145,7 @@ void SciDoc::SetWordWrap(bool on)
   setScrollStyle(on?
     ((getScrollStyle()&~HSCROLLER_ALWAYS)|HSCROLLER_NEVER):
     ((getScrollStyle()&~HSCROLLER_NEVER)|HSCROLLER_ALWAYS)
-  )
+  );
   slave(SetWordWrap,on);  
 }
 
@@ -1154,3 +1156,39 @@ bool SciDoc::GetWordWrap()
   return sendMessage(SCI_GETWRAPMODE,0,0)!=SC_WRAP_NONE;
 }
 
+
+#define LongFromTwoShorts(a,b) ( (a) | ((b) << 16) )
+
+
+#define AssignKey(key,mods,cmd) sendMessage(SCI_ASSIGNCMDKEY, \
+	        LongFromTwoShorts(static_cast<short>(key), \
+	                static_cast<short>(mods)), cmd);
+
+void SciDoc::SetWrapAware(bool aware)
+{
+  if (aware) {
+    if (smart_home) {
+      AssignKey(SCK_HOME, 0, SCI_VCHOMEWRAP);
+      AssignKey(SCK_HOME, SCMOD_SHIFT, SCI_VCHOMEWRAPEXTEND);
+      AssignKey(SCK_HOME, SCMOD_SHIFT|SCMOD_ALT, SCI_VCHOMERECTEXTEND);
+    } else {
+      AssignKey(SCK_HOME, 0, SCI_HOMEWRAP);
+      AssignKey(SCK_HOME, SCMOD_SHIFT, SCI_HOMEWRAPEXTEND);
+      AssignKey(SCK_HOME, SCMOD_SHIFT|SCMOD_ALT, SCI_HOMERECTEXTEND);
+    }
+    AssignKey(SCK_END, 0, SCI_LINEENDWRAP);
+    AssignKey(SCK_END, SCMOD_SHIFT, SCI_LINEENDWRAPEXTEND);
+  } else {
+    if (smart_home) {
+      AssignKey(SCK_HOME, 0, SCI_VCHOME);
+      AssignKey(SCK_HOME, SCMOD_SHIFT, SCI_VCHOMEEXTEND);
+      AssignKey(SCK_HOME, SCMOD_SHIFT|SCMOD_ALT, SCI_VCHOMERECTEXTEND);
+    } else {
+      AssignKey(SCK_HOME, 0, SCI_HOME);
+      AssignKey(SCK_HOME, SCMOD_SHIFT, SCI_HOMEEXTEND);
+      AssignKey(SCK_HOME, SCMOD_SHIFT|SCMOD_ALT, SCI_HOMERECTEXTEND);
+    }
+    AssignKey(SCK_END, 0, SCI_LINEEND);
+    AssignKey(SCK_END, SCMOD_SHIFT, SCI_LINEENDEXTEND);
+  }
+}

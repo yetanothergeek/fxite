@@ -71,6 +71,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 {
   switch FXSELID(sel) {
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
+    case ID_TOGGLE_WRAP_AWARE:  { WrapAwareHomeEnd = !WrapAwareHomeEnd; break; }
     case ID_TOGGLE_USE_TABS:    { 
       FXSpinner*spin=(FXSpinner*)(((FXCheckButton*)o)->getUserData());
       UseTabs = (bool)((FXival)p);
@@ -626,6 +627,7 @@ static const char* view_keys[] = {
 
 static const char* edit_keys[] = {
   "SmartHome",
+  "WrapAwareHomeEnd",
   "AutoIndent",
   "BraceMatch",
   "UseTabs",
@@ -808,6 +810,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadIntRng(SplitView,0,SPLIT_NONE,SPLIT_BESIDE);
   ReadInt(OutputPaneHeight,64);
   ReadInt(SmartHome,false);
+  ReadInt(WrapAwareHomeEnd,false);
   ReadInt(BraceMatch,true);
   ReadInt(UseTabs,true);
   ReadInt(CaretPastEOL,false);
@@ -973,6 +976,7 @@ Settings::~Settings()
   WriteInt(ShowLineNumbers);
   WriteInt(ShowToolbar);
   WriteInt(SmartHome);
+  WriteInt(WrapAwareHomeEnd);
   WriteInt(AutoIndent);
   WriteInt(BraceMatch);
   WriteInt(UseTabs);

@@ -57,6 +57,7 @@ private:
   unsigned char need_backup:1;
   unsigned char need_styled:1;
   unsigned char _utf8:1;
+  unsigned char smart_home:1;
 protected:
   SciDoc(){}
   inline bool IsBrace(long &pos);
@@ -183,6 +184,7 @@ public:
   int GetPropertyInt(const char*key, int default_value);
   void SetWordWrap(bool on);
   bool GetWordWrap();
+  void SetWrapAware(bool aware);
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
