@@ -294,23 +294,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       delete tab;
       return false;
     }
-    if (FXPath::extension(fn)=="h") { // Is header C or C++ ?
-      FXString fnbase=FXPath::stripExtension(fn);
-      // Check for matching source file and set language accordingly if found...
-      if (FXStat::exists(fnbase+".c")) {
-        sci->setLanguage("c");
-      } else if (FXStat::exists(fnbase+".cpp")||FXStat::exists(fnbase+".cxx")||FXStat::exists(fnbase+".cc")) {
-        sci->setLanguage("cpp");
-      } else {
-        // Take a wild guess - if the file contains the word "class" it's probably  C++
-        const char *content=(const char*)(sci->sendMessage(SCI_GETCHARACTERPOINTER,0,0));
-        if (FXRex("\\<class\\>").match(content)) {
-          sci->setLanguage("cpp");
-        } else {
-          sci->setLanguage("c");
-        }
-      }
-    } else {
+    if (!sci->SetLanguageForHeader(fn)) {
       if (!sci->setLanguageFromFileName(FXPath::name(fn).text())) {
         sci->setLanguageFromContent();
       }

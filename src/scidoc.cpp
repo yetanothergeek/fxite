@@ -342,8 +342,10 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
     if (fh.close() && (wrote==len)) {
       if (as_itself) {
         if (_filename.empty() && !getLanguage()) {
-          if (!setLanguageFromFileName(FXPath::name(filename).text())) {
-            setLanguageFromContent();
+          if (!SetLanguageForHeader(filename)) {
+            if (!setLanguageFromFileName(FXPath::name(filename).text())) {
+              setLanguageFromContent();
+            }
           }
         }
         _filename=FXPath::absolute(filename);
@@ -442,6 +444,36 @@ bool SciDoc::setLanguageFromFileName(const char*ext)
 {
   return setLanguage(GetLangFromDocName(ext));
 }
+
+
+// Try to guess if a *.h file is C or C++, return FALSE if file is not *.h, TRUE otherwise.
+bool SciDoc::SetLanguageForHeader(const FXString &fn)
+{
+  if (FXPath::extension(fn)=="h") { 
+    FXString fnbase=FXPath::stripExtension(fn);
+    // Check for matching source file and set language accordingly if found...
+    if (FXStat::exists(fnbase+".c")) {
+      setLanguage("c");
+    } else if (FXStat::exists(fnbase+".cpp")||FXStat::exists(fnbase+".cxx")||FXStat::exists(fnbase+".cc")) {
+      setLanguage("cpp");
+    } else {
+      // Take a wild guess - if the file contains the word "class" it's probably  C++
+      const char *content=(const char*)(sendMessage(SCI_GETCHARACTERPOINTER,0,0));
+      if (FXRex("\\<class\\>").match(content)) {
+        setLanguage("cpp");
+      } else {
+        setLanguage("c");
+      }
+    } 
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+
+
 
 
 /*

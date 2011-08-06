@@ -82,6 +82,7 @@ public:
   bool setLanguage(LangStyle*ls);
   bool setLanguageFromFileName(const char*ext);
   bool setLanguageFromContent();
+  bool SetLanguageForHeader(const FXString &filename);
   LangStyle* getLanguage() { return _lang; }
   static void DefaultStyles(StyleDef*styles);
   static StyleDef* DefaultStyles();
