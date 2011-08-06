@@ -13,8 +13,8 @@ of external commands.
 
 Despite these extra bells-and-whistles, there are still
 some important NEdit features currently missing from FXiTe:
-multiple-document search-and-replace, word wrap, paragraph
-reformatting, and multiple bookmarks, to name a few.
+multiple-document search-and-replace, paragraph reformatting,
+and multiple bookmarks, to name a few.
 
 Another design goal of this project was to create a single,
 standalone executable program that can be statically linked to
