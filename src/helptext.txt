@@ -422,6 +422,25 @@ systems or ===CR/LF=== for MS-Windows) but you can change the default format for
 transform the line endings in the current document into a different format from the %%%Edit->File Format%%% menu.
 
 
+By default, __APP__ does not wrap long lines of text. You can enable line wrapping \
+for a single document with the %%%Edit->Word Warp%%% checkbox, or you can make it the default \
+using the option in the %%%Edit->Preferences->editor%%% dialog. If you enable line wrapping, \
+lines wider than the window width are continued on the following lines. Lines are broken \
+after space or tab characters or between runs of different styles. If this is not possible \
+because a word in one style is wider than the window then the break occurs after the last \
+character that completely fits on the line. The horizontal scroll bar does not appear \
+when wrap mode is on.
+
+The behaviour of the [Home] and [End] keys can be altered with the "%%%Wrap-aware home/end keys%%%" \
+option in the Preferences dialog. When this option is off, the [Home] and [End] keys will move \
+the caret to the very beginning or end of the ///actual/// line, whether or not the line is \
+wrapped over multiple lines in the display. When the option is enabled, the caret moves to \
+the end of the current ///display/// line if you press [End] once, or to the very end of the \
+///actual/// line if you press [End] again. Likewise, the [Home] key moves first to the \
+beginning of the ///display/// line, then on to the ///actual/// beginning of the line.
+
+
+
 ###Character Sets and Encodings###
 
 When you open a file in __APP__, it first scans the file's contents and tries to determine \
