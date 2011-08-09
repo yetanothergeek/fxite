@@ -33,6 +33,7 @@
 #include <time.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if defined(__CYGWIN__)

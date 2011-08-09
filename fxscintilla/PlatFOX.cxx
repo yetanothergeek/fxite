@@ -300,6 +300,7 @@ public:
 
   void SetUnicodeMode(bool unicodeMode_);
   virtual void SetDBCSMode(int /* codePage */) {}
+  virtual void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage);
 };
 
 SurfaceImpl * SurfaceImpl::s_dc_owner = NULL;
@@ -738,6 +739,11 @@ Surface *Surface::Allocate() {
   return new SurfaceImpl;
 }
 
+void SurfaceImpl::DrawRGBAImage( PRectangle rc, int width, int height, 
+                               const unsigned char *pixelsImage) {
+
+}
+
 Window::~Window() {}
 
 void Window::Destroy() {
@@ -913,6 +919,7 @@ public:
     doubleClickActionData = data;
   }
   virtual void SetList(const char* list, char separator, char typesep);
+  virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage);
 };
 
 
@@ -1204,6 +1211,11 @@ void ListBoxFox::SetList(const char* items, char separator, char typesep) {
   }
 }
 
+void ListBoxFox::RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) {
+
+}
+
+
 // ====================================================================
 // ListBox
 // ====================================================================
@@ -1220,6 +1232,7 @@ ListBox * ListBox::Allocate()
 {
   return new ListBoxFox();
 }
+
 
 // ====================================================================
 // Menu
