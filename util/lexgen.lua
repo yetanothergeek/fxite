@@ -4,6 +4,7 @@ require "util/wildcards"
 require "util/wordlist"
 require "util/htmlstyle"
 require "util/markdownstyle"
+require "util/latexstyle"
 
 
 filetypes.cpp="*.cc|*.cpp|*.cxx|*.hh|*.hpp|*.hxx|*.ipp|*.sma"
@@ -120,6 +121,16 @@ function defstyle(state)
     else 
       return "_DEFLT_FG","Normal"
     end
+  end
+  if (lextag=="SCLEX_LATEX") then
+    local lx_index=(lx_vals["SCE_L_"..state] or -1)+1
+    local tbl=latex[lx_index]
+    if (tbl) then
+      return tbl[1], (state:find("COMMENT") and "Italic" or tbl[3]), tbl[2]
+    else
+      return "_DEFLT_FG","Normal"
+    end
+
   end
   if (lextag=="SCLEX_MAKEFILE") and state:find("IDENTIFIER")
   then

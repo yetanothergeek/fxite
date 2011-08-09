@@ -24,6 +24,7 @@ local wordlist_lua  = temp_dir .. "wordlist.lua"
 local wildcards_lua = temp_dir .. "wildcards.lua"
 local htmlstyle_lua = temp_dir .. "htmlstyle.lua"
 local markdownstyle_lua = temp_dir .. "markdownstyle.lua"
+local latexstyle_lua = temp_dir .. "latexstyle.lua"
 
 
 -- Create a table from the string STR, by splitting it at each DELIM
@@ -315,7 +316,7 @@ function print_html_styles()
     end
   end
   io.write("}\n")
-  io.write('hypertext={}')
+  io.write('hypertext={}\n')
 
   for line in io.open(props_dir.."html.properties"):lines() do
     if line:find("^style\.hypertext\.%d+[ \t]*=") then
@@ -372,6 +373,40 @@ function print_markdown_styles()
   )
 end --print_markdown_styles()
 
+function print_latex_styles()
+  io.output(latexstyle_lua)
+  io.write('lx_vals={\n')
+  for line in io.open("./fxscintilla/Scintilla.iface"):lines() do
+    if line:find("^val[ \t]+SCE_L_")
+    then
+      io.write((line:gsub("val[ \t]+","")), ',\n')
+    end
+  end
+  io.write("}\n")
+  io.write('latex={}\n')
+
+  for line in io.open(props_dir.."latex.properties"):lines() do
+    if line:find("^style\.latex\.%d+[ \t]*=") then
+      local n=line:match("^style\.latex\.(%d+).*") or 0
+      s=line:gsub("^style\.latex\.%d+[ \t]*=[ \t]*","")
+      s=s:gsub("[ \t]", "")
+      local t=split(s,',')
+      local fg="_DEFLT_FG"
+      local bg="_DEFLT_BG"
+      local sty="Normal"
+      for i,v in ipairs(t) do
+        if v:find("^fore:#%x+$") then
+          fg='"'..v:gsub("^fore:", "")..'"'
+        elseif v:find("^back:#%x+$") then
+          bg='"'..v:gsub("^back:", "")..'"'
+        elseif v:find("bold") then
+          sty="Bold"
+        end
+      end
+      io.write(string.format("latex[%d]={'%s','%s','%s'}\n", n+1, fg, bg, sty))
+    end
+  end
+end --print_latex_styles()
 
 function create_headers()
   if os.execute("mkdir -p "..lang_dir) ~= 0 then os.exit(1) end
@@ -467,6 +502,7 @@ function cleanup()
   os.remove (wildcards_lua)
   os.remove (htmlstyle_lua)
   os.remove (markdownstyle_lua)
+  os.remove (latexstyle_lua)
 end
 
 
@@ -474,6 +510,7 @@ print_words()
 print_types()
 print_html_styles()
 print_markdown_styles()
+print_latex_styles()
 create_headers()
 cleanup()
 

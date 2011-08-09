@@ -21,6 +21,7 @@ static StyleDef lua_style[] = {
   { "word6", SCE_LUA_WORD6, _WORD1_FG, _DEFLT_BG, Bold },
   { "word7", SCE_LUA_WORD7, _WORD1_FG, _DEFLT_BG, Bold },
   { "word8", SCE_LUA_WORD8, _WORD1_FG, _DEFLT_BG, Bold },
+  { "label", SCE_LUA_LABEL, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
