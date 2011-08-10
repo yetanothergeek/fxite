@@ -85,6 +85,7 @@ public:
 
   // From FXScrollArea
   virtual void create();
+  virtual void destroy();
   virtual bool canFocus() const;
 
   virtual FXint getViewportWidth();

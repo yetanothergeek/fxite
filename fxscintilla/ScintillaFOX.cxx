@@ -820,6 +820,11 @@ void FXScintilla::create()
   if(getApp()->hasInputMethod()){createComposeContext();}
 }
 
+void FXScintilla::destroy()
+{
+  if(getApp()->hasInputMethod()){destroyComposeContext();}
+  FXScrollArea::destroy();
+}
 
 bool FXScintilla::canFocus() const
 {
