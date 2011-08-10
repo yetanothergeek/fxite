@@ -817,6 +817,7 @@ void FXScintilla::create()
   if(!utf8Type){utf8Type=getApp()->registerDragType(utf8TypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
   dropEnable();
+  if(getApp()->hasInputMethod()){createComposeContext();}
 }
 
 
