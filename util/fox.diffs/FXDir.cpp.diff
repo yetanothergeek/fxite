@@ -1,5 +1,5 @@
---- ../fox-1.7.25.orig/lib/FXDir.cpp	2010-09-17 20:59:29.000000000 -0500
-+++ ./lib/FXDir.cpp	2010-12-02 03:08:53.000000000 -0600
+--- ../fox-1.7.29.orig/lib/FXDir.cpp	2011-06-27 23:30:29.000000000 -0500
++++ ./lib/FXDir.cpp	2011-08-09 22:34:24.000000000 -0500
 @@ -172,12 +172,16 @@
  FXbool FXDir::create(const FXString& path,FXuint perm){
    if(!path.empty()){

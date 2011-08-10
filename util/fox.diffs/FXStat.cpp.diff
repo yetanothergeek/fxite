@@ -1,5 +1,5 @@
---- ../fox-1.7.27.orig/lib/FXStat.cpp	2011-06-27 23:30:29.000000000 -0500
-+++ ./lib/FXStat.cpp	2011-06-30 15:42:14.000000000 -0500
+--- ../fox-1.7.29.orig/lib/FXStat.cpp	2011-07-26 09:01:41.000000000 -0500
++++ ./lib/FXStat.cpp	2011-08-09 22:34:24.000000000 -0500
 @@ -198,7 +198,7 @@
    info.fileIndex=0;
    info.fileSize=0;
@@ -9,7 +9,7 @@
  #ifdef UNICODE
      FXnchar unifile[MAXPATHLEN];
      HANDLE hfile;
-@@ -257,18 +257,36 @@
+@@ -255,18 +255,36 @@
  #else
      const FXTime seconds=1000000000;
      struct stat data;
@@ -47,7 +47,7 @@
        info.userNumber=data.st_uid;
        info.groupNumber=data.st_gid;
        info.linkCount=data.st_nlink;
-@@ -475,7 +493,7 @@
+@@ -471,7 +489,7 @@
  // Return true if file exists
  FXbool FXStat::exists(const FXString& file){
    if(!file.empty()){
