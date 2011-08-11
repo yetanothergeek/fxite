@@ -1,3 +1,82 @@
+2011-08-10
+  * Support for compose keys (aka "dead keys") input method in FOX >= 1.7.29.
+  * Cleaner exit from application if invalid command line option is found.
+
+
+2011-08-09
+  * Update to Scintilla-2.28 from HG 3828:118f544099e7.
+
+
+2011-08-06
+  * Fix language detection when saving a newly-created  *.h  file.
+  * Install basic icon and desktop files for freedesktop.org integration.
+
+
+2011-08-04
+  * Make zoom factor persistent.
+  * The config directory location referred to in the help text was incorrect for FOX-1.7.
+  * Added a "soft" line-wrapping option.
+
+
+2011-08-03
+  * Don't append trailing newline when inserting output of external commands/filters.
+  * Added the ability to set tab widths on a per-language basis.
+  * Remove some clutter from syntax dialog.
+
+
+2011-07-23
+  * Fix problem with "File not found" dialog not grabbing the focus as it should.
+  * Avoid a SIGABRT crash when selection is requested from destroyed text field.
+  * Configuration setting for maximum width of document tab titles.
+  * Rework code for setting initial window size; remember screen dimensions.
+  * Made highlighting of active document tab more subtle.
+
+
+2011-07-01
+  * Changes to compile with FOX-1.7.27 snapshot from June 29, 2011.
+
+
+2011-06-20
+  * Improve international keyboard support in UTF-8 mode.
+
+
+2011-06-16
+  * Fixed a possible crash when a file is neither 7-bit/ASCII nor UTF-8.
+
+
+2011-05-28
+  * Fixed a crash in "Open Selected" command when caret is at end of document.
+
+
+2011-05-27
+  * Added "Modula" syntax option to "Legacy" language menu.
+  * Update to Scintilla-2.26 from HG 3676:45219ddfa50c.
+  * Fixed a compiler error with older FOX versions.
+
+
+2011-05-26
+  * Reverted the ifdef for MINIX, because FOX handles the condition now.
+
+
+2011-04-29
+  * Moved FXList handling out of CmdIO object, let application take care of it.
+
+
+2011-04-28
+  * Adjust RGB/BGR color ordering for latest FOX snapshot.
+
+
+2011-04-09
+  * Use Windows' GetTempPath() function for temp file directory on win32.
+  * Avoid possible stack overflow in CmdIO object.
+  * Distinguish between stdout and stderr in event handler for CmdIO object.
+
+
+2011-03-13
+  * Added line-oriented event routine to CmdIO class.
+  * Speed up appending lines to ouput pane.
+
+
 2011-03-10
   * VERSION 0.7 RELEASE.
 
