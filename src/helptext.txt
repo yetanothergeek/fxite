@@ -1142,6 +1142,12 @@ the output at the current insertion point.
 The %%%Execute Command%%%  menu item prompts you for an external command and deposits \
 the output into a message window ( called the "output pane" ) below the current document. 
 
+Note that the items above are intended for capturing the output of short-lived commands like \
+text processors and compilers, they are not recommended for spawning interactive programs \
+or other lengthy processes. If you just want to launch some other application such as a file \
+manager or terminal emulator, it would be better to use the  ===os.execute()===  function from \
+the built-in Lua interpreter.
+
 By default, __APP__ uses  '===/bin/sh -c==='  to execute external commands, this can be \
 changed via:
   %%%Edit->Preferences->general->Shell command%%%
