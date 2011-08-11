@@ -536,7 +536,10 @@ interpretation of tab characters is eight characters (probably dating back to \
 mechanical capabilities of the original teletype), which is usually too coarse \
 for a single indent. __APP__ allows you to change the interpretation of the tab \
 character by setting the hardware tab distance in %%%Edit->Preferences->\
-Editor->Tab Width%%%. 
+Editor->Tab Width%%%. You can also set the tab width on a per-language basis \
+by selecting a language in %%%Edit->Preferences->Syntax%%% and changing the \
+%%%Tab width%%% there to something other than zero.
+
 
 Changing the meaning of the tab character makes programming much easier while \
 you're in the editor, but can cause you headaches outside of the editor, \
