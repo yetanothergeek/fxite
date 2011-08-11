@@ -343,7 +343,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
           }
           if (sock_name.empty()) {
             fxwarning(_("Option -s requires an argument.\n"));
-            return;
+            ::exit(1);
           }
           break;
         }
@@ -362,8 +362,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
         }
         default: {
           fxwarning(_("Unrecognized option: -%c\n"), argv[i][1]);
-          usage(argv[0]);
-          return;
+          ::exit(1);
         }
       }
     }
