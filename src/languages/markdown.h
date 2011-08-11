@@ -44,7 +44,8 @@ static LangStyle LangMarkdown = {
   (char*)markdown_mask,
   (char*)markdown_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

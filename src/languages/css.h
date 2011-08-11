@@ -55,7 +55,8 @@ static LangStyle LangCSS = {
   (char*)css_mask,
   (char*)css_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

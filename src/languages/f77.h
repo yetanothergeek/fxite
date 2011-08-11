@@ -42,7 +42,8 @@ static LangStyle LangF77 = {
   (char*)f77_mask,
   (char*)f77_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

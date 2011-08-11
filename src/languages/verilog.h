@@ -43,7 +43,8 @@ static LangStyle LangVerilog = {
   (char*)verilog_mask,
   (char*)verilog_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

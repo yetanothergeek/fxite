@@ -141,7 +141,8 @@ static LangStyle LangHTML = {
   (char*)html_mask,
   (char*)html_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

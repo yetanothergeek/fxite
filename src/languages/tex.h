@@ -37,7 +37,8 @@ static LangStyle LangTeX = {
   (char*)tex_mask,
   (char*)tex_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

@@ -28,7 +28,8 @@ static LangStyle LangProperties = {
   (char*)properties_mask,
   (char*)properties_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

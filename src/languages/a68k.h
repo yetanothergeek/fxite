@@ -49,7 +49,8 @@ static LangStyle LangA68k = {
   (char*)a68k_mask,
   (char*)a68k_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

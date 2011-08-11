@@ -42,7 +42,8 @@ static LangStyle LangPython = {
   (char*)python_mask,
   (char*)python_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

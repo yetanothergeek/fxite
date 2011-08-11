@@ -27,7 +27,8 @@ static LangStyle LangC = {
   (char*)c_mask,
   (char*)c_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

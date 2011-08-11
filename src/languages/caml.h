@@ -43,7 +43,8 @@ static LangStyle LangCaml = {
   (char*)caml_mask,
   (char*)caml_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

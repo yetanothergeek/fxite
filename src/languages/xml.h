@@ -27,7 +27,8 @@ static LangStyle LangXML = {
   (char*)xml_mask,
   (char*)xml_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

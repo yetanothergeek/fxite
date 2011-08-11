@@ -48,7 +48,8 @@ static LangStyle LangModula = {
   (char*)modula_mask,
   (char*)modula_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

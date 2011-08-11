@@ -59,7 +59,8 @@ static LangStyle LangRuby = {
   (char*)ruby_mask,
   (char*)ruby_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

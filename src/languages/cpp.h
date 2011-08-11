@@ -51,7 +51,8 @@ static LangStyle LangCpp = {
   (char*)cpp_mask,
   (char*)cpp_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

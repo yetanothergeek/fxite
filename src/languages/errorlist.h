@@ -44,7 +44,8 @@ static LangStyle LangErrorList = {
   (char*)errorlist_mask,
   (char*)errorlist_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

@@ -48,7 +48,8 @@ static LangStyle LangAsm = {
   (char*)asm_mask,
   (char*)asm_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

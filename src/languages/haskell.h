@@ -39,7 +39,8 @@ static LangStyle LangHaskell = {
   (char*)haskell_mask,
   (char*)haskell_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

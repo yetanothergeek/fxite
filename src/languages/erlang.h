@@ -56,7 +56,8 @@ static LangStyle LangErlang = {
   (char*)erlang_mask,
   (char*)erlang_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

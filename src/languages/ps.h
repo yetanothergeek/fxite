@@ -45,7 +45,8 @@ static LangStyle LangPS = {
   (char*)ps_mask,
   (char*)ps_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

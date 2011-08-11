@@ -46,7 +46,8 @@ static LangStyle LangVHDL = {
   (char*)vhdl_mask,
   (char*)vhdl_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

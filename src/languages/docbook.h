@@ -28,7 +28,8 @@ static LangStyle LangDocbook = {
   (char*)docbook_mask,
   (char*)docbook_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

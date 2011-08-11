@@ -60,7 +60,8 @@ static LangStyle LangPerl = {
   (char*)perl_mask,
   (char*)perl_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

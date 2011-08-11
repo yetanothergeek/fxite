@@ -41,7 +41,8 @@ static LangStyle LangR = {
   (char*)r_mask,
   (char*)r_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

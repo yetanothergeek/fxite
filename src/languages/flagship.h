@@ -61,7 +61,8 @@ static LangStyle LangFlagShip = {
   (char*)flagship_mask,
   (char*)flagship_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

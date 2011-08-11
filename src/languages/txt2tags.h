@@ -48,7 +48,8 @@ static LangStyle LangTxt2tags = {
   (char*)txt2tags_mask,
   (char*)txt2tags_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

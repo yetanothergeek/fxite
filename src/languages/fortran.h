@@ -42,7 +42,8 @@ static LangStyle LangFortran = {
   (char*)fortran_mask,
   (char*)fortran_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

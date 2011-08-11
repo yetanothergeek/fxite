@@ -40,7 +40,8 @@ static LangStyle LangPascal = {
   (char*)pascal_mask,
   (char*)pascal_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

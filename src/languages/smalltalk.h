@@ -42,7 +42,8 @@ static LangStyle LangSmalltalk = {
   (char*)smalltalk_mask,
   (char*)smalltalk_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

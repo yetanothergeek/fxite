@@ -36,7 +36,8 @@ static LangStyle LangConf = {
   (char*)conf_mask,
   (char*)conf_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

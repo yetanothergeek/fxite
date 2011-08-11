@@ -27,7 +27,8 @@ static LangStyle LangJava = {
   (char*)java_mask,
   (char*)java_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

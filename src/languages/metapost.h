@@ -33,7 +33,8 @@ static LangStyle LangMetapost = {
   (char*)metapost_mask,
   (char*)metapost_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

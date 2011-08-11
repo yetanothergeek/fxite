@@ -37,7 +37,8 @@ static LangStyle LangAda = {
   (char*)ada_mask,
   (char*)ada_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

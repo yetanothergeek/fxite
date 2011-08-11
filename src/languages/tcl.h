@@ -54,7 +54,8 @@ static LangStyle LangTCL = {
   (char*)tcl_mask,
   (char*)tcl_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

@@ -54,7 +54,8 @@ static LangStyle LangSQL = {
   (char*)sql_mask,
   (char*)sql_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

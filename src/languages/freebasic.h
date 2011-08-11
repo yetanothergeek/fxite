@@ -28,7 +28,8 @@ static LangStyle LangFreebasic = {
   (char*)freebasic_mask,
   (char*)freebasic_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

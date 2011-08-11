@@ -53,7 +53,8 @@ static LangStyle LangLua = {
   (char*)lua_mask,
   (char*)lua_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

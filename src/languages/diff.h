@@ -30,7 +30,8 @@ static LangStyle LangDiff = {
   (char*)diff_mask,
   (char*)diff_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

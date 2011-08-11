@@ -29,7 +29,8 @@ static LangStyle LangMakeFile = {
   (char*)makefile_mask,
   (char*)makefile_apps,
   0,
-  TABS_ALWAYS
+  TABS_ALWAYS,
+  0
 };
 
 

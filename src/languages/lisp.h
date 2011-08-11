@@ -38,7 +38,8 @@ static LangStyle LangLisp = {
   (char*)lisp_mask,
   (char*)lisp_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

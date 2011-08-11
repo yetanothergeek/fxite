@@ -39,7 +39,8 @@ static LangStyle LangBash = {
   (char*)bash_mask,
   (char*)bash_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

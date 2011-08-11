@@ -54,7 +54,8 @@ static LangStyle LangD = {
   (char*)d_mask,
   (char*)d_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

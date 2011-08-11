@@ -261,9 +261,10 @@ print(string.format("  (char*)%s_mask,",lexname_lower))
 print(string.format("  (char*)%s_apps,",lexname_lower))
 print(              "  0,")
 print( (lextag=="SCLEX_MAKEFILE")
-       and          "  TABS_ALWAYS"
-       or           "  TABS_DEFAULT"
+       and          "  TABS_ALWAYS,"
+       or           "  TABS_DEFAULT,"
      )
+print(              "  0")
 print(              "};\n\n")
 
 

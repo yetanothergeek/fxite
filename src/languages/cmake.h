@@ -42,7 +42,8 @@ static LangStyle LangCMAKE = {
   (char*)cmake_mask,
   (char*)cmake_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

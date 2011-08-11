@@ -27,7 +27,8 @@ static LangStyle LangJavascript = {
   (char*)javascript_mask,
   (char*)javascript_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

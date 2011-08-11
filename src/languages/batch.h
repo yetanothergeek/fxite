@@ -34,7 +34,8 @@ static LangStyle LangBatch = {
   (char*)batch_mask,
   (char*)batch_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 

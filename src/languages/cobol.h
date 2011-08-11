@@ -27,7 +27,8 @@ static LangStyle LangCOBOL = {
   (char*)cobol_mask,
   (char*)cobol_apps,
   0,
-  TABS_DEFAULT
+  TABS_DEFAULT,
+  0
 };
 
 
