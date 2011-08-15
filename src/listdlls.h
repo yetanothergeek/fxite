@@ -23,8 +23,8 @@ typedef int (ListDllsCallback)(const char*name, void*user_data);
 /*
   List all DLL files listed in the IMPORTS section of a Windows executable (PE) file.
   The callback will be called once for each DLL listed, passing the name of the DLL
-  and the user_data pointer (user_data can be anything you wish, or NULL). 
-  The DLL name might be upper, lower, or even mixed case, and some DLL names might 
+  and the user_data pointer (user_data can be anything you wish, or NULL).
+  The DLL name might be upper, lower, or even mixed case, and some DLL names might
   even be listed more than once.
   Return value is one of the LISTDLL_* codes above.
 */

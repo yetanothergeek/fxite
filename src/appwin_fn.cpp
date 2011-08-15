@@ -343,7 +343,7 @@ bool TopWindow::IsCommandReady()
       _("Multiple commands cannot be executed at the same time."));
     return false;
   }
-  if (!temp_accels) { 
+  if (!temp_accels) {
     FXMessageBox::error(this, MBOX_OK, _("Command support disabled"),
       _("Support for running macros and external commands has been\n"
         "disabled, because the interrupt key sequence is invalid.\n\n"
@@ -564,7 +564,7 @@ void TopWindow::AdjustIndent(SciDoc*sci, char ch)
   getApp()->runWhileEvents();
   long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
   long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
-  CharAdded(sci,line,pos,ch); 
+  CharAdded(sci,line,pos,ch);
 }
 
 
@@ -574,7 +574,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
   if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
   if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
   switch (ch) {
-    case '\r': { 
+    case '\r': {
       if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
     }
     case '\n': {
@@ -595,7 +595,7 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
         if (eolmode==SC_EOL_CRLF) { prev_pos--; }
         int prev_char=sci->sendMessage(SCI_GETCHARAT,prev_pos,0);
         if (prev_char=='{') {
-          if (sci->sendMessage(SCI_GETCHARAT,pos,0)=='}') { 
+          if (sci->sendMessage(SCI_GETCHARAT,pos,0)=='}') {
             sci->sendString(SCI_INSERTTEXT,pos,
               (eolmode==SC_EOL_LF)?"\n":(eolmode==SC_EOL_CRLF)?"\r\n":"\r");
             sci->SetLineIndentation(line+1,prev_indent);
@@ -668,7 +668,7 @@ static void GetFilenameFromSelection(TopWindow*tw,SciDoc*sci, FXString &filename
       FXuint n = eol ? (eol-xsel) : xlen;
       filename.assign((FXchar*)xsel,n);
       filename=filename.simplify();
-      if (!FXStat::exists(filename.contains(':')?filename.section(':',0):filename)) { 
+      if (!FXStat::exists(filename.contains(':')?filename.section(':',0):filename)) {
         filename=FXString::null;
       }
       break;

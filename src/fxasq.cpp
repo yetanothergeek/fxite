@@ -164,7 +164,7 @@ int FxAsqWin::Run(FxAsqItem**results)
       }
     }
   }
-  if (focused_btn>=0) { 
+  if (focused_btn>=0) {
     FXint i=0;
     for (FXWindow*btn=btnbox->getFirst(); btn; btn=btn->getNext()) {
       if (i==focused_btn) {

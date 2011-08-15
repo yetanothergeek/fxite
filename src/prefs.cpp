@@ -72,7 +72,7 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
   switch FXSELID(sel) {
     case ID_TOGGLE_SMART_HOME:  { SmartHome = !SmartHome; break; }
     case ID_TOGGLE_WRAP_AWARE:  { WrapAwareHomeEnd = !WrapAwareHomeEnd; break; }
-    case ID_TOGGLE_USE_TABS:    { 
+    case ID_TOGGLE_USE_TABS:    {
       FXSpinner*spin=(FXSpinner*)(((FXCheckButton*)o)->getUserData());
       UseTabs = (bool)((FXival)p);
       if (UseTabs) {
@@ -365,7 +365,7 @@ static const char* sysincs_sect="SystemIncludes";
 #define MAX_SYSINC_PATHS 255
 
 
-static const FXchar* DefaultSysIncs = 
+static const FXchar* DefaultSysIncs =
   "/usr/include\n"
 #ifdef __minix
   "/usr/pkg/include\n"
@@ -424,7 +424,7 @@ static void ReadSysIncPaths(FXSettings*reg)
     for (int i=0; i<MAX_SYSINC_PATHS; i++) {
       char key[16];
       snprintf(key, sizeof(key)-1 ,"Path_%d", i+1);
-      if (reg->existingEntry(sysincs_sect,key)) { 
+      if (reg->existingEntry(sysincs_sect,key)) {
         const char* value=reg->readStringEntry(sysincs_sect,key,NULL);
         if (value && *value) {
           SysIncs+=value;
@@ -842,7 +842,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadInt(DefaultToAscii,!LocaleIsUTF8());
   ReadInt(DefaultToSbcs,true);
   ReadIntRng(KeepFileFilter,REMEMBER_NEVER,REMEMBER_NEVER,REMEMBER_ALWAYS);
-  if (KeepFileFilter==REMEMBER_ALWAYS) { 
+  if (KeepFileFilter==REMEMBER_ALWAYS) {
     ReadInt(FileFilterIndex,0);
   } else {
     FileFilterIndex=0;

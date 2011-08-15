@@ -264,7 +264,7 @@ DescListDlg::DescListDlg( FXWindow* w, const char* name,
   setPadRight(0);
   setPadBottom(0);
 
-  if (intro) { 
+  if (intro) {
     intro_label=new FXLabel(this,intro, NULL, JUSTIFY_LEFT|FRAME_GROOVE|LAYOUT_FILL_X);
     intro_label->setPadLeft(4);
     intro_label->setPadRight(4);

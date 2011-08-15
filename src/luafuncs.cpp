@@ -432,7 +432,7 @@ static int _delete(lua_State* L)
       }
       break;
     }
-    default: { 
+    default: {
       mode=luaL_checkoption(L,1,"char",modes);
       count=luaL_checkint(L,2);
     }
@@ -585,7 +585,7 @@ static int insert(lua_State*L)
       sci->sendString(SCI_REPLACESEL,0,txt);
     }
     const char*eos=strchr(txt,'\0')-1;
-    if (('\n'==*eos)||('\r'==*eos)) { // indent if new line  
+    if (('\n'==*eos)||('\r'==*eos)) { // indent if new line
       tw->AdjustIndent(sci,*eos);
     }
   } else {  // ordinary insertion without auto-indent

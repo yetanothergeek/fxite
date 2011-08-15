@@ -34,7 +34,7 @@
 #include "sl.h"
 
 
-/* 
+/*
   If INI_NUMERIC_SORT is defined, keys with embedded integers are sorted in
   natural decimal order, for instance Key_9 will come before Key_10.
 */
@@ -43,7 +43,7 @@
 
 
 /*
-  This getline() doesn't behave exactly like the GNU version, 
+  This getline() doesn't behave exactly like the GNU version,
   but it should be close enough for this purpose...
 */
 #ifndef HAVE_GETLINE
@@ -179,10 +179,10 @@ static void free_section(void *p)
 
 
 /*
-  There is nothing fancy about the parser. It expects the file to be 
+  There is nothing fancy about the parser. It expects the file to be
   "well formed" -- any line that begins with '[' is considered as a
   section header, any other non-empty line is regarded as a key=value
-  line under the current section. This means if you feed it a file 
+  line under the current section. This means if you feed it a file
   that contains comment lines, you can expect to get a mess in return!
 */
 int ini_sort(const char *filename)

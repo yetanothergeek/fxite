@@ -35,13 +35,13 @@ Steps to adding a new preference:
 
 typedef struct _StyleDef StyleDef;
 
-typedef enum { 
+typedef enum {
   AUTO_INDENT_NONE=0,
   AUTO_INDENT_BASIC,
   AUTO_INDENT_SMART
 } AutoIndentPolicy;
 
-typedef enum { 
+typedef enum {
   REMEMBER_NEVER=0,
   REMEMBER_SESSION,
   REMEMBER_ALWAYS

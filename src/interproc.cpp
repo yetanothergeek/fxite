@@ -50,7 +50,7 @@ static FXHash Servers;
 static FXHash Clients;
 
 void InterProc::MakeAtoms()
-{    
+{
   FXString strTopic;
   FXString strApplication;
   if (DdeTopic.empty()) {
@@ -77,7 +77,7 @@ void InterProc::KillAtoms()
 
 
 /*
-The InterProc object should never be a client and server at the same time, else we would be 
+The InterProc object should never be a client and server at the same time, else we would be
 communicating with ourself, which is pointless. But problems arise when the same application
 has one object acting as a client and another as a server, how can dispatchEvent() know which
 object it is dealing with? The solution is to make dispatchEvent() into a static method, and
@@ -97,7 +97,7 @@ When iMsg is WM_DDE_ACK:
   Else If we don't find the InterProc object in the Conversations table:
     The wParam contains the remote server id, we can find the InterProc object via the
     Servers table. After we find it, we must remove server id from the table.
-  
+
 */
 
 
@@ -288,7 +288,7 @@ void InterProc::StartServer(FXTopWindow *win, FXObject*trg, FXSelector sel)
 
 
 void InterProc::StopServer()
-{  
+{
   LocalServerID=0;
   target=NULL;
   message=0;

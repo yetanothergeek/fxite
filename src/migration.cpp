@@ -29,7 +29,7 @@
 #include "appname.h"
 
 
-static void AppendError(FXString &errors, const char*err, const FXString &filename) 
+static void AppendError(FXString &errors, const char*err, const FXString &filename)
 {
   FXString tmp;
   tmp.format("\n%s (%s): %s", err, SystemErrorStr(), filename.text());

@@ -64,8 +64,8 @@ public:
   };
   // For max_desc_len, max_item_len, max_items: zero means unlimited.
   // For max_desc_len: (-1) creates an item list only, no descriptions.
-  DescListDlg( FXWindow* w, const char*name, const char*hdr2, 
-               const char*howto, const char*intro=NULL, 
+  DescListDlg( FXWindow* w, const char*name, const char*hdr2,
+               const char*howto, const char*intro=NULL,
                int max_desc_len=0, int max_item_len=0, int max_items=0, bool browse_btn=false);
   virtual void create();
 };

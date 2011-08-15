@@ -1391,7 +1391,7 @@ static bool AvoidMultiLineCommand(TopWindow*w, const FXString &cmd)
     FXMessageBox::error(w, MBOX_OK, _("Command Error"),
       _("Multiline commands are not supported."));
     return false;
-  } else { 
+  } else {
     return true;
   }
 }
@@ -1415,7 +1415,7 @@ long TopWindow::onFilterSel(FXObject*o, FXSelector sel, void*p)
   if ( dlg->execute(PLACEMENT_OWNER) ) {
     FXString cmd=dlg->getText();
     if (AvoidMultiLineCommand(this, cmd)) {
-      if ( (!save_first) || SaveAll(true) ) { 
+      if ( (!save_first) || SaveAll(true) ) {
         FXString input="";
         if (is_filter) { sci->GetSelText(input); }
         FilterSelection(sci, cmd, input);

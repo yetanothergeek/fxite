@@ -183,7 +183,7 @@ void SciDoc::AdjustHScroll()
   }
   FXint pos=sendMessage(SCI_GETLINEENDPOSITION,line,0);
   FXint x=sendMessage(SCI_POINTXFROMPOSITION,0,pos);
-  if (sendMessage(SCI_GETSCROLLWIDTH,0,0)<x) { 
+  if (sendMessage(SCI_GETSCROLLWIDTH,0,0)<x) {
     sendMessage(SCI_SETSCROLLWIDTH,x,0);
   }
 }
@@ -332,7 +332,7 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
   _lasterror="";
   if (fh.isOpen()) {
     FXbool en=isEnabled();
-    FXbool hf=hasFocus();  
+    FXbool hf=hasFocus();
     if (en) { disable(); }
     FXint len=sendMessage(SCI_GETLENGTH,0,0);
     const char*buf=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
@@ -449,7 +449,7 @@ bool SciDoc::setLanguageFromFileName(const char*ext)
 // Try to guess if a *.h file is C or C++, return FALSE if file is not *.h, TRUE otherwise.
 bool SciDoc::SetLanguageForHeader(const FXString &fn)
 {
-  if (FXPath::extension(fn)=="h") { 
+  if (FXPath::extension(fn)=="h") {
     FXString fnbase=FXPath::stripExtension(fn);
     // Check for matching source file and set language accordingly if found...
     if (FXStat::exists(fnbase+".c")) {
@@ -464,7 +464,7 @@ bool SciDoc::SetLanguageForHeader(const FXString &fn)
       } else {
         setLanguage("c");
       }
-    } 
+    }
     return true;
   } else {
     return false;
@@ -1178,7 +1178,7 @@ void SciDoc::SetWordWrap(bool on)
     ((getScrollStyle()&~HSCROLLER_ALWAYS)|HSCROLLER_NEVER):
     ((getScrollStyle()&~HSCROLLER_NEVER)|HSCROLLER_ALWAYS)
   );
-  slave(SetWordWrap,on);  
+  slave(SetWordWrap,on);
 }
 
 
@@ -1193,8 +1193,8 @@ bool SciDoc::GetWordWrap()
 
 
 #define AssignKey(key,mods,cmd) sendMessage(SCI_ASSIGNCMDKEY, \
-	        LongFromTwoShorts(static_cast<short>(key), \
-	                static_cast<short>(mods)), cmd);
+            LongFromTwoShorts(static_cast<short>(key), \
+                    static_cast<short>(mods)), cmd);
 
 void SciDoc::SetWrapAware(bool aware)
 {

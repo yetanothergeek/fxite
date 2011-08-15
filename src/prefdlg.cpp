@@ -1207,7 +1207,7 @@ void PrefsDialog::MakeEditorTab()
 
   chk->setUserData((void*)spin);
   chk->setCheck(prefs->UseTabs, TRUE);
-  
+
   new FXHorizontalSeparator(column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
   new FXLabel(column, _("Default search options:"));
   srchopts=new SciSearchOptions(column, prefs,Settings::ID_SET_SEARCH_OPTS);

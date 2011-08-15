@@ -32,7 +32,7 @@ the drop-down box for File Open and File Save dialogs.\
 
 
 FileFiltersDlg::FileFiltersDlg(FXWindow* w):
-  DescListDlg( w, _("File dialog filters"), 
+  DescListDlg( w, _("File dialog filters"),
                _("File mask"),_("File masks:   (separated by comma)"), file_filter_intro)
 {
   before=Settings::instance()->FileFilters;
@@ -54,7 +54,7 @@ bool FileFiltersDlg::Verify(FXString&item)
 
 void FileFiltersDlg::RestoreAppDefaults()
 {
-  setText(Settings::defaultFileFilters()); 
+  setText(Settings::defaultFileFilters());
 }
 
 
@@ -93,11 +93,11 @@ const FXString& FileFiltersDlg::getText()
 
 FXuint FileFiltersDlg::execute(FXuint placement)
 {
-  if (DescListDlg::execute(placement)) { 
+  if (DescListDlg::execute(placement)) {
     FXString filters=getText();
     filters.substitute('|', '\n', true);
     Settings::instance()->FileFilters=filters.text();
-    return true;    
+    return true;
   } else {
     return false;
   }
@@ -125,7 +125,7 @@ ErrPatDlg::ErrPatDlg(FXWindow* w):
     before+='\t';
     before+=ep[i].pat;
     before+='\n';
-  } 
+  }
   desc_max_len=sizeof(ep->id)-1;
   item_max_len=sizeof(ep->pat)-1;
   items_max=Settings::MaxErrorPatterns();
@@ -181,7 +181,7 @@ void ErrPatDlg::RestoreAppDefaults()
     txt+=ep[i].pat;
     txt+='\n';
   }
-  setText(txt); 
+  setText(txt);
 }
 
 
@@ -189,7 +189,7 @@ void ErrPatDlg::RestoreAppDefaults()
 FXuint ErrPatDlg::execute(FXuint placement)
 {
   ErrorPattern *ep=Settings::ErrorPatterns();
-  if (DescListDlg::execute(placement)) { 
+  if (DescListDlg::execute(placement)) {
     FXString txt=getText();
     for (FXint i=0; (i<Settings::MaxErrorPatterns()); i++) {
       if (i<txt.contains('\n')) {
@@ -201,10 +201,10 @@ FXuint ErrPatDlg::execute(FXuint placement)
         ep[i].pat[0]=0;
       }
     }
-    return true;    
+    return true;
   } else {
     return false;
-  }  
+  }
 }
 
 
@@ -285,10 +285,10 @@ bool SysIncDlg::Browse(FXString &text)
 
 FXuint SysIncDlg::execute(FXuint placement)
 {
-  if (DescListDlg::execute(placement)) { 
+  if (DescListDlg::execute(placement)) {
     Settings::SystemIncludePaths(after);
-    return true;    
+    return true;
   } else {
     return false;
-  }  
+  }
 }

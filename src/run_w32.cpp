@@ -57,7 +57,7 @@ static void WinErrMsg(FXString &err, const char*msg, int code) {
   SafeClose(StdERR_Wr); \
   SafeClose(stdinFD); \
   SafeClose(stdoutFD); \
-  SafeClose(stderrFD); 
+  SafeClose(stderrFD);
 
 
 #define CleanupAndReturn(s,b) \
@@ -67,7 +67,7 @@ static void WinErrMsg(FXString &err, const char*msg, int code) {
 
 
 /*
-  For most console-based commands, we want to use the CREATE_NO_WINDOW flag with 
+  For most console-based commands, we want to use the CREATE_NO_WINDOW flag with
   CreateProcess() to keep that annoying black window from flashing on the screen.
   But the problem with CREATE_NO_WINDOW is: if the launched application normally
   creates a GUI window, the window doesn't get created, so the application can't
@@ -77,11 +77,11 @@ static void WinErrMsg(FXString &err, const char*msg, int code) {
 */
 int ListDllsCB(const char*name, void*user_data)
 {
-  if (   (strncasecmp(name, "gdi",    3)==0) 
+  if (   (strncasecmp(name, "gdi",    3)==0)
       || (strncasecmp(name, "comctl", 6)==0)
       || (strncasecmp(name, "comdlg", 6)==0)
       || (strncasecmp(name, "msvbvm", 6)==0)
-  ) 
+  )
   {
     *((bool*)user_data)=true;
     return 0;
@@ -108,13 +108,13 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
     static char myname[MAX_PATH+1]="\0";
     if  (!myname[0]) { GetModuleFileName(NULL,myname,MAX_PATH); }
     if (strcasecmp(myname,exename)==0) { // Trying to execute myself results in a deadlock!
-      FXMessageBox::error(win, MBOX_OK, _("Command error"), 
+      FXMessageBox::error(win, MBOX_OK, _("Command error"),
         _("%s is not able to launch itself."), FXPath::title(exename).text());
       return 0;
     }
     FXString ext = cmdline[0]=='"'?cmdline.section('"',1):cmdline.section(' ',0);
     ext=FXPath::extension(ext).lower();
-    if ((!ext.empty())&&(ext!="exe")&&(ext!="bat")&&(ext!="com")) { 
+    if ((!ext.empty())&&(ext!="exe")&&(ext!="bat")&&(ext!="com")) {
       // If the file is not executable, run the associated application instead.
       cmdline.prepend("\" ");
       cmdline.prepend(exename);
@@ -129,7 +129,7 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
     }
     if (isgui) {
       flags=0;
-      si.dwFlags &= ~STARTF_USESHOWWINDOW;    
+      si.dwFlags &= ~STARTF_USESHOWWINDOW;
     }
   }
   return CreateProcess(NULL,cmdline.text(),NULL,NULL,TRUE,flags,NULL,NULL,&si,pi);
@@ -237,7 +237,7 @@ bool CmdIO::run(const char *command, bool*canceler)
     if (!SetupHandle(stdinFD)) { CleanupAndReturn("setting up stdin", false); }
     DWORD dwRetVal = GetTempPath(MAX_PATH, TempDir);
     if ((dwRetVal==0)||(dwRetVal>MAX_PATH)) {
-      CleanupAndReturn("retrieving name of temporary directory", false); 
+      CleanupAndReturn("retrieving name of temporary directory", false);
     }
     if (!GetTempFileName(TempDir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
     if (!GetTempFileName(TempDir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }

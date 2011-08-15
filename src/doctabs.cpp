@@ -91,14 +91,14 @@ static FXColor shade(FXColor c, bool brighten, bool istext, FXColor other)
   FXfloat h=0, s=0, v=0; // H is 0..360; S is 0..1; V is 0..255
   FXfloat r=FXREDVAL(c), g=FXGREENVAL(c), b=FXBLUEVAL(c);
   FXfloat d=.07;
-  fxrgb_to_hsv(h,s,v,r,g,b);  
+  fxrgb_to_hsv(h,s,v,r,g,b);
   if (brighten) {
     if (istext) {
       if ( brighten && (brightness(c)>brightness(other))) { d=.10; }
     } else {
       if (v>240) {
         if (s>0.50) { s=0.50; }
-      } else { 
+      } else {
         if (v<84) { v=84; }
         if (v<160) { d=.10; }
       }

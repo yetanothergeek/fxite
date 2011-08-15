@@ -249,7 +249,7 @@ void AppClass::CreateConfigDir()
   if (IsWin9x()) {
     if (!IsDir(newconfig)) {
       FXString homedir_cfg=FXSystem::getEnvironment("HOME");
-      if (!homedir_cfg.empty()) { 
+      if (!homedir_cfg.empty()) {
         homedir_cfg+=config_tail;
         homedir_cfg.substitute('/',PATHSEP,true);
       }

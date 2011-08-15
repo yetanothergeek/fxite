@@ -616,7 +616,7 @@ void TopWindow::VersionInfo()
     fxversion[0],fxversion[1],fxversion[2],
     FXScintilla::version().text(),
     LUA_RELEASE);
-  
+
 }
 
 void TopWindow::About()
@@ -650,10 +650,10 @@ void TopWindow::About()
         delete dlg;
         break;
       }
-      case 1: { 
+      case 1: {
         dlg=new FxAsqWin(_("About Lua"), btn);
         dlg->Label(Lua_License);
-  #ifdef FOX_1_6 
+  #ifdef FOX_1_6
         dlg->Label(Lua_License_2);
   #endif
         dlg->Run();

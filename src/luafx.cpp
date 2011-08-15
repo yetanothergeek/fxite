@@ -569,7 +569,7 @@ static int pid(lua_State* L)
 #else
   lua_pushnumber(L,fxgetpid());
 #endif
-  
+
   return(1);
 }
 

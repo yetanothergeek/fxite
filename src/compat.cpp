@@ -10,7 +10,7 @@ bool IsDir(const FXString &dn)
 {
   if (dn.empty()) { return false; }
   struct stat st;
-  if (strchr("/\\", dn[dn.length()-1])) { 
+  if (strchr("/\\", dn[dn.length()-1])) {
     FXString tmp=dn.text();
     tmp.trunc(dn.length()-1);
     return ( (stat(tmp.text(),&st)==0) && S_ISDIR(st.st_mode) );
