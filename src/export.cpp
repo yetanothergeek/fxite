@@ -31,6 +31,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
 #include <Scintilla.h>
 #include <SciLexer.h>
 #include <FXScintilla.h>
+#include <FX88591Codec.h>
 
 #include "appname.h"
 #include "scidoc.h"
@@ -676,6 +677,10 @@ void SaveToPDF(SciDoc*sci,  FILE *fp)
         strcpy(pr.style[j].fore, pr.style[STYLE_DEFAULT].fore);
       }
     }
+  } else {
+    for (int i = 0; i <= STYLE_MAX; i++) {
+      strcpy(pr.style[i].fore, "0 0 0 ");
+    }
   }
 
 
@@ -691,6 +696,7 @@ void SaveToPDF(SciDoc*sci,  FILE *fp)
   if (!lengthDoc) {  // enable zero length docs
     pr.nextLine();
   } else {
+    FX88591Codec *codec = sci->GetUTF8() ? new FX88591Codec() : NULL;
     for (int i = 0; i < lengthDoc; i++) {
       char ch = sci->sendMessage(SCI_GETCHARAT,i,0);
       int style = sci->sendMessage(SCI_GETSTYLEAT,i,0);
@@ -711,10 +717,30 @@ void SaveToPDF(SciDoc*sci,  FILE *fp)
         lineIndex = 0;
       } else {
         // write the character normally...
+        if (codec) {
+          long charlen=sci->sendMessage(SCI_POSITIONAFTER,i,0)-i;
+          if ((charlen>1)&&(charlen<=8)) {
+            // PDF doesn't like UTF-8, try conversion to single-byte ISO-8859
+            char utf[9]="\0";
+            char asc[2]="\0";
+            Sci_TextRange tr;
+            tr.chrg.cpMin=i;
+            tr.chrg.cpMax=i+charlen;
+            tr.lpstrText=utf;
+            sci->sendMessage(SCI_GETTEXTRANGE, 0, reinterpret_cast<long>(&tr));
+            codec->utf2mb(asc, sizeof(asc), tr.lpstrText, charlen);
+            if (asc[0]&&!asc[1]) {
+              // Conversion succeeded: use our single byte and move past the multi-bytes
+              ch=asc[0];
+              i+=charlen-1;
+            }
+          }
+        }
         pr.add(ch, style);
         lineIndex++;
       }
     }
+    if (codec) { delete codec; }
   }
 
   // write required stuff and close the PDF file
