@@ -67,6 +67,36 @@ Text files (*.txt)|\
 static const char* default_file_filters = FILE_FILTERS;
 
 
+class EditorFontDlg: public FXFontDialog {
+private:
+  FXSpinner*ascent;
+  FXSpinner*descent;
+  class EditorFontSel: public FXFontSelector {
+    public:
+    FXHorizontalFrame* ActionArea() {
+      return static_cast<FXHorizontalFrame*>(accept->getParent());
+    }
+  };
+public:
+  EditorFontDlg(FXWindow*o):FXFontDialog(o, _("Select Font"), 0) {
+    FXHorizontalFrame*frm=((EditorFontSel*)fontbox)->ActionArea();
+    (new FXLabel(frm, _("Line Spacing:\n(in pixels)")))->setPadTop(0);
+    new FXLabel(frm, _("  Above:"));
+    ascent=new FXSpinner(frm,2,NULL,0,SPIN_NORMAL|FRAME_SUNKEN|FRAME_THICK);
+    new FXLabel(frm, _("  Below:"));
+    descent=new FXSpinner(frm,2,NULL,0,SPIN_NORMAL|FRAME_SUNKEN|FRAME_THICK);
+    ascent->setRange(0,16);
+    descent->setRange(0,16);
+  }
+  FXint getAscent() { return ascent->getValue(); }
+  FXint getDescent() { return descent->getValue(); }
+  void setAscent(FXint a) { ascent->setValue(a); }
+  void setDescent(FXint d) { descent->setValue(d); }
+};
+
+
+
+
 long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
 {
   switch FXSELID(sel) {
@@ -114,7 +144,9 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_SAVE_ON_INS_CMD:    { SaveBeforeInsCmd    = !SaveBeforeInsCmd;    break; }
     case ID_SAVE_ON_EXEC_CMD:   { SaveBeforeExecCmd   = !SaveBeforeExecCmd;   break; }
     case ID_CHOOSE_FONT: {
-      FXFontDialog dlg(((FXWindow*)o)->getShell(), _("Select Font"), 0);
+      EditorFontDlg dlg(((FXWindow*)o)->getShell());
+      dlg.setAscent(FontAscent);
+      dlg.setDescent(FontDescent);
 #ifdef WIN32 // Windows font dialog is empty, unless setwidth is zero.
       FXushort setwidth=fontdesc.setwidth;
       fontdesc.setwidth=0;
@@ -124,6 +156,8 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
         SetFontFromDialog(fontdesc,dlg);
         FontName=(FXchar*)(fontdesc.face);
         FontSize=fontdesc.size;
+        FontAscent=dlg.getAscent();
+        FontDescent=dlg.getDescent();
       }
 #ifdef WIN32
       else { fontdesc.setwidth=setwidth; }
@@ -644,6 +678,8 @@ static const char* edit_keys[] = {
   "FontName",
   "FontSize",
   "fontdesc",
+  "FontAscent",
+  "FontDescent",
   NULL
 };
 
@@ -875,6 +911,8 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadIntRng(TabTitleMaxWidth,ScreenWidth/6,0,ScreenWidth);
   LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),"");
   ReadInt(FontSize,120);
+  ReadIntRng(FontAscent,2,0,16);
+  ReadIntRng(FontDescent,0,0,16);
 
   if (reg->existingEntry(edit_sect,"FontName")) {
     ReadStr(FontName,"Fixed [Misc]");
@@ -1015,6 +1053,8 @@ Settings::~Settings()
   WriteInt(Maximize);
   reg->writeStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),LastFocused.text());
   WriteInt(FontSize);
+  WriteInt(FontAscent);
+  WriteInt(FontDescent);
   WriteInt(DefaultToAscii);
   WriteInt(DefaultToSbcs);
   WriteInt(KeepFileFilter);

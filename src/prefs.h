@@ -113,6 +113,8 @@ public:
   FXint OutputPaneHeight;
   FXString FontName;
   FXint FontSize;
+  FXuchar FontAscent;
+  FXuchar FontDescent;
   FXint Left,Top,Width,Height;
   FXint SearchWrap;
   FXbool SearchVerbose;

@@ -197,6 +197,8 @@ bool TopWindow::PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 void TopWindow::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
 {
   sci->setFont(prefs->fontdesc.face, prefs->fontdesc.size / 10);
+  sci->sendMessage(SCI_SETEXTRAASCENT,prefs->FontAscent,0);
+  sci->sendMessage(SCI_SETEXTRADESCENT,prefs->FontDescent,0);
   sci->CaretLineBG(prefs->caretlineStyle()->bg);
   sci->RightMarginBG(prefs->rightmarginStyle()->bg);
   sci->CaretWidth(prefs->CaretWidth);
