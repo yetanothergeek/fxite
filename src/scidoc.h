@@ -60,7 +60,10 @@ private:
   unsigned char smart_home:1;
 protected:
   SciDoc(){}
-  inline bool IsBrace(long &pos);
+  inline bool IsInsideBrace(long &pos);
+  inline bool IsOutsideBrace(long &pos);
+  inline bool IsAfterBrace(long &pos);
+  inline bool IsBrace(long &pos, int mode);
   void GetSelection(CharacterRange &crange);
   bool DoLoadFromFile(const char*filename,bool insert=false);
   void AdjustHScroll();

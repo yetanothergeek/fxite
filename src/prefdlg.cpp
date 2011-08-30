@@ -1189,8 +1189,17 @@ void PrefsDialog::MakeEditorTab()
   new FXButton(column, _(" Editor font... "), NULL, prefs, Settings::ID_CHOOSE_FONT, BUTTON_NORMAL|LAYOUT_CENTER_X);
 
   column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
-  chk=new FXCheckButton(column, _("Highlight matching braces"), prefs, Settings::ID_TOGGLE_BRACE_MATCH);
-  chk->setCheck(prefs->BraceMatch, FALSE);
+
+  spinframe=new FXHorizontalFrame(column);
+  new FXLabel(spinframe, _("Highlight matching braces\n(when caret is...)"));
+  list=new FXListBox(spinframe,prefs,Settings::ID_SET_BRACE_MATCHING,LIST_BOX_OPTS|LAYOUT_CENTER_Y);
+  list->appendItem(_("never"),NULL,NULL);
+  list->appendItem(_("inside"),NULL,NULL);
+  list->appendItem(_("outside"),NULL,NULL);
+  list->appendItem(_("on either side"),NULL,NULL);
+  list->appendItem(_("after"),NULL,NULL);
+  list->setNumVisible(list->getNumItems());
+  list->setCurrentItem(prefs->BraceMatch);
 
   chk=new FXCheckButton(column, _("Use tabs for indent"), prefs, Settings::ID_TOGGLE_USE_TABS);
 

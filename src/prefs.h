@@ -47,6 +47,14 @@ typedef enum {
   REMEMBER_ALWAYS
 } FileFilterPolicy;
 
+typedef enum {
+  BRACEMATCH_NONE=0,
+  BRACEMATCH_INSIDE,
+  BRACEMATCH_OUTSIDE,
+  BRACEMATCH_EITHER,
+  BRACEMATCH_AFTER,
+} BraceMatchPolicy;
+
 
 typedef struct _ErrorPattern {
   char pat[64];
@@ -83,7 +91,7 @@ public:
   FXulong SmartHome:1;
   FXulong WrapAwareHomeEnd:1;
 
-  FXulong BraceMatch:1;
+  FXulong BraceMatch:3;
   FXulong UseTabs:1;
   FXulong CaretPastEOL:1;
   FXulong WhitespaceShowsEOL:1;
@@ -162,7 +170,6 @@ public:
     ID_TOGGLE_SMART_HOME,
     ID_TOGGLE_WRAP_AWARE,
     ID_TOGGLE_USE_TABS,
-    ID_TOGGLE_BRACE_MATCH,
     ID_TOGGLE_ASK_CLOSE_MULTI_EXIT,
     ID_TOGGLE_ASK_CLOSE_MULTI_MENU,
     ID_TOGGLE_WATCH_EXTERN,
@@ -198,6 +205,7 @@ public:
     ID_SET_SEARCH_OPTS,
     ID_SET_KEEP_FILE_FILTER,
     ID_SET_TAB_TITLE_MAX_WIDTH,
+    ID_SET_BRACE_MATCHING,
     ID_SET_AUTO_INDENT,
     ID_LAST
   };

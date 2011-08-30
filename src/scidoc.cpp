@@ -376,15 +376,19 @@ bool SciDoc::GtLtIsBrace()
 }
 
 
+#define IsCloser(c) ((c)&&(strchr(_closers,(c))))
+#define IsOpener(c) ((c)&&(strchr(_openers,(c))))
 
-inline bool SciDoc::IsBrace(long &pos)
+inline bool SciDoc::IsInsideBrace(long &pos)
 {
   char ThisBrace=sendMessage(SCI_GETCHARAT,pos,0);
-  if (!strchr(_closers,ThisBrace)) {
-     ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
-     if (strchr(_openers,ThisBrace)) { pos--;} else {
-       return false;
-     }
+  if (!IsCloser(ThisBrace)) {
+    ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
+    if (IsOpener(ThisBrace)) {
+      pos--;
+    } else {
+      return false;
+    }
   }
   int charwidth = sendMessage(SCI_POSITIONAFTER,pos,0)-sendMessage(SCI_POSITIONBEFORE,pos,0);
   return ((charwidth>=2)||((pos==0)&&(charwidth==1)));
@@ -392,13 +396,73 @@ inline bool SciDoc::IsBrace(long &pos)
 
 
 
+inline bool SciDoc::IsOutsideBrace(long &pos)
+{
+  char ThisBrace=sendMessage(SCI_GETCHARAT,pos,0);
+  if (!IsOpener(ThisBrace)) {
+    ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
+    if (IsCloser(ThisBrace)) {
+      if (sendMessage(SCI_GETCURRENTPOS,0,0)==pos) { pos--; }
+    } else {
+      return false;
+    }
+  }
+  int charwidth = sendMessage(SCI_POSITIONAFTER,pos,0)-sendMessage(SCI_POSITIONBEFORE,pos,0);
+  return ((charwidth>=2)||((pos==0)&&(charwidth==1)));
+}
+
+
+
+inline bool SciDoc::IsAfterBrace(long &pos)
+{
+  if (pos<=0) { return false; }
+  char ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
+  if (IsOpener(ThisBrace)||IsCloser(ThisBrace)) {
+    pos--;
+  } else {
+    return false;
+  }
+  int charwidth = sendMessage(SCI_POSITIONAFTER,pos,0)-sendMessage(SCI_POSITIONBEFORE,pos,0);
+  return ((charwidth>=2)||((pos==0)&&(charwidth==1)));
+}
+
+
+
+inline bool SciDoc::IsBrace(long &pos, int mode)
+{
+  switch (mode) {
+    case BRACEMATCH_INSIDE:  { return IsInsideBrace(pos); }
+    case BRACEMATCH_OUTSIDE: { return IsOutsideBrace(pos); }
+    case BRACEMATCH_EITHER:  { return (IsOutsideBrace(pos)||IsInsideBrace(pos)); }
+    case BRACEMATCH_AFTER:   { return IsAfterBrace(pos); }
+    default: { return false; }
+  }
+}
+
+
+
 #define INVALID_RANGE 2147483647
+
+#define StyleAt(idx) (sendMessage(SCI_GETSTYLEAT,(idx),0))
 
 void SciDoc::MatchBrace()
 {
+  int mode=Settings::instance()->BraceMatch;
   long CurrPos=sendMessage(SCI_GETCURRENTPOS,0,0);
-  if (IsBrace(CurrPos)) {
+  if (true&&(CurrPos>0)&&(mode==BRACEMATCH_EITHER)) {
+    char ThisChar=sendMessage(SCI_GETCHARAT,CurrPos,0);
+    if (IsCloser(ThisChar)||IsOpener(ThisChar)) {
+      long PrevPos=sendMessage(SCI_POSITIONBEFORE,CurrPos,0);
+      char PrevChar=sendMessage(SCI_GETCHARAT,PrevPos,0);
+      if (IsCloser(PrevChar)||IsOpener(PrevChar)) { CurrPos=PrevPos; }
+    }
+  }
+  if (IsBrace(CurrPos,mode)) {
     int ThatBrace=sendMessage(SCI_BRACEMATCH,CurrPos,0);
+    if ((ThatBrace>=0)&&(StyleAt(ThatBrace)!=StyleAt(CurrPos))) {
+      sendMessage(SCI_COLOURISE,0,-1);
+      ThatBrace=sendMessage(SCI_BRACEMATCH,CurrPos,0);
+    }
     if (ThatBrace>=0) {
       sendMessage(SCI_BRACEHIGHLIGHT,CurrPos,ThatBrace);
     } else {

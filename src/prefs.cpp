@@ -116,7 +116,11 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       }
       break;
     }
-    case ID_TOGGLE_BRACE_MATCH: { BraceMatch = !BraceMatch; break; }
+    case ID_SET_BRACE_MATCHING: {
+      BraceMatch = (FXival)p;
+      LIMIT_RANGE(BraceMatch,BRACEMATCH_NONE,BRACEMATCH_AFTER);
+      break;
+    }
     case ID_TOGGLE_ASK_CLOSE_MULTI_MENU: { PromptCloseMultiMenu = !PromptCloseMultiMenu; break; }
     case ID_TOGGLE_ASK_CLOSE_MULTI_EXIT: { PromptCloseMultiExit = !PromptCloseMultiExit; break; }
     case ID_TOGGLE_WATCH_EXTERN:    { WatchExternChanges = !WatchExternChanges; break; }
@@ -847,7 +851,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadInt(OutputPaneHeight,64);
   ReadInt(SmartHome,false);
   ReadInt(WrapAwareHomeEnd,false);
-  ReadInt(BraceMatch,true);
+  ReadIntRng(BraceMatch,BRACEMATCH_EITHER,BRACEMATCH_NONE,BRACEMATCH_AFTER);
   ReadInt(UseTabs,true);
   ReadInt(CaretPastEOL,false);
   ReadIntRng(TabWidth,4,1,16);
