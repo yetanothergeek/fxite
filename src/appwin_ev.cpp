@@ -1002,10 +1002,27 @@ long TopWindow::onFileNew(FXObject*o, FXSelector sel, void*p )
 }
 
 
+class WkDirDlg: public FXDirDialog {
+private:
+  class DirSel: public FXDirSelector {
+    public:
+    FXDirList* list()  { return dirbox; }
+  };
+public:
+  WkDirDlg(FXWindow* win,const FXString& name):FXDirDialog(win,name) {}
+  void setDirectory(const FXString& path) {
+    FXDirDialog::setDirectory((FXPath::simplify(path)));
+    if (FXPath::isTopDirectory(getDirectory())) {
+      FXDirList*list=((DirSel*)dirbox)->list();
+      list->expandTree(list->getFirstItem());
+    }
+  }
+};
+
 
 long TopWindow::onSelectDir(FXObject*o, FXSelector sel, void*p)
 {
-  FXDirDialog dlg(this, _("Set Working Directory"));
+  WkDirDlg dlg(this, _("Set Working Directory"));
   dlg.setHeight(420);
   dlg.setDirectory(FXSystem::getCurrentDirectory()+PATHSEP);
   if (dlg.execute(PLACEMENT_OWNER)) {
