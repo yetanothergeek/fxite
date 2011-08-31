@@ -1062,7 +1062,7 @@ static int xsel(lua_State* L)
 static int uppercase(lua_State* L)
 {
   DOC_REQD
-  sci->sendMessage(SCI_UPPERCASE,0,0);
+  sci->SelectionToUpper();
   return 0;
 }
 
@@ -1071,7 +1071,7 @@ static int uppercase(lua_State* L)
 static int lowercase(lua_State* L)
 {
   DOC_REQD
-  sci->sendMessage(SCI_LOWERCASE,0,0);
+  sci->SelectionToLower();
   return 0;
 }
 

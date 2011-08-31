@@ -1625,8 +1625,16 @@ long TopWindow::onChangeCase(FXObject*o, FXSelector sel, void*p)
   SciDoc*sci=FocusedDoc();
   if (sci->GetSelLength()>0) {
     switch (FXSELID(sel)) {
-      case ID_TOUPPER: { sci->sendMessage(SCI_UPPERCASE,0,0); break; }
-      case ID_TOLOWER: { sci->sendMessage(SCI_LOWERCASE,0,0); break; }
+      case ID_TOUPPER: {
+        sci->SelectionToUpper();
+        if (recording==sci) { recorder->record(SCI_UPPERCASE,0,0); }
+        break;
+      }
+      case ID_TOLOWER: {
+        sci->SelectionToLower();
+        if (recording==sci) { recorder->record(SCI_LOWERCASE,0,0); }
+        break;
+      }
     }
   }
   return 1;

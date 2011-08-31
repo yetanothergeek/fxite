@@ -1288,3 +1288,41 @@ void SciDoc::SetWrapAware(bool aware)
     AssignKey(SCK_END, SCMOD_SHIFT, SCI_LINEENDEXTEND);
   }
 }
+
+
+
+void SciDoc::SetCaseOfSelection(int msg)
+{
+  FXString seltext;
+  long anchor=sendMessage(SCI_GETANCHOR,0,0);
+  long currentpos=sendMessage(SCI_GETCURRENTPOS,0,0);
+  sendMessage(SCI_TARGETFROMSELECTION,0,0);
+  GetSelText(seltext);
+  switch (msg) {
+    case SCI_UPPERCASE: {
+      seltext.upper();
+      break;
+    }
+    case SCI_LOWERCASE: {
+      seltext.lower();
+      break;
+    }
+  }
+  sendString(SCI_REPLACETARGET,seltext.length(),seltext.text());
+  sendMessage(SCI_SETSEL,anchor,currentpos);
+}
+
+
+
+void SciDoc::SelectionToUpper()
+{
+  SetCaseOfSelection(SCI_UPPERCASE);
+}
+
+
+
+void SciDoc::SelectionToLower()
+{
+  SetCaseOfSelection(SCI_LOWERCASE);
+}
+

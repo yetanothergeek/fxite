@@ -67,6 +67,7 @@ protected:
   void GetSelection(CharacterRange &crange);
   bool DoLoadFromFile(const char*filename,bool insert=false);
   void AdjustHScroll();
+  void SetCaseOfSelection(int msg);
 public:
   SciDoc*Master() { return (SciDoc*)getPrev(); }
   SciDoc*Slave() { return (SciDoc*)getNext(); }
@@ -189,6 +190,8 @@ public:
   void SetWordWrap(bool on);
   bool GetWordWrap();
   void SetWrapAware(bool aware);
+  void SelectionToUpper();
+  void SelectionToLower();
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
