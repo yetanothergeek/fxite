@@ -475,19 +475,41 @@ are also likely to produce undesirable results.
 ###Matching Parentheses###
 
 To help you inspect nested parentheses, brackets, and braces, __APP__ has an \
-automatic bracket-matching mode. When you type, or move the cursor directly \
-///after/// an "opening" character or directly ///before/// a "closing" \
-character, it highlights both the opening and closing characters in green. \
-If no matching character can be found, it highlights the mismatched \
-parenthesis, bracket, or brace in red. These colors can be changed by \
+automatic bracket-matching feature. This feature can be enabled or disabled \
+by choosing one of the modes in the "Highlight matching braces" list under \
+the %%%Editor%%% tab of the %%%Preferences%%% dialog.
+
+The following modes are available:
+
+ * %%%Never%%% -- This option disables the matching feature.
+
+ * %%%Inside%%% -- Highlighting occurs when the cursor is directly ///after/// \
+an "opening" character or directly ///before/// a "closing" character.
+
+ * %%%Outside%%% -- Highlighting occurs when the cursor is directly ///before/// \
+an "opening" character or directly ///after/// a "closing" character.
+
+ * %%%Either%%% -- Highlighting occurs when the cursor is directly adjacent to ///either/// side \
+of an opening ///or/// closing character.
+
+ * %%%After%%% -- Highlighting occurs when the cursor is directly to the right of \
+of an "opening" or "closing" character.
+
+
+When a match is found, the opening and closing characters are highlighted in green. \
+If no matching character can be found, the mismatched parenthesis, bracket, or brace \
+is highlighted in red. These colors can be changed by \
 editing the %%%bracelight%%% and %%%bracebad%%% styles under the %%%Syntax%%% \
-tab of the %%%Preferences%%% dialog, or you can disable bracket-matching \
-completely by unchecking the "Highlight matching braces" option under \
-the %%%Editor%%% tab.
+tab of the %%%Preferences%%% dialog.
 
 When syntax highlighting is enabled, the matching routines make use of the \
 syntax information for improved accuracy. In that case, a brace inside a \
 highlighted string will not match a brace inside a comment, for instance. 
+
+When using the "Either" or "Outside" modes, it is possible to have an eligible \
+character on both sides of the cursor. In these cases, the character on the \
+left-hand side of the cursor is favored.
+
 
 
 ###Opening Included Files###
