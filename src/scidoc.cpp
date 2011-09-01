@@ -398,12 +398,12 @@ inline bool SciDoc::IsInsideBrace(long &pos)
 
 inline bool SciDoc::IsOutsideBrace(long &pos)
 {
-  char ThisBrace=sendMessage(SCI_GETCHARAT,pos,0);
-  if (!IsOpener(ThisBrace)) {
-    ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
-    if (IsCloser(ThisBrace)) {
-      if (sendMessage(SCI_GETCURRENTPOS,0,0)==pos) { pos--; }
-    } else {
+  char ThisBrace=sendMessage(SCI_GETCHARAT,pos-1,0);
+  if (IsCloser(ThisBrace)) {
+    if (sendMessage(SCI_GETCURRENTPOS,0,0)==pos) { pos--; }
+  } else {
+    ThisBrace=sendMessage(SCI_GETCHARAT,pos,0);
+    if (!IsOpener(ThisBrace)) {
       return false;
     }
   }
