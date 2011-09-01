@@ -449,7 +449,7 @@ void SciDoc::MatchBrace()
 {
   int mode=Settings::instance()->BraceMatch;
   long CurrPos=sendMessage(SCI_GETCURRENTPOS,0,0);
-  if (true&&(CurrPos>0)&&(mode==BRACEMATCH_EITHER)) {
+  if ((CurrPos>0)&&(mode==BRACEMATCH_EITHER)) {
     char ThisChar=sendMessage(SCI_GETCHARAT,CurrPos,0);
     if (IsCloser(ThisChar)||IsOpener(ThisChar)) {
       long PrevPos=sendMessage(SCI_POSITIONBEFORE,CurrPos,0);
