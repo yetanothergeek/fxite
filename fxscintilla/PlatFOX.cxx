@@ -1262,7 +1262,8 @@ void Menu::Show(Point pt, Window &) {
   if ((pt.y + mid->getHeight()) > screenHeight) {
     pt.y = screenHeight - mid->getHeight();
   }
-  mid->popup(NULL, pt.x - 4, pt.y);
+  mid->popup(NULL, pt.x - 4, pt.y - 2);
+  mid->grabKeyboard();
   FXApp::instance()->runModalWhileShown(mid);
 }
 
