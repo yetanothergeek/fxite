@@ -1296,20 +1296,33 @@ void SciDoc::SetCaseOfSelection(int msg)
   FXString seltext;
   long anchor=sendMessage(SCI_GETANCHOR,0,0);
   long currentpos=sendMessage(SCI_GETCURRENTPOS,0,0);
-  sendMessage(SCI_TARGETFROMSELECTION,0,0);
-  GetSelText(seltext);
-  switch (msg) {
-    case SCI_UPPERCASE: {
-      seltext.upper();
-      break;
+  long selcount=sendMessage(SCI_GETSELECTIONS,0,0);
+  sendMessage(SCI_BEGINUNDOACTION, 0, 0);
+  for (long selnum=0; selnum<selcount; selnum++) {
+    Sci_TextRange trng;
+    trng.chrg.cpMin=sendMessage(SCI_GETSELECTIONNSTART,selnum,0);
+    trng.chrg.cpMax=sendMessage(SCI_GETSELECTIONNEND,selnum,0);
+    seltext.length((trng.chrg.cpMax-trng.chrg.cpMin)+1);
+    trng.lpstrText=&seltext[0];
+    sendMessage(SCI_GETTEXTRANGE,0,reinterpret_cast<long>(&trng));
+    seltext.length((trng.chrg.cpMax-trng.chrg.cpMin));
+    switch (msg) {
+      case SCI_UPPERCASE: {
+        seltext.upper();
+        break;
+      }
+      case SCI_LOWERCASE: {
+       seltext.lower();
+       break;
+      }
     }
-    case SCI_LOWERCASE: {
-      seltext.lower();
-      break;
-    }
+    sendMessage(SCI_SETTARGETSTART,trng.chrg.cpMin,0);
+    sendMessage(SCI_SETTARGETEND,trng.chrg.cpMax,0);
+    sendString(SCI_REPLACETARGET,seltext.length(),seltext.text());
   }
-  sendString(SCI_REPLACETARGET,seltext.length(),seltext.text());
-  sendMessage(SCI_SETSEL,anchor,currentpos);
+  sendMessage(SCI_SETCURRENTPOS,currentpos,0);
+  sendMessage(SCI_SETANCHOR,anchor,0);
+  sendMessage(SCI_ENDUNDOACTION, 0, 0);
 }
 
 
