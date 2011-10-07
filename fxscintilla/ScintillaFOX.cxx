@@ -619,10 +619,33 @@ void ScintillaFOX::CreateCallTipWindow(PRectangle  rc )
   }
 }
 
+
+
+class PopUpCmd: public FXMenuCommand {
+  FXDECLARE(PopUpCmd)
+  PopUpCmd() {}
+  protected:
+#ifdef FOX_1_6
+ FXlong CreationTime;
+#else
+ FXTime CreationTime;
+#endif
+public:
+  PopUpCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel):
+     FXMenuCommand(p,text,ic,tgt,sel), CreationTime(FXThread::time()) { }
+  long onButtonRelease(FXObject*o,FXSelector sel,void*p) {
+    return (FXThread::time()-CreationTime)<500000000 ? 1 : FXMenuCommand::onButtonRelease(o,sel,p);
+  }
+};
+FXDEFMAP(PopUpCmd) PopUpCmdMap[]={ FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,PopUpCmd::onButtonRelease) };
+FXIMPLEMENT(PopUpCmd,FXMenuCommand,PopUpCmdMap,ARRAYNUMBER(PopUpCmdMap));
+
+
+
 void ScintillaFOX::AddToPopUp(const char * label, int cmd, bool enabled)
 {
   if (label[0]) {
-    FXMenuCommand * item = new FXMenuCommand(static_cast<FXComposite *>(popup.GetID()), label, NULL, &_fxsc, SCID(cmd));
+    PopUpCmd* item = new PopUpCmd(static_cast<FXComposite *>(popup.GetID()), label, NULL, &_fxsc, SCID(cmd));
     if (!enabled)
       item->disable();
   }
