@@ -1,14 +1,14 @@
---- ../fox-1.7.29.orig/lib/FXDirList.cpp	2011-07-15 18:05:17.000000000 -0500
-+++ ./lib/FXDirList.cpp	2011-08-09 22:34:24.000000000 -0500
-@@ -980,6 +980,11 @@
+--- ../fox-1.7.31.orig/lib/FXDirList.cpp	2011-10-06 10:25:40.000000000 -0500
++++ ./lib/FXDirList.cpp	2011-10-20 07:47:38.000000000 -0500
+@@ -916,6 +916,11 @@
    // Path to parent node
    directory=getItemPathname(par);
  
 +#ifdef WIN32
 +  if ((directory.length()==3) && (directory[1]==':') && (directory[2]=='\\')) {
-+     directory.trunc(2);
-+  }
++    directory.trunc(2);
++    }
 +#endif
-   // Build new insert-order list
-   oldlist=par->list;
-   newlist=NULL;
+   // Managed to open directory
+   if(dir.open(directory)){
+ 
