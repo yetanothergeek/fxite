@@ -126,7 +126,7 @@ case $host_os in
     dnl #Tell Lua sources if we are on Linux
     AC_DEFINE(LUA_USE_LINUX)
     dnl #Fedora-13 needs explicit libdl, should be harmless otherwise
-    FOX_LIBS="${FOX_LIBS} -ldl"
+    LUA_LIBS="${LUA_LIBS} -ldl"
     PKG_CHECK_MODULES([X11],[x11])
   ;;
   *mingw*)
