@@ -180,7 +180,24 @@ static void usage(const char*prog)
 #ifdef WIN32
 long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
 {
-  ipc->dispatchEvent(hwnd,iMsg,wParam,lParam);
+  switch (iMsg) {
+      case WM_DDE_INITIATE:
+      case WM_DDE_EXECUTE:
+      case WM_DDE_ACK: {
+        ipc->dispatchEvent(hwnd,iMsg,wParam,lParam);
+        break;
+      }
+      case WM_DROPFILES: {
+        HDROP hdrop = reinterpret_cast<HDROP>(wParam);
+        int nFiles = ::DragQueryFile(hdrop, 0xffffffff, NULL, 0);
+        FXchar files[nFiles][MAX_PATH];
+        FXint i;
+        for (i=0; i<nFiles; ++i) { ::DragQueryFile(hdrop, i, files[i], sizeof(files[i])); }
+        ::DragFinish(hdrop);
+        for (i=0; i<nFiles; ++i) { mainwin->OpenFile(files[i], NULL, false, true); }
+        break;
+      }
+  }
   return FXApp::dispatchEvent(hwnd,iMsg,wParam,lParam);
 }
 #else

@@ -31,9 +31,75 @@ FXDEFMAP(DocTabs) DocTabsMap[]={
   FXMAPFUNC(SEL_COMMAND,DocTabs::ID_TAB_POPUP_MENU,DocTabs::onTabPopupMenu),
   FXMAPFUNC(SEL_COMMAND,DocTabs::ID_POPUP_CLICK,DocTabs::onPopupClick),
   FXMAPFUNC(SEL_COMMAND,DocTabs::ID_OPEN_ITEM,DocTabs::onCmdOpenItem),
+#ifndef WIN32
+  FXMAPFUNC(SEL_DND_ENTER, 0, DocTabs::onDnd),
+  FXMAPFUNC(SEL_DND_LEAVE, 0, DocTabs::onDnd),
+  FXMAPFUNC(SEL_DND_DROP, 0, DocTabs::onDnd),
+  FXMAPFUNC(SEL_DND_MOTION, 0, DocTabs::onDnd),
+#endif
 };
 
 FXIMPLEMENT(DocTabs,FXTabBook,DocTabsMap,ARRAYNUMBER(DocTabsMap));
+
+
+
+#ifdef WIN32
+# include <windows.h>
+void DocTabs::create()
+{
+  FXTabBook::create();
+  ::DragAcceptFiles((HWND)id(),true);
+}
+#else
+long DocTabs::onDnd(FXObject* sender,FXSelector sel, void*p)
+{
+  switch (FXSELTYPE(sel)) {
+    case SEL_DND_ENTER: {
+      setDragRectangle(0,0,width,height,FALSE);
+      if (offeredDNDType(FROM_DRAGNDROP,urilistType)) {
+        acceptDrop();
+        dnd_accept=true;
+      } else {
+        dnd_accept=false;
+      }
+      break;
+    }
+    case SEL_DND_LEAVE: {
+        dnd_accept=false;
+        break;
+    }
+    case SEL_DND_DROP: {
+      dnd_accept=false;
+      FXuchar*dnd_data=NULL;
+      FXuint size=0;
+      if (getDNDData(FROM_DRAGNDROP,urilistType,dnd_data,size)) {
+        if (dnd_data)  {
+          dnd_accept=false;
+          FXchar *p1, *p2;
+          for (p1=(FXchar*)dnd_data; p1&&*p1; p1=p2) {
+            p2=strchr(p1,'\r');
+            if (p2) {
+              FXString uri;
+              uri.assign(p1,p2-p1);
+              if (compare(uri, "file://",7)==0) { 
+                uri.erase(0,7);
+                TopWindow::instance()->OpenFile(uri.text(),NULL,false,true);
+              }
+              p2+=2;
+            }
+          }
+        }
+      }
+      break;
+    } 
+    case SEL_DND_MOTION:  {
+      if (dnd_accept) { acceptDrop(); }
+      break;
+    }
+  }
+  return 1;
+}
+#endif
 
 
 
@@ -70,6 +136,8 @@ DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   tab_width_max=0;
   tab_popup=new FXMenuPane(this);
   new FXMenuCommand(tab_popup,_("&Close"),NULL,this,ID_POPUP_CLICK);
+  dnd_accept=false;
+  dropEnable();
 }
 
 

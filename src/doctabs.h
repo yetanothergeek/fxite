@@ -52,6 +52,7 @@ private:
   void UpdateTabs();
   void MoveTab(FXint how);
   FXint tab_width_max;
+  bool dnd_accept;
   static bool UpdateTabWidths(FXint index, DocTab*tab, FXWindow*page, void*user_data);
 public:
   long onCmdOpenItem  ( FXObject* sender, FXSelector sel, void* p );
@@ -60,6 +61,11 @@ public:
   DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts);
   ~DocTabs();
 
+#ifdef WIN32
+  virtual void create();
+#else
+  long onDnd(FXObject* sender,FXSelector sel, void*p);
+#endif
   DocTab*NewTab(FXString text);
   DocTab*ActiveTab();
   FXWindow*ActivePage();
