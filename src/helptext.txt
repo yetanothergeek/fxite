@@ -57,6 +57,12 @@ click on %%%OK%%%.  To open several files at the same time, enable multi-file mo
 while clicking on the desired files with the mouse. Note that you can manually type or paste a \
 filename into the dialog when in single-file mode, but not in multi-file mode.
 
+You can also open files by dragging them from other applications such as file managers \
+(Thunar, Nautilus, XFE, Windows Explorer, etc.) and dropping them on the tab bar just above the \
+editing area. (The MS-Windows version of __APP__ also lets you drop files on the \
+editing area itself.)
+
+
 %%%Creating a New File%%%
 If you already have an empty (Untitled) window displayed, just begin typing in \
 the window.  To create a new Untitled window, choose %%%New%%% from the \
