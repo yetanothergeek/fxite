@@ -551,7 +551,8 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
         acceptDrop();
         dnd_accept=true;
       } else {
-        dnd_accept=false;
+          dnd_accept=false;
+         ((DocTabs*)getParent())->handle(sender,sel,p);
       }
       break;
     }
@@ -583,6 +584,8 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
             ((DocTabs*)getParent())->ActivateTab(src);
           }
         }
+      } else {
+        ((DocTabs*)getParent())->handle(sender,sel,p);
       }
       break;
     }
