@@ -250,6 +250,7 @@ void SciHelp::parse(const char*txt, unsigned int size)
   FXint end[3]={0,0,0};
   loaded=txt;
   const char *content=NULL;
+  getApp()->beginWaitCursor();
   freelists();
   sendMessage(SCI_SETREADONLY,false,0);
   sendMessage(SCI_CLEARALL,0,0);
@@ -324,6 +325,7 @@ void SciHelp::parse(const char*txt, unsigned int size)
     }
     while ( (sendMessage(SCI_GETSTYLEAT,p1,0)==style) && (p1<len) ) { p1++; }
   }
+  getApp()->endWaitCursor();
 }
 
 
