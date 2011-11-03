@@ -131,4 +131,5 @@ StyleContext.h \
 UniConversion.h \
 ViewStyle.h \
 WordList.h \
-XPM.h
+XPM.h \
+version.h

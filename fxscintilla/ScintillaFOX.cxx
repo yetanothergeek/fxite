@@ -592,7 +592,7 @@ FXIMPLEMENT(CallTipWindow,FXFrame,CallTipWindowMap,ARRAYNUMBER(CallTipWindowMap)
 long CallTipWindow::onPaint(FXObject*o, FXSelector sel, void*p)
 {
   long rv=FXFrame::onPaint(o,sel,p);  
-  Surface *surfaceWindow = Surface::Allocate();
+  Surface *surfaceWindow = Surface::Allocate(SC_TECHNOLOGY_DEFAULT);
   if (surfaceWindow) {
     surfaceWindow->Init(this, this);
     surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == ct->codePage);
@@ -729,7 +729,7 @@ void ScintillaFOX::SyncPaint(PRectangle rc) {
   paintingAllText = rcPaint.Contains(rcClient);
   //Platform::DebugPrintf("ScintillaGTK::SyncPaint %0d,%0d %0d,%0d\n",
   //  rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
-  Surface *sw = Surface::Allocate();
+  Surface *sw = Surface::Allocate(SC_TECHNOLOGY_DEFAULT);
   if (sw) {
     sw->Init(wMain.GetID(), wMain.GetID());
     Paint(sw, rcPaint);
@@ -751,7 +751,7 @@ void ScintillaFOX::FullPaint() {
   //  rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
   paintingAllText = true;
   if (wMain.GetID()) {
-    Surface *sw = Surface::Allocate();
+    Surface *sw = Surface::Allocate(SC_TECHNOLOGY_DEFAULT);
     if (sw) {
       sw->Init(wMain.GetID(), wMain.GetID());
       Paint(sw, rcPaint);

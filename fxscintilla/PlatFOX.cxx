@@ -70,90 +70,24 @@ Point Point::FromLong(long lpoint) {
     Platform::HighShortFromLong(lpoint));
 }
 
-Palette::Palette() {
-  used = 0;
-  allowRealization = false;
-  visual = 0;
-  size = 100;
-  entries = new ColourPair[size];
-}
-
-Palette::~Palette() {
-  Release();
-  delete []entries;
-  entries = 0;
-}
-
-void Palette::Release() {
-  used = 0;
-  delete []entries;
-  size = 100;
-  entries = new ColourPair[size];
-}
-
-#if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
-# define RGBSWAP(rgb) FXRGB(FXBLUEVAL(rgb),FXGREENVAL(rgb),FXREDVAL(rgb))
-#else
-# define RGBSWAP(rgb) (rgb)
-#endif
-
-// This method either adds a colour to the list of wanted colours (want==true)
-// or retrieves the allocated colour back to the ColourPair.
-// This is one method to make it easier to keep the code for wanting and retrieving in sync.
-void Palette::WantFind(ColourPair &cp, bool want) {
-  if (want) {
-    for (int i=0; i < used; i++) {
-      if (entries[i].desired == cp.desired)
-        return;
-    }
-  
-    if (used >= size) {
-      int sizeNew = size * 2;
-      ColourPair *entriesNew = new ColourPair[sizeNew];
-      for (int j=0; j<size; j++) {
-        entriesNew[j] = entries[j];
-      }
-      delete []entries;
-      entries = entriesNew;
-      size = sizeNew;
-    }
-    entries[used].desired = cp.desired;
-    entries[used].allocated.Set(RGBSWAP(cp.desired.AsLong()));
-    used++;
-  } else {
-    for (int i=0; i < used; i++) {
-      if (entries[i].desired == cp.desired) {
-        cp.allocated = entries[i].allocated;
-        return;
-      }
-    }
-    cp.allocated.Set(RGBSWAP(cp.desired.AsLong()));
-  }
-}
-
-void Palette::Allocate(Window & /* w */) {
-// <FIXME/>
-}
-
 Font::Font() : fid(0) {}
 
 Font::~Font() {}
 
 #ifndef WIN32
 
-void Font::Create(const char *faceName, int characterSet,
-  int size, bool bold, bool italic, int) {
+void Font::Create(const FontParameters &fp) {
   Release();
   // If name of the font begins with a '-', assume, that it is
   // a full fontspec.
-  if (faceName[0] == '-') {
-    fid = new FXFont(FXApp::instance(), faceName);
+  if (fp.faceName[0] == '-') {
+    fid = new FXFont(FXApp::instance(), fp.faceName);
   }
   else {
-        fid = new FXFont(FXApp::instance(), faceName, size,
-          bold ? FXFont::Bold : FXFont::Normal ,
-      italic ? FXFont::Italic : FXFont::Straight,
-      characterSet);
+        fid = new FXFont(FXApp::instance(), fp.faceName, fp.size,
+          fp.weight>400 ? FXFont::Bold : FXFont::Normal ,
+      fp.italic ? FXFont::Italic : FXFont::Straight,
+      fp.characterSet);
   }
   if (!fid) {
     // Font not available so substitute with the app default font.
@@ -264,37 +198,36 @@ public:
 
   void Release();
   bool Initialised();
-  void PenColour(ColourAllocated fore);
-  void BackColour(ColourAllocated back);
+  void PenColour(ColourDesired fore);
+  void BackColour(ColourDesired back);
   int LogPixelsY();
   int DeviceHeightFont(int points);
   void MoveTo(int x_, int y_);
   void LineTo(int x_, int y_);
-  void Polygon(Point *pts, int npts, ColourAllocated fore, ColourAllocated back);
-  void RectangleDraw(PRectangle rc, ColourAllocated fore, ColourAllocated back);
-  void FillRectangle(PRectangle rc, ColourAllocated back);
+  void Polygon(Point *pts, int npts, ColourDesired fore, ColourDesired back);
+  void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back);
+  void FillRectangle(PRectangle rc, ColourDesired back);
   void FillRectangle(PRectangle rc, Surface &surfacePattern);
-  void RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAllocated back);
-  void AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
-    ColourAllocated outline, int alphaOutline, int flags);
-  void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back);
+  void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back);
+  void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
+    ColourDesired outline, int alphaOutline, int flags);
+  void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back);
   void Copy(PRectangle rc, Point from, Surface &surfaceSource);
 
-  void DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
-  void DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
-  void DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
-  void DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
-  void MeasureWidths(Font &font_, const char *s, int len, int *positions);
-  int WidthText(Font &font_, const char *s, int len);
-  int WidthChar(Font &font_, char ch);
-  int Ascent(Font &font_);
-  int Descent(Font &font_);
-  int InternalLeading(Font &font_);
-  int ExternalLeading(Font &font_);
-  int Height(Font &font_);
-  int AverageCharWidth(Font &font_);
+  void DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourDesired fore);
+  void DrawTextNoClip(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len, ColourDesired fore, ColourDesired back);
+  void DrawTextClipped(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len, ColourDesired fore, ColourDesired back);
+  void DrawTextTransparent(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len, ColourDesired fore);
+  void MeasureWidths(Font &font_, const char *s, int len, XYPOSITION *positions);
+  XYPOSITION WidthText(Font &font_, const char *s, int len);
+  XYPOSITION WidthChar(Font &font_, char ch);
+  XYPOSITION Ascent(Font &font_);
+  XYPOSITION Descent(Font &font_);
+  XYPOSITION InternalLeading(Font &font_);
+  XYPOSITION ExternalLeading(Font &font_);
+  XYPOSITION Height(Font &font_);
+  XYPOSITION AverageCharWidth(Font &font_);
 
-  int SetPalette(Palette *pal, bool inBackGround);
   void SetClip(PRectangle rc);
   void FlushCachedState();
 
@@ -375,17 +308,23 @@ void SurfaceImpl::InitPixMap(int width, int height, Surface*, WindowID) {
   inited = true;
 }
 
-void SurfaceImpl::PenColour(ColourAllocated fore) {
+#if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
+# define SCI_TO_FOX_COLOR(cd) FXRGB(cd.GetBlue(), cd.GetGreen(), cd.GetRed())
+#else
+# define SCI_TO_FOX_COLOR(cd) FXRGB(cd.GetRed(), cd.GetGreen(), cd.GetBlue())
+#endif
+
+void SurfaceImpl::PenColour(ColourDesired fore) {
   if (dc()) {
     ColourDesired cd(fore.AsLong());
-    _dc->setForeground(FXRGB(cd.GetRed(), cd.GetGreen(), cd.GetBlue()));
+    _dc->setForeground(SCI_TO_FOX_COLOR(cd));
   }
 }
 
-void SurfaceImpl::BackColour(ColourAllocated back) {
+void SurfaceImpl::BackColour(ColourDesired back) {
   if (dc()) {
     ColourDesired cd(back.AsLong());
-    _dc->setBackground(FXRGB(cd.GetRed(), cd.GetGreen(), cd.GetBlue()));
+    _dc->setBackground(SCI_TO_FOX_COLOR(cd));
   }
 }
 
@@ -411,8 +350,8 @@ void SurfaceImpl::LineTo(int x_, int y_) {
   y = y_;
 }
 
-void SurfaceImpl::Polygon(Point *pts, int npts, ColourAllocated fore,
-                      ColourAllocated back) {
+void SurfaceImpl::Polygon(Point *pts, int npts, ColourDesired fore,
+                      ColourDesired back) {
   if (dc()) {
     FXPoint gpts[20];
     if (npts < static_cast<int>((sizeof(gpts)/sizeof(gpts[0])))) {
@@ -430,7 +369,7 @@ void SurfaceImpl::Polygon(Point *pts, int npts, ColourAllocated fore,
   }
 }
 
-void SurfaceImpl::RectangleDraw(PRectangle rc, ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) {
   if (dc()) {
     PenColour(fore);
     BackColour(back);
@@ -439,7 +378,7 @@ void SurfaceImpl::RectangleDraw(PRectangle rc, ColourAllocated fore, ColourAlloc
   }
 }
 
-void SurfaceImpl::FillRectangle(PRectangle rc, ColourAllocated back) {
+void SurfaceImpl::FillRectangle(PRectangle rc, ColourDesired back) {
   if (dc() && (rc.left < maxCoordinate)) {  // Protect against out of range
     // GTK+ rectangles include their lower and right edges
     rc.bottom--;
@@ -471,11 +410,11 @@ void SurfaceImpl::FillRectangle(PRectangle rc, Surface &surfacePattern) {
   } else {
     // Something is wrong so try to show anyway
     // Shows up black because colour not allocated
-    FillRectangle(rc, ColourAllocated(0));
+    FillRectangle(rc, ColourDesired(0));
   }
 }
 
-void SurfaceImpl::RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) {
   if (((rc.right - rc.left) > 4) && ((rc.bottom - rc.top) > 4)) {
     // Approximate a round rect with some cut off corners
     Point pts[] = {
@@ -514,8 +453,8 @@ static unsigned int GetBlue(unsigned int co) {
   return co & 0xff;
 }
 
-void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
-    ColourAllocated outline, int alphaOutline, int flags) {
+void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
+    ColourDesired outline, int alphaOutline, int flags) {
   if (dc()) {
     int width = rc.Width();
     int height = rc.Height();
@@ -552,7 +491,7 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated 
 }
 
 
-void SurfaceImpl::Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) {
   if (dc()) {
     PenColour(back);
     _dc->fillArc(rc.left, rc.top,
@@ -574,7 +513,7 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
   }
 }
 
-void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore)
+void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourDesired fore)
 {
   if (dc()) {
     PenColour(fore);
@@ -605,8 +544,8 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
   if (codecBuffer.length()) { codecBuffer=FXString::null; }
 }
 
-void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                       ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len,
+                       ColourDesired fore, ColourDesired back) {
   if (dc()) {
     FillRectangle(rc, back);
     DrawTextBase(rc, font_, ybase, s, len, fore);
@@ -615,17 +554,17 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 
 // On GTK+, exactly same as DrawText NoClip
 // <FIXME> what about FOX ? </FIXME>
-void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                       ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len,
+                       ColourDesired fore, ColourDesired back) {
   DrawTextNoClip(rc, font_, ybase, s, len, fore, back);
 }
 
-void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                                      ColourAllocated fore) {
+void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, XYPOSITION ybase, const char *s, int len,
+                                      ColourDesired fore) {
   DrawTextBase(rc, font_, ybase, s, len, fore);
 }
 
-void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positions) {
+void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, XYPOSITION *positions) {
   if (font_.GetID()) {
     int totalWidth = 0;
     if (unicodeMode) {
@@ -670,57 +609,51 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
   }
 }
 
-int SurfaceImpl::WidthText(Font &font_, const char *s, int len) {
+XYPOSITION SurfaceImpl::WidthText(Font &font_, const char *s, int len) {
   if (font_.GetID())
     return font_.GetID()->getTextWidth(s, len);
   else
     return 1;
 }
 
-int SurfaceImpl::WidthChar(Font &font_, char ch) {
+XYPOSITION SurfaceImpl::WidthChar(Font &font_, char ch) {
   if (font_.GetID())
     return font_.GetID()->getTextWidth(&ch, 1);
   else
     return 1;
 }
 
-int SurfaceImpl::Ascent(Font &font_) {
+XYPOSITION SurfaceImpl::Ascent(Font &font_) {
   if (!font_.GetID())
     return 1;
   return font_.GetID()->getFontAscent();
 }
 
-int SurfaceImpl::Descent(Font &font_) {
+XYPOSITION SurfaceImpl::Descent(Font &font_) {
   if (!font_.GetID())
     return 1;
   return font_.GetID()->getFontDescent();
 }
 
-int SurfaceImpl::InternalLeading(Font &) {
+XYPOSITION SurfaceImpl::InternalLeading(Font &) {
   return 0;
 }
 
-int SurfaceImpl::ExternalLeading(Font &) {
+XYPOSITION SurfaceImpl::ExternalLeading(Font &) {
   return 0;
 }
 
-int SurfaceImpl::Height(Font &font_) {
+XYPOSITION SurfaceImpl::Height(Font &font_) {
   if (!font_.GetID())
     return 1;
   return font_.GetID()->getFontHeight();
 }
 
-int SurfaceImpl::AverageCharWidth(Font &font_) {
+XYPOSITION SurfaceImpl::AverageCharWidth(Font &font_) {
   if (font_.GetID())
     return font_.GetID()->getTextWidth("n", 1);
   else
     return 1;
-}
-
-int SurfaceImpl::SetPalette(Palette *, bool) {
-  // Handled in palette allocation for GTK so this does nothing
-// <FIXME> What about FOX ? </FIXME>
-  return 0;
 }
 
 void SurfaceImpl::SetClip(PRectangle rc) {
@@ -735,7 +668,7 @@ void SurfaceImpl::SetUnicodeMode(bool unicodeMode_) {
   unicodeMode=unicodeMode_;
 }
 
-Surface *Surface::Allocate() {
+Surface *Surface::Allocate(int technology) {
   return new SurfaceImpl;
 }
 
@@ -899,7 +832,7 @@ public:
   }
   virtual void Show(bool show=true);
   virtual void SetFont(Font &font);
-  virtual void Create(Window &parent, int ctrlID, Point location_, int lineHeight_, bool unicodeMode_);
+  virtual void Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_);
   virtual void SetAverageCharWidth(int width);
   virtual void SetVisibleRows(int rows);
   virtual int GetVisibleRows() const;
@@ -1014,7 +947,7 @@ long PopupListBox::onDoubleClicked(FXObject *, FXSelector, void *)
 
 // ====================================================================
 
-void ListBoxFox::Create(Window & parent, int, Point, int, bool) {
+void ListBoxFox::Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_) {
   wid = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
   wid->create();
   list = (static_cast<PopupListBox *>(wid))->getList();
