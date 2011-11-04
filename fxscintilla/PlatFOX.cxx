@@ -148,13 +148,12 @@ static int CharacterSetCode(int characterSet) {
   }
 }
 
-void Font::Create(const char *faceName, int characterSet,
-  int size, bool bold, bool italic, int) {
+void Font::Create(const FontParameters &fp) {
   Release();
-  fid = new FXFont(FXApp::instance(), faceName, size,
-          bold ? FXFont::Bold : FXFont::Normal ,
-      italic ? FXFont::Italic : FXFont::Straight,
-      CharacterSetCode(characterSet));
+  fid = new FXFont(FXApp::instance(), fp.faceName, fp.size,
+          fp.weight>400 ? FXFont::Bold : FXFont::Normal ,
+      fp.italic ? FXFont::Italic : FXFont::Straight,
+      CharacterSetCode(fp.characterSet));
   if (!fid) {
     // Font not available so substitute with the app default font.
     fid = FXApp::instance()->getNormalFont();
