@@ -19,14 +19,16 @@ fxite_SOURCES=\
   recorder.cpp scidoc.cpp search.cpp shmenu.cpp sl.c doctabs.cpp tagread.cpp scisrch.cpp \
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
   run_w32.cpp run_unx.cpp menuspec.cpp isutf8.c winshcut.c desclistdlg.cpp listdlls.c luafx.cpp \
-  migration.cpp compat.cpp interproc.cpp ini_sort.c filedlg.cpp theme.cpp prefdlg_ext.cpp
+  migration.cpp compat.cpp interproc.cpp ini_sort.c filedlg.cpp theme.cpp prefdlg_ext.cpp \
+  prefdlg_sntx.cpp
+
 
 noinst_HEADERS=\
   appmain.h appwin.h runcmd.h export.h filer.h help.h helptext.h help_lua.h histbox.h lang.h \
   luacmds.h luafuncs.h macro.h prefdlg.h prefs.h readtags.h recorder.h scidoc.h scisrch.h search.h \
   shmenu.h sl.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
   fxasq_lua.h luasci.h intl.h compat.h menuspec.h desclistdlg.h listdlls.h luafx.h appname.h \
-  interproc.h filedlg.h theme.h prefdlg_ext.h
+  interproc.h filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h
 
 
 EXTRA_DIST=fxite.xpm icon32x32.ico icon32x32.rc icon32x32.coff \

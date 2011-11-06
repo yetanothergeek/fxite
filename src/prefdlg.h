@@ -19,6 +19,7 @@
 class Settings;
 class StyleEdit;
 class SciSearchOptions;
+class LangGUI;
 
 class PrefsDialog: public FXDialogBox {
 private:
@@ -27,22 +28,8 @@ private:
   friend class StyleEdit;
   FXTabBook*tabs;
   Settings*prefs;
-  FXListBox *langlist;
   FXIconList*acclist;
-  FXListBox *wordlist;
-  FXButton *wildcardbtn;
-  FXButton *shabangbtn;
-  FXLabel *kwordslab;
-  FXLabel *taboptlab;
-  FXListBox* tabopts;
-  FXSpinner* tabwidthspin;
-  FXLabel* tabwidthlab;
-  FXButton*wordbtn;
-  FXVerticalFrame* style_pan;
-  FXScrollWindow*scroll;
-  FXuint maxw;
   SciSearchOptions*srchopts;
-  FXFont*scifont;
   FXTextField* filters_edit;
   FXButton* tbar_ins_btn;
   FXButton* tbar_rem_btn;
@@ -51,6 +38,7 @@ private:
   FXButton* tbar_lower_btn;
   FXList*   tbar_avail_items;
   FXList*   tbar_used_items;
+  LangGUI* langs;
 
   void MakeSyntaxTab();
   void MakeGeneralTab();
@@ -58,27 +46,21 @@ private:
   void MakeKeybindingsTab();
   void MakeToolbarTab();
   void MakeThemeTab();
-  FXHorizontalFrame*style_hdr;
   FXLabel* hint_lab;
   FXMainWindow* main_win;
   void AddToolbarButton(FXListItem*item, FXint &iUsed, FXint&nUsed);
 public:
   long onTabSwitch(FXObject*o,FXSelector sel,void*p);
-  long onLangSwitch(FXObject*o,FXSelector sel,void*p);
-  long onTabOptsSwitch(FXObject*o,FXSelector sel,void*p);
-  long onKeywordEdit(FXObject*o,FXSelector sel,void*p);
   long onAccelEdit(FXObject*o,FXSelector sel,void*p);
   long onFiltersEdit(FXObject*o,FXSelector sel,void*p);
   long onToolbarEdit(FXObject*o,FXSelector sel,void*p);
   long onErrPatsEdit(FXObject*o,FXSelector sel,void*p);
   long onSysIncsEdit(FXObject*o,FXSelector sel,void*p);
-  long onSyntaxFiletypeEdit(FXObject*o,FXSelector sel,void*p);
+  long onChooseFont(FXObject*o,FXSelector sel,void*p);
   enum {
     ID_SOMETHING=FXDialogBox::ID_LAST,
     ID_TAB_SWITCHED,
     ID_LANG_SWITCH,
-    ID_TABOPTS_SWITCH,
-    ID_KWORD_EDIT,
     ID_ACCEL_EDIT,
     ID_FILTERS_EDIT,
     ID_ERRPATS_EDIT,
@@ -90,13 +72,11 @@ public:
     ID_TBAR_ITEM_RAISE,
     ID_TBAR_ITEM_LOWER,
     ID_TBAR_INSERT_CUSTOM,
-    ID_EDIT_FILETYPES,
-    ID_EDIT_SHABANGS,
+    ID_CHOOSE_FONT,
     ID_LAST
   };
   PrefsDialog(FXMainWindow* w, Settings* aprefs);
   virtual void create();
-  virtual ~PrefsDialog();
   static FXuint ChangedToolbar();
 };
 
