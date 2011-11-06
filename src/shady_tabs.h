@@ -34,3 +34,4 @@ public:
               FXint pr=DEFAULT_SPACING, FXint pt=DEFAULT_SPACING, FXint pb=DEFAULT_SPACING);
 };
 #endif
+

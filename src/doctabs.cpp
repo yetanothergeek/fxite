@@ -82,7 +82,7 @@ long DocTabs::onDnd(FXObject* sender,FXSelector sel, void*p)
             if (p2) {
               FXString uri;
               uri.assign(p1,p2-p1);
-              if (compare(uri, "file://",7)==0) { 
+              if (compare(uri, "file://",7)==0) {
                 uri.erase(0,7);
                 TopWindow::instance()->OpenFile(uri.text(),NULL,false,true);
               }
@@ -92,7 +92,7 @@ long DocTabs::onDnd(FXObject* sender,FXSelector sel, void*p)
         }
       }
       break;
-    } 
+    }
     case SEL_DND_MOTION:  {
       if (dnd_accept) { acceptDrop(); }
       break;

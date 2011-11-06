@@ -823,7 +823,7 @@ void PrefsDialog::MakeThemeTab()
 
 long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 {
-  
+
   if (o==tabs) {
     whichtab=(FXival)p;
     hint_lab->setText(hint_list[whichtab]);

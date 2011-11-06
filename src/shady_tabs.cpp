@@ -29,7 +29,7 @@ ShadyTabs::ShadyTabs( FXComposite* p, FXObject* tgt, FXSelector sel ,FXuint opts
                       FXint w, FXint h,FXint pl, FXint pr,FXint pt,FXint pb
                     ):FXTabBook(p,tgt,sel,opts,x,y,w,h,pl,pr,pt,pb)
 {
-  
+
 }
 
 #define brightness(c) ( \
