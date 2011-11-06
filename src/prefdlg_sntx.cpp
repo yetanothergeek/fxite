@@ -31,6 +31,7 @@
 #include "scidoc.h"
 #include "lang.h"
 #include "prefs.h"
+#include "shady_tabs.h"
 
 #include "prefdlg_sntx.h"
 
@@ -586,7 +587,7 @@ LangGUI::LangGUI(FXComposite*o,Settings*aprefs,FXObject*trg, FXSelector sel):FXV
   langlist->setNumVisible(langlist->getNumItems()>12?12:langlist->getNumItems());
   langlist->setCurrentItem(whichlang);
 
-  syntabs=new FXTabBook(this,trg,sel,PACK_UNIFORM_WIDTH|LAYOUT_FILL);
+  syntabs=new ShadyTabs(this,trg,sel,PACK_UNIFORM_WIDTH|LAYOUT_FILL);
   SetPad(syntabs,0);
   MakeStyleTab();
   MakeOptsTab();

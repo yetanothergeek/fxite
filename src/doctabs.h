@@ -17,6 +17,8 @@
 */
 
 
+#include "shady_tabs.h"
+
 class DocTab: public FXTabItem {
   private:
     FXDECLARE(DocTab)
@@ -41,21 +43,18 @@ class DocTab: public FXTabItem {
 typedef bool (*TabCallback) (FXint index, DocTab*tab, FXWindow*page, void*user_data);
 
 
-class DocTabs: public FXTabBook {
+class DocTabs: public ShadyTabs {
   FXDECLARE(DocTabs);
 private:
   enum {MOVEUP,MOVEDOWN,MOVETOFIRST,MOVETOLAST};
   FXMenuPane*tab_popup;
 
   DocTabs(){}
-  void setTabColor(DocTab*t, bool active);
-  void UpdateTabs();
   void MoveTab(FXint how);
   FXint tab_width_max;
   bool dnd_accept;
   static bool UpdateTabWidths(FXint index, DocTab*tab, FXWindow*page, void*user_data);
 public:
-  long onCmdOpenItem  ( FXObject* sender, FXSelector sel, void* p );
   long onTabPopupMenu ( FXObject* sender, FXSelector sel, void* p );
   long onPopupClick   ( FXObject* sender, FXSelector sel, void* p );
   DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts);
@@ -72,7 +71,6 @@ public:
   FXWindow*ActiveView();
   FXWindow*PageAt(FXint n);
 
-  void setCurrent(FXint i, FXbool notify=FALSE);
   bool ActivateTab(DocTab*tab);
   bool ActivateTab(FXint n);
 

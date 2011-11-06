@@ -40,6 +40,7 @@ class Accessor;
 #include "prefdlg_ext.h"
 #include "prefdlg_sntx.h"
 #include "theme.h"
+#include "shady_tabs.h"
 
 #include "intl.h"
 #include "prefdlg.h"
@@ -874,7 +875,7 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
   hint_lab=new FXLabel(buttons, hint_list[0], NULL, LAYOUT_FILL_X);
 
   new FXHorizontalSeparator(this,SEPARATOR_GROOVE|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
-  tabs=new FXTabBook(this, this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
+  tabs=new ShadyTabs(this, this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
   MakeGeneralTab();
   MakeEditorTab();
   MakeSyntaxTab();
