@@ -116,6 +116,18 @@ function print_words()
   ]]
   )
 
+  local asm_instr = {
+    "aes", "alu", "avx", "avx2", "bcd", "bmi1", "bmi2", "cmov", "cvt16",
+    "emmx", "flag", "flow", "fma3", "fma4", "info", "k3d", "k3d2", 
+    "k3dgeode", "k3dprefetch", "lwp", "mem", "mmx", "mmx2", "padlock", 
+    "pred", "prefix", "sse", "sse2", "sse3", "sse41", "sse42", "sse4a", 
+    "ssse3", "stack", "string", "xop"
+  }
+
+  for k,v in ipairs(asm_instr) do
+    io.write(v,'_instruction=""\n')
+  end
+
   local kwclasses = {
             "ada", "metapost", "metafun", "pascal", "spice", "primitives",
             "macros", "tex", "etex", "latex", "pdflatex", "context",

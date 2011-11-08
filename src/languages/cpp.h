@@ -23,6 +23,7 @@ static StyleDef cpp_style[] = {
   { "globalclass", SCE_C_GLOBALCLASS, _WORD3_FG, _DEFLT_BG, Bold },
   { "stringraw", SCE_C_STRINGRAW, STRING_FG, _DEFLT_BG, Normal },
   { "tripleverbatim", SCE_C_TRIPLEVERBATIM, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "hashquotedstring", SCE_C_HASHQUOTEDSTRING, STRING_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
