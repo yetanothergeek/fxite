@@ -372,6 +372,7 @@ bool OrientTabsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
   tab->setTabOrientation(ornt);
   tab->setDefaultDragCursor(
   tab->getApp()->getDefaultCursor(((ornt==TAB_TOP)||(ornt==TAB_BOTTOM)) ? DEF_HSPLIT_CURSOR : DEF_VSPLIT_CURSOR));
+  tab->setDragCursor(tab->getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
   return true;
 }
 
