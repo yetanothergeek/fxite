@@ -288,6 +288,16 @@ FXIMPLEMENT(OkBtn,FXButton,OkBtnMap,ARRAYNUMBER(OkBtnMap));
 
 
 
+static bool HasTool(FXTreeItem*item)
+{
+  for(FXTreeItem*i=item; i; i=i->getNext()) {
+    if ((!i->hasItems())||HasTool(i->getFirst())) { return true; }
+  }
+  return false;
+}
+
+
+
 /* Display a dialog box to let the user select a tool item */
 bool ToolsTree::SelectTool(FXWindow* owner, UserMenu** menus, FXMenuCommand*&mc)
 {
@@ -298,6 +308,13 @@ bool ToolsTree::SelectTool(FXWindow* owner, UserMenu** menus, FXMenuCommand*&mc)
   FXHorizontalFrame*btns=new FXHorizontalFrame(vbox,FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   ok->reparent(btns,NULL);
   new FXButton(btns,_("Cancel"),NULL,&dlg,FXDialogBox::ID_CANCEL,BUTTON_NORMAL|LAYOUT_CENTER_X);
+  if (!HasTool(tree->getFirstItem())) {
+    FXMessageBox::information(owner, MBOX_OK,_("No tools defined"), "%s\n%s",
+      _("You have not defined any custom tools. To create a custom tool,"),
+      _("use the \"Customize menu\" item from the \"Tools\" menu.")
+    );
+    return false;
+  }
   if (dlg.execute(PLACEMENT_OWNER)) {
     mc=((FXMenuCommand*)(tree->getCurrentItem()->getData()));
     return true;
