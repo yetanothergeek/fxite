@@ -291,11 +291,34 @@ static int pickfile(lua_State*L)
 {
   const char*modes[]={"open", "save", "dir", NULL};
   int mode=luaL_checkoption(L,1,modes[0], modes);
-  const char*path=luaL_optstring(L,2,FXSystem::getCurrentDirectory().text());
+  FXString pathstr=FXSystem::getCurrentDirectory()+PATHSEPSTRING;
+  const char*path=luaL_optstring(L,2,pathstr.text());
   const char*patt=luaL_optstring(L,3,_("All files (*)"));
+  if (path && !*path) { path=pathstr.text(); }
   if (patt) {
     FXFileDialog dlg(main_window, "");
-    dlg.setFilename(path);
+    if (mode!=2) {
+      if (FXStat::isDirectory(path)) {
+        dlg.setDirectory(path);
+      } else {
+        pathstr=FXPath::simplify(FXPath::absolute(path));
+        if (FXStat::isDirectory(pathstr)) {
+          dlg.setDirectory(pathstr);
+        } else {
+          if (FXStat::isDirectory(FXPath::directory(pathstr))) {
+            dlg.setFilename(FXPath::name(pathstr));
+            dlg.setDirectory(FXPath::directory(pathstr));
+          } else {
+            FXMessageBox::warning( main_window, MBOX_OK, _("No such directory"), "%s:\n%s",
+               _("Specified path does not exist"),
+               (FXPath::directory(pathstr)+PATHSEPSTRING).text()
+            );
+            dlg.setDirectory(FXSystem::getCurrentDirectory());
+          }
+        }
+      }
+    }
+
     dlg.setPatternList(patt);
     bool rv=false;
     switch (mode) {
