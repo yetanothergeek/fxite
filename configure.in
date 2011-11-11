@@ -168,6 +168,20 @@ esac
 FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
 
 
+AC_ARG_ENABLE([assertions],AC_HELP_STRING([--enable-assert],[enable assertions]))
+
+AC_MSG_RESULT([$enable_assertions])
+
+if test "x$enable_assertions" = "xyes"
+then
+  CFLAGS="${CFLAGS} -DDEBUG"
+  CXXFLAGS="${CXXFLAGS} -DDEBUG"
+else
+  CFLAGS="${CFLAGS} -DNDEBUG"
+  CXXFLAGS="${CXXFLAGS} -DNDEBUG"
+fi
+
+
 AC_SUBST(FOX_CFLAGS)
 AC_SUBST(FOX_LIBS)
 
