@@ -168,7 +168,7 @@ esac
 FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
 
 
-AC_ARG_ENABLE([assertions],AC_HELP_STRING([--enable-assert],[enable assertions]))
+AC_ARG_ENABLE([assert],AC_HELP_STRING([--enable-assert],[enable assertions]))
 
 AC_MSG_RESULT([$enable_assertions])
 
