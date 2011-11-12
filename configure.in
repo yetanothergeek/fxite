@@ -182,6 +182,12 @@ else
 fi
 
 
+if test "x${RESWRAP}" = "x"
+then
+  AC_PATH_PROGS(RESWRAP, reswrap-1.7 reswrap)
+fi
+
+
 AC_SUBST(FOX_CFLAGS)
 AC_SUBST(FOX_LIBS)
 

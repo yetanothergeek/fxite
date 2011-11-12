@@ -39,12 +39,12 @@ $(srcdir)/help.cpp: $(srcdir)/helptext.h $(srcdir)/help_lua.h
 
 $(srcdir)/helptext.h: $(srcdir)/helptext.txt
 	awk '{if (/\\$$/) {sub(/\\$$/,""); printf("%s",$$0)} else {print}}' $< > $<.tmp
-	reswrap -o $@ $<.tmp
+	$(RESWRAP) -o $@ $<.tmp
 	$(RM) $<.tmp
 
 $(srcdir)/help_lua.h: $(srcdir)/help_lua.txt
 	awk '{if (/\\$$/) {sub(/\\$$/,""); printf("%s",$$0)} else {print}}' $< > $<.tmp
-	reswrap -o $@ $<.tmp
+	$(RESWRAP) -o $@ $<.tmp
 	$(RM) $<.tmp
 
 # Inlining does not work for sl library!
