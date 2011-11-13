@@ -1,3 +1,31 @@
+################################################################################
+#  NOTE: This is only a rough summary for some of the more significant changes.
+#  For a more accurate and detailed listing of changes, check the git log.
+################################################################################
+
+2011-11-12
+  * Add disclaimer to top of ChangeLog.
+  * Don't hard-code the name of "reswrap" in Makefile, use $RESWRAP instead.
+  * Show message if user tries to add custom tools to toolbar, but none are defined.
+  * Made setting of path in scripted file dialogs behave a little better.
+  * Turn assertion checking OFF by default.
+  * Fixed behavior of cursor after tab orientation is changed.
+  * Move tab-shading code to a separate class, use also for preferences dialog.
+  * Reworked syntax tab of preferences dialog, moved code to a separate source file.
+  * Update to Scintilla-3.0.0.
+  * Show "hourglass" cursor while loading help file.
+  * New feature: Open files by Drag-and-Drop (from file managers, etc.)
+  * Fix linker problem with Lua and libdl on newer Ubuntu etc.
+  * Update Win32 patches for FOX-1.7.31.
+  * Fixed some focus problems in popup menu.
+  * Made the command to change case of selection also work for UTF-8.
+  * Always expand first level of tree in working directory selection dialog.
+  * Made bracket-matching behavior more configurable.
+  * Added a setting to adjust line spacing for the editor font.
+  * PDF export fixes: Plain text style initialization; UTF8 to ISO8859 conversions.
+  * Bump version to 0.8
+
+
 2011-08-10
   * Support for compose keys (aka "dead keys") input method in FOX >= 1.7.29.
   * Cleaner exit from application if invalid command line option is found.
