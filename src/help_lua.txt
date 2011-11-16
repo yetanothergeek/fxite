@@ -334,7 +334,7 @@ Cuts the currently selected text to the clipboard.
 
 
 ###copy###
-===__MOD__.copy([text],[start,stop])
+===__MOD__.copy([[text]|[start,stop]])
 ===
 When called with no arguments, copies the currently selected text to the clipboard.
 When called with a single (string) argument, places that %%%text%%% on the clipboard.
