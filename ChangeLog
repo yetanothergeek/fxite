@@ -3,6 +3,10 @@
 #  For a more accurate and detailed listing of changes, check the git log.
 ################################################################################
 
+2011-11-30
+  * VERSION 0.8 RELEASE.
+
+
 2011-11-12
   * Add disclaimer to top of ChangeLog.
   * Don't hard-code the name of "reswrap" in Makefile, use $RESWRAP instead.
