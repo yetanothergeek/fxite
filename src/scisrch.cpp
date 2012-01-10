@@ -324,22 +324,15 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
   long count=0;
   if (patlen==0) { return 0; }
   SciMsg(SCI_SETSEARCHFLAGS,0,0);
+  bool swapped=SciMsg(SCI_GETANCHOR,0,0)>SciMsg(SCI_GETCURRENTPOS,0,0);
+  SciMsg(SCI_BEGINUNDOACTION,0,0);
 
   for (long isel=SciMsg(SCI_GETSELECTIONS,0,0)-1; isel>=0; isel--) {
-    SciMsg(SCI_SETMAINSELECTION,isel,0);
-    long start=SciMsg(SCI_GETSELECTIONSTART,0,0);
-    long end=SciMsg(SCI_GETSELECTIONEND,0,0);
+    long start=SciMsg(SCI_GETSELECTIONNSTART,isel,0);
+    long end=SciMsg(SCI_GETSELECTIONNEND,isel,0);
     if (end==start) { continue; }
     content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
 
-    bool swapped=start>end;
-    SciMsg(SCI_BEGINUNDOACTION,0,0);
-    if (swapped) {
-      long tmp=start;
-      start=end;
-      end=tmp;
-      SciMsg(SCI_SETSEL,start,end);
-    }
     SciMsg(SCI_SETSEARCHFLAGS,0,0);
     if (bol_only) { // Special case, start of first line
       if (rx.match(content,end,begs,ends,REX_FORWARD|REX_NOT_EMPTY,MAX_CAPTURES,start,end)) {
@@ -350,30 +343,26 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
         start=SciMsg(SCI_GETTARGETEND,0,0);
-        end=SciMsg(SCI_GETSELECTIONEND,0,0);
+        end=SciMsg(SCI_GETSELECTIONNEND,isel,0);
       }
     }
+    long substart=start;
     while (1) {
-      if (end<=start) { break; }
-      if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
+      if (end<=substart) { break; }
+      if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,substart,end)) {
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
         SciMsg(SCI_SETTARGETEND,ends[0],0);
         FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
         SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
-        start=SciMsg(SCI_GETTARGETEND,0,0);
-        end=SciMsg(SCI_GETSELECTIONEND,0,0);
-        if (eol_only) { start++; }
+        substart=SciMsg(SCI_GETTARGETEND,0,0);
+        end+=substart-ends[0];
+        if (eol_only) { substart++; }
       } else { break; }
     }
-    end=SciMsg(SCI_GETSELECTIONEND,0,0);
-    if (swapped) {
-      long tmp=start;
-      start=end;
-      end=tmp;
-      SciMsg(SCI_SETSEL,start,end);
-    }
+    SciMsg(SCI_SETSELECTIONNSTART,isel,swapped?end:start);
+    SciMsg(SCI_SETSELECTIONNEND,isel,swapped?start:end);
   }
   SciMsg(SCI_ENDUNDOACTION,0,0);
   return count;
