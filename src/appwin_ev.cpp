@@ -1119,10 +1119,7 @@ void TopWindow::Paste()
     }
     sci->sendMessage(SCI_PASTE,0,0);
     sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
-    if (sci->GetWordWrap()) {
-      getApp()->runWhileEvents();
-      sci->sendMessage(SCI_SCROLLCARET,0,0);
-    }
+    sci->ScrollWrappedInsert();
   }
 }
 

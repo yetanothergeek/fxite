@@ -956,6 +956,16 @@ void SciDoc::GoToPos(long pos)
 
 
 
+void SciDoc::ScrollWrappedInsert()
+{
+  if (GetWordWrap()) {
+    getApp()->runWhileEvents();
+    sendMessage(SCI_SCROLLCARET,0,0);
+  }
+}
+
+
+
 void SciDoc::ZoomStep(int direction)
 {
   long msg=SCI_SETZOOM;

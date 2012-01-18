@@ -122,6 +122,7 @@ public:
   void GoToPos(long pos);
   void GoToCoords(long row, long col);
   void ScrollCaret(long pos=-1);
+  void ScrollWrappedInsert();
   int GetLineLength(int line);
   long GetLineText(long linenum, FXString &text);
   long GetLineCount() { return sendMessage(SCI_GETLINECOUNT,0,0); }

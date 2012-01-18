@@ -776,6 +776,7 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
     DisableUI(true);
     if (cmdio.filter(cmd.text(), input, output, &command_timeout)) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
+      sci->ScrollWrappedInsert();
       rv=true;
     }
     DisableUI(false);
@@ -848,6 +849,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
 bool TopWindow::InsertFile(SciDoc *sci, const FXString &filename)
 {
   if (sci->InsertFile(filename.text())) {
+     sci->ScrollWrappedInsert();
     return true;
   } else {
     FXMessageBox::error(this, MBOX_OK, _("Error opening file"), "%s:\n%s\n%s",
