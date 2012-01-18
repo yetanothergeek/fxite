@@ -1105,7 +1105,7 @@ long TopWindow::onCopy(FXObject*o, FXSelector sel, void*p)
 
 
 
-long TopWindow::onPaste(FXObject*o, FXSelector sel, void*p)
+void TopWindow::Paste()
 {
   SciDoc*sci=FocusedDoc();
   sci->setFocus();
@@ -1124,6 +1124,13 @@ long TopWindow::onPaste(FXObject*o, FXSelector sel, void*p)
       sci->sendMessage(SCI_SCROLLCARET,0,0);
     }
   }
+}
+
+
+
+long TopWindow::onPaste(FXObject*o, FXSelector sel, void*p)
+{
+  Paste();
   return 1;
 }
 

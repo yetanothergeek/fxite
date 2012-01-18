@@ -428,6 +428,7 @@ public:
   bool Closing();
   bool SetReadOnly(SciDoc*sci, bool rdonly);
   void SetWordWrap(SciDoc*sci, bool wrapped);
+  void Paste();
   SciDoc*ControlDoc();
   SciDoc*FocusedDoc();
   DocTabs* Tabs() {return tabbook; }

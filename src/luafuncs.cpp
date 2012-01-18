@@ -541,8 +541,7 @@ static int paste(lua_State* L)
   CheckReadOnly();
   if (sci->sendMessage(SCI_CANPASTE,0,0)) {
     int len=sci->GetTextLength();
-    sci->sendMessage(SCI_PASTE,0,0);
-    sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
+    tw->Paste();
     lua_pushnumber(L, (len - sci->GetTextLength()) );
   } else {
     lua_pushnil(L);
