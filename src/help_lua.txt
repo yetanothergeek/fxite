@@ -9,6 +9,7 @@
 @@@filename@@@ -- Return the filename of a document.
 @@@ndocs@@@ -- Return the number of open documents.
 @@@lexer@@@ -- Return the name of the language lexer.
+@@@wordwrap@@@ -- Set or query the line-wrapping mode.
 
 
 %%%Cursor functions%%%
@@ -209,6 +210,14 @@ Returns the total number of open documents.
 ===
 Returns the internal name of the Scintilla lexer in use for the active document.
 If there is no lexer currently loaded, it returns the string ==="null"===
+
+###wordwrap###
+===__MOD__.wordwrap([wrapped])
+===
+When called with a single boolean argument, sets (or unsets) the word wrapping mode of the current \
+document.
+
+When called with no arguments, returns the current word wrap mode.
 
 
 ###caret###

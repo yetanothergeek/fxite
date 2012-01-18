@@ -677,12 +677,20 @@ bool TopWindow::SetReadOnly(SciDoc*sci, bool rdonly)
 
 
 
+void TopWindow::SetWordWrap(SciDoc*sci, bool wrapped)
+{
+  sci->SetWordWrap(wrapped);
+  wordwrapmenu->setCheck(wrapped);
+  SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
+  
+}
+
+
+
 long TopWindow::onWordWrap(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=ControlDoc();
-  sci->SetWordWrap(!sci->GetWordWrap());
-  wordwrapmenu->setCheck(sci->GetWordWrap());
-  SyncToggleBtn(o,sel);
+  SetWordWrap(sci, !sci->GetWordWrap());
   sci->setFocus();
   return 1;
 }

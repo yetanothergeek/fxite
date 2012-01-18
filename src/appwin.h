@@ -427,6 +427,7 @@ public:
   bool Destroying() { return destroying; }
   bool Closing();
   bool SetReadOnly(SciDoc*sci, bool rdonly);
+  void SetWordWrap(SciDoc*sci, bool wrapped);
   SciDoc*ControlDoc();
   SciDoc*FocusedDoc();
   DocTabs* Tabs() {return tabbook; }

@@ -962,6 +962,23 @@ static int readonly(lua_State*L)
 
 
 
+// bool wordwrap()  -- get
+// void wordwrap([wrapped])  -- set
+static int wordwrap(lua_State*L)
+{
+  DOC_REQD
+  if (lua_gettop(L)==0) {
+    lua_pushboolean(L,sci->GetWordWrap());
+    return 1;
+  } else {
+    bool wrapped=lua_toboolean(L,1);
+    tw->SetWordWrap(sci, wrapped);
+    return 0;
+  }
+}
+
+
+
 static int batch(lua_State*L)
 {
   DOC_REQD
@@ -1308,6 +1325,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"open", open},
   {"close", close},
   {"readonly", readonly},
+  {"wordwrap", wordwrap},
   {"sleep", sleep},
   {"yield", yield},
   {"quit", quit},
