@@ -937,6 +937,7 @@ void SciDoc::ScrollCaret(long pos)
   long top,btm,cur;
   sendMessage(SCI_SETXOFFSET,0,0);
   if (pos<0) sendMessage(SCI_SCROLLCARET,0,0);
+  if (GetWordWrap()) { return; }
   top=sendMessage(SCI_GETFIRSTVISIBLELINE,0,0);
   cur=sendMessage(SCI_LINEFROMPOSITION,pos>=0?pos:sendMessage(SCI_GETCURRENTPOS,0,0),0);
   btm=sendMessage(SCI_LINESONSCREEN,0,0)+top;
