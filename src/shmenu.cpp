@@ -191,7 +191,7 @@ void UserMenu::setText(const FXString &s)
 
 
 
-static bool MakeLabelFromPath(const char*path, FXString &label)
+bool UserMenu::MakeLabelFromPath(const char*path, FXString &label)
 {
   label=FXPath::name(path);
 
@@ -284,7 +284,7 @@ int NodeCB(StrNode*n, FXMenuPane*mp)
      free(n->data);
     } else {
       FXString label;
-      if ( MakeLabelFromPath(n->data, label) ) {
+      if ( UserMenu::MakeLabelFromPath(n->data, label) ) {
         UserMenuHelper::IncCount(um);
         UsrMnuCmd*cmd=new UsrMnuCmd(mp,label,um->getTarget(),um->getSelector());
         cmd->setUserData(n->data);

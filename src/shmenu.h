@@ -56,6 +56,7 @@ public:
   FXString helptext;
   void helpText(const char*txt) { helptext=txt; }
   const char*getTopDir(){ return topdir.text(); }
+  static bool MakeLabelFromPath(const char*path, FXString &label);
 };
 
 
