@@ -31,13 +31,6 @@ private:
   FXIconList*acclist;
   SciSearchOptions*srchopts;
   FXTextField* filters_edit;
-  FXButton* tbar_ins_btn;
-  FXButton* tbar_rem_btn;
-  FXButton* tbar_custom_btn;
-  FXButton* tbar_raise_btn;
-  FXButton* tbar_lower_btn;
-  FXList*   tbar_avail_items;
-  FXList*   tbar_used_items;
   LangGUI* langs;
 
   void MakeSyntaxTab();
@@ -48,15 +41,14 @@ private:
   void MakeThemeTab();
   FXLabel* hint_lab;
   FXMainWindow* main_win;
-  void AddToolbarButton(FXListItem*item, FXint &iUsed, FXint&nUsed);
 public:
   long onTabSwitch(FXObject*o,FXSelector sel,void*p);
   long onAccelEdit(FXObject*o,FXSelector sel,void*p);
   long onFiltersEdit(FXObject*o,FXSelector sel,void*p);
-  long onToolbarEdit(FXObject*o,FXSelector sel,void*p);
   long onErrPatsEdit(FXObject*o,FXSelector sel,void*p);
   long onSysIncsEdit(FXObject*o,FXSelector sel,void*p);
   long onChooseFont(FXObject*o,FXSelector sel,void*p);
+  long onChangedToolbar(FXObject*o,FXSelector sel,void*p);
   enum {
     ID_SOMETHING=FXDialogBox::ID_LAST,
     ID_TAB_SWITCHED,
@@ -65,14 +57,8 @@ public:
     ID_FILTERS_EDIT,
     ID_ERRPATS_EDIT,
     ID_SYSINCS_EDIT,
-    ID_TBAR_AVAIL_ITEMS,
-    ID_TBAR_USED_ITEMS,
-    ID_TBAR_ITEM_INSERT,
-    ID_TBAR_ITEM_REMOVE,
-    ID_TBAR_ITEM_RAISE,
-    ID_TBAR_ITEM_LOWER,
-    ID_TBAR_INSERT_CUSTOM,
     ID_CHOOSE_FONT,
+    ID_CHANGED_TOOLBAR,
     ID_LAST
   };
   PrefsDialog(FXMainWindow* w, Settings* aprefs);

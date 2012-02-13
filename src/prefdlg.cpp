@@ -39,6 +39,7 @@ class Accessor;
 #include "desclistdlg.h"
 #include "prefdlg_ext.h"
 #include "prefdlg_sntx.h"
+#include "prefdlg_tbar.h"
 #include "theme.h"
 #include "shady_tabs.h"
 
@@ -83,11 +84,10 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_ERRPATS_EDIT,PrefsDialog::onErrPatsEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_SYSINCS_EDIT,PrefsDialog::onSysIncsEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_CHOOSE_FONT,PrefsDialog::onChooseFont),
-  FXMAPFUNCS(SEL_COMMAND,PrefsDialog::ID_TBAR_AVAIL_ITEMS,PrefsDialog::ID_TBAR_INSERT_CUSTOM,PrefsDialog::onToolbarEdit)
+  FXMAPFUNC(SEL_CHANGED, PrefsDialog::ID_CHANGED_TOOLBAR,PrefsDialog::onChangedToolbar),
 };
 
 FXIMPLEMENT(PrefsDialog,FXDialogBox,PrefsDialogMap,ARRAYNUMBER(PrefsDialogMap));
-
 
 
 static bool AccelSanity(FXWindow*w, FXHotKey acckey)
@@ -312,121 +312,9 @@ FXuint PrefsDialog::ChangedToolbar()
 }
 
 
-void PrefsDialog::AddToolbarButton(FXListItem*item, FXint &iUsed, FXint&nUsed)
+long PrefsDialog::onChangedToolbar(FXObject*o,FXSelector sel,void*p)
 {
-  if (iUsed<0) {
-    tbar_used_items->appendItem(item);
-  } else {
-    tbar_used_items->getItem(iUsed)->setSelected(false);
-    if (iUsed<(nUsed-1)) {
-      tbar_used_items->insertItem(iUsed+1,item);
-    } else {
-      tbar_used_items->appendItem(item);
-    }
-  }
-  iUsed++;
-  tbar_used_items->selectItem(iUsed);
-  tbar_used_items->setCurrentItem(iUsed);
-  nUsed++;
-  changed_toolbar|=ToolbarChangedLayout;
-}
-
-
-
-long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
-{
-  FXint iAvail=tbar_avail_items->getCurrentItem();
-  FXint iUsed=tbar_used_items->getCurrentItem();
-  FXint nUsed=tbar_used_items->getNumItems();
-  MenuSpec*spec=NULL;
-  TBarListItem*item=NULL;
-  switch(FXSELID(sel)) {
-    case ID_TBAR_AVAIL_ITEMS: { return 1; }
-    case ID_TBAR_INSERT_CUSTOM: {
-      FXMenuCommand*mc;
-      if (ToolsTree::SelectTool(this, ((TopWindow*)main_win)->UserMenus(), mc)) {
-        const char*newpath=(const char*)mc->getUserData();
-        if (newpath) {
-          // If the command is already in the used items list, just select it...
-          for (FXint i=0; i<nUsed; i++) {
-            const char*oldpath=MenuMgr::GetUsrCmdPath((MenuSpec*)tbar_used_items->getItemData(i));
-            if (oldpath && (strcmp(newpath, oldpath)==0)) {
-              tbar_used_items->selectItem(i);
-              tbar_used_items->setCurrentItem(i);
-              tbar_used_items->makeItemVisible(i);
-              return 1;
-            }
-          }
-        }
-        spec=MenuMgr::AddTBarUsrCmd(mc);
-        item=new TBarListItem(spec->pref,NULL,(void*)spec);
-        AddToolbarButton(item, iUsed, nUsed);
-      }
-    }
-    case ID_TBAR_USED_ITEMS: { break; }
-    case ID_TBAR_ITEM_INSERT: {
-      item=(TBarListItem*)(tbar_avail_items->extractItem(iAvail));
-      AddToolbarButton(item, iUsed, nUsed);
-      break;
-    }
-    case ID_TBAR_ITEM_REMOVE: {
-      item=(TBarListItem*)(tbar_used_items->extractItem(tbar_used_items->getCurrentItem()));
-      spec=(MenuSpec*)item->getData();
-      if (spec->type=='u') {
-        MenuMgr::RemoveTBarUsrCmd(spec);
-      } else {
-        tbar_avail_items->clearItems();
-        for (spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
-          if (spec->sel==TopWindow::ID_KILL_COMMAND) { continue; }
-          if (tbar_used_items->findItemByData((void*)spec)<0) {
-            tbar_avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
-          }
-        }
-        iAvail=tbar_avail_items->findItemByData(item->getData());
-        tbar_avail_items->selectItem(iAvail);
-        tbar_avail_items->setCurrentItem(iAvail);
-        tbar_avail_items->makeItemVisible(iAvail);
-      }
-      nUsed--;
-      changed_toolbar|=ToolbarChangedLayout;
-      break;
-    }
-    case ID_TBAR_ITEM_RAISE: {
-      tbar_used_items->moveItem(iUsed, iUsed-1);
-      iUsed--;
-      tbar_used_items->selectItem(iUsed);
-      tbar_used_items->setCurrentItem(iUsed);
-      changed_toolbar|=ToolbarChangedLayout;
-      break;
-    }
-    case ID_TBAR_ITEM_LOWER: {
-      tbar_used_items->moveItem(iUsed, iUsed+1);
-      iUsed++;
-      tbar_used_items->selectItem(iUsed);
-      tbar_used_items->setCurrentItem(iUsed);
-      changed_toolbar|=ToolbarChangedLayout;
-      break;
-    }
-  }
-  tbar_used_items->makeItemVisible(iUsed);
-  if (nUsed<TBAR_MAX_BTNS) {
-    tbar_ins_btn->enable();
-    tbar_custom_btn->enable();
-  } else {
-    tbar_ins_btn->disable();
-    tbar_custom_btn->disable();
-  }
-  if (nUsed>0) { tbar_rem_btn->enable(); } else { tbar_rem_btn->disable(); }
-  if (iUsed>0) { tbar_raise_btn->enable(); } else {tbar_raise_btn->disable(); }
-  if (iUsed<(nUsed-1)) { tbar_lower_btn->enable(); } else {tbar_lower_btn->disable(); }
-  FXint*btns=MenuMgr::TBarBtns();
-  for (iUsed=0; iUsed<TBAR_MAX_BTNS; iUsed++) {
-    btns[iUsed]=TopWindow::ID_LAST;
-  }
-  for (iUsed=0; iUsed<nUsed; iUsed++) {
-    spec=(MenuSpec*)(tbar_used_items->getItemData(iUsed));
-    btns[iUsed]=spec->sel;
-  }
+  changed_toolbar|=(FXuint)((FXival)p);
   return 1;
 }
 
@@ -435,65 +323,8 @@ long PrefsDialog::onToolbarEdit(FXObject*o,FXSelector sel,void*p)
 void PrefsDialog::MakeToolbarTab()
 {
   new FXTabItem(tabs,_("toolbar"));
-  FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
-  FXVerticalFrame* left_column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
-  FXVerticalFrame* mid_column=new FXVerticalFrame(frame,FRAME_NONE|LAYOUT_CENTER_Y|PACK_UNIFORM_WIDTH);
-  FXVerticalFrame* right_column=new FXVerticalFrame(frame,FRAME_SUNKEN|LAYOUT_FILL);
-  new FXLabel(left_column, _("&Available items:"));
-
-  tbar_ins_btn=new FXButton(mid_column, _("&Insert>>"),NULL,this,ID_TBAR_ITEM_INSERT,BUTTON_NORMAL|LAYOUT_CENTER_Y);
-  tbar_rem_btn=new FXButton(mid_column, _("<<&Remove"),NULL,this,ID_TBAR_ITEM_REMOVE,BUTTON_NORMAL|LAYOUT_CENTER_Y);
-  FXLabel*btn_size_cpn=new FXLabel(mid_column, _("Button size:"), NULL, LABEL_NORMAL|JUSTIFY_LEFT);
-  btn_size_cpn->setPadTop(48);
-  FXListBox *tbar_size_list=new FXListBox(mid_column,prefs,Settings::ID_SET_TOOLBAR_BTN_SIZE);
-  tbar_size_list->setUserData(&changed_toolbar);
-  tbar_size_list->appendItem(_("small"),  NULL,NULL);
-  tbar_size_list->appendItem(_("medium"), NULL,NULL);
-  tbar_size_list->appendItem(_("large"),  NULL,NULL);
-  tbar_size_list->setNumVisible(3);
-  tbar_size_list->setCurrentItem(prefs->ToolbarButtonSize);
-
-  FXCheckButton*wrap_tbar_chk=new FXCheckButton(mid_column,_("Wrap buttons"),prefs,Settings::ID_TOGGLE_WRAP_TOOLBAR);
-  wrap_tbar_chk->setCheck(prefs->WrapToolbar);
-  wrap_tbar_chk->setUserData(&changed_toolbar);
-
-  new FXLabel(right_column, _("&Visible items:"));
-  tbar_avail_items=new FXList(left_column,this,ID_TBAR_AVAIL_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
-  tbar_used_items=new FXList(right_column,this,ID_TBAR_USED_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
-
-  FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
-                                                     FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
-
-  tbar_custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
-                                NULL,this, ID_TBAR_INSERT_CUSTOM,BUTTON_NORMAL|LAYOUT_CENTER_X);
-
-  FXHorizontalFrame* UpDnBtns=new FXHorizontalFrame( right_column,
-                                                     FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
-
-  tbar_raise_btn=new FXButton(UpDnBtns, _("Move &Up"),  NULL,this, ID_TBAR_ITEM_RAISE,BUTTON_NORMAL|LAYOUT_CENTER_X);
-  tbar_lower_btn=new FXButton(UpDnBtns, _("Move &Down"),NULL,this, ID_TBAR_ITEM_LOWER,BUTTON_NORMAL|LAYOUT_CENTER_X);
-
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
-    if (spec->ms_mc) {
-      tbar_avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
-    }
-  }
-  for (FXint*sel=MenuMgr::TBarBtns(); *sel!=TopWindow::ID_LAST; sel++) {
-    MenuSpec* spec=MenuMgr::LookupMenu(*sel);
-    if (spec) {
-      FXint found=tbar_avail_items->findItemByData((void*)spec);
-      if (found>=0) {
-        TBarListItem*item=(TBarListItem*)tbar_avail_items->extractItem(found);
-        item->setSelected(false);
-        tbar_used_items->appendItem(item);
-      } else {
-        tbar_used_items->appendItem(new TBarListItem(spec->pref,NULL,(void*)spec));
-      }
-    }
-  }
-  tbar_avail_items->selectItem(0);
-  if (tbar_used_items->getNumItems()) { tbar_used_items->selectItem(0); }
-  onToolbarEdit(NULL,0,NULL);
+  new ToolbarPrefs(tabs,this,ID_CHANGED_TOOLBAR);
+  changed_toolbar=ToolbarUnchanged;
 }
 
 
@@ -867,7 +698,6 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
   setX(w->getX()+16);
   setY(w->getY()+24);
   setWidth(620);
-  changed_toolbar=ToolbarUnchanged;
 
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   new FXButton(buttons,_("  &Close  "), NULL,this,ID_ACCEPT,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);

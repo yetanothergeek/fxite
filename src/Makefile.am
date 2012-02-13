@@ -20,7 +20,7 @@ fxite_SOURCES=\
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
   run_w32.cpp run_unx.cpp menuspec.cpp isutf8.c winshcut.c desclistdlg.cpp listdlls.c luafx.cpp \
   migration.cpp compat.cpp interproc.cpp ini_sort.c filedlg.cpp theme.cpp prefdlg_ext.cpp \
-  prefdlg_sntx.cpp shady_tabs.cpp
+  prefdlg_sntx.cpp prefdlg_tbar.cpp shady_tabs.cpp dual_list.cpp
 
 
 noinst_HEADERS=\
@@ -28,7 +28,8 @@ noinst_HEADERS=\
   luacmds.h luafuncs.h macro.h prefdlg.h prefs.h readtags.h recorder.h scidoc.h scisrch.h search.h \
   shmenu.h sl.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
   fxasq_lua.h luasci.h intl.h compat.h menuspec.h desclistdlg.h listdlls.h luafx.h appname.h \
-  interproc.h filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h shady_tabs.h
+  interproc.h filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h shady_tabs.h \
+  dual_list.h
 
 
 EXTRA_DIST=fxite.xpm icon32x32.ico icon32x32.rc icon32x32.coff \
