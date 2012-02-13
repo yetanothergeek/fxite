@@ -133,8 +133,6 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_TOGGLE_WORD_WRAP: { WordWrap = !WordWrap; break; }
     case ID_TOGGLE_WRAP_TOOLBAR: {
       WrapToolbar = !WrapToolbar;
-      FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
-      *changed|=ToolbarChangedWrap;
       break;
     }
     case ID_TOGGLE_AUTOSAVE:        {
@@ -288,8 +286,6 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
     case ID_SET_TOOLBAR_BTN_SIZE: {
       ToolbarButtonSize=(FXival)p;
       LIMIT_RANGE(ToolbarButtonSize,0,2);
-      FXuint*changed=(FXuint*)(((FXCheckButton*)o)->getUserData());
-      *changed|=ToolbarChangedFont;
       break;
     }
   }
