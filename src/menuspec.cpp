@@ -135,6 +135,8 @@ static MenuSpec menu_specs[] = {
   {TW::ID_SHOW_HELP,        "HelpHelp",        _("&Help..."),           _("help"),         "F1",           'm', {NULL}},
   {TW::ID_SHOW_LUA_HELP,    "HelpMacro",       _("&Macro help..."),     _("macro help"),   "",             'm', {NULL}},
   {TW::ID_HELP_ABOUT,       "HelpAbout",       _("&About..."),          _("about"),        "",             'm', {NULL}},
+  {TW::ID_POPUP_SELECT_ALL, "PopupSelectAll",  _("Select &All"),        _("sel all"),      "",             'm', {NULL}},
+  {TW::ID_POPUP_DELETE_SEL, "PopupDeleteSel",  _("&Delete"),            _("del sel"),      "",             'm', {NULL}},
   {TW::ID_KILL_COMMAND,     "KillCommand",     "\0",                    NULL,              "Ctrl+.",       'm', {NULL}},
   {TW::ID_LAST,             "\0",              "\0",                    NULL,              "\0",           'm', {NULL}}
 };

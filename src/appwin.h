@@ -294,6 +294,8 @@ public:
   long onFocusIn(        FXObject*o, FXSelector sel, void*p );
   long onFocusDoc(       FXObject*o, FXSelector sel, void*p );
   long onCmdIO(          FXObject*o, FXSelector sel, void*p );
+  long OnPopupSelectAll( FXObject*o, FXSelector sel, void*p );
+  long OnPopupDeleteSel( FXObject*o, FXSelector sel, void*p );
   long onTestSomething(  FXObject*o, FXSelector sel, void*p );
   enum {
     ID_TABS_TOP=FXMainWindow::ID_LAST,
@@ -409,6 +411,8 @@ public:
     ID_TBAR_CUSTOM_CMD,
     ID_FOCUS_DOC,
     ID_CMDIO,
+    ID_POPUP_SELECT_ALL,
+    ID_POPUP_DELETE_SEL,
     ID_TEST_SOMETHING,
     ID_LAST
   };

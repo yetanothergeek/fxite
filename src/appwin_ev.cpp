@@ -144,6 +144,8 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_SHOW_LUA_HELP, onShowHelp),
   TWMAPFUNCS(ID_FMT_DOS,ID_FMT_UNIX,onFileFormat),
   TWMAPFUNC(ID_TBAR_CUSTOM_CMD,onTBarCustomCmd),
+  TWMAPFUNC(ID_POPUP_SELECT_ALL,OnPopupSelectAll),
+  TWMAPFUNC(ID_POPUP_DELETE_SEL,OnPopupDeleteSel),
   TWMAPSEL(SEL_FOCUSIN,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STALE,CheckStale),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STYLE,CheckStyle),
@@ -1146,6 +1148,25 @@ long TopWindow::onDeleteChunk(FXObject*o, FXSelector sel, void*p)
   DOC_SEND(cmd);
   return 1;
 }
+
+
+
+long TopWindow::OnPopupSelectAll( FXObject*o, FXSelector sel, void*p )
+{
+  SciDoc*sci=FocusedDoc();
+  sci->sendMessage(SCI_SELECTALL, 0, 0);
+  return 1;
+}
+
+
+
+long TopWindow::OnPopupDeleteSel( FXObject*o, FXSelector sel, void*p )
+{
+  SciDoc*sci=ControlDoc();
+  sci->sendString(SCI_REPLACESEL, 0, "");
+  return 1;
+}
+
 
 
 #define macro_record_search() \
