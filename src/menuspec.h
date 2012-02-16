@@ -51,9 +51,11 @@ public:
   static MenuSpec*MenuSpecs();
   static FXint*TBarBtns();
   static MenuSpec*LookupMenu(FXint sel);
+  static MenuSpec*LookupMenuByPref(const char*pref);
   static const char*TBarColors(FXint i);
   static const char*GetUsrCmdPath(MenuSpec*spec);
   static void GetTBarBtnTip(MenuSpec*spec, FXString &tip);
+  static void GetTipFromFilename(const char*filename, FXString &tip);
   static MenuSpec*AddTBarUsrCmd(FXMenuCommand*mc);
   static void RemoveTBarUsrCmd(MenuSpec*spec);
   static void PurgeTBarCmds();

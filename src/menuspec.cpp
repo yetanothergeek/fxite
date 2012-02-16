@@ -364,43 +364,54 @@ void MenuMgr::PurgeTBarCmds()
 
 #define _GetCaption(p) ((FXMenuCaption*)((p)->getParent()->getUserData()))
 
+
+void MenuMgr::GetTipFromFilename(const char*filename, FXString &tip)
+{
+  tip=filename;
+  tip.erase(0,TopWindow::ConfigDir().length());
+  FXString path=FXPath::directory(tip);
+#ifdef WIN32
+  path.substitute(PATHSEP,'/');
+#endif
+  tip=FXPath::title(tip);
+  tip.erase(0,3);
+  if (tip.find('.')>=0) { tip=FXPath::title(tip); }
+  tip=tip.section('@',0);
+  tip.prepend(path+"/");
+  tip.substitute("_","");
+  tip.substitute('-',' ');
+  FXint n=0;
+  do {
+    n=tip.find('/',n);
+    if (n>=0) {
+      if (isdigit(tip[n+1])&&isdigit(tip[n+2])&&(tip[n+3]=='.')) { tip.erase(n+1,3); }
+      n++;
+    } else {
+      break;
+    }
+  } while (1);
+  tip.substitute("/"," -> ");
+  tip.at(0)=toupper(tip.text()[0]);
+  for (char*c=&(tip.at(0)); *c; c++) { if (c[0]==' ') { c[1]=toupper(c[1]); } } 
+}
+
+
+
 // Construct a tooltip string based on a menu item's path.
 void MenuMgr::GetTBarBtnTip(MenuSpec*spec, FXString &tip)
 {
   if (spec&&spec->ms_mc) {
     tip=spec->ms_mc->getText();
     if (spec->type=='u') {
-      tip=(const char*)spec->ms_mc->getUserData();
-      tip.erase(0,TopWindow::ConfigDir().length());
-      FXString path=FXPath::directory(tip);
-#ifdef WIN32
-      path.substitute(PATHSEP,'/');
-#endif
-      tip=FXPath::title(tip);
-      tip.erase(0,3);
-      if (tip.find('.')>=0) { tip=FXPath::title(tip); }
-      tip=tip.section('@',0);
-      tip.prepend(path+"/");
-      tip.substitute("_","");
-      tip.substitute('-',' ');
-      FXint n=0;
-      do {
-        n=tip.find('/',n);
-        if (n>=0) {
-          if (isdigit(tip[n+1])&&isdigit(tip[n+2])&&(tip[n+3]=='.')) { tip.erase(n+1,3); }
-          n++;
-        } else {
-          break;
-        }
-      } while (1);
-      tip.substitute("/"," -> ");
-      tip.at(0)=toupper(tip.text()[0]);
-      for (char*c=&(tip.at(0)); *c; c++) { if (c[0]==' ') { c[1]=toupper(c[1]); } }
+      GetTipFromFilename((const char*)spec->ms_mc->getUserData(),tip);
     } else {
       for (FXMenuCaption*cpn=_GetCaption(spec->ms_mc); cpn; cpn=_GetCaption(cpn)) {
         tip.prepend(cpn->getText()+" -> ");
       }
     }
+  } else {
+    tip=spec?spec->mnu_txt:FXString::null;
+    tip.substitute("&", "",true);
   }
 }
 
@@ -520,7 +531,7 @@ MenuSpec* MenuMgr::LookupMenu(FXint sel)
 
 
 
-static MenuSpec* LookupMenuByPref(const char* pref)
+MenuSpec* MenuMgr::LookupMenuByPref(const char*pref)
 {
   if (pref) {
     MenuSpec*spec;
