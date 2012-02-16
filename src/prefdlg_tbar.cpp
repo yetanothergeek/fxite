@@ -53,12 +53,11 @@ FXIMPLEMENT(ToolbarPrefs,DualListForm,ToolbarPrefsMap,ARRAYNUMBER(ToolbarPrefsMa
 
 
 
-ToolbarPrefs::ToolbarPrefs(FXComposite*p, FXObject* tgt, FXSelector sel, FXint max):
+ToolbarPrefs::ToolbarPrefs(FXComposite*p, FXObject* tgt, FXSelector sel):
   DualListForm(p,tgt,sel,TBAR_MAX_BTNS)
 {
   udata = (void*)((FXival)ToolbarChangedLayout);
   prefs=Settings::instance();
-  main_win=TopWindow::instance();
   FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
@@ -122,7 +121,7 @@ long ToolbarPrefs::onRemoveItem(FXObject*o,FXSelector sel,void*p)
 long ToolbarPrefs::onInsertCustomItem(FXObject*o,FXSelector sel,void*p)
 {
   FXMenuCommand*mc;
-  if (ToolsTree::SelectTool(this, ((TopWindow*)main_win)->UserMenus(), mc)) {
+  if (ToolsTree::SelectTool(this, TopWindow::instance()->UserMenus(), mc)) {
     const char*newpath=(const char*)mc->getUserData();
     if (newpath) {
       // If the command is already in the used items list, just select it...

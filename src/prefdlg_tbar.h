@@ -24,7 +24,6 @@ private:
   FXDECLARE(ToolbarPrefs);
   ToolbarPrefs(){}
   FXButton* custom_btn;
-  FXMainWindow* main_win;
   virtual void PopulateAvail();
   virtual void PopulateUsed();
   virtual void CheckCount();
@@ -35,7 +34,7 @@ public:
   long onInsertCustomItem(FXObject*o, FXSelector sel, void*p);
   long onChangeBtnSize(FXObject*o,FXSelector sel,void*p);
   long onChangeBtnWrap(FXObject*o,FXSelector sel,void*p);
-  ToolbarPrefs(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, FXint max=0);
+  ToolbarPrefs(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0);
   enum {
     ID_INSERT_CUSTOM=DualListForm::ID_LAST,
     ID_CHANGE_BTN_WRAP,
