@@ -110,8 +110,7 @@ long DualListForm::onArrangeItem(FXObject*o,FXSelector sel,void*p)
       break;
     }
   }
-  CheckIndex();
-  NotifyChanged(udata);
+  CheckCount();
   return 1;
 }
 
