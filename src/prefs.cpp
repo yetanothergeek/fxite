@@ -735,6 +735,7 @@ static const char* edit_sect = "Editor";
 static const char* view_sect = "ViewMenu";
 static const char* tbar_sect = "Toolbar";
 static const char* keys_sect = "Keybindings";
+static const char* popup_sect = "PopupMenu";
 
 
 static const char*  sectnames[] = {  main_sect,  geom_sect,  edit_sect,  view_sect,  tbar_sect,  NULL};
@@ -964,6 +965,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   styles=GlobalStyle;
   MenuMgr::ReadMenuSpecs(reg,keys_sect);
   MenuMgr::ReadToolbarButtons(reg,tbar_sect);
+  MenuMgr::ReadPopupMenu(reg,popup_sect);
   ReadErrorPatterns(reg);
   ReadSysIncPaths(reg);
 }
@@ -1073,6 +1075,7 @@ Settings::~Settings()
 
   MenuMgr::WriteMenuSpecs(reg,keys_sect);
   MenuMgr::WriteToolbarButtons(reg,tbar_sect);
+  MenuMgr::WritePopupMenu(reg,popup_sect);
   SaveErrorPatterns(reg);
   SaveSysIncPaths(reg);
 

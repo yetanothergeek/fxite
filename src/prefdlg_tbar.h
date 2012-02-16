@@ -43,3 +43,25 @@ public:
   };
 };
 
+
+
+class PopupPrefs: public DualListForm {
+private:
+  FXDECLARE(PopupPrefs);
+  PopupPrefs(){}
+  FXButton* custom_btn;
+  FXButton* separator_btn;
+  virtual void PopulateAvail();
+  virtual void PopulateUsed();
+  virtual void CheckCount();
+public:
+  PopupPrefs(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0);
+  long onInsertCustomItem( FXObject*o, FXSelector sel, void*p);
+  long onInsertSeparator(  FXObject*o, FXSelector sel, void*p);
+  enum {
+    ID_INSERT_CUSTOM=DualListForm::ID_LAST,
+    ID_INSERT_SEPARATOR,
+    ID_LAST
+  };
+};
+

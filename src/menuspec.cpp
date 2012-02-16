@@ -23,6 +23,11 @@
 #include "appwin.h"
 #include "lang.h"
 
+#include <Scintilla.h>
+#include <FXScintilla.h>
+#include "scidoc.h"
+#include "shmenu.h"
+
 #include "intl.h"
 #include "menuspec.h"
 
@@ -560,6 +565,173 @@ const char* MenuMgr::GetUsrCmdPath(MenuSpec*spec) {
     }
   }
   return NULL;
+}
+
+
+
+static const char* DefaultPopupCommands[] = {
+  "EditUndo",
+  "EditRedo",
+  "",
+  "EditCut",
+  "EditCopy",
+  "EditPaste",
+  "PopupDeleteSel",
+  "",
+  "PopupSelectAll",
+  NULL
+};
+
+static const char*popup_section=NULL;
+
+static char* PopupCommands[POPUP_MAX_CMDS];
+
+
+
+void MenuMgr::FreePopupCommands()
+{
+  for (FXint i=0; PopupCommands[i]; i++) {
+    free(PopupCommands[i]);
+    PopupCommands[i]=NULL;
+  }
+}
+
+
+
+char**MenuMgr::GetPopupCommands()
+{
+  return PopupCommands;
+}
+
+
+void MenuMgr::ReadPopupMenu(FXRegistry*reg, const char* popup_sect) {
+  popup_section=popup_sect;
+  FreePopupCommands();
+  if (reg->existingSection(popup_sect)) {
+    for (FXint i=0; i<POPUP_MAX_CMDS; i++) {
+      char keyname[32];
+      memset(keyname,0, sizeof(keyname));
+      snprintf(keyname,sizeof(keyname)-1,"Command_%d", i+1);
+      if (reg->existingEntry(popup_sect,keyname)) {
+        PopupCommands[i]=strdup(reg->readStringEntry(popup_sect,keyname));
+      }
+    }
+  } else {
+    for (FXint i=0; DefaultPopupCommands[i]; i++) {
+      PopupCommands[i]=strdup(DefaultPopupCommands[i]);
+    }
+  }
+}
+
+
+
+void MenuMgr::WritePopupMenu(FXRegistry*reg, const char* popup_sect) {
+  reg->deleteSection(popup_sect);
+  for (FXint i=0; PopupCommands[i]; i++) {
+    char keyname[32];
+    memset(keyname,0, sizeof(keyname));
+    snprintf(keyname,sizeof(keyname)-1,"Command_%d", i+1);
+    reg->writeStringEntry(popup_sect,keyname,PopupCommands[i]);
+  }
+  FreePopupCommands();
+}
+
+
+
+class PopUpMnuCmd: public FXMenuCommand {
+  FXDECLARE(PopUpMnuCmd)
+  PopUpMnuCmd() {}
+  protected:
+#ifdef FOX_1_6
+ FXlong CreationTime;
+#else
+ FXTime CreationTime;
+#endif
+public:
+  PopUpMnuCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel):
+     FXMenuCommand(p,text,ic,tgt,sel), CreationTime(FXThread::time()) { }
+  long onButtonRelease(FXObject*o,FXSelector sel,void*p) {
+    return (FXThread::time()-CreationTime)<500000000 ? 1 : FXMenuCommand::onButtonRelease(o,sel,p);
+  }
+};
+FXDEFMAP(PopUpMnuCmd) PopUpMnuCmdMap[]={ FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,PopUpMnuCmd::onButtonRelease) };
+FXIMPLEMENT(PopUpMnuCmd,FXMenuCommand,PopUpMnuCmdMap,ARRAYNUMBER(PopUpMnuCmdMap));
+
+
+
+void MenuMgr::ShowPopupMenu(FXPoint*pt)
+{
+  TopWindow*tw=TopWindow::instance();
+  SciDoc*sci=tw->FocusedDoc();
+  FXMenuPane *mnu=new FXMenuPane(tw);
+  static FXint toolpathlen=tw->ConfigDir().length()+6;
+  for (char**pref=PopupCommands; *pref; pref++) {
+    if ((*pref)[0]) {
+      if (strchr(*pref,PATHSEP)) {
+        if (FXStat::isFile(*pref)) {
+          FXString label;
+          FXSelector sel=0;
+          const FXchar *subdir=(*pref)+toolpathlen;
+          switch (subdir[0]) {
+            case 'c': {
+              if ((strncmp(subdir,"commands",8)==0)&&(subdir[8]==PATHSEP)) { sel=TopWindow::ID_USER_COMMAND; }
+              break;
+            }
+            case 'f': {
+              if ((strncmp(subdir,"filters",7)==0)&&(subdir[7]==PATHSEP)) { sel=TopWindow::ID_USER_FILTER; }
+              break;
+            }
+            case 'm': {
+              if ((strncmp(subdir,"macros",6)==0)&&(subdir[6]==PATHSEP)) { sel=TopWindow::ID_USER_MACRO; }
+              break;
+            }  
+            case 's': {
+              if ((strncmp(subdir,"snippets",8)==0&&(subdir[8]==PATHSEP))) { sel=TopWindow::ID_USER_SNIPPET; }
+              break;
+            }
+          }
+          if (sel && UserMenu::MakeLabelFromPath(*pref, label)) {
+            FXMenuCommand*mc = new PopUpMnuCmd(mnu,label,NULL,tw,sel);
+            mc->setUserData((void*)(*pref));
+            if ((sel==TopWindow::ID_USER_FILTER)&&(!sci->GetSelLength())) { mc->disable(); }
+          }
+        }
+      } else {
+        MenuSpec* spec=LookupMenuByPref(*pref);
+        if (spec) {
+          FXMenuCommand*mc = new PopUpMnuCmd(mnu,spec->mnu_txt,NULL,tw,spec->sel);     
+          switch (spec->sel) {
+            case TopWindow::ID_UNDO:{
+              if (!sci->sendMessage(SCI_CANUNDO,0,0)) { mc->disable(); } 
+              break;
+            }
+            case TopWindow::ID_REDO:{
+              if (!sci->sendMessage(SCI_CANREDO,0,0)) { mc->disable(); }
+              break;
+            }
+            case TopWindow::ID_PASTE:{
+              if (!sci->sendMessage(SCI_CANPASTE,0,0)) { mc->disable(); }
+              break;
+            }
+            case TopWindow::ID_CUT:
+            case TopWindow::ID_COPY:
+            case TopWindow::ID_POPUP_DELETE_SEL:{
+              if (!sci->GetSelLength()) { mc->disable(); }
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      new FXMenuSeparator(mnu);
+    }
+  }
+  mnu->create();
+  mnu->show();
+  mnu->popup(NULL,pt->x,pt->y);
+  mnu->grabKeyboard();
+  sci->getApp()->runModalWhileShown(mnu);
+  delete mnu;
 }
 
 

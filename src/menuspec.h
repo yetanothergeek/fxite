@@ -35,7 +35,7 @@ typedef struct _MenuSpec {
 
 
 #define TBAR_MAX_BTNS 24
-
+#define POPUP_MAX_CMDS 24
 
 class UsrMnuCmd;
 
@@ -48,6 +48,7 @@ private:
   static void InvalidateUsrTBarCmd(FXMenuCommand*mc);
 public:
   static FXMenuCommand*MakeMenuCommand(FXComposite*p, FXObject*tgt, FXSelector sel, char type, bool checked=false);
+  static void ShowPopupMenu(FXPoint*pt);
   static MenuSpec*MenuSpecs();
   static FXint*TBarBtns();
   static MenuSpec*LookupMenu(FXint sel);
@@ -63,5 +64,9 @@ public:
   static void ReadToolbarButtons(FXRegistry*reg, const char*tbar_section);
   static void ReadMenuSpecs(FXRegistry*reg, const char* keys_sect);
   static void WriteMenuSpecs(FXRegistry*reg, const char* keys_sect);
+  static void ReadPopupMenu(FXRegistry*reg, const char* popup_sect);
+  static void WritePopupMenu(FXRegistry*reg, const char* popup_sect);
+  static char**GetPopupCommands();
+  static void FreePopupCommands();
 };
 

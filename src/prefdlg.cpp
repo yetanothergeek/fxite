@@ -60,6 +60,7 @@ static const char* hint_list[] = {
   color_hint,
   _("Double-click an item to edit"),
   _("Edit toolbar buttons"),
+  _("Edit popup menu items"),
   _("User interface colors and font"),
   NULL
 };
@@ -325,6 +326,14 @@ void PrefsDialog::MakeToolbarTab()
   new FXTabItem(tabs,_("toolbar"));
   new ToolbarPrefs(tabs,this,ID_CHANGED_TOOLBAR);
   changed_toolbar=ToolbarUnchanged;
+}
+
+
+
+void PrefsDialog::MakePopupTab()
+{
+  new FXTabItem(tabs,_("popup"));
+  new PopupPrefs(tabs);
 }
 
 
@@ -711,6 +720,7 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
   MakeSyntaxTab();
   MakeKeybindingsTab();
   MakeToolbarTab();
+  MakePopupTab();
   MakeThemeTab();
   tabs->setCurrent(whichtab,true);
   tabs->childAtIndex(whichtab*2)->setFocus();

@@ -147,6 +147,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_POPUP_SELECT_ALL,OnPopupSelectAll),
   TWMAPFUNC(ID_POPUP_DELETE_SEL,OnPopupDeleteSel),
   TWMAPSEL(SEL_FOCUSIN,ID_SCINTILLA, onScintilla),
+  TWMAPSEL(SEL_PICKED,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STALE,CheckStale),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STYLE,CheckStyle),
   TWMAPSEL(SEL_CHORE,  ID_FOCUS_DOC,onFocusDoc),
@@ -854,6 +855,10 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
       getApp()->addChore(this, ID_CHECK_STALE);
       if (sci->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,sci); }
       active_widget=sci;
+      return 1;
+    }
+    case SEL_PICKED: {
+      MenuMgr::ShowPopupMenu((FXPoint*)p);
       return 1;
     }
     default: { return 1; }

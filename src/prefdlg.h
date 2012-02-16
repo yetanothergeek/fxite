@@ -38,6 +38,7 @@ private:
   void MakeEditorTab();
   void MakeKeybindingsTab();
   void MakeToolbarTab();
+  void MakePopupTab();
   void MakeThemeTab();
   FXLabel* hint_lab;
   FXMainWindow* main_win;

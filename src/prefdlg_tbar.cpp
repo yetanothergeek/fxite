@@ -21,6 +21,7 @@
 #include "menuspec.h"
 #include "appwin.h"
 #include "tooltree.h"
+#include "shmenu.h"
 
 #include "intl.h"
 #include "prefdlg_tbar.h"
@@ -186,6 +187,156 @@ void ToolbarPrefs::PopulateUsed()
       } else {
         used_items->appendItem(new TBarListItem(spec->pref,NULL,(void*)spec));
       }
+    }
+  }
+}
+
+
+
+
+FXDEFMAP(PopupPrefs) PopupPrefsMap[]={
+  FXMAPFUNC(SEL_COMMAND,PopupPrefs::ID_INSERT_CUSTOM,PopupPrefs::onInsertCustomItem),
+  FXMAPFUNC(SEL_COMMAND,PopupPrefs::ID_INSERT_SEPARATOR,PopupPrefs::onInsertSeparator),
+};
+
+FXIMPLEMENT(PopupPrefs,DualListForm,PopupPrefsMap,ARRAYNUMBER(PopupPrefsMap));
+
+
+
+class PopupListItem: public FXListItem {
+public:
+  PopupListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic) { 
+    data=strdup((const char*)ptr);
+  }
+  ~PopupListItem() { if (data) { free(data); }}
+  virtual FXString getTipText() const {
+    FXString tip;
+    MenuMgr::GetTipFromFilename((const char*)getData(),tip);
+    return tip;
+  }
+};
+
+
+
+class PopupSeparator: public FXListItem {
+public:
+  PopupSeparator():FXListItem("--"){}
+  virtual FXString getTipText() const { return _("<separator>"); }
+};
+
+
+
+PopupPrefs::PopupPrefs(FXComposite*p, FXObject*tgt, FXSelector sel):DualListForm(p,tgt,sel,POPUP_MAX_CMDS)
+{
+  FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
+                                                     FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
+  custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
+                                NULL,this, ID_INSERT_CUSTOM,BUTTON_NORMAL|LAYOUT_CENTER_X);
+  FXVerticalFrame* SepBtnFrm=new FXVerticalFrame( mid_column,
+                                                     FRAME_NONE|LAYOUT_FILL|LAYOUT_CENTER_X|LAYOUT_CENTER_Y|LAYOUT_SIDE_BOTTOM);
+  SepBtnFrm->setPadTop(32);
+  separator_btn=new FXButton( SepBtnFrm, _("&Separator>>"),
+                                NULL,this, ID_INSERT_SEPARATOR,BUTTON_NORMAL|LAYOUT_CENTER_X|LAYOUT_CENTER_Y);
+
+}
+
+
+
+void PopupPrefs::CheckCount()
+{
+  MenuMgr::FreePopupCommands();
+  char**commands=MenuMgr::GetPopupCommands();
+  for (FXint i=0; i<used_items->getNumItems(); i++) {
+    if (dynamic_cast<TBarListItem*>(used_items->getItem(i))) {
+      MenuSpec*ms=(MenuSpec*)(used_items->getItemData(i));
+      if (ms) {
+        commands[i]=strdup(ms->pref?ms->pref:"");
+      } else {
+        commands[i]=strdup("");
+      }
+    } else if (dynamic_cast<PopupListItem*>(used_items->getItem(i))) {
+      const char*cmd=(const char*)used_items->getItemData(i);
+      commands[i]=strdup(cmd?cmd:"");
+    } else {
+       commands[i]=strdup("");
+    }
+  }
+  DualListForm::CheckCount();
+  if (ins_btn->isEnabled()) { custom_btn->enable(); } else { custom_btn->disable(); }
+}
+
+
+
+long PopupPrefs::onInsertSeparator(FXObject*o, FXSelector sel, void*p)
+{
+  InsertItem(new PopupSeparator());
+  return 1;
+}
+
+
+
+long PopupPrefs::onInsertCustomItem(FXObject*o, FXSelector sel, void*p)
+{
+  FXMenuCommand*mc;
+  if (ToolsTree::SelectTool(this, TopWindow::instance()->UserMenus(), mc)) {
+    const char*newpath=(const char*)mc->getUserData();
+    if (newpath) {
+      // If the command is already in the used items list, just select it...
+      for (FXint i=0; i<used_items->getNumItems(); i++) {
+        const char*oldpath=(const char*)used_items->getItemData(i);
+        if (oldpath && (strcmp(newpath, oldpath)==0)) {
+          used_items->selectItem(i);
+          used_items->setCurrentItem(i);
+          used_items->makeItemVisible(i);
+          CheckIndex();
+          return 1;
+        }
+      }
+      FXString label;
+      if (FXStat::exists(newpath) && UserMenu::MakeLabelFromPath(newpath,label)) {
+        FXListItem*item=new PopupListItem(label,NULL,(void*)newpath);
+        InsertItem(item);
+      }
+    }
+  }
+  return 1;
+}
+
+
+
+void PopupPrefs::PopulateAvail()
+{
+  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
+    if ((spec->type=='m')&&(spec->ms_mc||(strncmp(spec->pref,"Popup",5)==0))) {
+      avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
+    }
+  }
+}
+
+
+
+void PopupPrefs::PopulateUsed()
+{
+  for (char**cmd=MenuMgr::GetPopupCommands(); *cmd; cmd++) {
+    if (*cmd[0]) {
+      MenuSpec* spec=MenuMgr::LookupMenuByPref(*cmd);
+      if (spec) {
+        FXint found=avail_items->findItemByData((void*)spec);
+        if (found>=0) {
+          TBarListItem*item=(TBarListItem*)avail_items->extractItem(found);
+          item->setSelected(false);
+          used_items->appendItem(item);
+        } else {
+          used_items->appendItem(new TBarListItem(spec->pref,NULL,(void*)spec));
+        }
+      } else {
+        FXString label;
+        if (FXStat::exists(*cmd) && UserMenu::MakeLabelFromPath(*cmd,label)) {
+          used_items->appendItem(new PopupListItem(label,NULL,*cmd));
+        }
+      }
+    } else {
+      used_items->appendItem(new PopupSeparator());
     }
   }
 }

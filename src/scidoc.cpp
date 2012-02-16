@@ -36,10 +36,12 @@
 
 
 FXDEFMAP(SciDoc) SciDocMap[] = {
-  FXMAPFUNC(SEL_KEYPRESS, 0, SciDoc::onKeyPress)
+  FXMAPFUNC(SEL_KEYPRESS, 0, SciDoc::onKeyPress),
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS, 0, SciDoc::onRightBtnPress)
 };
 
 FXIMPLEMENT(SciDoc,FXScintilla,SciDocMap,ARRAYNUMBER(SciDocMap));
+
 
 
 static const char* c_openers="{[(";
@@ -97,6 +99,29 @@ SciDoc::~SciDoc()
 
 
 
+void SciDoc::ShowPopupMenu(int x, int y)
+{
+  long pos=sendMessage(SCI_GETCURRENTPOS,0,0);
+  if (x<0||y<0) { 
+    x=sendMessage(SCI_POINTXFROMPOSITION,0,pos);
+    y=sendMessage(SCI_POINTYFROMPOSITION,0,pos);
+    translateCoordinatesTo(x,y,getApp()->getRootWindow(),x,y);
+  }
+  FXPoint p(x,y);
+  if (target && message) { target->tryHandle(this,FXSEL(SEL_PICKED,message), (void*)&p); }
+}
+
+
+
+long SciDoc::onRightBtnPress(FXObject *o, FXSelector sel, void *p)
+{
+  FXEvent* ev=(FXEvent*)p;
+  ShowPopupMenu(ev->root_x-4,ev->root_y-2);
+  return 1;
+}
+
+
+
 long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
 {
   FXEvent*ev=(FXEvent*)p;
@@ -111,12 +136,20 @@ long SciDoc::onKeyPress(FXObject *o, FXSelector sel, void *p)
       if ((ev->state & CONTROLMASK) && (sendMessage(SCI_GETUSETABS, 0, 0)==0)) {
         sendString(SCI_ADDTEXT, 1, "\t");
         return 1;
-      } // else fall through...
+      } else { break; }
     }
-    default: {
-      return FXScintilla::onKeyPress(o,sel,p);
+    case KEY_Menu: {
+      ShowPopupMenu(-1,-1);
+      return 1;
+    }
+    case KEY_F10: {
+      if (ev->state & SHIFTMASK) {
+        ShowPopupMenu(-1,-1);
+        return 1;
+      } else { break; }
     }
   }
+  return FXScintilla::onKeyPress(o,sel,p);
 }
 
 

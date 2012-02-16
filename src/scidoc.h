@@ -73,6 +73,7 @@ public:
   SciDoc*Slave() { return (SciDoc*)getNext(); }
   SciSearch *search;
   long onKeyPress(FXObject *o, FXSelector sel, void *p);
+  long onRightBtnPress(FXObject *o, FXSelector sel, void *p);
   virtual void moveContents(FXint x,FXint y);
   SciDoc(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0);
   ~SciDoc();
@@ -193,6 +194,7 @@ public:
   void SetWrapAware(bool aware);
   void SelectionToUpper();
   void SelectionToLower();
+  void ShowPopupMenu(int x, int y);
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
