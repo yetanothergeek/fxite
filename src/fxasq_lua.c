@@ -47,7 +47,7 @@ typedef struct _DialogBox {
 
 static DialogBox* todialog(lua_State *L, int argnum)
 {
-  DialogBox*rv=lua_touserdata(L,argnum);
+  DialogBox*rv=(DialogBox*)lua_touserdata(L,argnum);
   return (rv && (DialogBoxType==rv->id))?rv:NULL;
 }
 
@@ -243,7 +243,7 @@ static int asq_new(lua_State *L) {
     luaL_argcheck(L,lua_isstring(L, -1),2,msg);
     lua_pop(L, 1);
   }
-  btns=calloc(sizeof(char*)*(n+1), 1);
+  btns=(const char**)calloc(sizeof(char*)*(n+1), 1);
   for (i=1;i<=n; i++) {
     lua_rawgeti(L,2,i);
     btns[i-1]=lua_tostring(L, -1);
