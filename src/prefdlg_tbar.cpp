@@ -31,7 +31,15 @@
 // Subclass FXListItem to show custom tooltip...
 class TBarListItem: public FXListItem {
 public:
-  TBarListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic,ptr){ }
+  TBarListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic,ptr) {
+    if (text.empty()) {
+      const char *path=MenuMgr::GetUsrCmdPath((MenuSpec*)ptr);
+      FXString s;
+      if (path && UserMenu::MakeLabelFromPath(path,s)) {
+        setText(stripHotKey(s.section('\t',0)));
+      } else { setText(((MenuSpec*)ptr)->pref); }
+    }
+  }
   virtual FXString getTipText() const {
     FXString tip;
     MenuSpec*spec=(MenuSpec*)getData();
@@ -138,7 +146,7 @@ long ToolbarPrefs::onInsertCustomItem(FXObject*o,FXSelector sel,void*p)
       }
     }
     MenuSpec*spec=MenuMgr::AddTBarUsrCmd(mc);
-    FXListItem*item=new TBarListItem(spec->pref,NULL,(void*)spec);
+    FXListItem*item=new TBarListItem(FXString::null,NULL,(void*)spec);
     InsertItem(item);
   }
   return 1;
@@ -185,7 +193,7 @@ void ToolbarPrefs::PopulateUsed()
         item->setSelected(false);
         used_items->appendItem(item);
       } else {
-        used_items->appendItem(new TBarListItem(spec->pref,NULL,(void*)spec));
+        used_items->appendItem(new TBarListItem(FXString::null,NULL,(void*)spec));
       }
     }
   }
