@@ -205,8 +205,9 @@ FXIMPLEMENT(PopupPrefs,DualListForm,PopupPrefsMap,ARRAYNUMBER(PopupPrefsMap));
 
 class PopupListItem: public FXListItem {
 public:
-  PopupListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic) { 
+  PopupListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem() { 
     data=strdup((const char*)ptr);
+    setText(stripHotKey(text.section('\t',0)));
   }
   ~PopupListItem() { if (data) { free(data); }}
   virtual FXString getTipText() const {
