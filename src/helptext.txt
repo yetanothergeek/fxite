@@ -24,6 +24,7 @@
  @@@Hook Functions@@@
  @@@Custom Keybindings@@@
  @@@The Toolbar@@@
+ @@@The Popup Menu@@@
  @@@Multiple documents and multiple views@@@
  @@@Named Instances and Configurations@@@
  @@@Crash Recovery@@@
@@ -1362,6 +1363,19 @@ large buttons. For users who would rather not see the toolbar at all, you can hi
 the %%%Toolbar%%% option from the %%%View%%% menu.
 
 
+###The Popup Menu###
+
+When you right-click on a document, or press %%%Shift+F10%%%, a small "popup" menu is displayed. \
+The menu can also be displayed using the "context menu" key on Windows-style keyboards. By default, \
+this menu provides access to a few commonly-used commands (Undo/Redo, Cut/Copy/Paste, etc.) \
+You can alter this configuration from the %%%popup%%% tab of the %%%Preferences%%% dialog. \
+From there, you can remove unwanted commands, add commands that you use more often, and re-arrange \
+the commands to suit you own taste. You can also add items to access any custom menu commands \
+you may have added to the %%%Tools%%% menu. The "Separator" button in the dialog can be \
+used to insert horizontal dividers into the menu to help visually group the commands.
+
+Note that this menu only supports simple commands; menu items with check boxes or \
+"radio buttons" (multiple choice items) cannot be used in the popup menu.
 
 ###Crash Recovery###
 
