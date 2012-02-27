@@ -975,7 +975,8 @@ long TopWindow::onCloseAll(FXObject*o,FXSelector sel,void*p)
 
 long TopWindow::onFileSaveACopy(FXObject*o, FXSelector sel, void*p)
 {
-  filedlgs->SaveFileAs(ControlDoc(),false);
+  SciDoc*sci=ControlDoc();
+  filedlgs->SaveFileAs(sci,false,sci->Filename().empty()?"untitled.bak":FXPath::name(sci->Filename()+".bak"));
   return 1;
 }
 

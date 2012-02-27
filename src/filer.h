@@ -36,7 +36,7 @@ public:
   FXString patterns() { return _patterns; }
   bool TryClose(SciDoc*sci, const char *alt);
   bool SaveFile(SciDoc*sci, FXString filename, bool as_itself=true);
-  bool SaveFileAs(SciDoc*sci, bool as_itself=true);
+  bool SaveFileAs(SciDoc*sci, bool as_itself=true, const FXString &suggestion=FXString::null);
   bool ExportPdf(SciDoc*sci, const char* filename=NULL);
   bool ExportHtml(SciDoc*sci, const char* filename=NULL);
   bool GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi=true);

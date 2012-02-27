@@ -69,7 +69,7 @@ static void GetPathForDlg(SciDoc*sci, FXString &path)
 
 #define prefs Settings::instance()
 
-bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
+bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself, const FXString &suggestion)
 {
   FXString result="";
   FXString path;
@@ -77,6 +77,7 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself)
   FileDlg dlg(sci->getShell(),_("Save file as"));
   dlg.setPatternList(_patterns);
   dlg.setCurrentPattern(prefs->FileFilterIndex);
+  if (!suggestion.empty()) { dlg.setFilename(suggestion); }
   dlg.setDirectory(path);
   if (dlg.execute(PLACEMENT_OWNER)) {
     result=dlg.getFilename();
