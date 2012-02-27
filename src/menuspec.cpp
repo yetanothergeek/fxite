@@ -406,12 +406,21 @@ void MenuMgr::GetTipFromFilename(const char*filename, FXString &tip)
 void MenuMgr::GetTBarBtnTip(MenuSpec*spec, FXString &tip)
 {
   if (spec&&spec->ms_mc) {
-    tip=spec->ms_mc->getText();
-    if (spec->type=='u') {
-      GetTipFromFilename((const char*)spec->ms_mc->getUserData(),tip);
-    } else {
-      for (FXMenuCaption*cpn=_GetCaption(spec->ms_mc); cpn; cpn=_GetCaption(cpn)) {
-        tip.prepend(cpn->getText()+" -> ");
+    switch (spec->type) {
+      case 'u': {
+        GetTipFromFilename((const char*)spec->ms_mc->getUserData(),tip);
+        break;
+      }
+      case 'x': {
+        GetTipFromFilename(spec->ms_fn,tip);
+        break;
+      }
+      default: {
+        tip=spec->ms_mc->getText();
+        for (FXMenuCaption*cpn=_GetCaption(spec->ms_mc); cpn; cpn=_GetCaption(cpn)) {
+          tip.prepend(cpn->getText()+" -> ");
+        }
+        break;
       }
     }
   } else {
