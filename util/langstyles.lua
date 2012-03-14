@@ -87,6 +87,7 @@ function print_words()
   keywordclass2={}
   keywordclass3={}
   keywordclass4={}
+  keywordclass5={}
   keywordoptional1={}
   keywordoptional2={}
   keywordstandard={}
@@ -205,6 +206,16 @@ function print_words()
         line=line:gsub( "%.%.keywordclass%.primitives.pdftex%.%.","..keywordclass.primitives.pdftex.something..");
         line=line:gsub( "^keywordclass%.context%.all=", "keywordclass.context.all.something=");
         line=line:gsub( "keywordclass%.python%) ","keywordclass.python .. \"")
+
+        line=line:gsub( "keywordclass%.lua4%) ","keywordclass.lua4 .. \"")
+        line=line:gsub( "keywordclass2%.lua5%) ","keywordclass2.lua5 .. \"")
+        line=line:gsub( "keywordclass3%.lua5%) ","keywordclass3.lua5 .. \"")
+        line=line:gsub( "keywordclass4%.lua50%) ","keywordclass4.lua50 .. \"")
+        line=line:gsub( "keywordclass%.lua50%) ","keywordclass.lua50 .. \"")
+        line=line:gsub( "keywordclass5%.lua50%) ","keywordclass5.lua50 .. \"")
+        line=line:gsub("%$%(keywordclass4%.package$", "\"..keywordclass4.package")
+        line=line:gsub("%$%(keywordclass3%.bit32$", "\"..keywordclass3.bit32")
+
         line=line:gsub( "%.prefixes%) filter\"$", ".prefixes .. \"filter\"")
         if line:find("%) \"$") and not line:find("\".*%) \"$")  then
           line=line:gsub("%) \"$", "")
