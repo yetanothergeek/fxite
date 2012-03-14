@@ -1,5 +1,5 @@
 /*
-** $Id: ldblib.c,v 1.1 2009/11/10 10:22:59 yetanothergeek Exp $
+** $Id: ldblib.c,v 1.104.1.4 2009/08/04 18:50:18 roberto Exp $
 ** Interface from Lua to its debug API
 ** See Copyright Notice in lua.h
 */
@@ -45,6 +45,7 @@ static int db_setmetatable (lua_State *L) {
 
 
 static int db_getfenv (lua_State *L) {
+  luaL_checkany(L, 1);
   lua_getfenv(L, 1);
   return 1;
 }
