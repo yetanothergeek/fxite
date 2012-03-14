@@ -61,11 +61,14 @@ for UNUSED in \
 APDL \
 AU3 \
 AVE \
+AVS \
 Abaqus \
 Baan \
 Bullant \
+CoffeeScript \
 Crontab \
 Csound \
+ECL \
 EScript \
 Eiffel \
 Forth \
@@ -91,6 +94,7 @@ Spice \
 TACL \
 TADS3 \
 TAL \
+TCMD \
 VB \
 Eiffelkw \
 ESCRIPT \
