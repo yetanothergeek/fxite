@@ -554,6 +554,8 @@ void SCI_METHOD LexerCPP::Lex(unsigned int startPos, int length, int initStyle, 
 		// Handle line continuation generically.
 		if (sc.ch == '\\') {
 			if (sc.chNext == '\n' || sc.chNext == '\r') {
+				lineCurrent++;
+				vlls.Add(lineCurrent, preproc);
 				sc.Forward();
 				if (sc.ch == '\r' && sc.chNext == '\n') {
 					sc.Forward();
@@ -674,7 +676,7 @@ void SCI_METHOD LexerCPP::Lex(unsigned int startPos, int length, int initStyle, 
 					if (!IsASpace(sc.ch) || !keywords3.InList(s + 1)) {
 						sc.ChangeState(SCE_C_COMMENTDOCKEYWORDERROR|activitySet);
 					}
-					sc.SetState(styleBeforeDCKeyword);
+					sc.SetState(styleBeforeDCKeyword|activitySet);
 				}
 				break;
 			case SCE_C_STRING:

@@ -976,7 +976,7 @@ bool Document::InsertChar(int pos, char ch) {
  * Insert a null terminated string.
  */
 bool Document::InsertCString(int position, const char *s) {
-	return InsertString(position, s, static_cast<int>(strlen(s)));
+	return InsertString(position, s, static_cast<int>(s ? strlen(s) : 0));
 }
 
 void Document::ChangeChar(int pos, char ch) {
@@ -1461,7 +1461,7 @@ long Document::FindText(int minPos, int maxPos, const char *search,
 		const int endPos = MovePositionOutsideChar(maxPos, increment, false);
 
 		// Compute actual search ranges needed
-		const int lengthFind = (*length == -1) ? static_cast<int>(strlen(search)) : *length;
+		const int lengthFind = *length;
 
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, ft->lpstrText, lengthFind);
 		const int limitPos = Platform::Maximum(startPos, endPos);

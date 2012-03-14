@@ -105,6 +105,15 @@ public :
 		return sqlStatesLine;
 	}
 
+	unsigned short int IntoMergeStatement (unsigned short int sqlStatesLine, bool enable) {
+		if (enable)
+			sqlStatesLine |= MASK_MERGE_STATEMENT;
+		else
+			sqlStatesLine &= ~MASK_MERGE_STATEMENT;
+
+		return sqlStatesLine;
+	}
+
 	unsigned short int BeginCaseBlock (unsigned short int sqlStatesLine) {
 		if ((sqlStatesLine & MASK_NESTED_CASES) < MASK_NESTED_CASES) {
 			sqlStatesLine++;
@@ -139,6 +148,10 @@ public :
 		return (sqlStatesLine & MASK_INTO_DECLARE) != 0;
 	}
 
+	bool IsIntoMergeStatement (unsigned short int sqlStatesLine) {
+		return (sqlStatesLine & MASK_MERGE_STATEMENT) != 0;
+	}
+
 	unsigned short int ForLine(int lineNumber) {
 		if ((lineNumber > 0) && (sqlStatement.size() > static_cast<size_t>(lineNumber))) {
 			return sqlStatement[lineNumber];
@@ -156,7 +169,8 @@ private :
 		MASK_INTO_EXCEPTION = 0x2000,
 		MASK_INTO_CONDITION = 0x4000,
 		MASK_IGNORE_WHEN = 0x8000,
-		MASK_NESTED_CASES = 0x0FFF
+		MASK_MERGE_STATEMENT = 0x0800,
+		MASK_NESTED_CASES = 0x07FF
 	};
 };
 
@@ -291,6 +305,20 @@ private:
 		default :
 			return false;
 		}
+	}
+
+	bool IsCommentLine (int line, LexAccessor &styler) {
+		int pos = styler.LineStart(line);
+		int eol_pos = styler.LineStart(line + 1) - 1;
+		for (int i = pos; i + 1 < eol_pos; i++) {
+			int style = styler.StyleAt(i);
+			// MySQL needs -- comments to be followed by space or control char
+			if (style == SCE_SQL_COMMENTLINE && styler.Match(i, "--"))
+				return true;
+			else if (!IsASpaceOrTab(styler[i]))
+				return false;
+		}
+		return false;
 	}
 
 	OptionsSQL options;
@@ -508,8 +536,14 @@ void SCI_METHOD LexerSQL::Fold(unsigned int startPos, int length, int initStyle,
 	int visibleChars = 0;
 	int lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
+
 	if (lineCurrent > 0) {
-		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
+		// Backtrack to previous line in case need to fix its fold status for folding block of single-line comments (i.e. '--').
+		lineCurrent -= 1;
+		startPos = styler.LineStart(lineCurrent);
+
+		if (lineCurrent > 0)
+			levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	}
 	int levelNext = levelCurrent;
 	char chNext = styler[startPos];
@@ -540,6 +574,11 @@ void SCI_METHOD LexerSQL::Fold(unsigned int startPos, int length, int initStyle,
 			endFound = false;
 			isUnfoldingIgnored = false;
 		}
+		if ((!IsCommentStyle(style) && ch == ';') && sqlStates.IsIntoMergeStatement(sqlStatesCurrentLine)) {
+			// This is the end of "MERGE" statement.
+			sqlStatesCurrentLine = sqlStates.IntoMergeStatement(sqlStatesCurrentLine, false);
+			levelNext-=2;
+		}
 		if (options.foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
@@ -559,6 +598,13 @@ void SCI_METHOD LexerSQL::Fold(unsigned int startPos, int length, int initStyle,
 					levelNext--;
 				}
 			}
+		}
+		// Fold block of single-line comments (i.e. '--').
+		if (options.foldComment && atEOL && IsCommentLine(lineCurrent, styler)) {
+			if (!IsCommentLine(lineCurrent - 1, styler) && IsCommentLine(lineCurrent + 1, styler))
+				levelNext++;
+			else if (IsCommentLine(lineCurrent - 1, styler) && !IsCommentLine(lineCurrent + 1, styler))
+				levelNext--;
 		}
 		if (style == SCE_SQL_OPERATOR) {
 			if (ch == '(') {
@@ -690,11 +736,15 @@ void SCI_METHOD LexerSQL::Fold(unsigned int startPos, int length, int initStyle,
 			} else if ((!options.foldOnlyBegin) &&
 			           strcmp(s, "when") == 0 &&
 			           !sqlStates.IsIgnoreWhen(sqlStatesCurrentLine) &&
-			           !sqlStates.IsIntoExceptionBlock(sqlStatesCurrentLine) &&
-			           sqlStates.IsIntoCaseBlock(sqlStatesCurrentLine)) {
+			           !sqlStates.IsIntoExceptionBlock(sqlStatesCurrentLine) && (
+			               sqlStates.IsIntoCaseBlock(sqlStatesCurrentLine) ||
+			               sqlStates.IsIntoMergeStatement(sqlStatesCurrentLine)
+			               )
+			           ) {
 				sqlStatesCurrentLine = sqlStates.IntoCondition(sqlStatesCurrentLine, true);
 
 				// Don't foldind when CASE and WHEN are on the same line (with flag statementFound) (eg. "CASE selector WHEN expression1 THEN sequence_of_statements1;\n")
+				// and same way for MERGE statement.
 				if (!statementFound) {
 					levelCurrent--;
 					levelNext--;
@@ -709,6 +759,11 @@ void SCI_METHOD LexerSQL::Fold(unsigned int startPos, int length, int initStyle,
 			            strcmp(s, "procedure") == 0 ||
 			            strcmp(s, "package") == 0)) {
 				sqlStatesCurrentLine = sqlStates.IntoDeclareBlock(sqlStatesCurrentLine, true);
+			} else if ((!options.foldOnlyBegin) &&
+			           strcmp(s, "merge") == 0) {
+				sqlStatesCurrentLine = sqlStates.IntoMergeStatement(sqlStatesCurrentLine, true);
+				levelNext += 2;
+				statementFound = true;
 			}
 		}
 		if (atEOL) {
