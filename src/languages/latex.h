@@ -21,7 +21,7 @@ static StyleDef latex_style[] = {
 static const char* latex_words[]= {NULL};
 
 
-static const char* latex_mask = "*.tex|*.sty|*.aux|*.toc|*.idx";
+static const char* latex_mask = "*.tex|*.sty";
 
 
 static const char* latex_apps = "";
