@@ -908,6 +908,25 @@ long SciDoc::WordAtPos(FXString&s, long pos)
 }
 
 
+
+long SciDoc::PrefixAtPos(FXString&s, long pos)
+{
+  s="";
+  if (pos<0) { pos= sendMessage(SCI_GETCURRENTPOS,0,0); }
+  long line=sendMessage(SCI_LINEFROMPOSITION,pos,0);
+  GetLineText(line,s);
+  if (!s.empty()) {
+    long bow=sendMessage(SCI_GETCOLUMN,pos,0);
+    long eow=bow;
+    do { bow--; } while (strchr(WORD_CHARS, s[bow]));
+    s.trunc(eow);
+    s.erase(0,bow+1);
+  }
+  s.length(strlen(s.text()));
+  return s.length();
+}
+
+
 // Accept any one of these chars as a delimiter
 // for line:column coordinates
 static const char* RowColDelims=":,.";

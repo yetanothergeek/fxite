@@ -115,6 +115,7 @@ public:
   long GetSelText(FXString&txt);
   void SetSelText(const FXString&source);
   long WordAtPos(FXString&s, long pos=-1);
+  long PrefixAtPos(FXString&s, long pos=-1);
   long CharAt(long pos) { return sendMessage(SCI_GETCHARAT,pos,0); }
   long GetTextLength() { return sendMessage(SCI_GETLENGTH,0,0); }
   long GetText(FXString&txt);
