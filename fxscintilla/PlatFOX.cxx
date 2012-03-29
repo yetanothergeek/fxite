@@ -57,6 +57,7 @@
 #include "Platform.h"
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
+#include "FXScintilla.h"
 
 #include <map>
 using namespace std;
@@ -814,6 +815,7 @@ PRectangle Window::GetMonitorRect(Point pt) {
 
 class ListBoxFox : public ListBox
 {
+  Window * Parent;
   FXList * list;
   map<int, FXXPMIcon *> * pixhash;
   int desiredVisibleRows;
@@ -852,6 +854,7 @@ public:
   }
   virtual void SetList(const char* list, char separator, char typesep);
   virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage);
+  Window* GetParent() { return Parent; }
 };
 
 
@@ -859,97 +862,68 @@ static int sListSortFunction(const FXListItem* item1, const FXListItem* item2) {
   return compare(item1->getText(), item2->getText());
 }
 
-class PopupListBox : public FXPopup
-{
-FXDECLARE(PopupListBox)
-protected:
-  PopupListBox() {}
-protected:
-  ListBoxFox * listBox;
-  FXList * list;
-public:
-  enum {
-    ID_LIST = FXPopup::ID_LAST,
-    ID_LAST,
-  };
-public:
-  long onKeyPress(FXObject *, FXSelector, void *);
-  long onListKeyPress(FXObject *, FXSelector, void *);
-  long onDoubleClicked(FXObject *, FXSelector, void *);
-public:
-  PopupListBox(FXComposite * p, ListBoxFox * lb);
-  FXList * getList() { return list; }
-  virtual void setFocus() {
-    FXPopup::setFocus();
-    list->grabKeyboard();
+class ListBoxList: public FXList {
+private:
+  FXDECLARE(ListBoxList)
+  ListBoxList(){}
+  ListBoxFox*listBox;
+public: 
+  ListBoxList(FXComposite*p, ListBoxFox*lbf):FXList(p, NULL, 0, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER) {
+    listBox=lbf;
+    setSortFunc(sListSortFunction);
   }
-  virtual void killFocus() {
-    list->ungrabKeyboard();
-    FXPopup::killFocus();
+  long onKeyPress(FXObject*o, FXSelector sel, void*p) {
+    FXEvent*event = (FXEvent*)p;
+    switch(event->code) {
+      case KEY_Page_Up:
+      case KEY_KP_Page_Up:
+      case KEY_Page_Down:
+      case KEY_KP_Page_Down:
+      case KEY_Up:
+      case KEY_KP_Up:
+      case KEY_Down:
+      case KEY_KP_Down:
+      case KEY_Home:
+      case KEY_KP_Home:
+      case KEY_End:
+      case KEY_KP_End: {
+        return FXList::onKeyPress(o,sel,p);
+      }
+      default: {
+        return 0;
+      }
+    }
+  }
+  long onDoubleClicked(FXObject *o, FXSelector sel, void*p) {
+    FXList::onDoubleClicked(o,sel,p);
+    if (listBox->doubleClickAction) {
+      listBox->doubleClickAction(listBox->doubleClickActionData);
+      return 1;
+    } else {
+      FXEvent ev;
+      ev.type=SEL_KEYPRESS;
+      ev.code=KEY_Tab;
+      return listBox->GetParent()->GetID()->handle(o,MKUINT(0, SEL_KEYPRESS),&ev);
+    }
   }
 };
 
-FXDEFMAP(PopupListBox) PopupListBoxMap[]={
-  FXMAPFUNC(SEL_KEYPRESS, 0, PopupListBox::onKeyPress),
-  FXMAPFUNC(SEL_KEYPRESS, PopupListBox::ID_LIST, PopupListBox::onListKeyPress),
-  FXMAPFUNC(SEL_DOUBLECLICKED, 0, PopupListBox::onDoubleClicked),
+FXDEFMAP(ListBoxList) ListBoxListMap[] = {
+  FXMAPFUNC(SEL_KEYPRESS,0,ListBoxList::onKeyPress),
+  FXMAPFUNC(SEL_DOUBLECLICKED,0,ListBoxList::onDoubleClicked),
 };
+FXIMPLEMENT(ListBoxList,FXList,ListBoxListMap,ARRAYNUMBER(ListBoxListMap))
 
-FXIMPLEMENT(PopupListBox,FXPopup,PopupListBoxMap,ARRAYNUMBER(PopupListBoxMap))
 
-PopupListBox::PopupListBox(FXComposite * p, ListBoxFox * lb) :  FXPopup(p), listBox(lb)
-{
-  list = new FXList(this,
-    this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
-  list->setSortFunc(sListSortFunction);
-}
-
-long PopupListBox::onKeyPress(FXObject * sender, FXSelector sel, void * ptr)
-{
-  return FXPopup::onKeyPress(sender, sel, ptr);
-}
-
-long PopupListBox::onListKeyPress(FXObject * sender, FXSelector sel, void * ptr)
-{
-  list->setTarget(NULL);
-  list->onKeyPress(sender, sel, ptr);
-  FXEvent * event = (FXEvent *)ptr;
-
-  switch(event->code) {
-    case KEY_Page_Up:
-    case KEY_KP_Page_Up:
-    case KEY_Page_Down:
-    case KEY_KP_Page_Down:
-    case KEY_Up:
-    case KEY_KP_Up:
-    case KEY_Down:
-    case KEY_KP_Down:
-    case KEY_Home:
-    case KEY_KP_Home:
-    case KEY_End:
-    case KEY_KP_End:
-      break;
-    default:
-      getOwner()->handle(this, MKUINT(0, SEL_KEYPRESS), ptr);
-  }
-  list->setTarget(this);
-  return 1;
-}
-
-long PopupListBox::onDoubleClicked(FXObject *, FXSelector, void *)
-{
-  if (listBox->doubleClickAction) {
-    listBox->doubleClickAction(listBox->doubleClickActionData);
-  }
-  return 1;
-}
 
 // ====================================================================
 
 void ListBoxFox::Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_) {
-  wid = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
+  Parent=&parent;
+  wid = new FXPacker(static_cast<FXComposite*>(parent.GetID()), FRAME_NONE|LAYOUT_EXPLICIT,0,0,0,0,1,1,1,1,0,0);
+  list = new ListBoxList(static_cast<FXComposite*>(wid),this);
+  wid->setBackColor(list->getTextColor());
   wid->create();
-  list = (static_cast<PopupListBox *>(wid))->getList();
 }
 
 void ListBoxFox::SetFont(Font &scint_font) {
@@ -1020,9 +994,30 @@ PRectangle ListBoxFox::GetDesiredRect() {
 
 void ListBoxFox::Show(bool show) {
   if (show) {
-    (static_cast<FXPopup *>(wid))->popup(NULL, wid->getX(), wid->getY(),
-                      wid->getWidth(), wid->getHeight());
     list->selectItem(0);
+    list->setCurrentItem(0);
+    list->setFocus();
+    FXPacker *shell=static_cast<FXPacker*>(wid);
+    FXScintilla*sci=static_cast<FXScintilla*>(Parent->GetID());
+    FXint x=shell->getX();
+    FXint y=shell->getY();
+    FXint w=list->getWidth();
+    FXint h=shell->getDefaultHeight();
+    FXint sci_w = sci->getWidth();
+    FXint sci_h = sci->getHeight();
+    sci_w -= sci->isVerticalScrollable()?sci->verticalScrollBar()->getWidth():0;
+    sci_h -= sci->isHorizontalScrollable()?sci->horizontalScrollBar()->getHeight():0;
+    x -= sci->getX();
+    y -= sci->getY();
+    if ( x+w > sci_w ) {
+      x=sci_w-w;
+    }
+    if ( y+h > sci_h ) {
+      FXint line_hgt=sci->sendMessage(SCI_TEXTHEIGHT,sci->sendMessage(SCI_LINEFROMPOSITION,sci->sendMessage(SCI_GETCURRENTPOS,0,0),0),0);
+      y=y-(h+line_hgt);
+    }
+    shell->position(x,y,w,h);
+    shell->show();
   }
 }
 
@@ -1049,7 +1044,6 @@ void ListBoxFox::Append(char *s, int type) {
           maxItemCharacters = len;
   if (list->getNumItems() <= desiredVisibleRows)
     list->setNumVisible(list->getNumItems());
-  list->sortItems();
 }
 
 int ListBoxFox::Length() {
@@ -1061,6 +1055,8 @@ int ListBoxFox::Length() {
 void ListBoxFox::Select(int n) {
   // Case n==-1 handled by FXList
   list->setCurrentItem(n, true);
+  list->selectItem(n);
+  list->makeItemVisible(n);
 }
 
 int ListBoxFox::GetSelection() {
@@ -1141,6 +1137,7 @@ void ListBoxFox::SetList(const char* items, char separator, char typesep) {
     }
     delete []words;
   }
+  list->sortItems();
 }
 
 void ListBoxFox::RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) {
