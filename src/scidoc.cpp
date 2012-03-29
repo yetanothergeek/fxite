@@ -903,6 +903,7 @@ long SciDoc::WordAtPos(FXString&s, long pos)
     s.trunc(eow);
     s.erase(0,bow+1);
   }
+  s.length(strlen(s.text()));
   return s.length();
 }
 
