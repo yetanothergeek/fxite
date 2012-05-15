@@ -484,6 +484,7 @@ void TopWindow::AddFileToTagsMenu(const FXString &filename)
   unloadtagsmenu->enable();
   SetMenuEnabled(findtagmenu,true);
   SetMenuEnabled(showtipmenu,true);
+  SetMenuEnabled(autocompmenu,true);
   FXMenuCommand*mc=new FXMenuCommand(pane,"",NULL,this,ID_UNLOAD_TAGS);
   mc->create();
   mc->setText(fn);

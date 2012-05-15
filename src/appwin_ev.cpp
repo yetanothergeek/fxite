@@ -120,6 +120,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_UNLOAD_TAGS,onUnloadTags),
   TWMAPFUNC(ID_FIND_TAG,onFindTag),
   TWMAPFUNC(ID_SHOW_CALLTIP,onShowCallTip),
+  TWMAPFUNC(ID_AUTO_COMPLETE,onAutoComplete),
   TWMAPFUNCS(ID_USER_COMMAND,ID_USER_MACRO,onUserCmd),
   TWMAPFUNC(ID_MACRO_RECORD,onMacroRecord),
   TWMAPFUNC(ID_MACRO_PLAYBACK,onMacroPlayback),
@@ -624,6 +625,22 @@ long TopWindow::onShowCallTip(FXObject*o, FXSelector sel, void*p )
 
 
 
+long TopWindow::onAutoComplete(FXObject*o, FXSelector sel, void*p)
+{
+  SciDoc* sci=FocusedDoc();
+  FXString part=FXString::null;
+  completions.clear();
+  if (sci->PrefixAtPos(part)) {
+    for (FXWindow *w=unloadtagsmenu->getMenu()->getFirst(); w; w=w->getNext()) {
+      ParseAutoCompleteFile(&completions,part[0],((FXMenuCommand*)w)->getText().text());
+    }
+    ShowAutoComplete(sci);
+  }
+  return 1;
+}
+
+
+
 long TopWindow::onLoadTags(FXObject*o, FXSelector sel, void*p)
 {
   FXString filename="";
@@ -645,6 +662,7 @@ long TopWindow::onUnloadTags(FXObject*o, FXSelector sel, void*p)
     unloadtagsmenu->disable();
     SetMenuEnabled(findtagmenu,false);
     SetMenuEnabled(showtipmenu,false);
+    SetMenuEnabled(autocompmenu,false);
   }
   return 1;
 }

@@ -375,6 +375,9 @@ void TopWindow::CreateMenus()
   findtagmenu->disable();
   showtipmenu=MkMnuCmd(searchmenu,ID_SHOW_CALLTIP);
   showtipmenu->disable();
+  autocompmenu=MkMnuCmd(searchmenu,ID_AUTO_COMPLETE);
+  autocompmenu->disable();
+
 
   viewmenu=new TopMenuPane(this);
   NewTitle(menubar,_("&View"),NULL,viewmenu);

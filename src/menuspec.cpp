@@ -101,6 +101,7 @@ static MenuSpec menu_specs[] = {
   {TW::ID_BOOKMARK_RETURN,  "SearchMarkReturn",_("&Return"),            _("goto mark"),    "Ctrl+Shift+M", 'm', {NULL}},
   {TW::ID_FIND_TAG,         "SearchFindDef",   _("Find &Definition"),   _("find tag"),     "Ctrl+D",       'm', {NULL}},
   {TW::ID_SHOW_CALLTIP,     "SearchShowTip",   _("Show &Calltip"),      _("show tip"),     "Ctrl+'",       'm', {NULL}},
+  {TW::ID_AUTO_COMPLETE,    "SearchShowComp",  _("Show Comple&tions"),  _("auto comp"),    "Alt+'",        'm', {NULL}},
   {TW::ID_SHOW_STATUSBAR,   "ViewStatusBar",   _("&Status bar"),        _("stats bar"),    "",             'm', {NULL}},
   {TW::ID_SHOW_LINENUMS,    "ViewLineNumbers", _("Line &numbers"),      _("line nums"),    "",             'm', {NULL}},
   {TW::ID_SHOW_TOOLBAR,     "ViewToolbar",     _("Tool&bar"),           _("hide"),         "",             'm', {NULL}},

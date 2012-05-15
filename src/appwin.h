@@ -131,6 +131,7 @@ private:
   FXMenuCascade* unloadtagsmenu;
   FXMenuCommand* findtagmenu;
   FXMenuCommand* showtipmenu;
+  FXMenuCommand* autocompmenu;
   FXMenuCommand* filterselmenu;
   FXMenuCommand* openselmenu;
   FXMenuPane*recordermenu;
@@ -203,12 +204,14 @@ private:
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
   void SetStatusBarColors();
   void OpenSelected();
+  void ShowAutoComplete(SciDoc*sci);
   FXString save_hook;
   FXHotKey killkey;
   FXString bookmarked_file;
   DocTab* bookmarked_tab;
   long bookmarked_pos;
   bool skipfocus;
+  FXDict completions;
 public:
   long CheckStale(       FXObject*o, FXSelector sel, void*p );
   long CheckStyle(       FXObject*o, FXSelector sel, void*p );
@@ -273,6 +276,7 @@ public:
   long onUnloadTags(     FXObject*o, FXSelector sel, void*p );
   long onFindTag(        FXObject*o, FXSelector sel, void*p );
   long onShowCallTip(    FXObject*o, FXSelector sel, void*p );
+  long onAutoComplete(   FXObject*o, FXSelector sel, void*p );
   long onUserCmd(        FXObject*o, FXSelector sel, void*p );
   long onRescanUserMenu( FXObject*o, FXSelector sel, void*p );
   long onConfigureTools( FXObject*o, FXSelector sel, void*p );
@@ -385,6 +389,7 @@ public:
     ID_UNLOAD_TAGS,
     ID_FIND_TAG,
     ID_SHOW_CALLTIP,
+    ID_AUTO_COMPLETE,
     ID_USER_COMMAND,
     ID_USER_FILTER,
     ID_USER_SNIPPET,

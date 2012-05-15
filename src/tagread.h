@@ -19,3 +19,5 @@
 
 bool FindTag(SciDoc*sci, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat);
 void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu);
+void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename);
+

@@ -448,3 +448,45 @@ void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu)
     }
   }
 }
+
+
+
+void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
+{
+  FXFile file(filename,FXIO::Reading);
+  if (file.isOpen()) {
+    char*lines=(char*)malloc(file.size()+1);
+    lines[file.size()]='\0';
+    if (file.readBlock(lines,file.size())==file.size()) {
+      if (strncmp(lines,"!_TAG_FILE_FORMAT\t",18)==0) {
+        char*p1=lines;
+        do {
+          char*p3=strchr(p1,'\n');
+          if (!p3) { p3=strchr(p1,'\0'); }
+          if (*p1==startchar) {
+            char*p2=strchr(p1,'\t');
+            if (p2&&p3&&(p3>p2)) {
+              *p2='\0';
+              dict->insert(p1,NULL);
+            } else { break; }
+          }
+          if (*p3) { p1=p3+1; } else { break; }
+        } while (1);
+      } else {
+        char*p1=lines;
+        char*p3=strchr(p1,'\0');
+        do {
+          char*p2=strchr(p1,'\n');
+          if (!p2) { p2=p3; }
+          if (*p1==startchar) {
+            *p2='\0';
+            dict->insert(p1,NULL);
+          }
+          if (p2<p3) { p1=p2+1; } else { break; }
+        } while (1);
+      }
+    }
+    file.close();
+  }
+}
+
