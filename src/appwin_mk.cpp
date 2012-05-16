@@ -187,6 +187,7 @@ TopWindow::~TopWindow()
   delete getIcon();
   delete getMiniIcon();
   delete toolbar_font;
+  completions.clear();
   global_top_window_instance=NULL;
 }
 
