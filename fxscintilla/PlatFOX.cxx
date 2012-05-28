@@ -875,10 +875,7 @@ public:
   long onKeyPress(FXObject*o, FXSelector sel, void*p) {
     FXEvent*event = (FXEvent*)p;
     switch(event->code) {
-      case KEY_Page_Up:
-      case KEY_KP_Page_Up:
-      case KEY_Page_Down:
-      case KEY_KP_Page_Down:
+
       case KEY_Up:
       case KEY_KP_Up:
       case KEY_Down:
@@ -887,6 +884,16 @@ public:
       case KEY_KP_Home:
       case KEY_End:
       case KEY_KP_End: {
+        return FXList::onKeyPress(o,sel,p);
+      }
+      case KEY_Page_Up:
+      case KEY_KP_Page_Up: {
+        setCurrentItem(current>visible?current-visible:0);
+        return FXList::onKeyPress(o,sel,p);
+      }
+      case KEY_Page_Down:
+      case KEY_KP_Page_Down: {
+        setCurrentItem((current+visible)>(items.no()-1)?items.no()-1:current+visible);
         return FXList::onKeyPress(o,sel,p);
       }
       default: {
