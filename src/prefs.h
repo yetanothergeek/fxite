@@ -111,6 +111,8 @@ public:
   FXulong FileOpenMulti:1;
   FXulong WordWrap:1;
 
+  FXulong ShowCaretLine:1;
+
   FXint AutoIndent;
   FXint FileFilterIndex;
   FXint KeepFileFilter;

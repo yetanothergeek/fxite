@@ -185,6 +185,17 @@ bool TopWindow::ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_d
 
 
 
+bool TopWindow::ShowCaretLineCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  Settings*p=(Settings*)user_data;
+  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
+    sci->CaretLineBG(p->ShowCaretLine?p->caretlineStyle()->bg:NULL);
+  }
+  return true;
+}
+
+
+
 /* Mark all open documents as needing their settings updated. */
 bool TopWindow::PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
@@ -199,7 +210,7 @@ void TopWindow::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
   sci->setFont(prefs->fontdesc.face, prefs->fontdesc.size / 10);
   sci->sendMessage(SCI_SETEXTRAASCENT,prefs->FontAscent,0);
   sci->sendMessage(SCI_SETEXTRADESCENT,prefs->FontDescent,0);
-  sci->CaretLineBG(prefs->caretlineStyle()->bg);
+  sci->CaretLineBG(prefs->ShowCaretLine?prefs->caretlineStyle()->bg:NULL);
   sci->RightMarginBG(prefs->rightmarginStyle()->bg);
   sci->CaretWidth(prefs->CaretWidth);
   sci->SmartHome(prefs->SmartHome);

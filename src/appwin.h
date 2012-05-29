@@ -45,6 +45,7 @@ private:
   static bool WhiteSpaceCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
+  static bool ShowCaretLineCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
@@ -88,6 +89,7 @@ private:
   FXMenuCheck* white_chk;
   FXMenuCheck* margin_chk;
   FXMenuCheck* guides_chk;
+  FXMenuCheck* caretline_chk;
   FXMenuCheck* invert_chk;
   FXMenuCheck* status_chk;
   FXMenuPane* viewzoommenu;
@@ -249,6 +251,7 @@ public:
   long onShowStatusBar(  FXObject*o, FXSelector sel, void*p );
   long onShowMargin(     FXObject*o, FXSelector sel, void*p );
   long onShowIndent(     FXObject*o, FXSelector sel, void*p );
+  long onShowCaretLine(  FXObject*o, FXSelector sel, void*p );
   long onShowLineNums(   FXObject*o, FXSelector sel, void*p );
   long onShowToolbar(    FXObject*o, FXSelector sel, void*p );
   long onShowWhiteSpace( FXObject*o, FXSelector sel, void*p );
@@ -362,6 +365,7 @@ public:
     ID_INVERT_COLORS,
     ID_SHOW_MARGIN,
     ID_SHOW_INDENT,
+    ID_SHOW_CARET_LINE,
     ID_PREFS_DIALOG,
     ID_CTRL_TAB,
     ID_INDENT_STEP,

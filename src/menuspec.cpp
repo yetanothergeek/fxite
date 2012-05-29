@@ -108,6 +108,7 @@ static MenuSpec menu_specs[] = {
   {TW::ID_SHOW_WHITESPACE,  "ViewWhiteSpace",  _("&White space"),       _("white space"),  "",             'm', {NULL}},
   {TW::ID_SHOW_MARGIN,      "ViewRightMargin", _("Right &Margin"),      _("show margin"),  "",             'm', {NULL}},
   {TW::ID_SHOW_INDENT,      "ViewIndent",      _("Indent &Guides"),     _("show guides"),  "",             'm', {NULL}},
+  {TW::ID_SHOW_CARET_LINE,  "ViewCaretLine",   _("&Caret Line"),        _("caret line"),   "",             'm', {NULL}},
   {TW::ID_SHOW_OUTLIST,     "ViewOutputPane",  _("&Output pane"),       _("show panel"),   "",             'm', {NULL}},
   {TW::ID_INVERT_COLORS,    "ViewInvertColors",_("&Inverted colors"),   _("invert color"), "",             'm', {NULL}},
   {TW::ID_TABS_TOP,         "ViewTabsTop",     _("&Top"),               _("tabs top"),     "",             'm', {NULL}},

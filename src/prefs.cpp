@@ -656,6 +656,7 @@ static const char* view_keys[] = {
   "DocTabsPacked",
   "ZoomFactor",
   "DocTabPosition",
+  "ShowCaretLine",
   NULL
 };
 
@@ -857,6 +858,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   ReadIntRng(RightEdgeColumn,80,1,1024);
   ReadInt(ShowRightEdge,false);
   ReadInt(ShowIndentGuides,false);
+  ReadInt(ShowCaretLine,true);
   ReadInt(SmoothScroll,true);
   ReadIntRng(WheelLines,3,1,32);
   ReadIntRng(SearchWrap,SEARCH_WRAP_ASK,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
@@ -1027,6 +1029,7 @@ Settings::~Settings()
   WriteInt(RightEdgeColumn);
   WriteInt(ShowRightEdge);
   WriteInt(ShowIndentGuides);
+  WriteInt(ShowCaretLine);
   WriteInt(SmoothScroll);
   WriteInt(WheelLines);
   WriteInt(SearchWrap);

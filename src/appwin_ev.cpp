@@ -99,6 +99,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_SHOW_STATUSBAR,onShowStatusBar),
   TWMAPFUNC(ID_SHOW_MARGIN,onShowMargin),
   TWMAPFUNC(ID_SHOW_INDENT,onShowIndent),
+  TWMAPFUNC(ID_SHOW_CARET_LINE,onShowCaretLine),
   TWMAPFUNC(ID_SHOW_OUTLIST,onShowOutputPane),
   TWMAPFUNC(ID_INVERT_COLORS,onInvertColors),
   TWMAPFUNC(ID_PREFS_DIALOG,onPrefsDialog),
@@ -1361,6 +1362,17 @@ long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
   prefs->ShowIndentGuides = !prefs->ShowIndentGuides;
   tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)prefs->ShowIndentGuides);
   guides_chk->setCheck(prefs->ShowIndentGuides);
+  SyncToggleBtn(o,sel);
+  return 1;
+}
+
+
+
+long TopWindow::onShowCaretLine(FXObject*o, FXSelector sel, void*p)
+{
+  prefs->ShowCaretLine = !prefs->ShowCaretLine;
+  tabbook->ForEachTab(ShowCaretLineCB, (void*)prefs);
+  caretline_chk->setCheck(prefs->ShowCaretLine);
   SyncToggleBtn(o,sel);
   return 1;
 }

@@ -399,6 +399,7 @@ void TopWindow::CreateMenus()
   guides_chk =   MkMnuChk(viewmenu, ID_SHOW_INDENT,     prefs->ShowIndentGuides);
   white_chk =    MkMnuChk(viewmenu, ID_SHOW_WHITESPACE, prefs->ShowWhiteSpace);
   invert_chk =   MkMnuChk(viewmenu, ID_INVERT_COLORS,   prefs->InvertColors);
+  caretline_chk = MkMnuChk(viewmenu, ID_SHOW_CARET_LINE, prefs->ShowCaretLine);
 
   new FXMenuSeparator(viewmenu, 0);
 
