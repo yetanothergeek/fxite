@@ -101,7 +101,9 @@ ESCRIPT \
 Nncrontab \
 Octave \
 REBOL \
-VBScript 
+VBScript \
+OScript \
+VisualProlog
 do
   rm -f "Lex${UNUSED}.cxx"
   awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' Catalogue.cxx > Catalogue.tmp

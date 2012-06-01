@@ -1,5 +1,5 @@
 FXString FXScintilla::version()
 {
-  return "3.0.4";
+  return "3.2.0";
 }
 
