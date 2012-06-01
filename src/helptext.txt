@@ -16,6 +16,7 @@
  @@@Tabs vs Spaces@@@
  @@@Syntax Highlighting@@@
  @@@Using CTAGS and calltips files@@@
+ @@@Autocompletion@@@
  @@@Bookmarks@@@
  @@@Regular expressions@@@
  @@@Shell Commands and Filters@@@
@@ -677,6 +678,26 @@ If a function appears in more than one file, the tip texts are concatenated into
 In order to determine which format a file is in, the parser looks at the first few bytes of \
 the file -- tags files must begin with the string ==="!_TAG_FILE_FORMAT"=== - \
 calltips files must ///not/// begin with that text!
+
+
+###Autocompletion###
+
+Unlike some other editors, the autocomplete feature of __APP__ doesn't constantly nag you with \
+suggestions everytime you press a key. Instead, the list of suggested completions is only \
+displayed when you ask for it -- either by choosing "Show Completions" from the "View" menu, \
+or by pressing the assigned hotkey ( [Alt]+Apostrophe by default. )
+
+The list of possible completions is gathered from any loaded tags files ( See the section \
+"Using CTAGS and calltips files" ) and/or from simple "completion list" files which are loaded \
+using the "Load Tags File" item on the "File" menu. The format of these files is simply a \
+a list of words, one per line. Blank lines are allowed only at the very beginning or end \
+of the file; files with blank lines between words will be silently ignored. ( This requirement \
+is necessary to distinguish completion list files from calltips files. )
+
+Note that this feature is very simple-minded -- it doesn't consider the syntax of the language \
+or the current context -- the list contains all possible (loaded) completions that match the \
+characters to the left of the caret. ( Only ASCII alphanumeric characters and underscores are \
+considered word-start characters. )
 
 
 ###Bookmarks###
