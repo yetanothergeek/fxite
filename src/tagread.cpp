@@ -475,15 +475,24 @@ void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
       } else {
         char*p1=lines;
         char*p3=strchr(p1,'\0');
-        do {
-          char*p2=strchr(p1,'\n');
-          if (!p2) { p2=p3; }
-          if (*p1==startchar) {
-            *p2='\0';
-            dict->insert(p1,NULL);
-          }
-          if (p2<p3) { p1=p2+1; } else { break; }
-        } while (1);
+        while (Ascii::isSpace(*p1)) { p1++; }
+        while ((p3>p1)&&Ascii::isSpace(*(p3-1))) {
+          p3--;
+          *p3='\0';
+        }
+        if (strstr(p1,"\n\n")||strstr(p1,"\r\n\r\n")) {
+          // Blank lines are not allowed, it might be a calltips file, so skip it for now.
+        } else {
+          do {
+            char*p2=strchr(p1,'\n');
+            if (!p2) { p2=p3; }
+            if (*p1==startchar) {
+              *p2='\0';
+              dict->insert(p1,NULL);
+            }
+            if (p2<p3) { p1=p2+1; } else { break; }
+          } while (1);
+        }
       }
     }
     file.close();
