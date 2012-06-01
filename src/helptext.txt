@@ -659,9 +659,9 @@ Text") and choose %%%"Find Definition"%%% from the Search menu.
 
 Calltips are little yellow boxes that pop up to remind you what the arguments \
 and return type of a function are.  To display a calltip from the information \
-contained in the tag files, select some text and choose %%%"Show Calltip"%%% \
-from the %%%Search%%% menu.  To kill a displayed calltip, press the \
-%%%[Esc]%%% key. 
+contained in the tag files, position cursor after the function name (or its opening \
+parentheses) and choose %%%"Show Calltip"%%% from the %%%Search%%% menu. \
+To kill a displayed calltip, press the %%%[Esc]%%% key. 
 
 __APP__ can acquire its calltip information from two different types of files: the CTAGS \
 file described above, and its own "calltips" file format. The calltips files can be \
@@ -675,7 +675,7 @@ can be used for displaying overloaded function signatures.
 
 If a function appears in more than one file, the tip texts are concatenated into a single tip. \
 In order to determine which format a file is in, the parser looks at the first few bytes of \
-the file - tags files must begin with the string ==="!_TAG_FILE_FORMAT"=== - \
+the file -- tags files must begin with the string ==="!_TAG_FILE_FORMAT"=== - \
 calltips files must ///not/// begin with that text!
 
 
