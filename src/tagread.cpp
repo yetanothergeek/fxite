@@ -487,6 +487,7 @@ void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
       }
     }
     file.close();
+    free(lines);
   }
 }
 
