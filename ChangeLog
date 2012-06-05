@@ -3,6 +3,26 @@
 #  For a more accurate and detailed listing of changes, check the git log.
 ################################################################################
 
+2012-06-04
+  * Bumped version to 0.9
+  * Fixed a bug in the per-language indentation feature.
+  * Update to Scintilla-3.2.0.
+  * Added a menu option to toggle highlighting of the current line.
+  * New feature: Autocomplete (from tag files and/or word list files.)
+  * Reworked FOX implementation of Scintilla's "autocomplete" feature.
+  * Upgrade to Lua-5.1.5.
+  * Suggest a filename when saving a backup copy.
+  * Fixed a segfault when creating tooltip from menu spec.
+  * Use menu label instead of registry key for custom items in toolbar preferences list.
+  * New feature: popup menu can be customized.
+  * Removed some toolbar-related code that is no longer used.
+  * Created a "Dual List" class to separate toolbar configuration code from its GUI.
+  * Try harder to auto-scroll caret correctly when word wrap is on (not yet 100% fixed.)
+  * Exposed word wrapping get/set functionality to scripting engine.
+  * Preserve selection after "Replace all in selection".
+  * Better handling of rectangular selections for "Replace all in selection".
+
+
 2011-11-30
   * VERSION 0.8 RELEASE.
 
