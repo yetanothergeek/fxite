@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -605,7 +605,7 @@ For more details, visit http://www.fox-toolkit.org\
 
 #define App_About "\
 Free eXtensIble Text Editor (FXiTe) %s %s\n\n\
-Copyright (c) 2009,2011 Jeffrey Pohlmeyer\n\
+Copyright (c) 2009-2012 Jeffrey Pohlmeyer\n\
 <%s>\n\n\
 %s\
 GNU GENERAL PUBLIC LICENSE Version 3\n\n\
