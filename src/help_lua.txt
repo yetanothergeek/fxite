@@ -76,6 +76,7 @@
 @@@window@@@ -- Top-level window ID of the editor.
 @@@configdir@@@ -- Current configuration directory.
 @@@ipc@@@ -- Inter-process communication.
+@@@tagfiles@@@ -- Return the list of loaded tag files.
 
 
 %%%Dialog functions%%%
@@ -114,6 +115,8 @@ search_replace()
 search_go_to()
 search_go_to_selected()
 search_find_definition()
+search_show_calltip()
+search_show_completions()
 tools_rebuild_menu()
 tools_customize_menu()
 documents_next()
@@ -791,6 +794,13 @@ the command was successfully processed.)
 
 This function should currently be considered ///experimental///, in the future it may be used to \
 communicate with other programs such as a debugger or code navigator.
+
+
+###tagfiles###
+===__MOD__.tagfiles()
+===
+Returns an indexed table containing a list of the currently-loaded tag files.
+If no tag files are loaded, returns an empty table.
 
 
 

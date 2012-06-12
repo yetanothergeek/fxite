@@ -1312,6 +1312,21 @@ static int ipc(lua_State* L)
 }
 
 
+
+static int tagfiles(lua_State* L)
+{
+  lua_newtable(L);
+  FXint i=1;
+  for (FXWindow*w=tw->TagFiles(); w; w=w->getNext(), i++) {
+    lua_pushinteger(L,i);
+    lua_pushstring(L,((FXMenuCaption*)w)->getText().text());
+    lua_rawset(L,-3);
+  }
+  return 1;
+}
+
+
+
 static const struct luaL_reg fxte_funcs[] = {
   {"seltext", seltext},
   {"text", text},
@@ -1354,6 +1369,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"lexer", lexer},
   {"configdir", configdir},
   {"ipc", ipc},
+  {"tagfiles", tagfiles},
   {NULL, NULL}
 };
 

@@ -289,6 +289,21 @@ static int search_find_definition(lua_State* L)
 
 
 
+static int search_show_calltip(lua_State* L)
+{
+  tw->onShowCallTip(NULL,0,NULL);
+  return 0;
+}
+
+
+
+static int search_show_completions(lua_State* L)
+{
+  tw->onAutoComplete(NULL,0,NULL);
+  return 0;
+}
+
+
 
 static int tools_rebuild_menu(lua_State* L)
 {
@@ -543,6 +558,8 @@ static const struct luaL_reg fxte_commands[] = {
   {"search_go_to",              search_go_to},
   {"search_go_to_selected",     search_go_to_selected},
   {"search_find_definition",    search_find_definition},
+  {"search_show_calltip",       search_show_calltip},
+  {"search_show_completions",   search_show_completions},
 
   {"tools_rebuild_menu",        tools_rebuild_menu},
   {"tools_customize_menu",      tools_customize_menu},

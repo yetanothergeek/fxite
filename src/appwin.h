@@ -479,5 +479,6 @@ public:
   static TopWindow* instance();
   static const FXString& ConfigDir();
   static const FXString &Connector();
+  FXMenuCaption*TagFiles() { return (FXMenuCaption*)(unloadtagsmenu->getMenu()->getFirst()); }
 };
 
