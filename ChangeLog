@@ -3,6 +3,11 @@
 #  For a more accurate and detailed listing of changes, check the git log.
 ################################################################################
 
+2012-06-25
+  * Fixed problem with unhandled keystrokes on MS-Windows (Fixes calltip keybinding.)
+  * Exposed some calltip/ctags/autocomplete functions to the scripting engine.
+
+
 2012-06-04
   * Bumped version to 0.9
   * Fixed a bug in the per-language indentation feature.
