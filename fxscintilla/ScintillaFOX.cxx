@@ -277,7 +277,6 @@ void ScintillaFOX::UnclaimSelection()
 static CLIPFORMAT cfColumnSelect()
 {
   static CLIPFORMAT cf = static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
-fxmessage("cfColumnSelect=%d FXDragType=%d CLIPFORMAT=%d\n",cf,sizeof(FXDragType),sizeof(CLIPFORMAT));
   return cf;
 }
 #endif
