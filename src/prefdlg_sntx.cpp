@@ -591,7 +591,7 @@ LangGUI::LangGUI(FXComposite*o,Settings*aprefs,FXObject*trg, FXSelector sel):FXV
   SetPad(syntabs,0);
   MakeStyleTab();
   MakeOptsTab();
-  onLangSwitch(langlist, 0, (void*)(whichlang));
+  onLangSwitch(langlist, 0, (void*)(FXival)whichlang);
 }
 
 

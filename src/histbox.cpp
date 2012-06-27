@@ -272,7 +272,7 @@ long HistoryTextField::onHistory(FXObject*o,FXSelector sel,void*p)
   }
   setText(hist->text());
   if (hframe->getTarget()&&hframe->getSelector()&&hist->getModeVar()) {
-    hframe->getTarget()->tryHandle(this,FXSEL(SEL_CHANGED, hframe->getSelector()),(void*)(*(hist->getModeVar())));
+    hframe->getTarget()->tryHandle(this,FXSEL(SEL_CHANGED, hframe->getSelector()),(void*)((FXival)*(hist->getModeVar())));
   }
   return 1;
 }

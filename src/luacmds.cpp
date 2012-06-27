@@ -444,7 +444,7 @@ static int view_zoom(lua_State* L)
   if ((lua_gettop(L)>0) && lua_isnumber(L,1)) {
     int z=lua_tointeger(L,1);//-10 to +20
     luaL_argcheck(L,(z>-11)&&(z<21), 1, _("zoom factor out of range (-10 to +20)"));
-    tw->onZoom(NULL, 0, (void*)z);
+    tw->onZoom(NULL, 0, (void*)(FXival)z);
   } else {
     const char*cmds[]={"in", "out", "default", "closest", "furthest" , NULL};
     int cmd=luaL_checkoption(L,1,NULL,cmds);

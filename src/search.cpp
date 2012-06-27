@@ -67,7 +67,7 @@ long SciSearchOptions::onToggleChk(FXObject*o, FXSelector sel, void*p)
   if (wholeword->getCheck()) { n|=SCFIND_WHOLEWORD; }
   if (regexp->getCheck()) { n|=SCFIND_REGEXP; }
   if (target&&message) {
-    target->handle(this, FXSEL(SEL_COMMAND,message), (void*)n);
+    target->handle(this, FXSEL(SEL_COMMAND,message), (void*)(FXuval)n);
   }
   return 1;
 }
