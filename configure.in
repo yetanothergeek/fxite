@@ -158,14 +158,18 @@ esac
 case "${srcdir}" in
   */*)
     FXSCINTILLA_CFLAGS="-I${srcdir}/fxscintilla"
+    JEFFX_CFLAGS="-I${srcdir}/jef"
   ;;
   *)
     FXSCINTILLA_CFLAGS="-I${srcdir}/../fxscintilla"
+    JEFFX_CFLAGS="-I${srcdir}/../jef"
   ;;
 esac
 
 
 FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
+
+JEFFX_LIBS="-L`pwd`/jef -ljeffx"
 
 
 AC_ARG_ENABLE([assert],AC_HELP_STRING([--enable-assert],[enable assertions]))
@@ -200,9 +204,17 @@ AC_SUBST(FXSCINTILLA_LIBS)
 AC_SUBST(X11_CFLAGS)
 AC_SUBST(X11_LIBS)
 
+AC_SUBST(JEFFX_CFLAGS)
+AC_SUBST(JEFFX_LIBS)
 
-AC_OUTPUT( Makefile fxscintilla/Makefile lua/Makefile src/Makefile src/languages/Makefile po/Makefile.in )
 
-
-
+AC_OUTPUT( 
+ Makefile
+ fxscintilla/Makefile
+ lua/Makefile 
+ src/Makefile
+ src/languages/Makefile
+ po/Makefile.in
+ jef/Makefile
+)
 
