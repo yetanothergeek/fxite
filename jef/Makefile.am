@@ -1,4 +1,4 @@
-INCLUDES = $(JEFFX_CFLAGS) $(FOX_CFLAGS) -I$(srcdir)/../src
+INCLUDES = $(JEFFX_CFLAGS) $(FOX_CFLAGS)
 
 
 noinst_LIBRARIES=libjeffx.a
