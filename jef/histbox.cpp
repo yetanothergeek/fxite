@@ -19,38 +19,74 @@
 
 #include <fx.h>
 #include <fxkeys.h>
+#include <FXUTF16Codec.h>
+#include <FX88591Codec.h>
 
 #include "histbox.h"
 
-/*
-  You might be able to use the history-saving classes,
-  (minus the clipboard-saving functions) in some other
-  project, by un-defining HAVE_CLIPSAVER. Or you could
-  even re-implement the SaveClipboard() method in some
-  other class, and re-define "ClipboardSaver" to point
-  to your class instead.
-*/
-#define HAVE_CLIPSAVER
+FXDEFMAP(MainWinWithClipBrd) MainWinWithClipBrdMap[]={
+  FXMAPFUNC(SEL_CLIPBOARD_REQUEST, 0, MainWinWithClipBrd::onClipboardRequest),
+};
 
-#ifdef HAVE_CLIPSAVER
-# include "appwin.h"
-# define ClipboardSaver TopWindow
-#else
-  class ClipboardSaver:public FXWindow {
-  public:
-    void SaveClipboard() {}
-  };
-#endif
+FXIMPLEMENT(MainWinWithClipBrd,FXMainWindow,MainWinWithClipBrdMap,ARRAYNUMBER(MainWinWithClipBrdMap))
 
-static FXWindow*global_saver=NULL;
 
-void ClipTextField::SetSaver(FXWindow*w) {  global_saver=w; }
+void MainWinWithClipBrd::SaveClipboard()
+{
+  if (getDNDData(FROM_CLIPBOARD,utf8Type,cliptext)) { // <= OK as is
+  } else if (getDNDData(FROM_CLIPBOARD,utf16Type,cliptext)) {
+    FXUTF16LECodec unicode;
+    cliptext=unicode.mb2utf(cliptext);
+  } else if (getDNDData(FROM_CLIPBOARD,stringType,cliptext)) {
+    FX88591Codec ascii;
+    cliptext=ascii.mb2utf(cliptext);
+  } else { return; }
+  FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
+  acquireClipboard(types,4);
+}
+
+
+
+long MainWinWithClipBrd::onClipboardRequest(FXObject*o, FXSelector sel, void*p)
+{
+  FXEvent *ev=(FXEvent*)p;
+  FXDragType dt=ev->target;
+  if (FXMainWindow::onClipboardRequest(o,sel,p)) { return 1; } // <= Base class handled it
+  if ( dt==stringType || dt==textType || dt==utf8Type || dt==utf16Type) {
+    FXString string=cliptext;
+    if (dt==utf8Type) {
+      setDNDData(FROM_CLIPBOARD,dt,string);
+      return 1;
+    }
+    if (dt==stringType || dt==textType) {
+      FX88591Codec ascii;
+      setDNDData(FROM_CLIPBOARD,dt,ascii.utf2mb(string));
+      return 1;
+    }
+    if (dt==utf16Type) {
+      FXUTF16LECodec unicode;
+      setDNDData(FROM_CLIPBOARD,dt,unicode.utf2mb(string));
+      return 1;
+    }
+  }
+  return 0;
+}
+
+
+
+
 
 void ClipTextField::SurrenderClipboard() {
-  if (global_saver && hasClipboard()) {
-    ((ClipboardSaver*)global_saver)->SaveClipboard();
+  if (!hasClipboard()) { return; }
+  for (FXWindow*w=getShell()->getOwner(); w; w=w->getOwner()) {
+    if (dynamic_cast<MainWinWithClipBrd*>(w)) {
+      ((MainWinWithClipBrd*)w)->SaveClipboard();
+      break;
+    }
   }
 }
+
+
 
 void ClipTextField::destroy() {
   SurrenderClipboard();

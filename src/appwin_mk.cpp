@@ -65,7 +65,7 @@ const FXString& TopWindow::Connector() { return ((AppClass*)(FXApp::instance()))
 
 #define SessionFile() (((AppClass*)getApp())->SessionFile())
 
-TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
+TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
 {
   FXASSERT(!global_top_window_instance);
   global_top_window_instance=this;
@@ -133,7 +133,6 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   recorder=NULL;
   prefdlg=NULL;
   tooldlg=NULL;
-  clipsci=NULL;
   recording=NULL;
   skipfocus=false;
   destroying=false;
@@ -156,7 +155,6 @@ TopWindow::TopWindow(FXApp *a):FXMainWindow(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,6
   }
   saved_accels=NULL;
   ShowStatusBar(prefs->ShowStatusBar);
-  ClipTextField::SetSaver(this);
 }
 
 
@@ -199,23 +197,6 @@ void TopWindow::SetSrchDlgsPrefs()
   srchdlgs->defaultsearchmode=prefs->SearchOptions;
   srchdlgs->searchwrap=(SearchWrapPolicy)prefs->SearchWrap;
   srchdlgs->searchverbose=prefs->SearchVerbose;
-}
-
-
-
-void TopWindow::SaveClipboard()
-{
-  if (clipsci) {
-    FXuchar* cb_data=NULL;
-    FXuint len=0;
-    FXDragType types[]={textType,utf8Type,stringType,0};
-    for (FXDragType *dt=types; *dt; dt++) {
-      if (getDNDData(FROM_CLIPBOARD, *dt, cb_data, len) && cb_data && *cb_data) {
-        clipsci->sendString(SCI_COPYTEXT,len,cb_data);
-        break;
-      }
-    }
-  }
 }
 
 
@@ -305,7 +286,6 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
     sci->UpdateStyle();
   }
 
-  if (!clipsci) { clipsci=sci; }
   SetTabLocked(sci,readonly);
   sci->setFocus();
   tabbook->ActivateTab(tabbook->Count()-1);
@@ -366,31 +346,8 @@ bool TopWindow::SaveAll(bool break_on_fail)
 
 
 
-/*
-  This is a bit messy, but...
-  If a FOX widget owns the clipboard, the data is lost when the widget is destroyed.
-  So we check to see if the SciDoc we are destroying owns the clipboard, and if it
-  does, we pass the data off to some other SciDoc before we destroy this one.
-*/
-bool TopWindow::SetGlobalClipboardCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  TopWindow*tw=(TopWindow*)user_data;
-  SciDoc*sci=(SciDoc*)(page->getFirst());
-  if (sci!=tw->clipsci) {
-    tw->clipsci=sci;
-    return false;
-  }
-  return true;
-}
-
-
-
 void TopWindow::DoneSci(SciDoc*sci)
 {
-  if (clipsci==sci) {
-    tabbook->ForEachTab(SetGlobalClipboardCB,this);
-    if (clipsci==sci) { clipsci=NULL; }
-  }
   if (recording==sci) {
     onMacroRecord(NULL,0,NULL);
   }

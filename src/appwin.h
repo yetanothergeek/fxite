@@ -15,7 +15,10 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#ifndef APPWIN_H
+#define APPWIN_H
 
+#include "histbox.h"
 
 //class AppClass;
 class SciDoc;
@@ -34,7 +37,7 @@ class ToolsDialog;
 class TopMenuPane;
 
 
-class TopWindow: public FXMainWindow {
+class TopWindow: public MainWinWithClipBrd {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
@@ -53,7 +56,6 @@ private:
   static bool BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static void SetSciDocPrefs(SciDoc*sci, Settings*prefs);
   static bool FileStillOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool SetGlobalClipboardCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static void EnableFilterBtnCB(FXButton*btn, void*user_data);
   static void SetTBarBtnFontCB(FXButton*btn, void*user_data);
@@ -71,7 +73,6 @@ private:
   void SyncToggleBtn(FXObject*o, FXSelector sel);
   void UpdateEolMenu(SciDoc*sci);
   static void SetMenuEnabled(FXMenuCommand*mnu, bool enabled);
-  SciDoc*clipsci;
   SciDoc*recording;
   FXToolTip* tips;
   FXMenuBar*  menubar;
@@ -468,7 +469,6 @@ public:
     outlist->makeItemVisible(outlist->getNumItems()-1);
   };
   void ClearOutput() { outlist->clearItems(); };
-  void SaveClipboard();
   UserMenu**UserMenus() const;
   void About();
   static void VersionInfo();
@@ -482,3 +482,4 @@ public:
   FXMenuCaption*TagFiles() { return (FXMenuCaption*)(unloadtagsmenu->getMenu()->getFirst()); }
 };
 
+#endif

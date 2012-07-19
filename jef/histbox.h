@@ -16,14 +16,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef HISTBOX_H
+#define HISTBOX_H
+
+class MainWinWithClipBrd: public FXMainWindow {
+  FXDECLARE(MainWinWithClipBrd)
+protected:
+  MainWinWithClipBrd() {}
+  FXString cliptext;
+public:
+  MainWinWithClipBrd( FXApp* a,const FXString& name,FXIcon *ic=NULL,FXIcon *mi=NULL,
+                      FXuint opts=DECOR_ALL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,
+                      FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0,FXint hs=0,FXint vs=0 ):
+                      FXMainWindow(a,name,ic,mi,opts,x,y,w,h,pl,pr,pt,pb,hs,vs) {}
+  void SaveClipboard();
+  long onClipboardRequest(FXObject*o, FXSelector sel, void*p);
+};
+
 
 
 /*
-  When a ClipTextField object is destroyed, if it "owns" the clipoard,
-  it tries to pass the clipboard data off to the object pointed to by
-  its SetSaver() method. That window's class must implement its own
-  SaveClipboard() method, and must also be referenced in the histbox.cpp
-  file's ClipboardSaver macro.
+  When a ClipTextField object is destroyed and it "owns" the clipoard, it searches
+  up through the chain of "owner" windows trying to find a window that inherits
+  from "MainWinWithClipBrd". If found, it tries to hand off the clipboard data  
+  by calling MainWinWithClipBrd::SaveClipboard().
 */
 class ClipTextField: public FXTextField {
 private:
@@ -37,7 +53,6 @@ public:
    ):FXTextField(p,ncols,tgt,sel,opts,x,y,w,h,pl,pr,pt,pb) {}
   ~ClipTextField();
   void destroy();
-  static void SetSaver(FXWindow*w);
 };
 
 
@@ -106,4 +121,6 @@ public:
   HistBox(FXWindow* p, const FXString& caption, const FXString& label, const FXString &regname);
   virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
 };
+
+#endif
 

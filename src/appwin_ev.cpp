@@ -161,7 +161,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
 };
 
 
-FXIMPLEMENT(TopWindow,FXMainWindow,TopWindowMap,ARRAYNUMBER(TopWindowMap))
+FXIMPLEMENT(TopWindow,MainWinWithClipBrd,TopWindowMap,ARRAYNUMBER(TopWindowMap))
 
 
 
