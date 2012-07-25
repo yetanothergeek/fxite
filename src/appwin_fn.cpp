@@ -552,7 +552,7 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
              )==MBOX_CLICKED_YES )
         {
           if (!filedlgs->SaveFile(sci,sci->Filename())) {
-            onFileSaveAs(NULL,0,NULL);
+            ShowSaveAsDlg(sci);
           }
         } else {
           sci->DoStaleTest(false);
