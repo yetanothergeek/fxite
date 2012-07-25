@@ -44,6 +44,7 @@
 #include "backup.h"
 #include "menuspec.h"
 #include "theme.h"
+#include "appname.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -390,7 +391,7 @@ long TopWindow::onOpenPrevious(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onHelpAbout(FXObject*o, FXSelector sel, void*p)
 {
-  About();
+  AppAbout::AboutBox();
   return 1;
 }
 

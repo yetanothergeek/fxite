@@ -505,7 +505,7 @@ static void check_info_args(int argc, char *argv[])
     if (argv[i][0]=='-') {
       switch (argv[i][1]) {
         case 'v': {
-          TopWindow::VersionInfo();
+          AppAbout::VersionInfo();
           exit(0);
         }
         case 'h': {

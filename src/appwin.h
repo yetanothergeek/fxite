@@ -471,8 +471,6 @@ public:
   };
   void ClearOutput() { outlist->clearItems(); };
   UserMenu**UserMenus() const;
-  void About();
-  static void VersionInfo();
   void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
   FXID GetActiveWindow();

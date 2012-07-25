@@ -14,7 +14,7 @@ icon_DATA = fxite.xpm
 fxite_LDFLAGS=$(FXSCINTILLA_LIBS) $(LUA_LIBS) $(LDFLAGS)
 
 fxite_SOURCES=\
-  appmain.cpp appwin_ev.cpp appwin_mk.cpp appwin_mnu.cpp appwin_fn.cpp filer.cpp \
+  appmain.cpp appname.cpp appwin_ev.cpp appwin_mk.cpp appwin_mnu.cpp appwin_fn.cpp filer.cpp \
   lang.cpp luacmds.cpp luafuncs.cpp macro.cpp prefdlg.cpp prefs.cpp readtags.c \
   recorder.cpp scidoc.cpp search.cpp shmenu.cpp doctabs.cpp tagread.cpp scisrch.cpp \
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
