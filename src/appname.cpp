@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -28,7 +28,7 @@
 
 static const char *Scintilla_Copyright =" \
 The Scintilla editing control and the PDF/HTML export code are\n\
-copyright 1998-2011 by Neil Hodgson <neilh@scintilla.org>\n\
+copyright 1998-2012 by Neil Hodgson <neilh@scintilla.org>\n\
 and are released under the following license:\n\
 \n\
 All Rights Reserved\n\
