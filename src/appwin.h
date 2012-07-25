@@ -199,6 +199,7 @@ private:
   void SetTabDirty(SciDoc*sci, bool dirty);
   void SetTabLocked(SciDoc*sci, bool locked);
   bool SaveAll(bool break_on_fail);
+  bool ShowSaveAsDlg(SciDoc*sci);
   void SetInfo(const char*msg, bool hide_docname=false);
   void DisableUI(bool disabled);
   void SetSrchDlgsPrefs();

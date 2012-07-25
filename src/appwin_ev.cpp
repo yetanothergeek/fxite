@@ -224,20 +224,6 @@ long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
 
 
 
-bool TopWindow::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  TopWindow*tw=(TopWindow*)user_data;
-  if (tw->bookmarked_tab == tab) {
-    tw->tabbook->ActivateTab(tab);
-    SciDoc*sci=tw->FocusedDoc();
-    sci->GoToPos(tw->bookmarked_pos);
-    return false;
-  }
-  return true;
-}
-
-
-
 long TopWindow::onBookmark(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=ControlDoc();
@@ -1019,12 +1005,7 @@ long TopWindow::onFileSave(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFileSaveAs(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=ControlDoc();
-  FXString orig=sci->Filename();
-  if (filedlgs->SaveFileAs(sci)) {
-    if (!orig.empty()) { recent_files->prepend(orig); }
-    recent_files->remove(sci->Filename());
-  }
+  ShowSaveAsDlg(ControlDoc());
   return 1;
 }
 

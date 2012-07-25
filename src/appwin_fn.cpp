@@ -114,6 +114,18 @@ void TopWindow::EnableUserFilters(bool enabled)
 
 
 
+bool TopWindow::ShowSaveAsDlg(SciDoc*sci)
+{
+  FXString orig=sci->Filename();
+  if (filedlgs->SaveFileAs(sci)) {
+    if (!orig.empty()) { recent_files->prepend(orig); }
+    recent_files->remove(sci->Filename());
+    return true;
+  }
+  return false;
+}
+
+
 
 // Check each document to see if any of them should be auto-saved.
 bool TopWindow::AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
@@ -407,6 +419,20 @@ bool TopWindow::IsDocValid(SciDoc*sci)
 bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
   ((SciDoc*)(page->getFirst()))->SetUserUndoLevel(0);
+  return true;
+}
+
+
+
+bool TopWindow::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  TopWindow*tw=(TopWindow*)user_data;
+  if (tw->bookmarked_tab == tab) {
+    tw->tabbook->ActivateTab(tab);
+    SciDoc*sci=tw->FocusedDoc();
+    sci->GoToPos(tw->bookmarked_pos);
+    return false;
+  }
   return true;
 }
 
