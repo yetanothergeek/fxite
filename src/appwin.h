@@ -35,6 +35,7 @@ class HistMenu;
 class BackupMgr;
 class ToolsDialog;
 class TopMenuPane;
+class ToolBarFrame;
 
 
 class TopWindow: public MainWinWithClipBrd {
@@ -57,12 +58,6 @@ private:
   static void SetSciDocPrefs(SciDoc*sci, Settings*prefs);
   static bool FileStillOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static void EnableFilterBtnCB(FXButton*btn, void*user_data);
-  static void SetTBarBtnFontCB(FXButton*btn, void*user_data);
-  static void ClearTBarBtnDataCB(FXButton*btn, void*user_data);
-  static void SetTBarBtnColorCB(FXButton*btn, void*user_data);
-  void SetToolbarColors();
-  void UpdateToolbarWrap();
   bool IsDocValid(SciDoc*sci);
   void SetTabTag(SciDoc*sci, char mark, bool set);
   void Freeze(FXWindow*win, bool frozen);
@@ -153,8 +148,8 @@ private:
   FXGroupBox* outputpane;
   FXSplitter* hsplit;
   FXList*outlist;
-  FXPacker*toolbar_frm;
-  FXFont*toolbar_font;
+  ToolBarFrame*toolbar_frm;
+
   FXMenuCheck*outpane_chk;
   FXMenuPane *outpop;
   UserMenu* usercmdmenu;
@@ -182,7 +177,6 @@ private:
   bool command_timeout;
   bool command_busy;
   FXint need_status;
-  void CreateToolbar();
   void CreateMenus();
   void DeleteMenus();
   void CreateLanguageMenu();
@@ -471,7 +465,6 @@ public:
   };
   void ClearOutput() { outlist->clearItems(); };
   UserMenu**UserMenus() const;
-  void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
   FXID GetActiveWindow();
   void AdjustIndent(SciDoc*sci,char ch);
@@ -479,6 +472,7 @@ public:
   static const FXString& ConfigDir();
   static const FXString &Connector();
   FXMenuCaption*TagFiles() { return (FXMenuCaption*)(unloadtagsmenu->getMenu()->getFirst()); }
+  void RemoveTBarBtnData(void*p);
 };
 
 #endif

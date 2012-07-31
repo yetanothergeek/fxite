@@ -45,6 +45,7 @@
 #include "menuspec.h"
 #include "theme.h"
 #include "appname.h"
+#include "toolbar.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -190,7 +191,7 @@ long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 {
   prefs->InvertColors=!prefs->InvertColors;
-  SetToolbarColors();
+  toolbar_frm->SetToolbarColors();
   SciDoc*sci=ControlDoc();
   tabbook->ForEachTab(PrefsCB,NULL);
   CheckStyle(NULL,0,sci);
@@ -1310,7 +1311,6 @@ long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
   } else {
     toolbar_frm->hide();
   }
-  toolbar_frm->getParent()->layout();
   SyncToggleBtn(o,sel);
   return 1;
 }
@@ -1394,13 +1394,14 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL);
   }
   getApp()->setWheelLines(prefs->WheelLines);
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) { UpdateToolbar(); }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) { UpdateToolbarWrap(); }
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) {
+    UpdateToolbar();
+  }
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) { 
+    toolbar_frm->handle(toolbar_frm,FXSEL(SEL_CONFIGURE,0),NULL);
+  }
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
-    delete toolbar_font;
-    toolbar_font=NULL;
-    ForEachToolbarButton(SetTBarBtnFontCB,this);
-    toolbar_frm->getParent()->layout();
+    toolbar_frm->SetTBarFont();
   }
   filedlgs->patterns(prefs->FileFilters);
   if (Theme::changed() & ThemeChangedColors) {
@@ -1411,7 +1412,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     SetStatusBarColors();
   }
   tabbook->ActivateTab(tabbook->ActiveTab());
-  SetToolbarColors();
+  toolbar_frm->SetToolbarColors();
   EnableUserFilters(FocusedDoc()->GetSelLength());
   return 1;
 }

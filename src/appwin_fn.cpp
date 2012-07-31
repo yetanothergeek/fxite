@@ -31,6 +31,8 @@
 #include "menuspec.h"
 #include "shmenu.h"
 #include "search.h"
+#include "toolbar.h"
+
 
 #include "intl.h"
 #include "appwin.h"
@@ -96,21 +98,37 @@ void TopWindow::SetMenuEnabled(FXMenuCommand*mnu, bool enabled)
 
 
 
-void TopWindow::EnableFilterBtnCB(FXButton*btn, void*user_data)
-{
-  MenuSpec*spec=(MenuSpec*)btn->getUserData();
-  if (spec && (spec->type=='u') && spec->ms_mc && (spec->ms_mc->getSelector()==ID_USER_FILTER)) {
-    if ((bool)user_data) { btn->enable(); } else { btn->disable(); }
-  }
-}
-
-
-
 void TopWindow::EnableUserFilters(bool enabled)
 {
-  ForEachToolbarButton(EnableFilterBtnCB,(void*)enabled);
+  toolbar_frm->EnableFilterBtn(enabled);
   if (enabled) { userfiltermenu->enable(); } else { userfiltermenu->disable(); }
 }
+
+
+
+void TopWindow::RemoveTBarBtnData(void*p)
+{
+  toolbar_frm->NullifyButtonData(p);
+}
+
+
+
+void TopWindow::UpdateToolbar()
+{
+  toolbar_frm->CreateButtons(this);
+  switch (prefs->DocTabPosition) {
+    case 'T': RadioUpdate(ID_TABS_TOP,    ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'B': RadioUpdate(ID_TABS_BOTTOM, ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'L': RadioUpdate(ID_TABS_LEFT,   ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'R': RadioUpdate(ID_TABS_RIGHT,  ID_TABS_TOP, ID_TABS_RIGHT); break;
+  }
+  RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
+  if (recording&&recorderstartmenu->getUserData()) {
+    ((FXToggleButton*)(recorderstartmenu->getUserData()))->setState(true);
+  }
+  toolbar_frm->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
+}
+
 
 
 

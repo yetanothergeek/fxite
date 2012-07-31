@@ -42,7 +42,7 @@
 #include "backup.h"
 #include "histbox.h"
 #include "menuspec.h"
-
+#include "toolbar.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -85,7 +85,8 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   statusbar=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED, 0,0,0,0, 3,3,3,3, 7,3);
 
   vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
-  CreateToolbar();
+
+  toolbar_frm=new ToolBarFrame(vbox);
 
   hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
@@ -184,7 +185,6 @@ TopWindow::~TopWindow()
   if (tooldlg) { delete tooldlg; }
   delete getIcon();
   delete getMiniIcon();
-  delete toolbar_font;
   completions.clear();
   global_top_window_instance=NULL;
 }
@@ -1193,8 +1193,6 @@ void TopWindow::create()
   AppClass* a=(AppClass*)getApp();
   a->setWheelLines(prefs->WheelLines);
   position(prefs->Left, prefs->Top,prefs->Width,prefs->Height);
-
-  toolbar_font = NULL;
   UpdateToolbar();
 
   FXMainWindow::create();
