@@ -143,8 +143,8 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_SHOW_LUA_HELP, onShowHelp),
   TWMAPFUNCS(ID_FMT_DOS,ID_FMT_UNIX,onFileFormat),
   TWMAPFUNC(ID_TBAR_CUSTOM_CMD,onTBarCustomCmd),
-  TWMAPFUNC(ID_POPUP_SELECT_ALL,OnPopupSelectAll),
-  TWMAPFUNC(ID_POPUP_DELETE_SEL,OnPopupDeleteSel),
+  TWMAPFUNC(ID_POPUP_SELECT_ALL,onPopupSelectAll),
+  TWMAPFUNC(ID_POPUP_DELETE_SEL,onPopupDeleteSel),
   TWMAPSEL(SEL_FOCUSIN,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_PICKED,ID_SCINTILLA, onScintilla),
   TWMAPSEL(SEL_CHORE,  ID_CHECK_STALE,CheckStale),
@@ -1150,7 +1150,7 @@ long TopWindow::onDeleteChunk(FXObject*o, FXSelector sel, void*p)
 
 
 
-long TopWindow::OnPopupSelectAll( FXObject*o, FXSelector sel, void*p )
+long TopWindow::onPopupSelectAll( FXObject*o, FXSelector sel, void*p )
 {
   SciDoc*sci=FocusedDoc();
   sci->sendMessage(SCI_SELECTALL, 0, 0);
@@ -1159,7 +1159,7 @@ long TopWindow::OnPopupSelectAll( FXObject*o, FXSelector sel, void*p )
 
 
 
-long TopWindow::OnPopupDeleteSel( FXObject*o, FXSelector sel, void*p )
+long TopWindow::onPopupDeleteSel( FXObject*o, FXSelector sel, void*p )
 {
   SciDoc*sci=ControlDoc();
   sci->sendString(SCI_REPLACESEL, 0, "");

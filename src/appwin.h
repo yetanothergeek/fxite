@@ -295,8 +295,8 @@ public:
   long onFocusIn(        FXObject*o, FXSelector sel, void*p );
   long onFocusDoc(       FXObject*o, FXSelector sel, void*p );
   long onCmdIO(          FXObject*o, FXSelector sel, void*p );
-  long OnPopupSelectAll( FXObject*o, FXSelector sel, void*p );
-  long OnPopupDeleteSel( FXObject*o, FXSelector sel, void*p );
+  long onPopupSelectAll( FXObject*o, FXSelector sel, void*p );
+  long onPopupDeleteSel( FXObject*o, FXSelector sel, void*p );
   long onTestSomething(  FXObject*o, FXSelector sel, void*p );
   enum {
     ID_TABS_TOP=FXMainWindow::ID_LAST,
