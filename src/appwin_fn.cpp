@@ -39,6 +39,62 @@
 
 
 
+// Tell the window manager we want the focus back after dialogs close...
+void TopWindow::ClosedDialog()
+{
+  setFocus();
+  FocusedDoc()->setFocus();
+}
+
+
+
+void TopWindow::Paste()
+{
+  SciDoc*sci=FocusedDoc();
+  sci->setFocus();
+  if (sci->sendMessage(SCI_CANPASTE,0,0)) {
+    // If any text is already selected, make sure the selection is "alive"
+    long start=sci->sendMessage(SCI_GETSELECTIONSTART,0,0);
+    long end=sci->sendMessage(SCI_GETSELECTIONEND,0,0);
+    if (start!=end) {
+      sci->sendMessage(SCI_SETSELECTIONSTART,start,0);
+      sci->sendMessage(SCI_SETSELECTIONEND,end,0);
+    }
+    sci->sendMessage(SCI_PASTE,0,0);
+    sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
+    sci->ScrollWrappedInsert();
+  }
+}
+
+
+
+bool TopWindow::SetReadOnly(SciDoc*sci, bool rdonly)
+{
+  if (!sci) { return false; }
+  if (rdonly && sci->Dirty()) {
+    FXMessageBox::error(this, MBOX_OK, _("Unsaved changes"),
+      _("Cannot mark a modified document as read-only.\n"
+        "You should save or undo your changes first.")
+    );
+    return false;
+  }
+  SetTabLocked(sci,rdonly);
+  need_status=32;
+  return true;
+}
+
+
+
+void TopWindow::SetWordWrap(SciDoc*sci, bool wrapped)
+{
+  sci->SetWordWrap(wrapped);
+  wordwrapmenu->setCheck(wrapped);
+  SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
+  
+}
+
+
+
 //  Used by the macro recorder to translate "machine language" into a Lua macro.
 void TopWindow::TranslatorCB(const char*text, void*user_data)
 {
