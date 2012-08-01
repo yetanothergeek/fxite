@@ -36,6 +36,7 @@ class BackupMgr;
 class ToolsDialog;
 class TopMenuPane;
 class ToolBarFrame;
+class OutputList;
 
 
 class TopWindow: public MainWinWithClipBrd {
@@ -147,11 +148,10 @@ private:
   DocTabs*    tabbook;
   FXGroupBox* outputpane;
   FXSplitter* hsplit;
-  FXList*outlist;
+  OutputList*outlist;
   ToolBarFrame*toolbar_frm;
 
   FXMenuCheck*outpane_chk;
-  FXMenuPane *outpop;
   UserMenu* usercmdmenu;
   UserMenu* usersnipmenu;
   UserMenu* userfiltermenu;
@@ -259,12 +259,10 @@ public:
   long onFilterSel(      FXObject*o, FXSelector sel, void*p );
   long onKillCommand(    FXObject*o, FXSelector sel, void*p );
   long onRunCommand(     FXObject*o, FXSelector sel, void*p );
-  long onOutlistClick(   FXObject*o, FXSelector sel, void*p );
   long onGoToError(      FXObject*o, FXSelector sel, void*p );
   long onBookmark(       FXObject*o, FXSelector sel, void*p );
   long onSplitChanged(   FXObject*o, FXSelector sel, void*p );
   long onOutlistFocus(   FXObject*o, FXSelector sel, void*p );
-  long onOutlistPopup(   FXObject*o, FXSelector sel, void*p );
   long onChangeCase(     FXObject*o, FXSelector sel, void*p );
   long onSetLanguage(    FXObject*o, FXSelector sel, void*p );
   long onReload(         FXObject*o, FXSelector sel, void*p );
@@ -372,11 +370,8 @@ public:
     ID_FILTER_SEL,
     ID_INSERT_CMD_OUT,
     ID_RUN_COMMAND,
-    ID_OUTLIST_CLICK,
     ID_SPLIT_CHANGED,
     ID_FOCUS_OUTLIST,
-    ID_OUTLIST_ASEL,
-    ID_OUTLIST_COPY,
     ID_TOUPPER,
     ID_TOLOWER,
     ID_SET_LANGUAGE,
@@ -459,11 +454,8 @@ public:
   void SetKillCommandAccelKey(FXHotKey acckey);
   FXHotKey GetKillCommandAccelKey() { return killkey; }
   static void DumpLexers();
-  void AddOutput(const FXString&line) {
-    outlist->appendItem(line,NULL,NULL,true);
-    outlist->makeItemVisible(outlist->getNumItems()-1);
-  };
-  void ClearOutput() { outlist->clearItems(); };
+  void AddOutput(const FXString&line);
+  void ClearOutput();
   UserMenu**UserMenus() const;
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
   FXID GetActiveWindow();
@@ -473,6 +465,7 @@ public:
   static const FXString &Connector();
   FXMenuCaption*TagFiles() { return (FXMenuCaption*)(unloadtagsmenu->getMenu()->getFirst()); }
   void RemoveTBarBtnData(void*p);
+  void ActiveWidget(FXWindow*aw) { active_widget=aw; }
 };
 
 #endif

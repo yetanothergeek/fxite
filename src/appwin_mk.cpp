@@ -43,6 +43,7 @@
 #include "histbox.h"
 #include "menuspec.h"
 #include "toolbar.h"
+#include "outpane.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -99,7 +100,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
 
   outputpane=new FXGroupBox(hsplit,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
-  outlist=new FXList(outputpane,this,ID_OUTLIST_CLICK,LAYOUT_SIDE_TOP|LAYOUT_FILL);
+  outlist=new OutputList(outputpane,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
   hsplit->setSplit(1,prefs->OutputPaneHeight);
   ShowOutputPane(prefs->ShowOutputPane);
 
@@ -127,9 +128,6 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
 
   backups=new BackupMgr(this, ConfigDir());
 
-  outpop=new FXMenuPane(outlist);
-  new FXMenuCommand(outpop,_("Select &All"),NULL,this,ID_OUTLIST_ASEL);
-  new FXMenuCommand(outpop,_("&Copy"),NULL,this,ID_OUTLIST_COPY);
   macros=NULL;
   recorder=NULL;
   prefdlg=NULL;
@@ -174,7 +172,6 @@ TopWindow::~TopWindow()
 {
   destroying=true;
   DeleteMenus();
-  delete outpop;
   delete macros;
   delete filedlgs;
   delete backups;
@@ -544,9 +541,7 @@ void TopWindow::ShowOutputPane(bool showit)
     if (prefs->OutputPaneHeight<16) {prefs->OutputPaneHeight=16; }
     hsplit->setSplit(1, prefs->OutputPaneHeight);
     outputpane->show();
-    outlist->show();
-    } else {
-    outlist->hide();
+  } else {
     outputpane->hide();
     hsplit->setSplit(1,0);
   }
@@ -775,25 +770,12 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
     getApp()->endWaitCursor();
     if (success) {
       outlist->appendItem(_("Command succeeded."));
-      outlist->makeItemVisible(outlist->getNumItems()-1);
     } else {
       if (command_timeout) {
         outlist->appendItem(_("Command cancelled."));
-        outlist->makeItemVisible(outlist->getNumItems()-1);
       } else {
-        FXint i;
         outlist->appendItem(_("Command failed."));
-        outlist->makeItemVisible(outlist->getNumItems()-1);
-        FXRex rx(_(": [Ee]rror: "));
-        for (i=0; i<outlist->getNumItems(); i++) {
-          FXListItem *item=outlist->getItem(i);
-          if (rx.match(item->getText())) {
-            outlist->selectItem(i);
-            outlist->setCurrentItem(i);
-            outlist->makeItemVisible(i);
-            break;
-          }
-        }
+        outlist->SelectFirstError();
       }
     }
   }
@@ -1224,7 +1206,7 @@ void TopWindow::create()
   if (prefs->Maximize) { maximize(); }
   FXFont fnt(a, prefs->FontName, prefs->FontSize/10);
   GetFontDescription(prefs->fontdesc,&fnt);
-  outpop->create();
+
   recent_files->create();
   unloadtagsmenu->create();
   save_hook.format("%s%s%c%s%c%s.lua", ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, "saved");
@@ -1243,5 +1225,16 @@ void TopWindow::create()
     a->migration_errors="";
   }
 #endif
+}
+
+
+void TopWindow::AddOutput(const FXString&line)
+{
+  outlist->appendItem(line.text());
+}
+
+void TopWindow::ClearOutput()
+{ 
+  outlist->clearItems();
 }
 

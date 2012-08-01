@@ -46,6 +46,7 @@
 #include "theme.h"
 #include "appname.h"
 #include "toolbar.h"
+#include "outpane.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -112,8 +113,6 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_RUN_COMMAND, onRunCommand),
   TWMAPFUNC(ID_SPLIT_CHANGED, onSplitChanged),
   TWMAPFUNC(ID_FOCUS_OUTLIST,onOutlistFocus),
-  TWMAPFUNC(ID_OUTLIST_ASEL,onOutlistPopup),
-  TWMAPFUNC(ID_OUTLIST_COPY,onOutlistPopup),
   TWMAPFUNCS(ID_TOUPPER,ID_TOLOWER,onChangeCase),
   TWMAPFUNC(ID_SET_LANGUAGE,onSetLanguage),
   TWMAPFUNC(ID_RELOAD,onReload),
@@ -134,10 +133,6 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   TWMAPFUNC(ID_HELP_ABOUT, onHelpAbout),
   TWMAPSEL(SEL_TIMEOUT,ID_CLOSEWAIT,onCloseWait),
   TWMAPSEL(SEL_CHORE,ID_CLOSEWAIT,onCloseWait),
-  TWMAPSEL(SEL_DOUBLECLICKED,     ID_OUTLIST_CLICK, onOutlistClick),
-  TWMAPSEL(SEL_KEYPRESS,          ID_OUTLIST_CLICK, onOutlistClick),
-  TWMAPSEL(SEL_RIGHTBUTTONRELEASE,ID_OUTLIST_CLICK, onOutlistClick),
-  TWMAPSEL(SEL_FOCUSIN,           ID_OUTLIST_CLICK, onOutlistClick),
   TWMAPFUNC(ID_FILE_SAVED,onFileSaved),
   TWMAPFUNC(ID_OPEN_PREVIOUS, onOpenPrevious),
   TWMAPFUNC(ID_OPEN_SELECTED, onOpenSelected),
@@ -178,11 +173,7 @@ void TopWindow::ClosedDialog()
 
 long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
 {
-  FXString*s=(FXString*)p;
-  s->substitute('\t', ' ');
-  s->substitute('\r', ' ');
-  outlist->fillItems(*s);
-  outlist->makeItemVisible(outlist->getNumItems()-1);
+  outlist->fillItems(*((FXString*)p));
   return 1;
 }
 
@@ -1532,61 +1523,11 @@ long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
 
 
 
-long TopWindow::onOutlistPopup(FXObject*o, FXSelector sel, void*p)
-{
-  FXint count=outlist->getNumItems();
-  if (count==0) { return 1; }
-  switch (FXSELID(sel))
-  {
-    case ID_OUTLIST_ASEL: {
-      outlist->setAnchorItem(0);
-      outlist->selectItem(0);
-      outlist->extendSelection(count-1);
-      break;
-    }
-    case ID_OUTLIST_COPY: {
-      FXint i;
-      FXString outclip="";
-      FXString newline="\n";
-      switch (prefs->DefaultFileFormat) {
-        case 0: { newline="\r\n"; break; }
-        case 1: { newline="\r";   break; }
-        case 2: { newline="\n";   break; }
-      }
-      for (i=0; i<count; i++) {
-        if (outlist->isItemSelected(i)) {
-          outclip.append(outlist->getItemText(i));
-          outclip.append(newline);
-        }
-      }
-      ControlDoc()->sendString(SCI_COPYTEXT,outclip.length(), outclip.text());
-    }
-    default: { return 0; }
-  }
-  return 1;
-}
-
 
 
 long TopWindow::onOutlistFocus(FXObject*o, FXSelector sel, void*p)
 {
-  static bool isfocused=false;
-  if (outlist->getNumItems()<=0) { return 1; }
-  if (isfocused) {
-    outlist->killFocus();
-    ControlDoc()->setFocus();
-  } else {
-    skipfocus=true;
-    if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
-    FocusedDoc()->killFocus();
-    outlist->setFocus();
-    if (outlist->getCurrentItem()<0) { outlist->setCurrentItem(0); }
-    if (!outlist->isItemSelected(outlist->getCurrentItem())) {
-      outlist->selectItem(outlist->getCurrentItem());
-    }
-    outlist->makeItemVisible(outlist->getCurrentItem());
-  }
-  isfocused=!isfocused;
+  if (outlist->Focus()) { skipfocus=true; }
   return 1;
 }
 
@@ -1594,83 +1535,7 @@ long TopWindow::onOutlistFocus(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onGoToError(FXObject*o, FXSelector sel, void*p)
 {
-  FXint n=outlist->getCurrentItem();
-  if (n>=0) {
-    FXListItem*item=outlist->getItem(n);
-    if (item) {
-      FXString txt=item->getText();
-      if (!txt.empty()) {
-        ErrorPattern*pats=prefs->ErrorPatterns();
-        for (FXint i=0; i<prefs->ErrorPatternCount(); i++) {
-          FXint begs[4]={0,0,0,0};
-          FXint ends[4]={0,0,0,0};
-          FXRex rx(pats[i].pat, REX_CAPTURE);
-          if (rx.match(txt,begs,ends,REX_FORWARD,3)) {
-            FXString filename = txt.mid(begs[1],ends[1]-begs[1]);
-            FXString linenum =  txt.mid(begs[2],ends[2]-begs[2]);
-            if (FXStat::isFile(filename)) {
-              OpenFile(filename.text(), linenum.text(),false,true);
-              break;
-            } else {
-              SciDoc*sci=ControlDoc();
-              if (sci && (!sci->Filename().empty()) && (!FXPath::isAbsolute(filename))) {
-                filename=FXPath::name(filename);
-                filename.prepend(PATHSEP);
-                filename.prepend(FXPath::directory(sci->Filename()));
-                if (FXStat::isFile(filename)) {
-                  OpenFile(filename.text(), linenum.text(),false,true);
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return 1;
-}
-
-
-
-long TopWindow::onOutlistClick(FXObject*o, FXSelector sel, void*p)
-{
-  if (o!=outlist) {return 0;}
-  FXEvent* ev=(FXEvent*)p;
-  switch (FXSELTYPE(sel)) {
-    case SEL_RIGHTBUTTONRELEASE: {
-      if(!ev->moved){
-        outpop->popup(NULL,ev->root_x,ev->root_y);
-        getApp()->runModalWhileShown(outpop);
-      }
-      return 1;
-    }
-    case SEL_DOUBLECLICKED: { break; }
-    case SEL_KEYPRESS: {
-      FXint code=ev->code;
-      if ((code==KEY_Return)||(code==KEY_KP_Enter)) { break; } else {
-        if (code==KEY_Tab) {
-          outlist->killFocus();
-          ControlDoc()->setFocus();
-          return 1;
-        } else {
-          if (ev->state==CONTROLMASK) {
-            switch (code) {
-              case KEY_a: { return onOutlistPopup(this,FXSEL(SEL_COMMAND,ID_OUTLIST_ASEL),p); }
-              case KEY_c: { return onOutlistPopup(this,FXSEL(SEL_COMMAND,ID_OUTLIST_COPY),p); }
-            }
-          }
-        }
-        return 0;
-      }
-    }
-    case SEL_FOCUSIN: {
-      active_widget=outlist;
-      return 0;
-    }
-    default: { return 0; }
-  }
-  onGoToError(o,sel,p);
+  outlist->GoToError();
   return 1;
 }
 
