@@ -513,14 +513,9 @@ void TopWindow::ShowStatusBar(bool showit)
   } else {
     statusbar->hide();
   }
+
   // Layout doesn't work right without this...
-  if (prefs->ShowOutputPane) {
-    ShowOutputPane(false);
-    ShowOutputPane(true);
-  } else {
-    ShowOutputPane(true);
-    ShowOutputPane(false);
-  }
+  statusbar->getParent()->layout();
 }
 
 
