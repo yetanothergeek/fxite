@@ -47,6 +47,7 @@
 #include "appname.h"
 #include "toolbar.h"
 #include "outpane.h"
+#include "statusbar.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -425,7 +426,7 @@ long TopWindow::onMacroRecord(FXObject*o, FXSelector sel, void*p)
   SetMenuEnabled(showmacromenu,recording==NULL);
   if (tbar_rec_btn) { tbar_rec_btn->setState(recording!=NULL); }
 
-  SetInfo(recording?_("(recording)"):"");
+  statusbar->Recording(recording);
   ControlDoc()->setFocus();
   return 1;
 }
@@ -1344,7 +1345,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
     Theme::apply(srchdlgs->FindDialog());
     tips->setBackColor(getApp()->getTipbackColor());
     tips->setTextColor(getApp()->getTipforeColor());
-    SetStatusBarColors();
+    statusbar->Colorize();
   }
   tabbook->ActivateTab(tabbook->ActiveTab());
   toolbar_frm->SetToolbarColors();

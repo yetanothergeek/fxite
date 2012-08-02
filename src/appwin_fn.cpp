@@ -789,22 +789,6 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 
 
 
-void TopWindow::SetStatusBarColors()
-{
-  FXColor clr=statusbar->getBaseColor();
-  coords->setShadowColor(clr);
-  coords->setBackColor(clr);
-  coords->setEditable(false);
-  docname->setShadowColor(clr);
-  docname->setBackColor(clr);
-  encname->setShadowColor(clr);
-  encname->setBackColor(clr);
-  general_info->setBackColor(HexToRGB("#FFFFCC"));
-  general_info->setTextColor(HexToRGB("#FF0000"));
-}
-
-
-
 // Check for an already-selected filename
 static void GetFilenameFromSelection(TopWindow*tw,SciDoc*sci, FXString &filename)
 {

@@ -20,7 +20,7 @@ fxite_SOURCES=\
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
   menuspec.cpp isutf8.c winshcut.c listdlls.c luafx.cpp \
   migration.cpp filedlg.cpp theme.cpp prefdlg_ext.cpp \
-  prefdlg_sntx.cpp prefdlg_tbar.cpp toolbar.cpp outpane.cpp
+  prefdlg_sntx.cpp prefdlg_tbar.cpp toolbar.cpp outpane.cpp statusbar.cpp
 
 
 noinst_HEADERS=\
@@ -28,7 +28,7 @@ noinst_HEADERS=\
   luacmds.h luafuncs.h macro.h prefdlg.h prefs.h readtags.h recorder.h scidoc.h scisrch.h search.h \
   shmenu.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
   fxasq_lua.h luasci.h menuspec.h listdlls.h luafx.h appname.h \
-  filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h toolbar.h outpane.h
+  filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h toolbar.h outpane.h statusbar.h
 
 
 

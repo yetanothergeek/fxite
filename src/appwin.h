@@ -37,6 +37,8 @@ class ToolsDialog;
 class TopMenuPane;
 class ToolBarFrame;
 class OutputList;
+class StatusBar;
+
 
 
 class TopWindow: public MainWinWithClipBrd {
@@ -140,11 +142,7 @@ private:
   FXMenuCheck* readonlymenu;
   FXMenuCheck* wordwrapmenu;
   FXVerticalFrame* vbox;
-  FXHorizontalFrame* statusbar;
-  FXTextField* coords;
-  FXTextField* docname;
-  FXTextField* encname;
-  FXLabel* general_info;
+  StatusBar* statusbar;
   DocTabs*    tabbook;
   FXSplitter* hsplit;
   OutputList*outlist;
@@ -193,13 +191,11 @@ private:
   void SetTabLocked(SciDoc*sci, bool locked);
   bool SaveAll(bool break_on_fail);
   bool ShowSaveAsDlg(SciDoc*sci);
-  void SetInfo(const char*msg, bool hide_docname=false);
   void DisableUI(bool disabled);
   void SetSrchDlgsPrefs();
   void DoneSci(SciDoc*sci);
   void EnableUserFilters(bool enabled);
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
-  void SetStatusBarColors();
   void OpenSelected();
   void ShowAutoComplete(SciDoc*sci);
   FXString save_hook;

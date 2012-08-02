@@ -44,6 +44,7 @@
 #include "menuspec.h"
 #include "toolbar.h"
 #include "outpane.h"
+#include "statusbar.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -66,6 +67,8 @@ const FXString& TopWindow::Connector() { return ((AppClass*)(FXApp::instance()))
 
 #define SessionFile() (((AppClass*)getApp())->SessionFile())
 
+
+
 TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
 {
   FXASSERT(!global_top_window_instance);
@@ -83,8 +86,8 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   CreateMenus();
   new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
 
-  statusbar=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED, 0,0,0,0, 3,3,3,3, 7,3);
-
+  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
+  
   vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
 
   toolbar_frm=new ToolBarFrame(vbox);
@@ -102,21 +105,6 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
   hsplit->setSplit(1,prefs->OutputPaneHeight);
   ShowOutputPane(prefs->ShowOutputPane);
-
-  coords=new FXTextField(statusbar,12,NULL,FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  coords->setEditable(false);
-
-  docname=new FXTextField(statusbar, 64, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  docname->setEditable(false);
-
-  encname=new FXTextField(statusbar, 6, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
-  encname->setEditable(false);
-
-  general_info=new FXLabel(statusbar, FXString::null, NULL,JUSTIFY_LEFT|LAYOUT_FIX_Y);
-  general_info->setUserData((void*)DontFreezeMe());
-  general_info->hide();
-
-  SetStatusBarColors();
 
   srchdlgs=new SearchDialogs(this);
   srchdlgs->searchstring="";
@@ -506,15 +494,7 @@ void TopWindow::ShowStatusBar(bool showit)
   prefs->ShowStatusBar=showit;
   status_chk->setCheck(showit);
   SyncToggleBtn(status_chk,FXSEL(SEL_COMMAND,ID_SHOW_STATUSBAR));
-
-  if (showit) {
-    statusbar->show();
-  } else {
-    statusbar->hide();
-  }
-
-  // Layout doesn't work right without this...
-  statusbar->getParent()->layout();
+  statusbar->Show(showit);
 }
 
 
@@ -634,17 +614,11 @@ void TopWindow::UpdateTitle(long line, long col)
     SetMenuEnabled(fmt_unx_mnu,!readonlymenu->getCheck());
     wordwrapmenu->setCheck(sci->GetWordWrap());
     SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
-    docname->setText(sci->Filename().empty()?"":sci->Filename().text());
-    encname->setText(sci->GetUTF8()?"UTF-8":"ASCII");
-    char rowcol[16];
-    memset(rowcol,0,sizeof(rowcol));
-    snprintf(rowcol,sizeof(rowcol)-1," %ld:%ld",line+1,col);
-    coords->setText(rowcol);
+    statusbar->FileInfo(sci->Filename(),sci->GetUTF8(),line,col);
     UpdateEolMenu(sci);
   } else {
     setTitle(EXE_NAME);
-    docname->setText("");
-    coords->setText("");
+    statusbar->Clear();
   }
 }
 
@@ -663,23 +637,6 @@ void TopWindow::DisableUI(bool disabled)
     saved_accels=NULL;
   }
   Freeze(this,disabled);
-}
-
-
-
-void TopWindow::SetInfo(const char*msg, bool hide_docname)
-{
-  if (hide_docname) {
-    docname->setNumColumns(24);
-  } else {
-    docname->setNumColumns(64);
-  }
-  general_info->setText(msg);
-  if (msg&&*msg) {
-    general_info->show();
-  } else {
-    general_info->hide();
-  }
 }
 
 
@@ -718,9 +675,7 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
     FXString output="";
     command_timeout=false;
     getApp()->beginWaitCursor();
-    FXString status;
-    status.format(_("Running command (press %s to cancel)"), MenuMgr::LookupMenu(ID_KILL_COMMAND)->accel);
-    SetInfo(status.text(), true);
+    statusbar->Running(_("command"));
     DisableUI(true);
     if (cmdio.filter(cmd.text(), input, output, &command_timeout)) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
@@ -728,7 +683,7 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
       rv=true;
     }
     DisableUI(false);
-    SetInfo("");
+    statusbar->Normal();
     getApp()->endWaitCursor();
   }
   sci->setFocus();
@@ -753,14 +708,12 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
     repaint();
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
     getApp()->beginWaitCursor();
-    FXString status;
-    status.format(_("Running command (press %s to cancel)"), MenuMgr::LookupMenu(ID_KILL_COMMAND)->accel);
-    SetInfo(status.text(), true);
+    statusbar->Running(_("command"));
     DisableUI(true);
     getApp()->runWhileEvents();
     success=cmdio.lines(cmd.text(), this, ID_CMDIO, &command_timeout, true);
     DisableUI(false);
-    SetInfo("");
+    statusbar->Normal();
     getApp()->endWaitCursor();
     if (success) {
       outlist->appendItem(_("Command succeeded."));
@@ -830,7 +783,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
   command_busy=true;
   if (!macros) { macros = new MacroRunner(this); }
   command_timeout=false;
-  SetInfo(_("Running macro (press Ctrl+. to cancel)"), true);
+  statusbar->Running(_("macro"));
   update();
   DisableUI(true);
   getApp()->runWhileEvents();
@@ -838,7 +791,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
   if (!destroying) {
     tabbook->ForEachTab(ResetUndoLevelCB,NULL);
     DisableUI(false);
-    SetInfo("");
+    statusbar->Normal();
     if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
@@ -1210,7 +1163,6 @@ void TopWindow::create()
   StaleTicks=0;
   SaveTicks=0;
   a->addTimeout(this,ID_TIMER,ONE_SECOND,NULL);
-  general_info->setY(6);
 #ifndef FOX_1_6
   if (!a->migration_errors.empty()) {
     NewFile(false);
