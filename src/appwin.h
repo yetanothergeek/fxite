@@ -146,7 +146,6 @@ private:
   FXTextField* encname;
   FXLabel* general_info;
   DocTabs*    tabbook;
-  FXGroupBox* outputpane;
   FXSplitter* hsplit;
   OutputList*outlist;
   ToolBarFrame*toolbar_frm;

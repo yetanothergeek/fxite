@@ -99,8 +99,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   tabbook->setTabsCompact(prefs->DocTabsPacked);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
 
-  outputpane=new FXGroupBox(hsplit,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
-  outlist=new OutputList(outputpane,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
+  outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
   hsplit->setSplit(1,prefs->OutputPaneHeight);
   ShowOutputPane(prefs->ShowOutputPane);
 
@@ -535,9 +534,9 @@ void TopWindow::ShowOutputPane(bool showit)
   if (showit) {
     if (prefs->OutputPaneHeight<16) {prefs->OutputPaneHeight=16; }
     hsplit->setSplit(1, prefs->OutputPaneHeight);
-    outputpane->show();
+    outlist->show();
   } else {
-    outputpane->hide();
+    outlist->hide();
     hsplit->setSplit(1,0);
   }
 }

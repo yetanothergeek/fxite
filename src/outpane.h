@@ -38,6 +38,8 @@ public:
   FXint fillItems(const FXString& strings);
   FXint appendItem(const FXString& text);
   void SelectFirstError();
+  virtual void show();
+  virtual void hide();
   enum {
     ID_SOMETHING=FXList::ID_LAST,
     ID_SELECT_ALL,

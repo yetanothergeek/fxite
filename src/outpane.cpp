@@ -226,7 +226,7 @@ void OutputList::SelectFirstError()
 
 
 OutputList::OutputList(FXComposite*p,FXObject*tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
-FXList(p,tgt,sel,opts,x,y,w,h)
+FXList(new FXGroupBox(p,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0),tgt,sel,opts,x,y,w,h)
 {
   tw=TopWindow::instance();
   prefs=Settings::instance();
@@ -241,4 +241,19 @@ OutputList::~OutputList()
 {
   delete outpop; 
 }
+
+
+
+void OutputList::show()
+{
+  getParent()->show();
+}
+
+
+
+void OutputList::hide()
+{
+  getParent()->hide();
+}
+
 
