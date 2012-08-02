@@ -33,7 +33,7 @@ FXIMPLEMENT(StatusBar,FXHorizontalFrame,StatusBarMap,ARRAYNUMBER(StatusBarMap));
 
 StatusBar::StatusBar(FXComposite *p, FXSelector kill_id, void* dont_freeze):
     FXHorizontalFrame(p,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED, 0,0,0,0, 3,3,3,3, 7,3)
-{              
+{
   coords=new FXTextField(this,12,NULL,FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
   coords->setEditable(false);
 
@@ -97,7 +97,7 @@ void StatusBar::Recording(bool recording)
 
 
 void StatusBar::Clear()
-{ 
+{
   Normal();
   docname->setText("");
   encname->setText("");
@@ -144,5 +144,4 @@ void StatusBar::Show(bool showit)
   if (showit) { show(); } else { hide(); }
   getParent()->layout();  // <=Layout doesn't work right without this
 }
-
 

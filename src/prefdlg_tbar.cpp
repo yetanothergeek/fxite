@@ -213,7 +213,7 @@ FXIMPLEMENT(PopupPrefs,DualListForm,PopupPrefsMap,ARRAYNUMBER(PopupPrefsMap));
 
 class PopupListItem: public FXListItem {
 public:
-  PopupListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem() { 
+  PopupListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem() {
     data=strdup((const char*)ptr);
     setText(stripHotKey(text.section('\t',0)));
   }

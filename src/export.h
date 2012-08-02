@@ -18,3 +18,4 @@
 
 void SaveToPDF(SciDoc*sci,  FILE *fp);
 void SaveToHTML(SciDoc*sci,  FILE *fp);
+

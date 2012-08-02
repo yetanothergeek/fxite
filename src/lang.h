@@ -78,4 +78,3 @@ long HexToRGB(const char* rgb);
 
 StyleDef* GetStyleFromId(StyleDef*styles, int id);
 
-

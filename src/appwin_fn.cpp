@@ -90,7 +90,6 @@ void TopWindow::SetWordWrap(SciDoc*sci, bool wrapped)
   sci->SetWordWrap(wrapped);
   wordwrapmenu->setCheck(wrapped);
   SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
-  
 }
 
 
@@ -673,7 +672,7 @@ UserMenu**TopWindow::UserMenus() const
 
 
 void TopWindow::ShowAutoComplete(SciDoc*sci)
-{ 
+{
   FXString part=FXString::null;
   if (completions.no()&&sci->PrefixAtPos(part)) {
     FXint partlen=part.length();

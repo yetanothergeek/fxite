@@ -221,4 +221,3 @@ enum {
   ToolbarChangedWrap   = 1<<2
 };
 
-

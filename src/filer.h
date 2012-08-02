@@ -49,3 +49,4 @@ public:
   static bool ReadShortcut(FXWindow*w, FXString &filename);
 #endif
 };
+

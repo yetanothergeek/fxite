@@ -19,4 +19,3 @@
 
 const luaL_reg* LuaFxUtils(FXWindow*topwin, const char*exe_name);
 
-

@@ -932,4 +932,3 @@ FXHorizontalFrame* Theme::MakeThemeGUI(FXComposite*o)
   return (FXHorizontalFrame*)(new ThemeGUI(o));
 }
 
-

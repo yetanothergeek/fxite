@@ -28,3 +28,4 @@ public:
   static void VersionInfo();
   static void AboutBox();
 };
+

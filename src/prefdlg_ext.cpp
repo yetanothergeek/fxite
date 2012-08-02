@@ -292,3 +292,4 @@ FXuint SysIncDlg::execute(FXuint placement)
     return false;
   }
 }
+

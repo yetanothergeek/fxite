@@ -64,7 +64,7 @@ FXIMPLEMENT(ToolBarBtn,FXButton,ToolBarBtnMap,ARRAYNUMBER(ToolBarBtnMap))
 ToolBarBtn::ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
     FXButton(p,text,NULL,tgt,sel,FRAME_NONE|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0)
 {
-  
+
 }
 
 
@@ -305,7 +305,7 @@ void ToolBarFrame::create()
 
 void ToolBarFrame::show()
 {
-  FXVerticalFrame::show();  
+  FXVerticalFrame::show();
   getParent()->layout();
 }
 

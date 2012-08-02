@@ -520,4 +520,3 @@ void TopWindow::DeleteMenus()
   delete viewmenu;
 }
 
-

@@ -152,4 +152,3 @@ void BackupMgr::RemoveBackup(SciDoc*sci)
   }
 }
 
-

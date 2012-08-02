@@ -87,7 +87,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
 
   statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
-  
+
   vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
 
   toolbar_frm=new ToolBarFrame(vbox);
@@ -1180,7 +1180,7 @@ void TopWindow::AddOutput(const FXString&line)
 }
 
 void TopWindow::ClearOutput()
-{ 
+{
   outlist->clearItems();
 }
 

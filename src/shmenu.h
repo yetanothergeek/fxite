@@ -87,6 +87,3 @@ class HistMenu: public FXMenuPane {
     void remove(const FXString &txt);
 };
 
-
-
-

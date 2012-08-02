@@ -26,3 +26,4 @@ extern int luaopen_dialog(lua_State *L);
 #ifdef __cplusplus
 }
 #endif
+

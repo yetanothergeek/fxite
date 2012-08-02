@@ -102,7 +102,7 @@ SciDoc::~SciDoc()
 void SciDoc::ShowPopupMenu(int x, int y)
 {
   long pos=sendMessage(SCI_GETCURRENTPOS,0,0);
-  if (x<0||y<0) { 
+  if (x<0||y<0) {
     x=sendMessage(SCI_POINTXFROMPOSITION,0,pos);
     y=sendMessage(SCI_POINTYFROMPOSITION,0,pos);
     translateCoordinatesTo(x,y,getApp()->getRootWindow(),x,y);

@@ -204,7 +204,7 @@ FXint OutputList::appendItem(const FXString& text)
 {
   FXint rv=FXList::appendItem(text);
   makeItemVisible(getNumItems()-1);
-  return rv; 
+  return rv;
 }
 
 
@@ -239,7 +239,7 @@ FXList(new FXGroupBox(p,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THIC
 
 OutputList::~OutputList()
 {
-  delete outpop; 
+  delete outpop;
 }
 
 
@@ -255,5 +255,4 @@ void OutputList::hide()
 {
   getParent()->hide();
 }
-
 

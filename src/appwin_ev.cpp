@@ -1333,7 +1333,7 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) {
     UpdateToolbar();
   }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) { 
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) {
     toolbar_frm->handle(toolbar_frm,FXSEL(SEL_CONFIGURE,0),NULL);
   }
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {

@@ -162,5 +162,3 @@ void fxasq_hr(FxAsqDlg *dlg)
   Dlg->HR();
 }
 
-
-

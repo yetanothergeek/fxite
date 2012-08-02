@@ -47,6 +47,3 @@ public:
   static bool SelectTool(FXWindow* owner, UserMenu** menus, FXMenuCommand*&mc);
 };
 
-
-
-

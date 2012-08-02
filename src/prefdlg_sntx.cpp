@@ -594,4 +594,3 @@ LangGUI::LangGUI(FXComposite*o,Settings*aprefs,FXObject*trg, FXSelector sel):FXV
   onLangSwitch(langlist, 0, (void*)(FXival)whichlang);
 }
 
-

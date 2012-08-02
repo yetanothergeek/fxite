@@ -57,3 +57,4 @@ public:
     ID_TABOPTS_SWITCH
   };
 };
+

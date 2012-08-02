@@ -533,4 +533,3 @@ FxAsqWin::~FxAsqWin()
   delete dlg;
 }
 
-

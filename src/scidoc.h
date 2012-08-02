@@ -200,5 +200,3 @@ public:
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
 
-
-

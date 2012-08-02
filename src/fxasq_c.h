@@ -61,3 +61,4 @@ void fxasq_hr(       FxAsqDlg *dlg);
 #ifdef __cplusplus
 }
 #endif
+

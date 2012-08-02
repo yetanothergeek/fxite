@@ -23,3 +23,4 @@ class TopWindow;
 const luaL_reg* LuaFuncs(TopWindow*topwin);
 void LuaFuncsCleanup();
 const char *LuaQuitMessage();
+

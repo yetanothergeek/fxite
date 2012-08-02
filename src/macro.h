@@ -37,4 +37,3 @@ public:
   bool DoString(const FXString &sourcecode);
 };
 
-

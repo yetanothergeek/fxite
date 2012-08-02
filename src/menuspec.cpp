@@ -392,7 +392,7 @@ void MenuMgr::GetTipFromFilename(const char*filename, FXString &tip)
   } while (1);
   tip.substitute("/"," -> ");
   tip.at(0)=toupper(tip.text()[0]);
-  for (char*c=&(tip.at(0)); *c; c++) { if (c[0]==' ') { c[1]=toupper(c[1]); } } 
+  for (char*c=&(tip.at(0)); *c; c++) { if (c[0]==' ') { c[1]=toupper(c[1]); } }
 }
 
 
@@ -688,7 +688,7 @@ void MenuMgr::ShowPopupMenu(FXPoint*pt)
             case 'm': {
               if ((strncmp(subdir,"macros",6)==0)&&(subdir[6]==PATHSEP)) { sel=TopWindow::ID_USER_MACRO; }
               break;
-            }  
+            }
             case 's': {
               if ((strncmp(subdir,"snippets",8)==0&&(subdir[8]==PATHSEP))) { sel=TopWindow::ID_USER_SNIPPET; }
               break;
@@ -703,10 +703,10 @@ void MenuMgr::ShowPopupMenu(FXPoint*pt)
       } else {
         MenuSpec* spec=LookupMenuByPref(*pref);
         if (spec) {
-          FXMenuCommand*mc = new PopUpMnuCmd(mnu,spec->mnu_txt,NULL,tw,spec->sel);     
+          FXMenuCommand*mc = new PopUpMnuCmd(mnu,spec->mnu_txt,NULL,tw,spec->sel);
           switch (spec->sel) {
             case TopWindow::ID_UNDO:{
-              if (!sci->sendMessage(SCI_CANUNDO,0,0)) { mc->disable(); } 
+              if (!sci->sendMessage(SCI_CANUNDO,0,0)) { mc->disable(); }
               break;
             }
             case TopWindow::ID_REDO:{

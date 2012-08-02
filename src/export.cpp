@@ -747,3 +747,4 @@ void SaveToPDF(SciDoc*sci,  FILE *fp)
   pr.endPDF();
 
 }
+

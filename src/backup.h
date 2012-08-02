@@ -31,3 +31,4 @@ public:
   void RemoveBackup(SciDoc*sci);
   const FXString &LastError();
 };
+

@@ -588,3 +588,4 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
     callback(text.text(), user_data);
   }
 }
+

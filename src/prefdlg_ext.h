@@ -51,3 +51,4 @@ public:
   virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
   SysIncDlg(FXWindow* w);
 };
+
