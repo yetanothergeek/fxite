@@ -45,6 +45,7 @@
 #include "toolbar.h"
 #include "outpane.h"
 #include "statusbar.h"
+#include "mainmenu.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -158,7 +159,6 @@ void TopWindow::SetKillCommandAccelKey(FXHotKey acckey)
 TopWindow::~TopWindow()
 {
   destroying=true;
-  DeleteMenus();
   delete macros;
   delete filedlgs;
   delete backups;
@@ -271,19 +271,12 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   }
 
   SetTabLocked(sci,readonly);
-  sci->setFocus();
   tabbook->ActivateTab(tabbook->Count()-1);
-  FXMenuCommand*cmd=new FXMenuCommand(doclistmenu, sci->Filename().empty()?tab->getText():sci->Filename(),
-                              NULL,this,ID_TAB_ACTIVATE, 0);
-
-  cmd->setUserData(tab);
-  tab->setUserData(cmd);
+  menubar->AppendDocList(sci->Filename(), tab);
   if (shown()) {
     sci->create();
-    cmd->create();
     if (rowcol) { sci->GoToStringCoords(rowcol); }
   }
-  recent_files->remove(sci->Filename());
 
   //  If the only thing we had open prior to this file was a single,
   //  empty, untitled, unmodified document, then close it...
@@ -294,7 +287,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       CloseFile(false,false);
     }
   }
-
+  sci->setFocus();
   if (hooked) { RunHookScript("opened"); }
   return true;
 }
@@ -352,7 +345,7 @@ bool TopWindow::CloseFile(bool close_last, bool hooked)
   DocTab*tab=tabbook->ActiveTab();
   SciDoc*sci=ControlDoc();
   if (!filedlgs->TryClose(sci,tab->getText().text())) { return false; }
-  recent_files->prepend(sci->Filename());
+  menubar->PrependRecentFile(sci->Filename());
   if (hooked) { RunHookScript("closing"); }
   if (close_last) {
     if (!sci->Filename().empty()) {
@@ -415,69 +408,42 @@ bool TopWindow::CloseAll(bool close_last)
 
 void TopWindow::AddFileToTagsMenu(const FXString &filename)
 {
-  FXMenuPane*pane=(FXMenuPane*)unloadtagsmenu->getMenu();
-  FXWindow*w;
-  FXString fn=FXPath::simplify(FXPath::absolute(filename));
-  for ( w=pane->getFirst(); w; w=w->getNext() ) {
-    if (strcmp(fn.text(),((FXMenuCaption*)w)->getText().text())==0) {
-      return;
-    }
-  }
-  unloadtagsmenu->enable();
-  SetMenuEnabled(findtagmenu,true);
-  SetMenuEnabled(showtipmenu,true);
-  SetMenuEnabled(autocompmenu,true);
-  FXMenuCommand*mc=new FXMenuCommand(pane,"",NULL,this,ID_UNLOAD_TAGS);
-  mc->create();
-  mc->setText(fn);
+  menubar->AddFileToTagsList(filename);
 }
-
 
 
 bool TopWindow::RemoveFileFromTagsMenu(const FXString &filename)
 {
-  FXMenuPane*pane=(FXMenuPane*)unloadtagsmenu->getMenu();
-  if (filename.empty()) { /* remove all tag files */
-    while (pane->numChildren()>0) {
-      onUnloadTags(pane->getFirst(),0,NULL);
-    }
+  menubar->RemoveFileFromTagsList(filename);
+}
+
+
+
+bool TopWindow::SetLanguage(FXMenuRadio *mnu)
+{
+  if (mnu) {
+    LangStyle*ls=(LangStyle*) mnu->getUserData();
+    SciDoc*sci=ControlDoc();
+    sci->setLanguage(ls);
+    menubar->SetLanguageCheckmark(ls);
     return true;
-  } else {
-    FXWindow*w;
-    FXString fn=FXPath::simplify(FXPath::absolute(filename));
-    for ( w=pane->getFirst(); w; w=w->getNext() ) {
-      if (strcmp(fn.text(),((FXMenuCaption*)w)->getText().text())==0) {
-        onUnloadTags(w,0,NULL);
-        return true; /* we found it */
-      }
-    }
-    return false; /* we did not find the filename in the menu */
-  }
+  } else { return false; }
 }
 
 
 
 bool TopWindow::SetLanguage(const FXString &name)
 {
-  for (FXWindow*grp=langmenu->getFirst(); grp; grp=grp->getNext()) {
-    for (FXWindow*mnu=((FXMenuCascade*)grp)->getMenu()->getFirst(); mnu; mnu=mnu->getNext()) {
-      if (compare(((FXMenuCommand*)mnu)->getText(),name)==0) {
-        onSetLanguage(mnu,0,NULL);
-        return true;
-      }
-    }
-  }
-  return false;
+  return SetLanguage(menubar->GetMenuForLanguage(name));
 }
 
 
 
 void TopWindow::ShowLineNumbers(bool showit)
 {
-  if (linenums_chk->getCheck()!=showit) {
-    linenums_chk->setCheck(showit);
-    onShowLineNums(linenums_chk,FXSEL(SEL_COMMAND,ID_SHOW_LINENUMS),(void*)showit);
-  }
+  prefs->ShowLineNumbers=showit;
+  tabbook->ForEachTab(LineNumsCB, (void*)(FXival)showit);
+  menubar->SetCheck(ID_SHOW_LINENUMS,showit);
 }
 
 
@@ -492,8 +458,7 @@ bool TopWindow::ShowLineNumbers()
 void TopWindow::ShowStatusBar(bool showit)
 {
   prefs->ShowStatusBar=showit;
-  status_chk->setCheck(showit);
-  SyncToggleBtn(status_chk,FXSEL(SEL_COMMAND,ID_SHOW_STATUSBAR));
+  menubar->SetCheck(ID_SHOW_STATUSBAR,showit);
   statusbar->Show(showit);
 }
 
@@ -509,8 +474,7 @@ bool TopWindow::ShowStatusBar()
 void TopWindow::ShowOutputPane(bool showit)
 {
   prefs->ShowOutputPane=showit;
-  outpane_chk->setCheck(showit);
-  SyncToggleBtn(outpane_chk,FXSEL(SEL_COMMAND,ID_SHOW_OUTLIST));
+  menubar->SetCheck(ID_SHOW_OUTLIST,showit);
   if (showit) {
     if (prefs->OutputPaneHeight<16) {prefs->OutputPaneHeight=16; }
     hsplit->setSplit(1, prefs->OutputPaneHeight);
@@ -532,10 +496,9 @@ bool TopWindow::ShowOutputPane()
 
 void TopWindow::ShowWhiteSpace(bool showit)
 {
-  if (white_chk->getCheck()!=showit) {
-    white_chk->setCheck(showit);
-    onShowWhiteSpace(white_chk,FXSEL(SEL_COMMAND,ID_SHOW_WHITESPACE),(void*)showit);
-  }
+  prefs->ShowWhiteSpace=showit;
+  tabbook->ForEachTab(WhiteSpaceCB, (void*)(FXival)showit);
+  menubar->SetCheck(ID_SHOW_WHITESPACE,prefs->ShowWhiteSpace);
 }
 
 
@@ -549,10 +512,9 @@ bool TopWindow::ShowWhiteSpace()
 
 void TopWindow::ShowToolbar(bool showit)
 {
-  if (toolbar_chk->getCheck()!=showit) {
-    toolbar_chk->setCheck(showit);
-    onShowToolbar(toolbar_chk,FXSEL(SEL_COMMAND,ID_SHOW_TOOLBAR),(void*)showit);
-  }
+  prefs->ShowToolbar=showit;
+  if (showit) { toolbar_frm->show(); } else { toolbar_frm->hide(); }
+  menubar->SetCheck(ID_SHOW_TOOLBAR,showit);
 }
 
 
@@ -589,31 +551,12 @@ void TopWindow::UpdateTitle(long line, long col)
   SciDoc*sci=ControlDoc();
   if (sci) {
     DocTab *tab=tabbook->ActiveTab();
-    LangStyle*ls=NULL;
     FXString s;
     s.format("%s  %s - %s", tab->getText().text(), FXPath::directory(sci->Filename()).text(), EXE_NAME);
     setTitle(s);
-    ls=sci->getLanguage();
-    for (FXWindow*wmc=langmenu->getFirst(); wmc; wmc=wmc->getNext()) {
-      FXPopup*pu=((FXMenuCascade*)wmc)->getMenu();
-      for (FXWindow*wmr=pu->getFirst(); wmr; wmr=wmr->getNext()) {
-        FXMenuRadio*mr=(FXMenuRadio*)wmr;
-        mr->setCheck(mr->getUserData()==ls);
-      }
-    }
-    if (sci->sendMessage(SCI_GETREADONLY,0,0)) {
-      readonlymenu->setCheck(true);
-      fileformatcasc->disable();
-    } else {
-      readonlymenu->setCheck(false);
-      fileformatcasc->enable();
-    }
-    SyncToggleBtn(readonlymenu,FXSEL(SEL_COMMAND,ID_READONLY));
-    SetMenuEnabled(fmt_dos_mnu,!readonlymenu->getCheck());
-    SetMenuEnabled(fmt_mac_mnu,!readonlymenu->getCheck());
-    SetMenuEnabled(fmt_unx_mnu,!readonlymenu->getCheck());
-    wordwrapmenu->setCheck(sci->GetWordWrap());
-    SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
+    menubar->SetLanguageCheckmark(sci->getLanguage());
+    menubar->SetReadOnly(sci->sendMessage(SCI_GETREADONLY,0,0));
+    menubar->SetCheck(ID_WORDWRAP,sci->GetWordWrap());
     statusbar->FileInfo(sci->Filename(),sci->GetUTF8(),line,col);
     UpdateEolMenu(sci);
   } else {
@@ -894,7 +837,6 @@ FXbool TopWindow::close(FXbool notify)
   topwin_closing=true;
   delete srchdlgs;
   delete prefs;
-  delete recent_files;
   return FXMainWindow::close(notify);
 }
 
@@ -1154,8 +1096,6 @@ void TopWindow::create()
   FXFont fnt(a, prefs->FontName, prefs->FontSize/10);
   GetFontDescription(prefs->fontdesc,&fnt);
 
-  recent_files->create();
-  unloadtagsmenu->create();
   save_hook.format("%s%s%c%s%c%s.lua", ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, "saved");
   RunHookScript("startup");
   ParseCommands(a->Commands());
@@ -1182,5 +1122,18 @@ void TopWindow::AddOutput(const FXString&line)
 void TopWindow::ClearOutput()
 {
   outlist->clearItems();
+}
+
+
+
+FXMenuCaption*TopWindow::TagFiles() {
+  return (FXMenuCaption*)(menubar->TagsMenu()->getMenu()->getFirst());
+}
+
+
+
+void TopWindow::CreateMenus()
+{
+  menubar=new MainMenu(this);
 }
 

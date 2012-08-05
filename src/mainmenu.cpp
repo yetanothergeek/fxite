@@ -16,34 +16,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <cctype>
 
 #include <fx.h>
-#include <fxkeys.h>
-
 #include <SciLexer.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
-#include <lua.h>
 
-#include "intl.h"
-#include "scidoc.h"
 #include "prefs.h"
 #include "shmenu.h"
 #include "lang.h"
 #include "menuspec.h"
-#include "fxasq.h"
-#include "compat.h"
-#include "appname.h"
-
 #include "appwin.h"
+
+#include "intl.h"
+#include "mainmenu.h"
 
 #define TEST_SOMETHING 0
 
+#define TW TopWindow
+
 // Create a new menu command, menu check box, or menu radio item...
-#define MkMnuCmd(p,s) MenuMgr::MakeMenuCommand(p,this,s,'m')
-#define MkMnuChk(p,s,c) ((FXMenuCheck*)MenuMgr::MakeMenuCommand(p,this,s,'k',c))
-#define MkMnuRad(p,s) ((FXMenuRadio*)MenuMgr::MakeMenuCommand(p,this,s,'r'))
+#define MkMnuCmd(p,s) MenuMgr::MakeMenuCommand(p,tw,TW::s,'m')
+#define MkMnuChk(p,s,c) ((FXMenuCheck*)MenuMgr::MakeMenuCommand(p,tw,TW::s,'k',c))
+#define MkMnuRad(p,s) ((FXMenuRadio*)MenuMgr::MakeMenuCommand(p,tw,TW::s,'r'))
+
 
 
 static const char*usercmdflags[]={
@@ -59,16 +53,23 @@ static const char*usersnipflags[]={
 };
 
 
+MainMenu::MainMenu(FXComposite* p):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
+{ 
+  tw=(TopWindow*)p;
+  prefs=Settings::instance();
+  CreateMenus();
+}
+
 
 /*
   Fox menus don't re-focus the previously active widget after they are dismissed.
   This sub-class helps to work around that.
 */
-class TopMenuPane: public FXMenuPane {
-  FXDECLARE(TopMenuPane)
-  TopMenuPane(){}
+class MyMenuPane: public FXMenuPane {
+  FXDECLARE(MyMenuPane)
+  MyMenuPane(){}
 public:
-  TopMenuPane(FXComposite*o):FXMenuPane(o) {}
+  MyMenuPane(FXComposite*o):FXMenuPane(o) {}
   long onCmdUnpost(FXObject*o, FXSelector sel, void*p ){
     long rv=FXMenuPane::onCmdUnpost(o,sel,p);
     getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
@@ -78,52 +79,50 @@ public:
 
 
 
-FXDEFMAP(TopMenuPane) TopMenuPaneMap[] = {
-  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNPOST,TopMenuPane::onCmdUnpost),
+FXDEFMAP(MyMenuPane) MyMenuPaneMap[] = {
+  FXMAPFUNC(SEL_COMMAND,FXWindow::ID_UNPOST,MyMenuPane::onCmdUnpost),
 };
 
-FXIMPLEMENT(TopMenuPane,FXMenuPane,TopMenuPaneMap,ARRAYNUMBER(TopMenuPaneMap))
-
-#define SubMenuPane TopMenuPane
+FXIMPLEMENT(MyMenuPane,FXMenuPane,MyMenuPaneMap,ARRAYNUMBER(MyMenuPaneMap))
 
 
-void TopWindow::CreateLanguageMenu()
+void MainMenu::CreateLanguageMenu()
 {
-  langmenu=new SubMenuPane(this);
+  langmenu=new MyMenuPane(tw);
   langcasc=new FXMenuCascade(viewmenu,_("&Language"),NULL,langmenu);
   FXMenuRadio*mr;
 
-  cpp_langmenu=new SubMenuPane(langmenu);
+  cpp_langmenu=new MyMenuPane(langmenu);
   cpp_langcasc=new FXMenuCascade(langmenu,_("C/C++"),NULL,cpp_langmenu);
 
-  scr_langmenu=new SubMenuPane(langmenu);
+  scr_langmenu=new MyMenuPane(langmenu);
   scr_langcasc=new FXMenuCascade(langmenu,_("Scripting"),NULL,scr_langmenu);
 
-  cfg_langmenu=new SubMenuPane(langmenu);
+  cfg_langmenu=new MyMenuPane(langmenu);
   cfg_langcasc=new FXMenuCascade(langmenu,_("Config"),NULL,cfg_langmenu);
 
-  html_langmenu=new SubMenuPane(langmenu);
+  html_langmenu=new MyMenuPane(langmenu);
   html_langcasc=new FXMenuCascade(langmenu,_("Web"),NULL,html_langmenu);
 
-  inf_langmenu=new SubMenuPane(langmenu);
+  inf_langmenu=new MyMenuPane(langmenu);
   inf_langcasc=new FXMenuCascade(langmenu,_("Info"),NULL,inf_langmenu);
 
-  lgcy_langmenu=new SubMenuPane(langmenu);
+  lgcy_langmenu=new MyMenuPane(langmenu);
   lgcy_langcasc=new FXMenuCascade(langmenu,_("Legacy"),NULL,lgcy_langmenu);
 
-  tex_langmenu=new SubMenuPane(langmenu);
+  tex_langmenu=new MyMenuPane(langmenu);
   tex_langcasc=new FXMenuCascade(langmenu,_("Typeset"),NULL,tex_langmenu);
 
-  db_langmenu=new SubMenuPane(langmenu);
+  db_langmenu=new MyMenuPane(langmenu);
   db_langcasc=new FXMenuCascade(langmenu,_("Database"),NULL,db_langmenu);
 
-  asm_langmenu=new SubMenuPane(langmenu);
+  asm_langmenu=new MyMenuPane(langmenu);
   asm_langcasc=new FXMenuCascade(langmenu,_("Asm/HDL"),NULL,asm_langmenu);
 
-  misc_langmenu=new SubMenuPane(langmenu);
+  misc_langmenu=new MyMenuPane(langmenu);
   misc_langcasc=new FXMenuCascade(langmenu,_("Other"),NULL,misc_langmenu);
 
-  mr=new FXMenuRadio(misc_langmenu,_("none"),this,ID_SET_LANGUAGE);
+  mr=new FXMenuRadio(misc_langmenu,_("none"),tw,TW::ID_SET_LANGUAGE);
   mr->setUserData(NULL);
 
   for (LangStyle*ls=languages; ls->name; ls++) {
@@ -199,7 +198,7 @@ void TopWindow::CreateLanguageMenu()
     }
     default: { mp=misc_langmenu; }
     }
-    mr=new FXMenuRadio(mp,ls->name,this,ID_SET_LANGUAGE);
+    mr=new FXMenuRadio(mp,ls->name,tw,TW::ID_SET_LANGUAGE);
     mr->setUserData((void*)ls);
   }
 }
@@ -224,12 +223,12 @@ static FXMenuCascade*NewCascade(FXComposite*p, const FXString&text, FXIcon*ic=NU
 
 
 
-void TopWindow::CreateTabsMenu()
+void MainMenu::CreateTabsMenu()
 {
-  tabmenu=new SubMenuPane(this);
+  tabmenu=new MyMenuPane(tw);
   NewCascade(viewmenu,_("&Tabs"),NULL,tabmenu);
 
-  tabsidemenu=new SubMenuPane(this);
+  tabsidemenu=new MyMenuPane(tw);
   NewCascade(tabmenu,_("&Position"),NULL,tabsidemenu);
 
   FXMenuRadio*tT=MkMnuRad(tabsidemenu,ID_TABS_TOP);
@@ -244,7 +243,7 @@ void TopWindow::CreateTabsMenu()
     default:  { tT->setCheck(); break; }
   }
 
-  tabwidthmenu=new SubMenuPane(this);
+  tabwidthmenu=new MyMenuPane(tw);
   NewCascade(tabmenu,_("&Width"),NULL,tabwidthmenu);
 
   FXMenuRadio*tU=MkMnuRad(tabwidthmenu,ID_TABS_UNIFORM);
@@ -255,9 +254,9 @@ void TopWindow::CreateTabsMenu()
 
 
 
-void TopWindow::CreateZoomMenu()
+void MainMenu::CreateZoomMenu()
 {
-  viewzoommenu=new SubMenuPane(this);
+  viewzoommenu=new MyMenuPane(tw);
   NewCascade(viewmenu,_("&Zoom"),NULL,viewzoommenu);
   MkMnuCmd(viewzoommenu,ID_ZOOM_IN);
   MkMnuCmd(viewzoommenu,ID_ZOOM_OUT);
@@ -268,15 +267,14 @@ void TopWindow::CreateZoomMenu()
 
 
 
-void TopWindow::CreateMenus()
+void MainMenu::CreateMenus()
 {
-  menubar=new FXMenuBar(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X);
-  filemenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&File"),NULL,filemenu);
+  filemenu=new MyMenuPane(tw);
+  NewTitle(this,_("&File"),NULL,filemenu);
   MkMnuCmd(filemenu,ID_NEW);
   MkMnuCmd(filemenu,ID_OPEN_FILES);
   openselmenu=MkMnuCmd(filemenu,ID_OPEN_SELECTED);
-  recent_files=new HistMenu(filemenu, _("Open pre&vious"), "RecentFiles", this, ID_OPEN_PREVIOUS);
+  recent_files=new HistMenu(filemenu, _("Open pre&vious"), "RecentFiles", tw, TW::ID_OPEN_PREVIOUS);
 
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_SAVE);
@@ -287,7 +285,7 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_RELOAD);
 
-  fileexportmenu=new SubMenuPane(this);
+  fileexportmenu=new MyMenuPane(tw);
   NewCascade(filemenu,_("E&xport"),NULL,fileexportmenu);
   MkMnuCmd(fileexportmenu,ID_EXPORT_PDF);
   MkMnuCmd(fileexportmenu,ID_EXPORT_HTML);
@@ -298,14 +296,14 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_INSERT_FILE);
   MkMnuCmd(filemenu,ID_LOAD_TAGS);
-  unloadtagsmenu=new FXMenuCascade(filemenu,_("&Unload tags file"),NULL,(new SubMenuPane(filemenu)));
+  unloadtagsmenu=new FXMenuCascade(filemenu,_("&Unload tags file"),NULL,(new MyMenuPane(filemenu)));
   unloadtagsmenu->disable();
   MkMnuCmd(filemenu,ID_SELECT_DIR);
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_QUIT);
 
-  editmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&Edit"),NULL,editmenu);
+  editmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&Edit"),NULL,editmenu);
 
   MkMnuCmd(editmenu,ID_UNDO);
   MkMnuCmd(editmenu,ID_REDO);
@@ -314,7 +312,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(editmenu,ID_COPY);
   MkMnuCmd(editmenu,ID_PASTE);
 
-  editdeletemenu=new SubMenuPane(this);
+  editdeletemenu=new MyMenuPane(tw);
   NewCascade(editmenu,_("&Delete"),NULL,editdeletemenu);
 
   MkMnuCmd(editdeletemenu,ID_DEL_WORD_LEFT);
@@ -326,7 +324,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(editmenu,ID_TOLOWER);
   MkMnuCmd(editmenu,ID_TOUPPER);
 
-  editindentmenu=new SubMenuPane(this);
+  editindentmenu=new MyMenuPane(tw);
   NewCascade(editmenu,_("&Indent"),NULL,editindentmenu);
 
   MkMnuCmd(editindentmenu,ID_INDENT_STEP);
@@ -335,10 +333,10 @@ void TopWindow::CreateMenus()
   MkMnuCmd(editindentmenu,ID_UNINDENT_FULL);
 
   new FXMenuSeparator(editmenu, 0);
-  readonlymenu=MkMnuChk(editmenu,ID_READONLY,false);
-  wordwrapmenu=MkMnuChk(editmenu,ID_WORDWRAP,false);
+  readonly_chk=MkMnuChk(editmenu,ID_READONLY,false);
+  wordwrap_chk=MkMnuChk(editmenu,ID_WORDWRAP,false);
 
-  fileformatmenu=new SubMenuPane(this);
+  fileformatmenu=new MyMenuPane(tw);
   fileformatcasc=NewCascade(editmenu,_("File &Format"),NULL,fileformatmenu);
 
   fmt_dos_mnu=MkMnuRad(fileformatmenu,ID_FMT_DOS);
@@ -347,14 +345,14 @@ void TopWindow::CreateMenus()
 
   MkMnuCmd(editmenu,ID_PREFS_DIALOG);
 
-  searchmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&Search"),NULL,searchmenu);
+  searchmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&Search"),NULL,searchmenu);
 
   MkMnuCmd(searchmenu,ID_FIND);
   MkMnuCmd(searchmenu,ID_FINDNEXT);
   MkMnuCmd(searchmenu,ID_FINDPREV);
 
-  searchselectmenu=new SubMenuPane(this);
+  searchselectmenu=new MyMenuPane(tw);
   NewCascade(searchmenu,_("Find &Selected"),NULL,searchselectmenu);
   MkMnuCmd(searchselectmenu,ID_NEXT_SELECTED);
   MkMnuCmd(searchselectmenu,ID_PREV_SELECTED);
@@ -365,7 +363,7 @@ void TopWindow::CreateMenus()
   MkMnuCmd(searchmenu,ID_GOTO_SELECTED);
   MkMnuCmd(searchmenu,ID_GOTO_ERROR);
 
-  searchmarkmenu=new SubMenuPane(this);
+  searchmarkmenu=new MyMenuPane(tw);
   NewCascade(searchmenu,_("&Bookmark"),NULL,searchmarkmenu);
   MkMnuCmd(searchmarkmenu,ID_BOOKMARK_SET);
   MkMnuCmd(searchmarkmenu,ID_BOOKMARK_RETURN);
@@ -380,8 +378,8 @@ void TopWindow::CreateMenus()
   autocompmenu->disable();
 
 
-  viewmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&View"),NULL,viewmenu);
+  viewmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&View"),NULL,viewmenu);
 
   CreateLanguageMenu();
   CreateTabsMenu();
@@ -407,14 +405,14 @@ void TopWindow::CreateMenus()
   MkMnuCmd(viewmenu,ID_CYCLE_SPLITTER);
   MkMnuCmd(viewmenu,ID_CLEAR_OUTPUT);
 
-  toolsmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&Tools"),NULL,toolsmenu);
+  toolsmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&Tools"),NULL,toolsmenu);
 
   filterselmenu=MkMnuCmd(toolsmenu,ID_FILTER_SEL);
   MkMnuCmd(toolsmenu,ID_INSERT_CMD_OUT);
   MkMnuCmd(toolsmenu,ID_RUN_COMMAND);
 
-  recordermenu=new SubMenuPane(this);
+  recordermenu=new MyMenuPane(tw);
   NewCascade(toolsmenu,_("Macro &recorder"),NULL,recordermenu);
 
   recorderstartmenu=MkMnuCmd(recordermenu,ID_MACRO_RECORD);
@@ -429,40 +427,40 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(toolsmenu, 0);
 
   FXString scriptdir;
-  scriptdir.format("%s%s", ConfigDir().text(), "tools");
+  scriptdir.format("%s%s", tw->ConfigDir().text(), "tools");
   FXDir::create(scriptdir);
 
-  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "commands");
+  scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "commands");
   FXDir::create(scriptdir);
-  usercmdmenu=new UserMenu(toolsmenu, _("&Commands"), scriptdir, this, ID_USER_COMMAND, usercmdflags);
+  usercmdmenu=new UserMenu(toolsmenu, _("&Commands"), scriptdir, tw, TW::ID_USER_COMMAND, usercmdflags);
   usercmdmenu->helpText(_("Commands: Execute a command and send its output to the output pane."));
 
-  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "filters");
+  scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "filters");
   FXDir::create(scriptdir);
-  userfiltermenu=new UserMenu(toolsmenu, _("&Filters"), scriptdir, this, ID_USER_FILTER);
+  userfiltermenu=new UserMenu(toolsmenu, _("&Filters"), scriptdir, tw, TW::ID_USER_FILTER);
   userfiltermenu->helpText(_("Filters: Pipe selected text to a command and replace with its output."));
 
-  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "snippets");
+  scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "snippets");
   FXDir::create(scriptdir);
-  usersnipmenu=new UserMenu(toolsmenu, _("&Snippets"), scriptdir, this, ID_USER_SNIPPET,usersnipflags);
+  usersnipmenu=new UserMenu(toolsmenu, _("&Snippets"), scriptdir, tw, TW::ID_USER_SNIPPET,usersnipflags);
   usersnipmenu->helpText(_("Snippets: Insert the text of a file or the output of a command."));
 
-  scriptdir.format("%s%s%c%s", ConfigDir().text(), "tools", PATHSEP, "macros");
+  scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "macros");
   FXDir::create(scriptdir);
-  usermacromenu=new UserMenu(toolsmenu, _("&Macros"), scriptdir, this, ID_USER_MACRO);
+  usermacromenu=new UserMenu(toolsmenu, _("&Macros"), scriptdir, tw, TW::ID_USER_MACRO);
   usermacromenu->helpText(_("Macros: Execute a Lua macro using the built-in interpreter."));
 
 #if TEST_SOMETHING
-  new FXMenuCommand(toolsmenu, _("Test something\tF2"), NULL, this, ID_TEST_SOMETHING);
+  new FXMenuCommand(toolsmenu, _("Test something\tF2"), NULL, tw, ID_TEST_SOMETHING);
 #endif
 
-  docmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&Documents"),NULL,docmenu);
+  docmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&Documents"),NULL,docmenu);
 
   MkMnuCmd(docmenu,ID_TAB_NEXT);
   MkMnuCmd(docmenu,ID_TAB_PREV);
 
-  tabordermenu=new SubMenuPane(this);
+  tabordermenu=new MyMenuPane(tw);
   NewCascade(docmenu,_("&Move"),NULL,tabordermenu);
 
   MkMnuCmd(tabordermenu,ID_TAB_TOFIRST);
@@ -481,8 +479,8 @@ void TopWindow::CreateMenus()
   new FXMenuSeparator(docmenu, 0);
   MkMnuCmd(docmenu,ID_FOCUS_OUTLIST);
 
-  helpmenu=new TopMenuPane(this);
-  NewTitle(menubar,_("&Help"),NULL,helpmenu /*,LAYOUT_RIGHT*/);
+  helpmenu=new MyMenuPane(tw);
+  NewTitle(this,_("&Help"),NULL,helpmenu /*,LAYOUT_RIGHT*/);
 
   MkMnuCmd(helpmenu,ID_SHOW_HELP);
   MkMnuCmd(helpmenu,ID_SHOW_LUA_HELP);
@@ -492,7 +490,7 @@ void TopWindow::CreateMenus()
 
 
 
-void TopWindow::DeleteMenus()
+MainMenu::~MainMenu()
 {
   delete usercmdmenu;
   delete userfiltermenu;
@@ -518,5 +516,224 @@ void TopWindow::DeleteMenus()
   delete langmenu;
   delete viewzoommenu;
   delete viewmenu;
+  delete recent_files;
+}
+
+
+
+void MainMenu::RescanUserMenus()
+{
+  usercmdmenu->rescan();
+  userfiltermenu->rescan();
+  usersnipmenu->rescan();
+  usermacromenu->rescan();
+}
+
+
+
+UserMenu**MainMenu::UserMenus() const
+{
+  static UserMenu* menus[]={ usercmdmenu, userfiltermenu, usersnipmenu, usermacromenu, NULL };
+  return menus;
+}
+
+
+
+void MainMenu::EnableFileFormats()
+{
+
+}
+
+
+
+void MainMenu::EnableFilterMenu(bool enabled)
+{
+  if (enabled) { userfiltermenu->enable(); } else { userfiltermenu->disable(); }
+  SetMenuEnabled(filterselmenu,enabled);
+}
+
+
+
+void MainMenu::SetMenuEnabled(FXMenuCommand*mnu, bool enabled)
+{
+  FXLabel*btn=(FXLabel*)(mnu->getUserData());
+  if (enabled) {
+    mnu->enable();
+    if (btn) { btn->enable(); }
+  } else {
+    mnu->disable();
+    if (btn) { btn->disable(); }
+  }
+}
+
+
+
+void MainMenu::EnableTagMenus(bool enabled)
+{
+  if (enabled) { unloadtagsmenu->enable(); } else { unloadtagsmenu->disable(); }
+  SetMenuEnabled(findtagmenu,  enabled);
+  SetMenuEnabled(showtipmenu,  enabled);
+  SetMenuEnabled(autocompmenu, enabled);
+}
+
+
+
+void MainMenu::AddFileToTagsList(const FXString &filename)
+{
+  FXMenuPane*pane=(FXMenuPane*)unloadtagsmenu->getMenu();
+  FXWindow*w;
+  FXString fn=FXPath::simplify(FXPath::absolute(filename));
+  for ( w=pane->getFirst(); w; w=w->getNext() ) {
+    if (strcmp(fn.text(),((FXMenuCaption*)w)->getText().text())==0) {
+      return;
+    }
+  }
+  EnableTagMenus(true);
+  FXMenuCommand*mc=new FXMenuCommand(pane,"",NULL,this,TopWindow::ID_UNLOAD_TAGS);
+  mc->create();
+  mc->setText(fn);
+}
+
+
+
+void MainMenu::UnloadTagFile(FXMenuCommand*mc)
+{
+  mc->hide();
+  mc->destroy();
+  delete mc;
+  if (unloadtagsmenu->getMenu()->numChildren()==0) {
+    EnableTagMenus(false);
+  } 
+}
+
+
+
+bool MainMenu::RemoveFileFromTagsList(const FXString &filename)
+{
+  FXMenuPane*pane=(FXMenuPane*)unloadtagsmenu->getMenu();
+  if (filename.empty()) { /* remove all tag files */
+    while (pane->numChildren()>0) { UnloadTagFile((FXMenuCommand*)pane->getFirst()); }
+    return true;
+  } else {
+    FXWindow*w;
+    FXString fn=FXPath::simplify(FXPath::absolute(filename));
+    for ( w=pane->getFirst(); w; w=w->getNext() ) {
+      if (strcmp(fn.text(),((FXMenuCaption*)w)->getText().text())==0) {
+        UnloadTagFile((FXMenuCommand*)w);
+        return true; /* we found it */
+      }
+    }
+    return false; /* we did not find the filename in the menu */
+  }
+}
+
+
+
+FXMenuCascade*MainMenu::TagsMenu() const
+{
+  return unloadtagsmenu;
+}
+
+
+
+void MainMenu::SetLanguageCheckmark(LangStyle*ls)
+{
+  for (FXWindow*wmc=langmenu->getFirst(); wmc; wmc=wmc->getNext()) {
+    FXPopup*pu=((FXMenuCascade*)wmc)->getMenu();
+    for (FXWindow*wmr=pu->getFirst(); wmr; wmr=wmr->getNext()) {
+      FXMenuRadio*mr=(FXMenuRadio*)wmr;
+      mr->setCheck(mr->getUserData()==ls);
+    }
+  }
+}
+
+
+
+FXMenuRadio*MainMenu::GetMenuForLanguage(const FXString &name) const
+{
+  for (FXWindow*grp=langmenu->getFirst(); grp; grp=grp->getNext()) {
+    for (FXWindow*mnu=((FXMenuCascade*)grp)->getMenu()->getFirst(); mnu; mnu=mnu->getNext()) {
+      if (compare(((FXMenuCommand*)mnu)->getText(),name)==0) { return (FXMenuRadio*)mnu; }
+    }
+  }
+  return NULL;
+}
+
+
+
+void MainMenu::Recording(bool recording, bool recorded)
+{
+  FXToggleButton*tbar_rec_btn=dynamic_cast<FXToggleButton*>((FXObject*)recorderstartmenu->getUserData());
+  recorderstartmenu->setText(recording?_("Stop re&cording"):_("Re&cord macro"));
+  SetMenuEnabled(playbackmenu,recorded && !recording);
+  SetMenuEnabled(showmacromenu,recorded && !recording);
+  if (tbar_rec_btn) { tbar_rec_btn->setState(recording); }
+}
+
+
+
+void MainMenu::AppendDocList(const FXString &filename, FXTabItem*tab)
+{
+  FXMenuCommand* cmd = new FXMenuCommand(  doclistmenu, filename.empty()?tab->getText():filename, 
+                                           NULL, tw, TW::ID_TAB_ACTIVATE, 0 );
+  if (shown()) { cmd->create(); }
+  RemoveRecentFile(filename);
+  cmd->setUserData(tab);
+  tab->setUserData(cmd);
+}
+
+
+
+void MainMenu::PrependRecentFile(const FXString &filename)
+{
+  recent_files->prepend(filename);
+}
+
+
+
+void MainMenu::RemoveRecentFile(const FXString &filename)
+{
+  recent_files->remove(filename);
+}
+
+
+
+static inline void SyncCheck(FXMenuCheck *chk, bool checked)
+{
+  chk->setCheck(checked);
+  FXToggleButton*btn=dynamic_cast<FXToggleButton*>((FXObject*)chk->getUserData());
+  if (btn) { btn->setState(chk->getCheck()); }
+}
+
+
+
+#define SETCHK(m) SyncCheck(m,checked); return;
+
+void MainMenu::SetCheck(FXSelector sel, bool checked)
+{
+  switch (sel) {
+    case TW::ID_READONLY:        { SETCHK(readonly_chk);  }
+    case TW::ID_SHOW_CARET_LINE: { SETCHK(caretline_chk); }
+    case TW::ID_SHOW_INDENT:     { SETCHK(guides_chk);    }
+    case TW::ID_SHOW_LINENUMS:   { SETCHK(linenums_chk);  }
+    case TW::ID_SHOW_MARGIN:     { SETCHK(margin_chk);    }
+    case TW::ID_SHOW_OUTLIST:    { SETCHK(outpane_chk);   }
+    case TW::ID_SHOW_STATUSBAR:  { SETCHK(status_chk);    }
+    case TW::ID_SHOW_TOOLBAR:    { SETCHK(toolbar_chk);   }
+    case TW::ID_SHOW_WHITESPACE: { SETCHK(white_chk);     }
+    case TW::ID_WORDWRAP:        { SETCHK(wordwrap_chk);  }
+    case TW::ID_INVERT_COLORS:   { SETCHK(invert_chk);    }
+  }
+}
+
+
+
+void MainMenu::SetReadOnly(bool rdonly)
+{
+  SyncCheck(readonly_chk,rdonly);
+  if (rdonly) { fileformatcasc->disable(); } else { fileformatcasc->enable(); }
+  SetMenuEnabled(fmt_dos_mnu,!rdonly);
+  SetMenuEnabled(fmt_mac_mnu,!rdonly);
+  SetMenuEnabled(fmt_unx_mnu,!rdonly);
 }
 

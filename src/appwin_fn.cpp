@@ -32,6 +32,7 @@
 #include "shmenu.h"
 #include "search.h"
 #include "toolbar.h"
+#include "mainmenu.h"
 
 
 #include "intl.h"
@@ -79,6 +80,7 @@ bool TopWindow::SetReadOnly(SciDoc*sci, bool rdonly)
     return false;
   }
   SetTabLocked(sci,rdonly);
+  menubar->SetReadOnly(rdonly);
   need_status=32;
   return true;
 }
@@ -88,8 +90,7 @@ bool TopWindow::SetReadOnly(SciDoc*sci, bool rdonly)
 void TopWindow::SetWordWrap(SciDoc*sci, bool wrapped)
 {
   sci->SetWordWrap(wrapped);
-  wordwrapmenu->setCheck(wrapped);
-  SyncToggleBtn(wordwrapmenu,FXSEL(SEL_COMMAND,ID_WORDWRAP));
+  menubar->SetCheck(ID_WORDWRAP,wrapped);
 }
 
 
@@ -126,37 +127,10 @@ void TopWindow::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
 
 
 
-void TopWindow::SyncToggleBtn(FXObject*o, FXSelector sel)
-{
-  MenuSpec*spec=MenuMgr::LookupMenu(FXSELID(sel));
-  if (spec && (spec->ms_mc==o) && (spec->type=='k')) {
-    FXToggleButton*btn=(FXToggleButton*)(spec->ms_mc->getUserData());
-    if (btn) {
-      btn->setState(((FXMenuCheck*)(spec->ms_mc))->getCheck());
-    }
-  }
-}
-
-
-
-void TopWindow::SetMenuEnabled(FXMenuCommand*mnu, bool enabled)
-{
-  FXLabel*btn=(FXLabel*)(mnu->getUserData());
-  if (enabled) {
-    mnu->enable();
-    if (btn) { btn->enable(); }
-  } else {
-    mnu->disable();
-    if (btn) { btn->disable(); }
-  }
-}
-
-
-
 void TopWindow::EnableUserFilters(bool enabled)
 {
   toolbar_frm->EnableFilterBtn(enabled);
-  if (enabled) { userfiltermenu->enable(); } else { userfiltermenu->disable(); }
+  menubar->EnableFilterMenu(enabled);
 }
 
 
@@ -178,9 +152,7 @@ void TopWindow::UpdateToolbar()
     case 'R': RadioUpdate(ID_TABS_RIGHT,  ID_TABS_TOP, ID_TABS_RIGHT); break;
   }
   RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
-  if (recording&&recorderstartmenu->getUserData()) {
-    ((FXToggleButton*)(recorderstartmenu->getUserData()))->setState(true);
-  }
+  menubar->Recording(recording,recorder);
   toolbar_frm->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
 }
 
@@ -191,8 +163,8 @@ bool TopWindow::ShowSaveAsDlg(SciDoc*sci)
 {
   FXString orig=sci->Filename();
   if (filedlgs->SaveFileAs(sci)) {
-    if (!orig.empty()) { recent_files->prepend(orig); }
-    recent_files->remove(sci->Filename());
+    if (!orig.empty()) { menubar->PrependRecentFile(orig); }
+    menubar->RemoveRecentFile(sci->Filename());
     return true;
   }
   return false;
@@ -665,8 +637,7 @@ SciDoc*TopWindow::FocusedDoc()
 
 UserMenu**TopWindow::UserMenus() const
 {
-  static UserMenu* menus[]={usercmdmenu, userfiltermenu, usersnipmenu, usermacromenu,NULL};
-  return menus;
+  return menubar->UserMenus();
 }
 
 

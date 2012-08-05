@@ -48,6 +48,7 @@
 #include "toolbar.h"
 #include "outpane.h"
 #include "statusbar.h"
+#include "mainmenu.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -173,12 +174,11 @@ long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->InvertColors=!prefs->InvertColors;
+  prefs->InvertColors=(bool)(FXival)p;
   toolbar_frm->SetToolbarColors();
-  SciDoc*sci=ControlDoc();
   tabbook->ForEachTab(PrefsCB,NULL);
-  CheckStyle(NULL,0,sci);
-  SyncToggleBtn(o,sel);
+  CheckStyle(NULL,0,ControlDoc());
+  menubar->SetCheck(ID_INVERT_COLORS,prefs->InvertColors);
   return 1;
 }
 
@@ -410,23 +410,17 @@ long TopWindow::onMacroShow(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onMacroRecord(FXObject*o, FXSelector sel, void*p)
 {
-  FXToggleButton*tbar_rec_btn=(FXToggleButton*)(recorderstartmenu->getUserData());
   if (recording) {
-    recorderstartmenu->setText(_("Re&cord macro"));
     recording->sendMessage(SCI_STOPRECORD, 0, 0);
     recording=NULL;
   } else {
     if (!recorder) {recorder=new MacroRecorder(); }
     recorder->clear();
-    recorderstartmenu->setText(_("Stop re&cording"));
     recording=ControlDoc();
     recording->sendMessage(SCI_STARTRECORD, 0, 0);
   }
-  SetMenuEnabled(playbackmenu,recording==NULL);
-  SetMenuEnabled(showmacromenu,recording==NULL);
-  if (tbar_rec_btn) { tbar_rec_btn->setState(recording!=NULL); }
-
   statusbar->Recording(recording);
+  menubar->Recording(recording,recorder);
   ControlDoc()->setFocus();
   return 1;
 }
@@ -451,10 +445,7 @@ long TopWindow::onInsertFile(FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onRescanUserMenu(FXObject*o, FXSelector sel, void*p)
 {
-  usercmdmenu->rescan();
-  userfiltermenu->rescan();
-  usersnipmenu->rescan();
-  usermacromenu->rescan();
+  menubar->RescanUserMenus();
   MenuMgr::PurgeTBarCmds();
   UpdateToolbar();
   return 1;
@@ -554,7 +545,7 @@ long TopWindow::onFindTag(FXObject*o, FXSelector sel, void*p)
   FXString filename;
   FXString locn;
   FXString pattern;
-  if ( FindTag(FocusedDoc(), unloadtagsmenu, filename, locn, pattern) ) {
+  if ( FindTag(FocusedDoc(), menubar->TagsMenu(), filename, locn, pattern) ) {
     if (!filename.empty()) {
        OpenFile(filename.text(), locn.empty()?NULL:locn.text(),false,true);
        if (locn.empty() &&!pattern.empty()) {
@@ -591,7 +582,7 @@ long TopWindow::onFindTag(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowCallTip(FXObject*o, FXSelector sel, void*p )
 {
-  ShowCallTip(FocusedDoc(), unloadtagsmenu);
+  ShowCallTip(FocusedDoc(), menubar->TagsMenu());
   return 1;
 }
 
@@ -603,7 +594,7 @@ long TopWindow::onAutoComplete(FXObject*o, FXSelector sel, void*p)
   FXString part=FXString::null;
   completions.clear();
   if (sci->PrefixAtPos(part)) {
-    for (FXWindow *w=unloadtagsmenu->getMenu()->getFirst(); w; w=w->getNext()) {
+    for (FXWindow *w=TagFiles(); w; w=w->getNext()) {
       ParseAutoCompleteFile(&completions,part[0],((FXMenuCommand*)w)->getText().text());
     }
     ShowAutoComplete(sci);
@@ -626,16 +617,7 @@ long TopWindow::onLoadTags(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onUnloadTags(FXObject*o, FXSelector sel, void*p)
 {
-  FXMenuCommand*mc=(FXMenuCommand*)o;
-  mc->hide();
-  mc->destroy();
-  delete mc;
-  if (unloadtagsmenu->getMenu()->numChildren()==0) {
-    unloadtagsmenu->disable();
-    SetMenuEnabled(findtagmenu,false);
-    SetMenuEnabled(showtipmenu,false);
-    SetMenuEnabled(autocompmenu,false);
-  }
+  menubar->UnloadTagFile((FXMenuCommand*)o);
   return 1;
 }
 
@@ -645,8 +627,6 @@ long TopWindow::onReadOnly(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=ControlDoc();
   SetReadOnly(sci, !sci->GetReadOnly());
-  readonlymenu->setCheck(sci->GetReadOnly());
-  SyncToggleBtn(o,sel);
   sci->setFocus();
   return 1;
 }
@@ -725,16 +705,7 @@ long TopWindow::onReload(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onSetLanguage(FXObject*o, FXSelector sel, void*p)
 {
-  LangStyle*ls=(LangStyle*) ((FXWindow*)o)->getUserData();
-  SciDoc*sci=ControlDoc();
-  sci->setLanguage(ls);
-  for (FXWindow*wmc=langmenu->getFirst(); wmc; wmc=wmc->getNext()) {
-    FXPopup*pu=((FXMenuCascade*)wmc)->getMenu();
-    for (FXWindow*wmr=pu->getFirst(); wmr; wmr=wmr->getNext()) {
-      FXMenuRadio*mr=(FXMenuRadio*)wmr;
-      mr->setCheck(mr==o);
-    }
-  }
+  SetLanguage((FXMenuRadio*)o);
   return 1;
 }
 
@@ -806,10 +777,8 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
       }
       UpdateTitle(line,col);
       if ( sci->GetSelLength() ) {
-        SetMenuEnabled(filterselmenu,true);
         EnableUserFilters(true);
       } else {
-        SetMenuEnabled(filterselmenu,false);
         EnableUserFilters(false);
       }
       return 1;
@@ -1230,10 +1199,7 @@ long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowLineNums( FXObject*o, FXSelector sel, void*p )
 {
-  prefs->ShowLineNumbers=!prefs->ShowLineNumbers;
-  tabbook->ForEachTab(LineNumsCB, (void*)(FXival)prefs->ShowLineNumbers);
-  linenums_chk->setCheck(prefs->ShowLineNumbers);
-  SyncToggleBtn(o,sel);
+  ShowLineNumbers((bool)((FXival)p));
   return 1;
 }
 
@@ -1241,13 +1207,7 @@ long TopWindow::onShowLineNums( FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
 {
-  prefs->ShowToolbar=!prefs->ShowToolbar;
-  if (prefs->ShowToolbar) {
-    toolbar_frm->show();
-  } else {
-    toolbar_frm->hide();
-  }
-  SyncToggleBtn(o,sel);
+  ShowToolbar((bool)((FXival)p));
   return 1;
 }
 
@@ -1255,10 +1215,7 @@ long TopWindow::onShowToolbar( FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->ShowWhiteSpace=!prefs->ShowWhiteSpace;
-  tabbook->ForEachTab(WhiteSpaceCB, (void*)(FXival)prefs->ShowWhiteSpace);
-  white_chk->setCheck(prefs->ShowWhiteSpace);
-  SyncToggleBtn(o,sel);
+  ShowWhiteSpace((bool)((FXival)p));
   return 1;
 }
 
@@ -1268,8 +1225,7 @@ long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowRightEdge=!prefs->ShowRightEdge;
   tabbook->ForEachTab(ShowMarginCB, (void*)(FXival)prefs->ShowRightEdge);
-  margin_chk->setCheck(prefs->ShowRightEdge);
-  SyncToggleBtn(o,sel);
+  menubar->SetCheck(ID_SHOW_MARGIN,prefs->ShowRightEdge);
   return 1;
 }
 
@@ -1279,8 +1235,7 @@ long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowIndentGuides = !prefs->ShowIndentGuides;
   tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)prefs->ShowIndentGuides);
-  guides_chk->setCheck(prefs->ShowIndentGuides);
-  SyncToggleBtn(o,sel);
+  menubar->SetCheck(ID_SHOW_INDENT,prefs->ShowIndentGuides);
   return 1;
 }
 
@@ -1290,8 +1245,7 @@ long TopWindow::onShowCaretLine(FXObject*o, FXSelector sel, void*p)
 {
   prefs->ShowCaretLine = !prefs->ShowCaretLine;
   tabbook->ForEachTab(ShowCaretLineCB, (void*)prefs);
-  caretline_chk->setCheck(prefs->ShowCaretLine);
-  SyncToggleBtn(o,sel);
+  menubar->SetCheck(ID_SHOW_CARET_LINE,prefs->ShowCaretLine);
   return 1;
 }
 
@@ -1300,7 +1254,6 @@ long TopWindow::onShowCaretLine(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onShowOutputPane(FXObject*o, FXSelector sel, void*p)
 {
   ShowOutputPane(!prefs->ShowOutputPane);
-  SyncToggleBtn(o,sel);
   return 1;
 }
 
@@ -1309,7 +1262,6 @@ long TopWindow::onShowOutputPane(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onShowStatusBar(FXObject*o, FXSelector sel, void*p)
 {
   ShowStatusBar(!prefs->ShowStatusBar);
-  SyncToggleBtn(o,sel);
   return 1;
 }
 

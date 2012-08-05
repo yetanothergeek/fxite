@@ -38,6 +38,7 @@ class TopMenuPane;
 class ToolBarFrame;
 class OutputList;
 class StatusBar;
+class MainMenu;
 
 
 
@@ -68,79 +69,11 @@ private:
   static const char* DontFreezeMe();
   bool IsCommandReady();
   void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
-  void SyncToggleBtn(FXObject*o, FXSelector sel);
   void UpdateEolMenu(SciDoc*sci);
-  static void SetMenuEnabled(FXMenuCommand*mnu, bool enabled);
+
   SciDoc*recording;
   FXToolTip* tips;
-  FXMenuBar*  menubar;
-  TopMenuPane* filemenu;
-  TopMenuPane* editmenu;
-  TopMenuPane* searchmenu;
-  TopMenuPane* viewmenu;
-  TopMenuPane* toolsmenu;
-  TopMenuPane* docmenu;
-  TopMenuPane* helpmenu;
-  FXMenuPane* editdeletemenu;
-  FXMenuPane* editindentmenu;
-  FXMenuCheck* linenums_chk;
-  FXMenuCheck* toolbar_chk;
-  FXMenuCheck* white_chk;
-  FXMenuCheck* margin_chk;
-  FXMenuCheck* guides_chk;
-  FXMenuCheck* caretline_chk;
-  FXMenuCheck* invert_chk;
-  FXMenuCheck* status_chk;
-  FXMenuPane* viewzoommenu;
-  FXMenuPane* searchselectmenu;
-  FXMenuPane* searchmarkmenu;
-  FXMenuPane* tabmenu;
-  FXMenuPane* tabordermenu;
-  FXMenuPane* tabsidemenu;
-  FXMenuPane* tabwidthmenu;
-  FXMenuPane* fileexportmenu;
-  FXMenuPane* fileformatmenu;
-  FXMenuCascade* fileformatcasc;
-
-  FXMenuRadio*fmt_dos_mnu;
-  FXMenuRadio*fmt_mac_mnu;
-  FXMenuRadio*fmt_unx_mnu;
-
-  FXMenuPane* langmenu;
-  FXMenuCascade* langcasc;
-  FXMenuPane* cpp_langmenu;
-  FXMenuCascade* cpp_langcasc;
-  FXMenuPane* html_langmenu;
-  FXMenuCascade* html_langcasc;
-  FXMenuPane* lgcy_langmenu;
-  FXMenuCascade* lgcy_langcasc;
-  FXMenuPane* scr_langmenu;
-  FXMenuCascade* scr_langcasc;
-  FXMenuPane* db_langmenu;
-  FXMenuCascade* db_langcasc;
-  FXMenuPane* cfg_langmenu;
-  FXMenuCascade* cfg_langcasc;
-  FXMenuPane* inf_langmenu;
-  FXMenuCascade* inf_langcasc;
-  FXMenuPane* tex_langmenu;
-  FXMenuCascade* tex_langcasc;
-  FXMenuPane* asm_langmenu;
-  FXMenuCascade* asm_langcasc;
-  FXMenuPane* misc_langmenu;
-  FXMenuCascade* misc_langcasc;
-  FXScrollPane* doclistmenu;
-  FXMenuCascade* unloadtagsmenu;
-  FXMenuCommand* findtagmenu;
-  FXMenuCommand* showtipmenu;
-  FXMenuCommand* autocompmenu;
-  FXMenuCommand* filterselmenu;
-  FXMenuCommand* openselmenu;
-  FXMenuPane*recordermenu;
-  FXMenuCommand *recorderstartmenu;
-  FXMenuCommand* playbackmenu;
-  FXMenuCommand* showmacromenu;
-  FXMenuCheck* readonlymenu;
-  FXMenuCheck* wordwrapmenu;
+  MainMenu*  menubar;
   FXVerticalFrame* vbox;
   StatusBar* statusbar;
   DocTabs*    tabbook;
@@ -148,11 +81,6 @@ private:
   OutputList*outlist;
   ToolBarFrame*toolbar_frm;
 
-  FXMenuCheck*outpane_chk;
-  UserMenu* usercmdmenu;
-  UserMenu* usersnipmenu;
-  UserMenu* userfiltermenu;
-  UserMenu* usermacromenu;
   SearchDialogs* srchdlgs;
   FileDialogs*   filedlgs;
   Settings* prefs;
@@ -166,7 +94,6 @@ private:
   FXAccelTable*saved_accels;
   FXAccelTable*temp_accels;
   FXString session_data;
-  HistMenu*recent_files;
   FXWindow* active_widget;
   bool destroying;
   bool close_all_confirmed;
@@ -175,10 +102,6 @@ private:
   bool command_busy;
   FXint need_status;
   void CreateMenus();
-  void DeleteMenus();
-  void CreateLanguageMenu();
-  void CreateTabsMenu();
-  void CreateZoomMenu();
   void UpdateToolbar();
   void UpdateTitle(long line, long col);
   bool AskReload(SciDoc*sci);
@@ -433,6 +356,7 @@ public:
   DocTabs* Tabs() {return tabbook; }
   FileDialogs* FileDlgs() { return filedlgs; }
   bool SetLanguage(const FXString &name);
+  bool SetLanguage(FXMenuRadio *mnu);
   void ShowLineNumbers(bool showit);
   bool ShowLineNumbers();
   void ShowStatusBar(bool showit);
@@ -458,7 +382,7 @@ public:
   static TopWindow* instance();
   static const FXString& ConfigDir();
   static const FXString &Connector();
-  FXMenuCaption*TagFiles() { return (FXMenuCaption*)(unloadtagsmenu->getMenu()->getFirst()); }
+  FXMenuCaption*TagFiles();
   void RemoveTBarBtnData(void*p);
   void ActiveWidget(FXWindow*aw) { active_widget=aw; }
 };
