@@ -412,6 +412,7 @@ void TopWindow::AddFileToTagsMenu(const FXString &filename)
 }
 
 
+
 bool TopWindow::RemoveFileFromTagsMenu(const FXString &filename)
 {
   menubar->RemoveFileFromTagsList(filename);
@@ -1118,6 +1119,8 @@ void TopWindow::AddOutput(const FXString&line)
 {
   outlist->appendItem(line.text());
 }
+
+
 
 void TopWindow::ClearOutput()
 {

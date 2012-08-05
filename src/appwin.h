@@ -20,7 +20,6 @@
 
 #include "histbox.h"
 
-//class AppClass;
 class SciDoc;
 class DocTab;
 class DocTabs;
@@ -31,10 +30,8 @@ class PrefsDialog;
 class UserMenu;
 class MacroRunner;
 class MacroRecorder;
-class HistMenu;
 class BackupMgr;
 class ToolsDialog;
-class TopMenuPane;
 class ToolBarFrame;
 class OutputList;
 class StatusBar;
@@ -80,7 +77,6 @@ private:
   FXSplitter* hsplit;
   OutputList*outlist;
   ToolBarFrame*toolbar_frm;
-
   SearchDialogs* srchdlgs;
   FileDialogs*   filedlgs;
   Settings* prefs;
@@ -101,6 +97,14 @@ private:
   bool command_timeout;
   bool command_busy;
   FXint need_status;
+  FXString save_hook;
+  FXHotKey killkey;
+  FXString bookmarked_file;
+  DocTab* bookmarked_tab;
+  long bookmarked_pos;
+  bool skipfocus;
+  FXDict completions;
+
   void CreateMenus();
   void UpdateToolbar();
   void UpdateTitle(long line, long col);
@@ -121,13 +125,7 @@ private:
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
   void OpenSelected();
   void ShowAutoComplete(SciDoc*sci);
-  FXString save_hook;
-  FXHotKey killkey;
-  FXString bookmarked_file;
-  DocTab* bookmarked_tab;
-  long bookmarked_pos;
-  bool skipfocus;
-  FXDict completions;
+  bool SetLanguage(FXMenuRadio *mnu);
 public:
   long CheckStale(       FXObject*o, FXSelector sel, void*p );
   long CheckStyle(       FXObject*o, FXSelector sel, void*p );
@@ -356,7 +354,6 @@ public:
   DocTabs* Tabs() {return tabbook; }
   FileDialogs* FileDlgs() { return filedlgs; }
   bool SetLanguage(const FXString &name);
-  bool SetLanguage(FXMenuRadio *mnu);
   void ShowLineNumbers(bool showit);
   bool ShowLineNumbers();
   void ShowStatusBar(bool showit);

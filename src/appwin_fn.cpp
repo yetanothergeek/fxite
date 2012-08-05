@@ -329,7 +329,6 @@ long TopWindow::CheckStyle(FXObject*o, FXSelector sel, void*p)
 
 
 
-
 /*
   ForEachTab callback that checks to see if a file is already open
   If we find the document, then we activate that tab and set the
@@ -851,6 +850,7 @@ static bool OpenSystemIncludeFile(TopWindow*tw, SciDoc*sci, const FXString &file
   }
   return false;
 }
+
 
 
 // Look for line number after filename in the form of FILE.EXT:NNN

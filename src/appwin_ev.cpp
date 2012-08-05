@@ -164,6 +164,19 @@ FXIMPLEMENT(TopWindow,MainWinWithClipBrd,TopWindowMap,ARRAYNUMBER(TopWindowMap))
 
 
 
+/* Utility function, only used for testing new stuff */
+long TopWindow::onTestSomething(FXObject*o, FXSelector sel, void*p)
+{
+  if (FXSELTYPE(sel)==SEL_CHORE) {
+ /*do something*/
+  } else {
+    getApp()->addChore(this, ID_TEST_SOMETHING);
+  }
+  return 1;
+}
+
+
+
 long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
 {
   outlist->fillItems(*((FXString*)p));
@@ -244,18 +257,6 @@ long TopWindow::onFocusIn(FXObject*o, FXSelector sel, void*p)
     FocusedDoc()->setFocus();
   }
   return rv;
-}
-
-
-/* Utility function, only used for testing new stuff */
-long TopWindow::onTestSomething(FXObject*o, FXSelector sel, void*p)
-{
-  if (FXSELTYPE(sel)==SEL_CHORE) {
- /*do something*/
-  } else {
-    getApp()->addChore(this, ID_TEST_SOMETHING);
-  }
-  return 1;
 }
 
 
@@ -1417,8 +1418,6 @@ long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
   delete dlg;
   return 1;
 }
-
-
 
 
 
