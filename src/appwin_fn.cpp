@@ -26,6 +26,9 @@
 #include "scidoc.h"
 #include "doctabs.h"
 #include "prefs.h"
+#include "prefdlg.h"
+#include "theme.h"
+#include "statusbar.h"
 #include "filer.h"
 #include "backup.h"
 #include "menuspec.h"
@@ -33,7 +36,9 @@
 #include "search.h"
 #include "toolbar.h"
 #include "mainmenu.h"
-
+#include "tagread.h"
+#include "toolmgr.h"
+#include "compat.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -45,6 +50,29 @@ void TopWindow::ClosedDialog()
 {
   setFocus();
   FocusedDoc()->setFocus();
+}
+
+void TopWindow::Cut()
+{
+  SciDoc*sci=FocusedDoc();
+  sci->setFocus();
+  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_CUT,0,0); }
+}
+
+
+
+void TopWindow::Copy()
+{
+  SciDoc*sci=FocusedDoc();
+  sci->setFocus();
+  // If any text is already selected, make sure the selection is "alive"
+  long start=sci->sendMessage(SCI_GETSELECTIONSTART,0,0);
+  long end=sci->sendMessage(SCI_GETSELECTIONEND,0,0);
+  if (start!=end) {
+    sci->sendMessage(SCI_SETSELECTIONSTART,start,0);
+    sci->sendMessage(SCI_SETSELECTIONEND,end,0);
+  }
+  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_COPY,0,0); }
 }
 
 
@@ -933,6 +961,385 @@ void TopWindow::OpenSelected()
   filename=filename.section("\n",0);
   filename.trunc(128);
   FXMessageBox::error(this, MBOX_OK, _("File not found"), "%s:\n%s", _("Cannot find file"), filename.text());
+}
+
+
+
+void TopWindow::InvertColors(bool inverted)
+{
+  prefs->InvertColors=inverted;
+  toolbar_frm->SetToolbarColors();
+  tabbook->ForEachTab(PrefsCB,NULL);
+  CheckStyle(NULL,0,ControlDoc());
+  menubar->SetCheck(ID_INVERT_COLORS,prefs->InvertColors); 
+}
+
+
+
+void TopWindow::CycleSplitter()
+{
+  SciDoc*sci=ControlDoc();
+  switch (prefs->SplitView) {
+    case SPLIT_NONE: {
+      switch (sci->GetSplit()) {
+        case SPLIT_NONE: {
+          sci->SetSplit(SPLIT_BELOW);
+          break;
+        }
+        case SPLIT_BELOW: {
+          sci->SetSplit(SPLIT_BESIDE);
+          break;
+        }
+        case SPLIT_BESIDE: {
+          sci->SetSplit(SPLIT_NONE);
+          break;
+        }
+      }
+      break;
+    }
+    case SPLIT_BELOW:
+    case SPLIT_BESIDE: {
+      switch (sci->GetSplit()) {
+        case SPLIT_NONE: {
+          sci->SetSplit(prefs->SplitView);
+          break;
+        }
+        case SPLIT_BELOW:
+        case SPLIT_BESIDE: {
+          sci->SetSplit(SPLIT_NONE);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  sci=(SciDoc*)sci->getNext();
+  if (sci) {
+    SetSciDocPrefs(sci,prefs);
+    sci->setFocus();
+  } else {
+    ControlDoc()->setFocus();
+  }
+}
+
+
+
+void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
+{
+  FXString script=(char*)(mc->getUserData());
+  if ( b==2 ) { // Right-clicked, open file instead of executing
+    OpenFile(script.text(), NULL, false, true);
+    return;
+  }
+  //  If this file is currently open in the editor, and has
+  //  unsaved changes, prompt the user to save the changes.
+  FXWindow*tab,*page;
+  for (tab=tabbook->getFirst(); tab && (page=tab->getNext()); tab=page->getNext()) {
+    SciDoc*sci=(SciDoc*)page->getFirst();
+    if (sci->Dirty() && (sci->Filename()==script)) {
+      FXuint answer=FXMessageBox::warning(this,
+        MBOX_YES_NO_CANCEL,_("Unsaved changes"),
+        _("The disk file for the \"%s\" command is currently\n"
+          " open in the editor, and has unsaved changes.\n\n"
+          "  Save the file before continuing?"), mc->getText().text());
+      switch (answer) {
+        case MBOX_CLICKED_YES: {
+          if (!filedlgs->SaveFile(sci,sci->Filename())) { return; }
+          break;
+        }
+        case MBOX_CLICKED_NO: { break; }
+        default: { return; }
+      }
+    }
+  }
+  FXString input="";
+  SciDoc *sci=FocusedDoc();
+  switch (FXSELID(sel)) {
+    case ID_USER_COMMAND: {
+      if (PathMatch("*.save.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
+        if (!SaveAll(true)) { return; }
+      }
+#ifdef WIN32
+     script.prepend('"');
+     script.append('"');
+#endif
+      RunCommand(sci, script);
+      break;
+    }
+    case ID_USER_FILTER: {
+      if (sci->GetSelLength()>0) {
+        sci->GetSelText(input);
+        FilterSelection(sci, script, input);
+      }
+      break;
+    }
+    case ID_USER_SNIPPET: {
+      if (PathMatch("*.exec.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
+        FilterSelection(sci, script, input);
+      } else {
+        InsertFile(sci,script);
+      }
+      break;
+    }
+    case ID_USER_MACRO: {
+      RunMacro(script, true);
+      break;
+    }
+  }  
+}
+
+
+
+void TopWindow::FindTag()
+{
+  FXString filename;
+  FXString locn;
+  FXString pattern;
+  if ( ::FindTag(FocusedDoc(), menubar->TagsMenu(), filename, locn, pattern) ) {
+    if (!filename.empty()) {
+       OpenFile(filename.text(), locn.empty()?NULL:locn.text(),false,true);
+       if (locn.empty() &&!pattern.empty()) {
+         SciDoc*sci=ControlDoc();
+         sci->sendMessage(SCI_SETTARGETSTART,0,0);
+         sci->sendMessage(SCI_SETTARGETEND,sci->sendMessage(SCI_GETTEXTLENGTH,0,0),0);
+         long oldflags=sci->sendMessage(SCI_GETSEARCHFLAGS,0,0);
+         sci->sendMessage(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX|SCFIND_MATCHCASE, 0);
+         pattern.erase(0,1);
+         pattern.trunc(pattern.length()-1);
+         const char *esc_chars="*()";
+         const char *c;
+         for (c=esc_chars; *c; c++) {
+           char esc[3]="\\ ";
+           char orig[2]=" ";
+           esc[1]=*c;
+           orig[0]=*c;
+           if ( (pattern.find(*c)>=0) && (pattern.find(esc)==-1)) {
+             pattern.substitute(orig,esc,true);
+           }
+         }
+         long found=sci->sendString(SCI_SEARCHINTARGET,pattern.length(),pattern.text());
+         if (found>=0) {
+           sci->GoToPos(found);
+         }
+         sci->sendMessage(SCI_SETSEARCHFLAGS,oldflags,0);
+       }
+    }
+  }
+}
+
+
+
+void TopWindow::SetFileFormat(FXSelector sel)
+{
+  int EolMode=SC_EOL_LF;
+  switch (sel) {
+    case ID_FMT_DOS:{
+      EolMode=SC_EOL_CRLF;
+      break;
+    }
+    case ID_FMT_MAC:{
+      EolMode=SC_EOL_CR;
+      break;
+    }
+    case ID_FMT_UNIX:{
+      EolMode=SC_EOL_LF;
+      break;
+    }
+  }
+  FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
+  FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
+  RadioUpdate(sel,ID_FMT_DOS,ID_FMT_UNIX);
+}
+
+
+
+void TopWindow::SetTabOrientation(FXSelector sel)
+{
+  switch(sel){
+    case ID_TABS_TOP:
+      tabbook->setTabStyle(TABBOOK_TOPTABS);
+      prefs->DocTabPosition='T';
+      break;
+    case ID_TABS_BOTTOM:
+      tabbook->setTabStyle(TABBOOK_BOTTOMTABS);
+      prefs->DocTabPosition='B';
+      break;
+    case ID_TABS_LEFT:
+      tabbook->setTabStyle(TABBOOK_LEFTTABS);
+      prefs->DocTabPosition='L';
+      break;
+    case ID_TABS_RIGHT:
+      tabbook->setTabStyle(TABBOOK_RIGHTTABS);
+      prefs->DocTabPosition='R';
+      break;
+  }
+  RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
+}
+
+
+
+void TopWindow::ShowPrefsDialog()
+{
+  if (!prefdlg) { prefdlg=new PrefsDialog(this, prefs); }
+  prefdlg->execute(PLACEMENT_DEFAULT);
+  delete prefdlg;
+  prefdlg=NULL;
+  ClosedDialog();
+  SetSrchDlgsPrefs();
+  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
+  tabbook->ForEachTab(PrefsCB, NULL);
+  CheckStyle(NULL,0,ControlDoc());
+  if ((prefs->WatchExternChanges||prefs->Autosave) && !getApp()->hasTimeout(this,ID_TIMER)) {
+    getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL);
+  }
+  getApp()->setWheelLines(prefs->WheelLines);
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) {
+    UpdateToolbar();
+  }
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) {
+    toolbar_frm->handle(toolbar_frm,FXSEL(SEL_CONFIGURE,0),NULL);
+  }
+  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
+    toolbar_frm->SetTBarFont();
+  }
+  filedlgs->patterns(prefs->FileFilters);
+  if (Theme::changed() & ThemeChangedColors) {
+    Theme::apply(this);
+    Theme::apply(srchdlgs->FindDialog());
+    tips->setBackColor(getApp()->getTipbackColor());
+    tips->setTextColor(getApp()->getTipforeColor());
+    statusbar->Colorize();
+  }
+  tabbook->ActivateTab(tabbook->ActiveTab());
+  toolbar_frm->SetToolbarColors();
+  EnableUserFilters(FocusedDoc()->GetSelLength());  
+}
+
+
+
+static bool AvoidMultiLineCommand(TopWindow*w, const FXString &cmd)
+{
+  if (cmd.contains('\n')) {
+    FXMessageBox::error(w, MBOX_OK, _("Command Error"),
+      _("Multiline commands are not supported."));
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+
+void TopWindow::ShowFilterDialog(bool is_filter)
+{
+  SciDoc *sci=FocusedDoc();
+  HistBox *dlg;
+  bool save_first;
+  if(is_filter) {
+    dlg=new HistBox(this, _("Filter selection"), _("Command:"), "Filters");
+    save_first=prefs->SaveBeforeFilterSel;
+  } else {
+    dlg=new HistBox(this, _("Insert output of command"), _("Command:"), "InsertOutput");
+    save_first=prefs->SaveBeforeInsCmd;
+  }
+  dlg->setNumColumns(48);
+  if ( dlg->execute(PLACEMENT_OWNER) ) {
+    FXString cmd=dlg->getText();
+    if (AvoidMultiLineCommand(this, cmd)) {
+      if ( (!save_first) || SaveAll(true) ) {
+        FXString input="";
+        if (is_filter) { sci->GetSelText(input); }
+        FilterSelection(sci, cmd, input);
+      }
+    }
+  }
+  delete dlg;
+  ClosedDialog();
+}
+
+
+
+void TopWindow::ShowCommandDialog()
+{
+  SciDoc *sci=FocusedDoc();
+  HistBox *dlg= new HistBox(this, _("Run command"), _("Command:"), "Commands");
+  dlg->setNumColumns(48);
+  if ( dlg->execute(PLACEMENT_OWNER) ) {
+    FXString cmd=dlg->getText();
+    if (AvoidMultiLineCommand(this,cmd)) {
+      if ( (!prefs->SaveBeforeExecCmd) || SaveAll(true) ) {
+        ClosedDialog();
+        RunCommand(sci,cmd);
+      }
+    }
+  } else {
+    ClosedDialog();
+  }
+  delete dlg;
+}
+
+
+
+void TopWindow::Indent(FXSelector sel)
+{
+  SciDoc*sci=FocusedDoc();
+  long msg=((ID_INDENT_STEP==sel)||(ID_INDENT_FULL==sel))?SCI_TAB:SCI_BACKTAB;
+  int tab_width=sci->TabWidth();
+  if ((ID_INDENT_STEP==sel)||(ID_UNINDENT_STEP==sel))
+  {
+    FXbool use_tabs=sci->UseTabs();
+    sci->UseTabs(false);
+    sci->sendMessage(SCI_SETTABWIDTH,1,0);
+    sci->sendMessage(msg,0,0);
+    sci->TabWidth(tab_width);
+    sci->UseTabs(use_tabs);
+  } else {
+    sci->TabWidth(sci->UseTabs()?tab_width:prefs->IndentWidth);
+    sci->sendMessage(msg,0,0);
+    sci->TabWidth(tab_width);
+  }
+}
+
+
+
+void TopWindow::SetBookmark()
+{
+  SciDoc*sci=ControlDoc();
+  bookmarked_file=sci->Filename();
+  bookmarked_tab=tabbook->ActiveTab();
+  bookmarked_pos=sci->GetCaretPos();
+}
+
+
+
+void TopWindow::GoToBookmark()
+{
+  if (!bookmarked_file.empty()) {
+    if (OpenFile(bookmarked_file.text(),NULL,false,false)) {
+      FocusedDoc()->GoToPos(bookmarked_pos);
+    }
+  } else {
+    tabbook->ForEachTab(BookmarkCB,this);
+  }
+}
+
+
+
+void TopWindow::ShowToolManagerDialog()
+{
+  ToolsDialog tooldlg(this,UserMenus());
+  tooldlg.execute(PLACEMENT_SCREEN);
+  RescanUserMenu();
+  ClosedDialog();
+}
+
+
+
+void TopWindow::RescanUserMenu()
+{
+  menubar->RescanUserMenus();
+  MenuMgr::PurgeTBarCmds();
+  UpdateToolbar();
 }
 
 

@@ -119,7 +119,6 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   macros=NULL;
   recorder=NULL;
   prefdlg=NULL;
-  tooldlg=NULL;
   recording=NULL;
   skipfocus=false;
   destroying=false;
@@ -166,7 +165,6 @@ TopWindow::~TopWindow()
   if (saved_accels)  { delete saved_accels; }
   if (recorder) { delete recorder; }
   if (prefdlg) { delete prefdlg; }
-  if (tooldlg) { delete tooldlg; }
   delete getIcon();
   delete getMiniIcon();
   completions.clear();
@@ -524,6 +522,55 @@ bool TopWindow::ShowToolbar()
 {
   return prefs->ShowToolbar;
 }
+
+
+
+void TopWindow::ShowMargin(bool showit)
+{
+  prefs->ShowRightEdge = showit;
+  tabbook->ForEachTab(ShowMarginCB, (void*)(FXival)showit);
+  menubar->SetCheck(ID_SHOW_MARGIN, showit);
+}
+
+
+
+bool TopWindow::ShowMargin()
+{
+  return prefs->ShowRightEdge;
+}
+
+
+
+void TopWindow::ShowIndent(bool showit)
+{
+  prefs->ShowIndentGuides = showit;
+  tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)showit);
+  menubar->SetCheck(ID_SHOW_INDENT,showit);
+}
+
+
+
+bool TopWindow::ShowIndent()
+{
+  return prefs->ShowIndentGuides;
+}
+
+
+
+void TopWindow::ShowCaretLine(bool showit)
+{
+  prefs->ShowCaretLine = showit;
+  tabbook->ForEachTab(ShowCaretLineCB, (void*)prefs);
+  menubar->SetCheck(ID_SHOW_CARET_LINE,showit);
+}
+
+
+
+bool TopWindow::ShowCaretLine()
+{
+  return prefs->ShowCaretLine;
+}
+
 
 
 

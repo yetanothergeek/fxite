@@ -81,7 +81,6 @@ private:
   FileDialogs*   filedlgs;
   Settings* prefs;
   PrefsDialog *prefdlg;
-  ToolsDialog *tooldlg;
   MacroRunner* macros;
   MacroRecorder* recorder;
   BackupMgr* backups;
@@ -126,6 +125,20 @@ private:
   void OpenSelected();
   void ShowAutoComplete(SciDoc*sci);
   bool SetLanguage(FXMenuRadio *mnu);
+  void InvertColors(bool inverted);
+  void CycleSplitter();
+  void RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b);
+  void FindTag();
+  void SetFileFormat(FXSelector sel);
+  void SetTabOrientation(FXSelector sel);
+  void ShowPrefsDialog();
+  void ShowFilterDialog(bool is_filter);
+  void ShowCommandDialog();
+  void ShowToolManagerDialog();
+  void RescanUserMenu();
+  void Indent(FXSelector sel);
+  void SetBookmark();
+  void GoToBookmark();
 public:
   long CheckStale(       FXObject*o, FXSelector sel, void*p );
   long CheckStyle(       FXObject*o, FXSelector sel, void*p );
@@ -348,6 +361,8 @@ public:
   bool Closing();
   bool SetReadOnly(SciDoc*sci, bool rdonly);
   void SetWordWrap(SciDoc*sci, bool wrapped);
+  void Cut();
+  void Copy();
   void Paste();
   SciDoc*ControlDoc();
   SciDoc*FocusedDoc();
@@ -364,6 +379,12 @@ public:
   bool ShowWhiteSpace();
   void ShowToolbar(bool showit);
   bool ShowToolbar();
+  void ShowMargin(bool showit);
+  bool ShowMargin();
+  void ShowIndent(bool showit);
+  bool ShowIndent();
+  void ShowCaretLine(bool showit);
+  bool ShowCaretLine();
   void AddFileToTagsMenu(const FXString &filename);
   bool RemoveFileFromTagsMenu(const FXString &filename);
   Settings* GetPrefs() { return prefs; }

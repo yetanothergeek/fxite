@@ -34,16 +34,13 @@
 #include "search.h"
 #include "filer.h"
 #include "prefs.h"
-#include "prefdlg.h"
 #include "histbox.h"
 #include "tagread.h"
 #include "shmenu.h"
 #include "recorder.h"
 #include "help.h"
-#include "toolmgr.h"
 #include "backup.h"
 #include "menuspec.h"
-#include "theme.h"
 #include "appname.h"
 #include "toolbar.h"
 #include "outpane.h"
@@ -187,11 +184,7 @@ long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->InvertColors=(bool)(FXival)p;
-  toolbar_frm->SetToolbarColors();
-  tabbook->ForEachTab(PrefsCB,NULL);
-  CheckStyle(NULL,0,ControlDoc());
-  menubar->SetCheck(ID_INVERT_COLORS,prefs->InvertColors);
+  InvertColors((bool)(FXival)p);
   return 1;
 }
 
@@ -199,24 +192,7 @@ long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
 {
-  int EolMode=SC_EOL_LF;
-  switch (FXSELID(sel)) {
-    case ID_FMT_DOS:{
-      EolMode=SC_EOL_CRLF;
-      break;
-    }
-    case ID_FMT_MAC:{
-      EolMode=SC_EOL_CR;
-      break;
-    }
-    case ID_FMT_UNIX:{
-      EolMode=SC_EOL_LF;
-      break;
-    }
-  }
-  FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
-  FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
-  RadioUpdate(FXSELID(sel),ID_FMT_DOS,ID_FMT_UNIX);
+  SetFileFormat(FXSELID(sel));
   return 1;
 }
 
@@ -224,26 +200,17 @@ long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onBookmark(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=ControlDoc();
   switch (FXSELID(sel)) {
     case ID_BOOKMARK_SET: {
-      bookmarked_file=sci->Filename();
-      bookmarked_tab=tabbook->ActiveTab();
-      bookmarked_pos=sci->GetCaretPos();
-      return 1;
+      SetBookmark();
+      break;
     }
     case ID_BOOKMARK_RETURN: {
-      if (!bookmarked_file.empty()) {
-        if (OpenFile(bookmarked_file.text(),NULL,false,false)) {
-          FocusedDoc()->GoToPos(bookmarked_pos);
-        }
-      } else {
-        tabbook->ForEachTab(BookmarkCB,this);
-      }
-      return 1;
+      GoToBookmark();
+      break;
     }
-    default:return 0;
   }
+  return 1;
 }
 
 
@@ -263,12 +230,7 @@ long TopWindow::onFocusIn(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onConfigureTools( FXObject*o, FXSelector sel, void*p )
 {
-  tooldlg=new ToolsDialog(this,UserMenus());
-  tooldlg->execute(PLACEMENT_SCREEN);
-  delete tooldlg;
-  tooldlg=NULL;
-  onRescanUserMenu(NULL,0,NULL);
-  ClosedDialog();
+  ShowToolManagerDialog();
   return 1;
 }
 
@@ -303,48 +265,7 @@ long TopWindow::onFileExport(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCycleSplitter(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=ControlDoc();
-  switch (prefs->SplitView) {
-    case SPLIT_NONE: {
-      switch (sci->GetSplit()) {
-        case SPLIT_NONE: {
-          sci->SetSplit(SPLIT_BELOW);
-          break;
-        }
-        case SPLIT_BELOW: {
-          sci->SetSplit(SPLIT_BESIDE);
-          break;
-        }
-        case SPLIT_BESIDE: {
-          sci->SetSplit(SPLIT_NONE);
-          break;
-        }
-      }
-      break;
-    }
-    case SPLIT_BELOW:
-    case SPLIT_BESIDE: {
-      switch (sci->GetSplit()) {
-        case SPLIT_NONE: {
-          sci->SetSplit(prefs->SplitView);
-          break;
-        }
-        case SPLIT_BELOW:
-        case SPLIT_BESIDE: {
-          sci->SetSplit(SPLIT_NONE);
-          break;
-        }
-      }
-      break;
-    }
-  }
-  sci=(SciDoc*)sci->getNext();
-  if (sci) {
-    SetSciDocPrefs(sci,prefs);
-    sci->setFocus();
-  } else {
-    ControlDoc()->setFocus();
-  }
+  CycleSplitter();
   return 1;
 }
 
@@ -446,9 +367,7 @@ long TopWindow::onInsertFile(FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onRescanUserMenu(FXObject*o, FXSelector sel, void*p)
 {
-  menubar->RescanUserMenus();
-  MenuMgr::PurgeTBarCmds();
-  UpdateToolbar();
+  RescanUserMenu();
   return 1;
 }
 
@@ -475,67 +394,16 @@ long TopWindow::onFileSaved(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onUserCmd(FXObject*o, FXSelector sel, void*p)
 {
-  FXMenuCommand* mc=(FXMenuCommand*)o;
-  FXString script=(char*)(mc->getUserData());
-  if ( ((FXuval)p)==2 ) { // Right-clicked, open file instead of executing
-    OpenFile(script.text(), NULL, false, true);
-    return 1;
-  }
-  //  If this file is currently open in the editor, and has
-  //  unsaved changes, prompt the user to save the changes.
-  FXWindow*tab,*page;
-  for (tab=tabbook->getFirst(); tab && (page=tab->getNext()); tab=page->getNext()) {
-    SciDoc*sci=(SciDoc*)page->getFirst();
-    if (sci->Dirty() && (sci->Filename()==script)) {
-      FXuint answer=FXMessageBox::warning(this,
-        MBOX_YES_NO_CANCEL,_("Unsaved changes"),
-        _("The disk file for the \"%s\" command is currently\n"
-          " open in the editor, and has unsaved changes.\n\n"
-          "  Save the file before continuing?"), mc->getText().text());
-      switch (answer) {
-        case MBOX_CLICKED_YES: {
-          if (!filedlgs->SaveFile(sci,sci->Filename())) { return 1; }
-          break;
-        }
-        case MBOX_CLICKED_NO: { break; }
-        default: { return 1; }
-      }
-    }
-  }
-  FXString input="";
-  SciDoc *sci=FocusedDoc();
-  switch (FXSELID(sel)) {
-    case ID_USER_COMMAND: {
-      if (PathMatch("*.save.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
-        if (!SaveAll(true)) { return 1; }
-      }
-#ifdef WIN32
-     script.prepend('"');
-     script.append('"');
-#endif
-      RunCommand(sci, script);
-      break;
-    }
-    case ID_USER_FILTER: {
-      if (sci->GetSelLength()>0) {
-        sci->GetSelText(input);
-        FilterSelection(sci, script, input);
-      }
-      break;
-    }
-    case ID_USER_SNIPPET: {
-      if (PathMatch("*.exec.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
-        FilterSelection(sci, script, input);
-      } else {
-        InsertFile(sci,script);
-      }
-      break;
-    }
-    case ID_USER_MACRO: {
-      RunMacro(script, true);
-      break;
-    }
-  }
+  RunUserCmd((FXMenuCommand*)o,sel,(FXuval)p);
+  return 1;
+}
+
+
+
+long TopWindow::onTBarCustomCmd(FXObject*o, FXSelector sel, void*p)
+{
+  MenuSpec*spec=(MenuSpec*)(((FXButton*)o)->getUserData());
+  RunUserCmd(spec->ms_mc, FXSEL(SEL_COMMAND,spec->ms_mc->getSelector()),0);
   return 1;
 }
 
@@ -543,39 +411,7 @@ long TopWindow::onUserCmd(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFindTag(FXObject*o, FXSelector sel, void*p)
 {
-  FXString filename;
-  FXString locn;
-  FXString pattern;
-  if ( FindTag(FocusedDoc(), menubar->TagsMenu(), filename, locn, pattern) ) {
-    if (!filename.empty()) {
-       OpenFile(filename.text(), locn.empty()?NULL:locn.text(),false,true);
-       if (locn.empty() &&!pattern.empty()) {
-         SciDoc*sci=ControlDoc();
-         sci->sendMessage(SCI_SETTARGETSTART,0,0);
-         sci->sendMessage(SCI_SETTARGETEND,sci->sendMessage(SCI_GETTEXTLENGTH,0,0),0);
-         long oldflags=sci->sendMessage(SCI_GETSEARCHFLAGS,0,0);
-         sci->sendMessage(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX|SCFIND_MATCHCASE, 0);
-         pattern.erase(0,1);
-         pattern.trunc(pattern.length()-1);
-         const char *esc_chars="*()";
-         const char *c;
-         for (c=esc_chars; *c; c++) {
-           char esc[3]="\\ ";
-           char orig[2]=" ";
-           esc[1]=*c;
-           orig[0]=*c;
-           if ( (pattern.find(*c)>=0) && (pattern.find(esc)==-1)) {
-             pattern.substitute(orig,esc,true);
-           }
-         }
-         long found=sci->sendString(SCI_SEARCHINTARGET,pattern.length(),pattern.text());
-         if (found>=0) {
-           sci->GoToPos(found);
-         }
-         sci->sendMessage(SCI_SETSEARCHFLAGS,oldflags,0);
-       }
-    }
-  }
+  FindTag();
   return 1;
 }
 
@@ -803,25 +639,7 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
 // Switch tab orientations
 long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 {
-  switch(FXSELID(sel)){
-    case ID_TABS_TOP:
-      tabbook->setTabStyle(TABBOOK_TOPTABS);
-      prefs->DocTabPosition='T';
-      break;
-    case ID_TABS_BOTTOM:
-      tabbook->setTabStyle(TABBOOK_BOTTOMTABS);
-      prefs->DocTabPosition='B';
-      break;
-    case ID_TABS_LEFT:
-      tabbook->setTabStyle(TABBOOK_LEFTTABS);
-      prefs->DocTabPosition='L';
-      break;
-    case ID_TABS_RIGHT:
-      tabbook->setTabStyle(TABBOOK_RIGHTTABS);
-      prefs->DocTabPosition='R';
-      break;
-  }
-  RadioUpdate(FXSELID(sel), ID_TABS_TOP, ID_TABS_RIGHT);
+  SetTabOrientation(FXSELID(sel));
   FocusedDoc()->setFocus();
   return 1;
 }
@@ -1016,9 +834,7 @@ long TopWindow::onRedo(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCut(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=FocusedDoc();
-  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_CUT,0,0); }
-  sci->setFocus();
+  Cut();
   return 1;
 }
 
@@ -1026,16 +842,7 @@ long TopWindow::onCut(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCopy(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=FocusedDoc();
-  // If any text is already selected, make sure the selection is "alive"
-  long start=sci->sendMessage(SCI_GETSELECTIONSTART,0,0);
-  long end=sci->sendMessage(SCI_GETSELECTIONEND,0,0);
-  if (start!=end) {
-    sci->sendMessage(SCI_SETSELECTIONSTART,start,0);
-    sci->sendMessage(SCI_SETSELECTIONEND,end,0);
-  }
-  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_COPY,0,0); }
-  if (getApp()->getFocusWindow()!=outlist) { sci->setFocus(); }
+  Copy();
   return 1;
 }
 
@@ -1095,9 +902,7 @@ long TopWindow::onPopupDeleteSel( FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onFind(FXObject*o, FXSelector sel, void*p)
 {
-  if (srchdlgs->ShowFindDialog(FocusedDoc())) {
-    macro_record_search();
-  }
+  if (srchdlgs->ShowFindDialog(FocusedDoc())) { macro_record_search(); }
   ClosedDialog();
   return 1;
 }
@@ -1224,9 +1029,7 @@ long TopWindow::onShowWhiteSpace(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->ShowRightEdge=!prefs->ShowRightEdge;
-  tabbook->ForEachTab(ShowMarginCB, (void*)(FXival)prefs->ShowRightEdge);
-  menubar->SetCheck(ID_SHOW_MARGIN,prefs->ShowRightEdge);
+  ShowMargin((bool)((FXival)p));
   return 1;
 }
 
@@ -1234,9 +1037,7 @@ long TopWindow::onShowMargin(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->ShowIndentGuides = !prefs->ShowIndentGuides;
-  tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)prefs->ShowIndentGuides);
-  menubar->SetCheck(ID_SHOW_INDENT,prefs->ShowIndentGuides);
+  ShowIndent((bool)((FXival)p));
   return 1;
 }
 
@@ -1244,9 +1045,7 @@ long TopWindow::onShowIndent(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowCaretLine(FXObject*o, FXSelector sel, void*p)
 {
-  prefs->ShowCaretLine = !prefs->ShowCaretLine;
-  tabbook->ForEachTab(ShowCaretLineCB, (void*)prefs);
-  menubar->SetCheck(ID_SHOW_CARET_LINE,prefs->ShowCaretLine);
+  ShowCaretLine((bool)((FXival)p));
   return 1;
 }
 
@@ -1254,7 +1053,7 @@ long TopWindow::onShowCaretLine(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowOutputPane(FXObject*o, FXSelector sel, void*p)
 {
-  ShowOutputPane(!prefs->ShowOutputPane);
+  ShowOutputPane((bool)((FXival)p));
   return 1;
 }
 
@@ -1262,7 +1061,7 @@ long TopWindow::onShowOutputPane(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowStatusBar(FXObject*o, FXSelector sel, void*p)
 {
-  ShowStatusBar(!prefs->ShowStatusBar);
+  ShowStatusBar((bool)((FXival)p));
   return 1;
 }
 
@@ -1270,39 +1069,7 @@ long TopWindow::onShowStatusBar(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
 {
-  if (!prefdlg) { prefdlg=new PrefsDialog(this, prefs); }
-  prefdlg->execute(PLACEMENT_DEFAULT);
-  delete prefdlg;
-  prefdlg=NULL;
-  ClosedDialog();
-  SetSrchDlgsPrefs();
-  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
-  tabbook->ForEachTab(PrefsCB, NULL);
-  CheckStyle(NULL,0,ControlDoc());
-  if ((prefs->WatchExternChanges||prefs->Autosave) && !getApp()->hasTimeout(this,ID_TIMER)) {
-    getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL);
-  }
-  getApp()->setWheelLines(prefs->WheelLines);
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) {
-    UpdateToolbar();
-  }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) {
-    toolbar_frm->handle(toolbar_frm,FXSEL(SEL_CONFIGURE,0),NULL);
-  }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
-    toolbar_frm->SetTBarFont();
-  }
-  filedlgs->patterns(prefs->FileFilters);
-  if (Theme::changed() & ThemeChangedColors) {
-    Theme::apply(this);
-    Theme::apply(srchdlgs->FindDialog());
-    tips->setBackColor(getApp()->getTipbackColor());
-    tips->setTextColor(getApp()->getTipforeColor());
-    statusbar->Colorize();
-  }
-  tabbook->ActivateTab(tabbook->ActiveTab());
-  toolbar_frm->SetToolbarColors();
-  EnableUserFilters(FocusedDoc()->GetSelLength());
+  ShowPrefsDialog();
   return 1;
 }
 
@@ -1324,68 +1091,15 @@ long TopWindow::onCtrlTab(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=FocusedDoc();
-  if (!sci) { return 0; }
-  int selid=FXSELID(sel);
-  long msg=((ID_INDENT_STEP==selid)||(ID_INDENT_FULL==selid))?SCI_TAB:SCI_BACKTAB;
-  int tab_width=sci->TabWidth();
-  if ((ID_INDENT_STEP==selid)||(ID_UNINDENT_STEP==selid))
-  {
-    FXbool use_tabs=sci->UseTabs();
-    sci->UseTabs(false);
-    sci->sendMessage(SCI_SETTABWIDTH,1,0);
-    sci->sendMessage(msg,0,0);
-    sci->TabWidth(tab_width);
-    sci->UseTabs(use_tabs);
-  } else {
-    sci->TabWidth(sci->UseTabs()?tab_width:prefs->IndentWidth);
-    sci->sendMessage(msg,0,0);
-    sci->TabWidth(tab_width);
-  }
+  Indent(FXSELID(sel));
   return 1;
-}
-
-
-
-static bool AvoidMultiLineCommand(TopWindow*w, const FXString &cmd)
-{
-  if (cmd.contains('\n')) {
-    FXMessageBox::error(w, MBOX_OK, _("Command Error"),
-      _("Multiline commands are not supported."));
-    return false;
-  } else {
-    return true;
-  }
 }
 
 
 
 long TopWindow::onFilterSel(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc *sci=FocusedDoc();
-  HistBox *dlg;
-  bool save_first;
-  bool is_filter=FXSELID(sel)==ID_FILTER_SEL;
-  if(is_filter) {
-    dlg=new HistBox(this, _("Filter selection"), _("Command:"), "Filters");
-    save_first=prefs->SaveBeforeFilterSel;
-  } else {
-    dlg=new HistBox(this, _("Insert output of command"), _("Command:"), "InsertOutput");
-    save_first=prefs->SaveBeforeInsCmd;
-  }
-  dlg->setNumColumns(48);
-  if ( dlg->execute(PLACEMENT_OWNER) ) {
-    FXString cmd=dlg->getText();
-    if (AvoidMultiLineCommand(this, cmd)) {
-      if ( (!save_first) || SaveAll(true) ) {
-        FXString input="";
-        if (is_filter) { sci->GetSelText(input); }
-        FilterSelection(sci, cmd, input);
-      }
-    }
-  }
-  delete dlg;
-  ClosedDialog();
+  ShowFilterDialog(FXSELID(sel)==ID_FILTER_SEL);
   return 1;
 }
 
@@ -1401,21 +1115,7 @@ long TopWindow::onKillCommand(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onRunCommand(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc *sci=FocusedDoc();
-  HistBox *dlg= new HistBox(this, _("Run command"), _("Command:"), "Commands");
-  dlg->setNumColumns(48);
-  if ( dlg->execute(PLACEMENT_OWNER) ) {
-    FXString cmd=dlg->getText();
-    if (AvoidMultiLineCommand(this,cmd)) {
-      if ( (!prefs->SaveBeforeExecCmd) || SaveAll(true) ) {
-        ClosedDialog();
-        RunCommand(sci,cmd);
-      }
-    }
-  } else {
-    ClosedDialog();
-  }
-  delete dlg;
+  ShowCommandDialog();
   return 1;
 }
 
@@ -1455,14 +1155,6 @@ long TopWindow::onChangeCase(FXObject*o, FXSelector sel, void*p)
     }
   }
   return 1;
-}
-
-
-
-long TopWindow::onTBarCustomCmd(FXObject*o, FXSelector sel, void*p)
-{
-  MenuSpec*spec=(MenuSpec*)(((FXButton*)o)->getUserData());
-  return onUserCmd(spec->ms_mc, FXSEL(SEL_COMMAND,spec->ms_mc->getSelector()),p);
 }
 
 
