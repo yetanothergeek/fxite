@@ -432,22 +432,22 @@ void MainMenu::CreateMenus()
 
   scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "commands");
   FXDir::create(scriptdir);
-  usercmdmenu=new UserMenu(toolsmenu, _("&Commands"), scriptdir, tw, TW::ID_USER_COMMAND, usercmdflags);
+  usercmdmenu=new UserMenu(toolsmenu, _("&Commands"), scriptdir, 'C', tw, TW::ID_USER_COMMAND, usercmdflags);
   usercmdmenu->helpText(_("Commands: Execute a command and send its output to the output pane."));
 
   scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "filters");
   FXDir::create(scriptdir);
-  userfiltermenu=new UserMenu(toolsmenu, _("&Filters"), scriptdir, tw, TW::ID_USER_FILTER);
+  userfiltermenu=new UserMenu(toolsmenu, _("&Filters"), scriptdir, 'F', tw, TW::ID_USER_FILTER);
   userfiltermenu->helpText(_("Filters: Pipe selected text to a command and replace with its output."));
 
   scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "snippets");
   FXDir::create(scriptdir);
-  usersnipmenu=new UserMenu(toolsmenu, _("&Snippets"), scriptdir, tw, TW::ID_USER_SNIPPET,usersnipflags);
+  usersnipmenu=new UserMenu(toolsmenu, _("&Snippets"), scriptdir, 'S', tw, TW::ID_USER_SNIPPET, usersnipflags);
   usersnipmenu->helpText(_("Snippets: Insert the text of a file or the output of a command."));
 
   scriptdir.format("%s%s%c%s", tw->ConfigDir().text(), "tools", PATHSEP, "macros");
   FXDir::create(scriptdir);
-  usermacromenu=new UserMenu(toolsmenu, _("&Macros"), scriptdir, tw, TW::ID_USER_MACRO);
+  usermacromenu=new UserMenu(toolsmenu, _("&Macros"), scriptdir, 'M', tw, TW::ID_USER_MACRO);
   usermacromenu->helpText(_("Macros: Execute a Lua macro using the built-in interpreter."));
 
 #if TEST_SOMETHING

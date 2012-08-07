@@ -23,7 +23,6 @@
 #include <fx.h>
 
 #include "shmenu.h"
-#include "appwin.h"
 #include "compat.h"
 
 #include "intl.h"
@@ -211,9 +210,9 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
   FXString path=getFilePath(parent_item);
   const char *ext;
   UserMenu*um=GetUserMenu(parent_item);
-  switch (um?um->getSelector():0) {
-    case TopWindow::ID_USER_COMMAND:
-    case TopWindow::ID_USER_FILTER: {
+  switch (um?um->Tag():0) { // Suggest a file extension
+    case 'C':
+    case 'F': { // Commands and Filters use shell script extension.
 #ifdef WIN32
       ext="bat";
 #else
@@ -221,11 +220,11 @@ void ToolsTree::MakeDummyTool(FXTreeItem*parent_item, FXuint perm)
 #endif
       break;
     }
-    case TopWindow::ID_USER_MACRO: {
+    case 'M': { // Macros use lua extension
       ext="lua";
       break;
     }
-    default: {
+    default: { // Snippets (maybe just a text file)
       ext=(perm & FXIO::OwnerExec)?"exec.txt":"read.txt";
     }
   }

@@ -34,6 +34,7 @@ private:
   FXWindow *target;
   FXSelector selector;
   const char**_flags;
+  char _tag;
 protected:
   int count;
   void ScanDir(FXMenuPane*parent, const char *directory);
@@ -44,7 +45,7 @@ public:
   FXSelector getSelector() { return selector; }
   int getCount() { return count; }
   UserMenu(FXMenuPane *owner,
-    const FXString &label, const FXString &dirname, FXObject *tgt, FXSelector sel, const char**flags=NULL);
+    const FXString &label, const FXString &dirname, char tag, FXObject *tgt, FXSelector sel, const char**flags=NULL);
   ~UserMenu();
   void rescan();
   void enable();
@@ -57,6 +58,7 @@ public:
   void helpText(const char*txt) { helptext=txt; }
   const char*getTopDir(){ return topdir.text(); }
   static bool MakeLabelFromPath(const char*path, FXString &label);
+  char Tag() { return _tag; }
 };
 
 

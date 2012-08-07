@@ -82,11 +82,12 @@ FXIMPLEMENT(UsrMnuCmd,FXMenuCommand,MyCmdMap,ARRAYNUMBER(MyCmdMap))
 
 
 UserMenu::UserMenu(FXMenuPane *owner,
-  const FXString &label, const FXString &dirname, FXObject *tgt, FXSelector sel, const char**flags)
+  const FXString &label, const FXString &dirname, char tag, FXObject *tgt, FXSelector sel, const char**flags)
 {
   target=(FXWindow*)tgt;
   selector=sel;
   _flags=flags;
+  _tag=tag;
   topcasc=NULL;
   toplabel=label.text();
   topdir=dirname.text();
