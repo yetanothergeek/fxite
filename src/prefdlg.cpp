@@ -324,7 +324,7 @@ long PrefsDialog::onChangedToolbar(FXObject*o,FXSelector sel,void*p)
 void PrefsDialog::MakeToolbarTab()
 {
   new FXTabItem(tabs,_("toolbar"));
-  new ToolbarPrefs(tabs,this,ID_CHANGED_TOOLBAR);
+  new ToolbarPrefs(tabs, TopWindow::instance()->UserMenus(), TopWindow::ID_LAST, this, ID_CHANGED_TOOLBAR);
   changed_toolbar=ToolbarUnchanged;
 }
 
@@ -333,7 +333,7 @@ void PrefsDialog::MakeToolbarTab()
 void PrefsDialog::MakePopupTab()
 {
   new FXTabItem(tabs,_("popup"));
-  new PopupPrefs(tabs);
+  new PopupPrefs(tabs, TopWindow::instance()->UserMenus(), TopWindow::ID_LAST);
 }
 
 

@@ -18,6 +18,7 @@
 
 
 class ToolsDialog;
+class UserMenu;
 
 
 class ToolsTree: public FXTreeList {

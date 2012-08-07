@@ -19,7 +19,6 @@
 #include <fx.h>
 #include "prefs.h"
 #include "menuspec.h"
-#include "appwin.h"
 #include "tooltree.h"
 #include "shmenu.h"
 
@@ -62,11 +61,14 @@ FXIMPLEMENT(ToolbarPrefs,DualListForm,ToolbarPrefsMap,ARRAYNUMBER(ToolbarPrefsMa
 
 
 
-ToolbarPrefs::ToolbarPrefs(FXComposite*p, FXObject* tgt, FXSelector sel):
+ToolbarPrefs::ToolbarPrefs(FXComposite*p, UserMenu**ums, FXSelector last, FXObject* tgt, FXSelector sel):
   DualListForm(p,tgt,sel,TBAR_MAX_BTNS)
 {
+  user_menus=ums;
+  invalid=last;
   udata = (void*)((FXival)ToolbarChangedLayout);
   prefs=Settings::instance();
+
   FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
@@ -130,7 +132,7 @@ long ToolbarPrefs::onRemoveItem(FXObject*o,FXSelector sel,void*p)
 long ToolbarPrefs::onInsertCustomItem(FXObject*o,FXSelector sel,void*p)
 {
   FXMenuCommand*mc;
-  if (ToolsTree::SelectTool(this, TopWindow::instance()->UserMenus(), mc)) {
+  if (ToolsTree::SelectTool(this, user_menus, mc)) {
     const char*newpath=(const char*)mc->getUserData();
     if (newpath) {
       // If the command is already in the used items list, just select it...
@@ -159,7 +161,7 @@ void ToolbarPrefs::CheckCount()
   FXint*btns=MenuMgr::TBarBtns();
   FXint iUsed;
   for (iUsed=0; iUsed<max_items; iUsed++) {
-    btns[iUsed]=TopWindow::ID_LAST;
+    btns[iUsed]=invalid;
   }
   for (iUsed=0; iUsed<used_items->getNumItems(); iUsed++) {
     MenuSpec*spec=(MenuSpec*)(used_items->getItemData(iUsed));
@@ -173,7 +175,7 @@ void ToolbarPrefs::CheckCount()
 
 void ToolbarPrefs::PopulateAvail()
 {
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
+  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=invalid; spec++) {
     if (spec->ms_mc) {
       avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
     }
@@ -184,7 +186,7 @@ void ToolbarPrefs::PopulateAvail()
 
 void ToolbarPrefs::PopulateUsed()
 {
-  for (FXint*isel=MenuMgr::TBarBtns(); *isel!=TopWindow::ID_LAST; isel++) {
+  for (FXint*isel=MenuMgr::TBarBtns(); *isel!=invalid; isel++) {
     MenuSpec* spec=MenuMgr::LookupMenu(*isel);
     if (spec) {
       FXint found=avail_items->findItemByData((void*)spec);
@@ -235,8 +237,10 @@ public:
 
 
 
-PopupPrefs::PopupPrefs(FXComposite*p, FXObject*tgt, FXSelector sel):DualListForm(p,tgt,sel,POPUP_MAX_CMDS)
+PopupPrefs::PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector last, FXObject*tgt, FXSelector sel):DualListForm(p,tgt,sel,POPUP_MAX_CMDS)
 {
+  user_menus=ums;
+  invalid=last;
   FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),
@@ -287,7 +291,7 @@ long PopupPrefs::onInsertSeparator(FXObject*o, FXSelector sel, void*p)
 long PopupPrefs::onInsertCustomItem(FXObject*o, FXSelector sel, void*p)
 {
   FXMenuCommand*mc;
-  if (ToolsTree::SelectTool(this, TopWindow::instance()->UserMenus(), mc)) {
+  if (ToolsTree::SelectTool(this, user_menus, mc)) {
     const char*newpath=(const char*)mc->getUserData();
     if (newpath) {
       // If the command is already in the used items list, just select it...
@@ -315,7 +319,7 @@ long PopupPrefs::onInsertCustomItem(FXObject*o, FXSelector sel, void*p)
 
 void PopupPrefs::PopulateAvail()
 {
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
+  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=invalid; spec++) {
     if ((spec->type=='m')&&(spec->ms_mc||(strncmp(spec->pref,"Popup",5)==0))) {
       avail_items->appendItem(new TBarListItem(spec->pref, NULL, (void*)spec));
     }
