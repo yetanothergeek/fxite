@@ -30,7 +30,7 @@ noinst_HEADERS=\
   shmenu.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
   fxasq_lua.h luasci.h menuspec.h listdlls.h luafx.h appname.h \
   filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h toolbar.h outpane.h statusbar.h\
-  mainmenu.cpp
+  mainmenu.h
 
 
 
