@@ -24,7 +24,7 @@ class InterProc;
 class AppClass: public FXApp {
   FXDECLARE(AppClass);
 private:
-  TopWindow* mainwin;
+  FXMainWindow* mainwin;
   bool quitting;
   AppClass() {}
   FXString sock_name;

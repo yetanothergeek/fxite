@@ -25,7 +25,7 @@
 #include <Catalogue.h>
 
 #include "intl.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "compat.h"
 #include "histbox.h"
 #include "scidoc.h"
@@ -444,7 +444,7 @@ long LangGUI::onKeywordEdit(FXObject*o,FXSelector sel,void*p)
     }
   }
   if (sc->hasClipboard()) {
-    TopWindow::instance()->SaveClipboard();
+    TopWinPub::SaveClipboard();
   }
   return 1;
 }

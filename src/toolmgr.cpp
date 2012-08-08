@@ -25,7 +25,7 @@
 
 #include "shmenu.h"
 #include "compat.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "histbox.h"
 #include "tooltree.h"
 
@@ -694,7 +694,7 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_EDIT_CLICK: {
-      ((TopWindow*)getOwner())->OpenFile(
+      TopWinPub::OpenFile(
         (const char*)(((FXMenuCommand*)(tree->PrevItem()->getData()))->getUserData()),
         NULL,false,false
       );

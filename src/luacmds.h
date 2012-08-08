@@ -17,5 +17,5 @@
 */
 
 
-const luaL_reg* LuaCommands(TopWindow*topwin);
+const luaL_reg* LuaCommands(FXMainWindow*topwin);
 

@@ -29,7 +29,7 @@
 
 #include "macro.h"
 #include "compat.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "scidoc.h"
 #include "doctabs.h"
 #include "filer.h"
@@ -58,12 +58,10 @@ const char *LuaQuitMessage()
 
 class SelSaver;
 
-
-static TopWindow*tw=NULL;
 static SelSaver* selsaver=NULL;
 
 #define DOC_REQD \
-SciDoc*sci=tw->FocusedDoc(); \
+SciDoc*sci=TopWinPub::FocusedDoc(); \
 if (!sci) { \
   luaL_error(L,_("No active document!")); \
   return 0; \
@@ -152,7 +150,7 @@ static int gofind(lua_State* L)
   const char*lpstrText=luaL_checkstring(L,1);
   if (!check_find_flags(L,2,flags)) { return 0; }
   bool forward=(lua_gettop(L)>2)?lua_toboolean(L,3):true;
-  tw->FindText(lpstrText,flags,forward);
+  TopWinPub::FindText(lpstrText,flags,forward);
   return 0;
 }
 
@@ -359,7 +357,7 @@ static int go(lua_State* L)
     }
     case 1:{ strcmd=luaL_checkstring(L,1); }
   }
-  scicmd=GetSciNavCmd(strcmd,fwd,sel,rect,tw->GetPrefs()->SmartHome);
+  scicmd=GetSciNavCmd(strcmd,fwd,sel,rect,Settings::instance()->SmartHome);
   luaL_argcheck(L,SCI_NULL != scicmd, 1, _("invalid mode"));
   for (i=0; i<count; i++) { sci->sendMessage(scicmd, 0, 0); }
   return 0;
@@ -541,7 +539,7 @@ static int paste(lua_State* L)
   CheckReadOnly();
   if (sci->sendMessage(SCI_CANPASTE,0,0)) {
     int len=sci->GetTextLength();
-    tw->Paste();
+    TopWinPub::Paste();
     lua_pushnumber(L, (len - sci->GetTextLength()) );
   } else {
     lua_pushnil(L);
@@ -578,14 +576,14 @@ static int insert(lua_State*L)
   if (adjust && *txt && Settings::instance()->AutoIndent) { // Fix up indents for macro recorder
     if (*txt=='}') {  // if text starts with a closing brace, align it first
       sci->sendString(SCI_REPLACESEL,0,"}");
-      tw->AdjustIndent(sci,*txt);
+      TopWinPub::AdjustIndent(sci,*txt);
       sci->sendString(SCI_REPLACESEL,0,txt+1);
     } else {
       sci->sendString(SCI_REPLACESEL,0,txt);
     }
     const char*eos=strchr(txt,'\0')-1;
     if (('\n'==*eos)||('\r'==*eos)) { // indent if new line
-      tw->AdjustIndent(sci,*eos);
+      TopWinPub::AdjustIndent(sci,*eos);
     }
   } else {  // ordinary insertion without auto-indent
     sci->sendString(SCI_REPLACESEL,0,txt);
@@ -645,7 +643,7 @@ static bool FindIndexFromNameCB(FXint index, DocTab*tab, FXWindow*page, void*p)
 
 static bool doc_idx_to_filename(int n, FXString &fn)
 {
-  FXWindow*w=tw->Tabs()->PageAt(n);
+  FXWindow*w=TopWinPub::Tabs()->PageAt(n);
   if (w) {
     SciDoc*sci=(SciDoc*)w->getFirst();
     if (sci) {
@@ -662,7 +660,7 @@ static bool doc_idx_to_filename(int n, FXString &fn)
 static int documents_closure(lua_State *L)
 {
   int idx=lua_tointeger(L, lua_upvalueindex(1));
-  int max=tw->Tabs()->Count();
+  int max=TopWinPub::Tabs()->Count();
   idx++;
   if ( idx < max ){
     lua_pushnumber(L, idx);
@@ -684,7 +682,7 @@ static int FindIndexFromName(const char*filename)
   DocCBData data;
   data.name=filename;
   data.index=-1;
-  tw->Tabs()->ForEachTab(FindIndexFromNameCB,&data);
+  TopWinPub::Tabs()->ForEachTab(FindIndexFromNameCB,&data);
   return data.index;
 }
 
@@ -737,7 +735,7 @@ static int activate(lua_State *L)
     const char *name=luaL_checkstring(L,1);
     idx=FindIndexFromName(name);
   }
-  lua_pushboolean(L, tw->Tabs()->ActivateTab(idx));
+  lua_pushboolean(L, TopWinPub::Tabs()->ActivateTab(idx));
   return 1;
 }
 
@@ -747,7 +745,7 @@ static int lines_closure(lua_State *L)
 {
   int idx=lua_tointeger(L, lua_upvalueindex(1))+1;
   SciDoc*sci=(SciDoc*)lua_touserdata(L,lua_upvalueindex(2));
-  if (sci!=tw->FocusedDoc()) { return 0; }
+  if (sci!=TopWinPub::FocusedDoc()) { return 0; }
   FXString text="";
   if ( sci->GetLineText(idx-1,text)>=0 ) {
     lua_pushnumber(L, idx);
@@ -788,7 +786,7 @@ static int lines(lua_State* L)
 
 static int ndocs(lua_State*L)
 {
-  lua_pushnumber(L,tw->Tabs()->Count());
+  lua_pushnumber(L,TopWinPub::Tabs()->Count());
   return 1;
 }
 
@@ -825,7 +823,7 @@ static int open(lua_State*L)
     case 2: { rowcol=luaL_checkstring(L,2); }
     default: { name=luaL_checkstring(L,1); }
   }
-  lua_pushboolean(L, tw->OpenFile(name[0]?name:NULL,rowcol,rdonly,false));
+  lua_pushboolean(L, TopWinPub::OpenFile(name[0]?name:NULL,rowcol,rdonly,false));
   return 1;
 }
 
@@ -841,7 +839,7 @@ static int close(lua_State*L)
     if (dirty) { sci->Dirty(false); }
   } else {
     if (strcmp(opt,"save")==0) {
-      if ( tw->FileDlgs()->SaveFile(sci,sci->Filename()) ) {
+      if ( TopWinPub::FileDlgs()->SaveFile(sci,sci->Filename()) ) {
         dirty=false;
       } else {
         lua_pushboolean(L,false);
@@ -853,7 +851,7 @@ static int close(lua_State*L)
       }
     }
   }
-  if (tw->CloseFile(false,false)) {
+  if (TopWinPub::CloseFile(false,false)) {
     lua_pushboolean(L, true);
   } else {
     if (dirty!=sci->Dirty()) { sci->Dirty(dirty); }
@@ -871,7 +869,7 @@ static int save(lua_State*L)
   int nargs=lua_gettop(L);
   if (nargs==0) {
     char*fn=strdup(sci->Filename().text());
-    lua_pushboolean(L,tw->FileDlgs()->SaveFile(sci,fn));
+    lua_pushboolean(L,TopWinPub::FileDlgs()->SaveFile(sci,fn));
     free(fn);
   } else {
     const char *fn=luaL_checkstring(L,1);
@@ -882,7 +880,7 @@ static int save(lua_State*L)
         return 1;
       }
     }
-    lua_pushboolean(L,tw->FileDlgs()->SaveFile(sci,fn));
+    lua_pushboolean(L,TopWinPub::FileDlgs()->SaveFile(sci,fn));
   }
   return 1;
 }
@@ -891,14 +889,14 @@ static int save(lua_State*L)
 
 static bool breathe(lua_State*L)
 {
-  FXApp*a=tw->getApp();
-  tw->update();
+  FXApp*a=FXApp::instance();
+  TopWinPub::update();
   a->refresh();
   a->forceRefresh();
   a->flush();
   a->repaint();
   a->runWhileEvents();
-  if ( (!tw) || tw->IsMacroCancelled() || tw->Closing() ) {
+  if ( (!TopWinPub::instance()) || TopWinPub::IsMacroCancelled() || TopWinPub::Closing() ) {
     lua_pushstring(L, _("Macro cancelled by user."));
     lua_error(L);
     return false;
@@ -935,9 +933,9 @@ static int yield(lua_State*L)
 static int quit(lua_State*L)
 {
   DOC_REQD
-  if ((tw->Tabs()->Count()==1)&&(sci->Filename().empty())&&(!sci->Dirty()))
+  if ((TopWinPub::Tabs()->Count()==1)&&(sci->Filename().empty())&&(!sci->Dirty()))
   {
-    tw->getApp()->addChore(tw,TopWindow::ID_CLOSEWAIT,NULL);
+    TopWinPub::CloseWait();
     lua_pushstring(L,LuaQuitMessage());
     lua_error(L);
   }
@@ -954,7 +952,7 @@ static int readonly(lua_State*L)
     lua_pushboolean(L,sci->GetReadOnly());
   } else {
     bool rdonly=lua_toboolean(L,1);
-    lua_pushboolean(L,tw->SetReadOnly(sci, rdonly));
+    lua_pushboolean(L,TopWinPub::SetReadOnly(sci, rdonly));
   }
   return 1;
 }
@@ -971,7 +969,7 @@ static int wordwrap(lua_State*L)
     return 1;
   } else {
     bool wrapped=lua_toboolean(L,1);
-    tw->SetWordWrap(sci, wrapped);
+    TopWinPub::SetWordWrap(sci, wrapped);
     return 0;
   }
 }
@@ -1062,7 +1060,7 @@ FXIMPLEMENT(SelSaver, FXWindow, SelSaverMap, ARRAYNUMBER(SelSaverMap))
 static int xsel(lua_State* L)
 {
   DOC_REQD
-  if (!selsaver) { selsaver=new SelSaver(tw); }
+  if (!selsaver) { selsaver=new SelSaver(TopWinPub::instance()); }
   if (lua_gettop(L)==0) {
     lua_pushstring(L,selsaver->GetSel());
     return 1;
@@ -1283,7 +1281,7 @@ static int lexer(lua_State* L)
 
 static int configdir(lua_State* L)
 {
-  lua_pushstring(L,tw->ConfigDir().text());
+  lua_pushstring(L,TopWinPub::ConfigDir().text());
   return 1;
 }
 
@@ -1298,14 +1296,14 @@ static int configdir(lua_State* L)
 static int ipc(lua_State* L)
 {
   if (lua_gettop(L)==0) {
-    lua_pushstring(L,tw->Connector().text());
+    lua_pushstring(L,TopWinPub::Connector().text());
   } else {
     size_t len=0;
     const char*cmd=luaL_checklstring(L,1,&len);
     const char*conn=luaL_checkstring(L,2);
     const char*topic=luaL_optstring(L,3,NULL);
     FXString cmdstr(cmd,len);
-    InterProc ip(tw->getApp(),conn,topic);
+    InterProc ip(FXApp::instance(),conn,topic);
     lua_pushboolean(L,ip.ClientSend(NULL,cmdstr));
   }
   return 1;
@@ -1317,7 +1315,7 @@ static int tagfiles(lua_State* L)
 {
   lua_newtable(L);
   FXint i=1;
-  for (FXWindow*w=tw->TagFiles(); w; w=w->getNext(), i++) {
+  for (FXWindow*w=TopWinPub::TagFiles(); w; w=w->getNext(), i++) {
     lua_pushinteger(L,i);
     lua_pushstring(L,((FXMenuCaption*)w)->getText().text());
     lua_rawset(L,-3);
@@ -1375,9 +1373,8 @@ static const struct luaL_reg fxte_funcs[] = {
 
 
 
-const luaL_reg* LuaFuncs(TopWindow*topwin)
+const luaL_reg* LuaFuncs()
 {
-  if (!tw) { tw=topwin; }
   return fxte_funcs;
 }
 

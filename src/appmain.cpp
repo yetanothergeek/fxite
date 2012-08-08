@@ -35,7 +35,7 @@
 
 #include "appname.h"
 #include "compat.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 
 #include "interproc.h"
 #include "theme.h"
@@ -132,7 +132,7 @@ void AppClass::ParseCommandLine()
 
 long AppClass::onIpcExec(FXObject*o, FXSelector sel, void*p)
 {
-  mainwin->ParseCommands(*((FXString*)p));
+  TopWinPub::ParseCommands(*((FXString*)p));
   return 1;
 }
 
@@ -427,7 +427,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
     setToolTipTime(2000000000);
     setToolTipPause(250000000);
 #endif
-    mainwin=new TopWindow(this);
+    mainwin=TopWinPub::instantiate(this);
     if (getRootWindow() && getRootWindow()->id()) { mainwin->create(); } else { create(); }
     ipc->StartServer(mainwin, this,ID_IPC_EXEC);
 #if !(defined(WIN32) || defined(__minix))
@@ -532,7 +532,7 @@ int main(int argc, char *argv[])
   textdomain(PACKAGE);
 #endif
   if ((argc==2)&&(strcmp(argv[1],"--dump-lexers")==0)) {
-    TopWindow::DumpLexers();
+    TopWinPub::DumpLexers();
     exit(0);
   }
   check_info_args(argc,argv); // Checks for switches that exit after they print some info.

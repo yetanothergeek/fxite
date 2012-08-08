@@ -31,7 +31,7 @@ class Accessor;
 #include "scidoc.h"
 #include "prefs.h"
 #include "lang.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "search.h"
 #include "histbox.h"
 #include "tooltree.h"
@@ -112,7 +112,7 @@ static bool AccelSanity(FXWindow*w, FXHotKey acckey)
 
 static bool AccelUnique(FXWindow*w, FXAccelTable *table, FXHotKey acckey, MenuSpec*spec)
 {
-  MenuSpec*killcmd=MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND);
+  MenuSpec*killcmd=MenuMgr::LookupMenu(TopWinPub::KillCmdID());
 
   if ( (acckey==parseAccel(killcmd->accel)) && (spec!=killcmd)) {
     FXMessageBox::error(w, MBOX_OK, _("Conflicting keybinding"),
@@ -173,7 +173,7 @@ static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acck
     acckey=0;
     if (dlg.getString(acctxt, w->getShell(), _("Edit keybinding"), msg )) {
       if (acctxt.empty()) {
-        if (spec->sel==TopWindow::ID_KILL_COMMAND) {
+        if (spec->sel==TopWinPub::KillCmdID()) {
           FXMessageBox::error(w->getShell(), MBOX_OK, _("Empty keybinding"), "%s \"%s\"",
             _("You cannot remove the keybinding for"), spec->pref);
           acctxt=orig.text();
@@ -243,8 +243,8 @@ long PrefsDialog::onAccelEdit(FXObject*o, FXSelector s, void*p)
           memset(spec->accel,0,sizeof(spec->accel));
           strncpy(spec->accel, acctxt.text(),sizeof(spec->accel)-1);
           if (oldkey && table->hasAccel(oldkey)) { table->removeAccel(oldkey); }
-          if (spec->sel==TopWindow::ID_KILL_COMMAND){
-            ((TopWindow*)own)->SetKillCommandAccelKey(acckey);
+          if (spec->sel==TopWinPub::KillCmdID()){
+            TopWinPub::SetKillCommandAccelKey(acckey);
           } else  {
             if (spec->ms_mc) {
               spec->ms_mc->setSelector(0);
@@ -324,7 +324,7 @@ long PrefsDialog::onChangedToolbar(FXObject*o,FXSelector sel,void*p)
 void PrefsDialog::MakeToolbarTab()
 {
   new FXTabItem(tabs,_("toolbar"));
-  new ToolbarPrefs(tabs, TopWindow::instance()->UserMenus(), TopWindow::ID_LAST, this, ID_CHANGED_TOOLBAR);
+  new ToolbarPrefs(tabs, TopWinPub::UserMenus(), TopWinPub::LastID(), this, ID_CHANGED_TOOLBAR);
   changed_toolbar=ToolbarUnchanged;
 }
 
@@ -333,7 +333,7 @@ void PrefsDialog::MakeToolbarTab()
 void PrefsDialog::MakePopupTab()
 {
   new FXTabItem(tabs,_("popup"));
-  new PopupPrefs(tabs, TopWindow::instance()->UserMenus(), TopWindow::ID_LAST);
+  new PopupPrefs(tabs, TopWinPub::UserMenus(), TopWinPub::LastID());
 }
 
 
@@ -348,7 +348,7 @@ void PrefsDialog::MakeKeybindingsTab()
   acclist->appendHeader(_("action"));
   acclist->appendHeader(_("keybinding"));
   FXString spaces;
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWindow::ID_LAST; spec++) {
+  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWinPub::LastID(); spec++) {
     FXString txt;
     txt.format("%s\t%s", spec->pref, spec->accel);
     acclist->appendItem(new KBindListItem(txt, NULL, NULL, (void*)spec));

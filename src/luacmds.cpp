@@ -583,9 +583,9 @@ static const struct luaL_reg fxte_commands[] = {
 
 
 
-const luaL_reg* LuaCommands(TopWindow*topwin)
+const luaL_reg* LuaCommands(FXMainWindow*topwin)
 {
-  if (!tw) { tw=topwin; }
+  if (!tw) { tw=(TopWindow*)topwin; }
   return fxte_commands;
 }
 

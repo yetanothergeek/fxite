@@ -22,7 +22,7 @@
 
 #include "compat.h"
 #include "appname.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "luacmds.h"
 #include "luafuncs.h"
 #include "luafx.h"
@@ -32,21 +32,14 @@
 #include "macro.h"
 
 
-static TopWindow*tw=NULL;
 
-
-MacroRunner::MacroRunner(TopWindow*topwin):FXObject()
-{
-  if (!tw) { tw=topwin; }
-}
-
+MacroRunner::MacroRunner():FXObject(){}
 
 
 MacroRunner::~MacroRunner()
 {
   LuaFuncsCleanup();
   ClearKeepers();
-  tw=NULL;
 }
 
 
@@ -157,20 +150,20 @@ static void format_message(const char *rawmsg, FXString &outmsg)
 */
 static void script_error(const FXString &filename, const char *msg, bool need_name, FXint line)
 {
-  if ((!tw) || tw->Destroying() || tw->Closing()) {
+  if ((!TopWinPub::instance()) || TopWinPub::Destroying() || TopWinPub::Closing()) {
    fprintf(stderr, "%s\n", msg);
    return;
  }
   if (need_name||filename.empty()) {
-    FXMessageBox::error(tw,MBOX_OK,_("Macro Error"),"%s\n%s\n", filename.text(),msg);
+    FXMessageBox::error(TopWinPub::instance(),MBOX_OK,_("Macro Error"),"%s\n%s\n", filename.text(),msg);
   } else {
     FXString m;
     format_message(msg,m);
-    if ( FXMessageBox::error(tw, MBOX_YES_NO, _("Macro Error"), "%s\n\n\n%s",
+    if ( FXMessageBox::error(TopWinPub::instance(), MBOX_YES_NO, _("Macro Error"), "%s\n\n\n%s",
            m.text(), _("Edit script?"))==MBOX_CLICKED_YES) {
       char linenum[8]="\0\0\0\0\0\0\0";
       snprintf(linenum,sizeof(linenum)-1, "%d", line);
-      tw->OpenFile(filename.text(), linenum, false, false);
+      TopWinPub::OpenFile(filename.text(), linenum, false, false);
     }
   }
 }
@@ -212,7 +205,7 @@ static int scriptname(lua_State *L)
 /* Override Lua's standard os.exit() function, so we can have a clean shutdown. */
 static int osexit(lua_State *L)
 {
-  tw->getApp()->addChore(tw,TopWindow::ID_CLOSEWAIT,NULL);
+  TopWinPub::CloseWait();
   lua_pushstring(L,LuaQuitMessage());
   lua_error(L);
   return 0;
@@ -284,9 +277,9 @@ static int print(lua_State *L)
   data.substitute("\r\n", "\n");
   FXint sects=data.contains('\n');
   for (FXint sect=0; sect<sects; sect++) {
-    tw->AddOutput(data.section('\n', sect));
+    TopWinPub::AddOutput(data.section('\n', sect));
   }
-  if (!data.section('\n', sects).empty()) { tw->AddOutput(data.section('\n', sects)); }
+  if (!data.section('\n', sects).empty()) { TopWinPub::AddOutput(data.section('\n', sects)); }
   return 0;
 }
 
@@ -314,14 +307,14 @@ static void debug_hook(lua_State *L, lua_Debug *ar)
       }
       si->line=ar->currentline;
     }
-    if ( (!tw) || tw->IsMacroCancelled()) {
+    if ( (!TopWinPub::instance()) || TopWinPub::IsMacroCancelled()) {
       lua_pushstring(L, _("Macro cancelled by user."));
       lua_error(L);
       return;
     }
     if (si->counter > 100000) {
-      tw->update();
-      tw->getApp()->runWhileEvents();
+      TopWinPub::update();
+      FXApp::instance()->runWhileEvents();
       si->counter=0;
     } else si->counter++;
   }
@@ -494,11 +487,11 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   si->script=isfilename?source.text():NULL;
   states.append(si);
   lua_sethook(L,debug_hook,LUA_MASKLINE,1);
-  luaL_register(L, LUA_MODULE_NAME, LuaFuncs(tw));
-  luaL_register(L, LUA_MODULE_NAME, LuaFxUtils(tw, EXE_NAME));
+  luaL_register(L, LUA_MODULE_NAME, LuaFuncs());
+  luaL_register(L, LUA_MODULE_NAME, LuaFxUtils(TopWinPub::instance(), EXE_NAME));
   override(L,LUA_MODULE_NAME,"script", scriptname);
   override(L,LUA_MODULE_NAME,"optimize", optimize);
-  luaL_openlib(L, LUA_MODULE_NAME, LuaCommands(tw), 0);
+  luaL_openlib(L, LUA_MODULE_NAME, LuaCommands(TopWinPub::instance()), 0);
   set_string_token(L, "_VERSION", VERSION);
   PushKeepers(L);
   if (isfilename) {

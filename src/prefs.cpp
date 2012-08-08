@@ -27,7 +27,7 @@
 #include "scidoc.h"
 #include "lang.h"
 #include "search.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "menuspec.h"
 
 
@@ -912,7 +912,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir)
   LIMIT_RANGE(Height,120,Height);
   ReadInt(Maximize,false);
   ReadIntRng(TabTitleMaxWidth,ScreenWidth/6,0,ScreenWidth);
-  LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),"");
+  LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWinPub::Connector()).text(),"");
   ReadInt(FontSize,120);
   ReadIntRng(FontAscent,2,0,16);
   ReadIntRng(FontDescent,0,0,16);
@@ -1056,7 +1056,7 @@ Settings::~Settings()
   WriteInt(Width);
   WriteInt(Height);
   WriteInt(Maximize);
-  reg->writeStringEntry("LastFocused",FXPath::title(TopWindow::Connector()).text(),LastFocused.text());
+  reg->writeStringEntry("LastFocused",FXPath::title(TopWinPub::Connector()).text(),LastFocused.text());
   WriteInt(FontSize);
   WriteInt(FontAscent);
   WriteInt(FontDescent);

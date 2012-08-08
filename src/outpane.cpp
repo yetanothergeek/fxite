@@ -22,7 +22,7 @@
 #include <FXScintilla.h>
 
 #include "scidoc.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 #include "compat.h"
 #include "prefs.h"
 
@@ -63,7 +63,7 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
       if ((code==KEY_Return)||(code==KEY_KP_Enter)) { break; } else {
         if (code==KEY_Tab) {
           killFocus();
-          tw->ControlDoc()->setFocus();
+          TopWinPub::ControlDoc()->setFocus();
           return 1;
         } else {
           if (ev->state&CONTROLMASK) {
@@ -77,7 +77,7 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
       }
     }
     case SEL_FOCUSIN: {
-      tw->ActiveWidget(this);
+      TopWinPub::ActiveWidget(this);
       return FXList::handle(o,sel,p);
     }
     default: { return FXList::handle(o,sel,p); }
@@ -105,16 +105,16 @@ void OutputList::GoToError()
             FXString filename = txt.mid(begs[1],ends[1]-begs[1]);
             FXString linenum =  txt.mid(begs[2],ends[2]-begs[2]);
             if (FXStat::isFile(filename)) {
-              tw->OpenFile(filename.text(), linenum.text(),false,true);
+              TopWinPub::OpenFile(filename.text(), linenum.text(),false,true);
               break;
             } else {
-              SciDoc*sci=tw->ControlDoc();
+              SciDoc*sci=TopWinPub::ControlDoc();
               if (sci && (!sci->Filename().empty()) && (!FXPath::isAbsolute(filename))) {
                 filename=FXPath::name(filename);
                 filename.prepend(PATHSEP);
                 filename.prepend(FXPath::directory(sci->Filename()));
                 if (FXStat::isFile(filename)) {
-                  tw->OpenFile(filename.text(), linenum.text(),false,true);
+                  TopWinPub::OpenFile(filename.text(), linenum.text(),false,true);
                   break;
                 }
               }
@@ -135,11 +135,11 @@ bool OutputList::Focus()
   isfocused=!isfocused;
   if (!isfocused) {
     killFocus();
-    tw->ControlDoc()->setFocus();
+    TopWinPub::ControlDoc()->setFocus();
     return false;
   } else {
-    if (!prefs->ShowOutputPane) { tw->ShowOutputPane(true); }
-    tw->FocusedDoc()->killFocus();
+    if (!prefs->ShowOutputPane) { TopWinPub::ShowOutputPane(true); }
+    TopWinPub::FocusedDoc()->killFocus();
     setFocus();
     if (getCurrentItem()<0) { setCurrentItem(0); }
     if (!isItemSelected(getCurrentItem())) {
@@ -179,7 +179,7 @@ long OutputList::onPopup(FXObject*o, FXSelector sel, void*p)
           outclip.append(newline);
         }
       }
-      tw->ControlDoc()->sendString(SCI_COPYTEXT,outclip.length(), outclip.text());
+      TopWinPub::ControlDoc()->sendString(SCI_COPYTEXT,outclip.length(), outclip.text());
     }
     default: { return 0; }
   }
@@ -228,7 +228,6 @@ void OutputList::SelectFirstError()
 OutputList::OutputList(FXComposite*p,FXObject*tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):
 FXList(new FXGroupBox(p,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0),tgt,sel,opts,x,y,w,h)
 {
-  tw=TopWindow::instance();
   prefs=Settings::instance();
   outpop=new FXMenuPane(this);
   new FXMenuCommand(outpop,_("Select &All"),NULL,this,ID_SELECT_ALL);

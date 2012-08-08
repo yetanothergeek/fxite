@@ -25,7 +25,6 @@ class OutputList: public FXList {
   FXDECLARE(OutputList)
   OutputList() {}
 protected:
-  TopWindow*tw;
   FXMenuPane *outpop;
   Settings* prefs;
 public:

@@ -772,7 +772,7 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 {
   if (!IsCommandReady()) { return false; }
   command_busy=true;
-  if (!macros) { macros = new MacroRunner(this); }
+  if (!macros) { macros = new MacroRunner(); }
   command_timeout=false;
   statusbar->Running(_("macro"));
   update();

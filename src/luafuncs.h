@@ -20,7 +20,7 @@
 struct luaL_reg;
 class TopWindow;
 
-const luaL_reg* LuaFuncs(TopWindow*topwin);
+const luaL_reg* LuaFuncs();
 void LuaFuncsCleanup();
 const char *LuaQuitMessage();
 

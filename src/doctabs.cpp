@@ -21,7 +21,7 @@
 #include <fx.h>
 
 #include "compat.h"
-#include "appwin.h"
+#include "appwin_pub.h"
 
 #include "intl.h"
 #include "doctabs.h"
@@ -84,7 +84,7 @@ long DocTabs::onDnd(FXObject* sender,FXSelector sel, void*p)
               uri.assign(p1,p2-p1);
               if (compare(uri, "file://",7)==0) {
                 uri.erase(0,7);
-                TopWindow::instance()->OpenFile(uri.text(),NULL,false,true);
+                TopWinPub::OpenFile(uri.text(),NULL,false,true);
               }
               p2+=2;
             }
@@ -109,7 +109,7 @@ long DocTabs::onPopupClick( FXObject* sender, FXSelector sel, void* p )
   DocTab*tab=(DocTab*)(((FXMenuCommand*)sender)->getParent()->getUserData());
   DocTab*curr=ActiveTab();
   if ( tab && ActivateTab(tab) ) {
-    ((TopWindow*)getShell())->CloseFile(false,true);
+    TopWinPub::CloseFile(false,true);
   }
   if (curr && (tab!=curr)) { ActivateTab(curr); }
   return 1;

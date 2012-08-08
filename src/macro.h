@@ -31,7 +31,7 @@ private:
   void PopKeepers(lua_State *L);
   bool RunMacro(const FXString &source, bool isfilename);
 public:
-  MacroRunner(TopWindow*topwin);
+  MacroRunner();
   ~MacroRunner();
   bool DoFile(const FXString &filename);
   bool DoString(const FXString &sourcecode);
