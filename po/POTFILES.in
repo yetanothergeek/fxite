@@ -6,10 +6,10 @@ jef/run_unx.cpp
 jef/run_w32.cpp
 jef/runcmd.cpp
 src/appmain.cpp
+src/appname.cpp
 src/appwin_ev.cpp
 src/appwin_fn.cpp
 src/appwin_mk.cpp
-src/appwin_mnu.cpp
 src/backup.cpp
 src/doctabs.cpp
 src/filedlg.cpp
@@ -22,8 +22,10 @@ src/luacmds.cpp
 src/luafuncs.cpp
 src/luafx.cpp
 src/macro.cpp
+src/mainmenu.cpp
 src/menuspec.cpp
 src/migration.cpp
+src/outpane.cpp
 src/prefdlg.cpp
 src/prefdlg_ext.cpp
 src/prefdlg_sntx.cpp
@@ -34,6 +36,7 @@ src/scidoc.cpp
 src/scisrch.cpp
 src/search.cpp
 src/shmenu.cpp
+src/statusbar.cpp
 src/tagread.cpp
 src/theme.cpp
 src/toolmgr.cpp
