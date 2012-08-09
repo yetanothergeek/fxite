@@ -20,12 +20,6 @@
 
 #include <fxkeys.h>
 #include <fx.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
-
-class WordList;
-class Accessor;
-
 
 #include "compat.h"
 #include "scidoc.h"

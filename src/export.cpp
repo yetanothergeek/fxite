@@ -28,9 +28,6 @@ OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 #include <fx.h>
-#include <Scintilla.h>
-#include <SciLexer.h>
-#include <FXScintilla.h>
 #include <FX88591Codec.h>
 
 #include "appname.h"

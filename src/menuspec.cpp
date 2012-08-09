@@ -22,9 +22,6 @@
 #include "appname.h"
 #include "appwin.h"
 #include "lang.h"
-
-#include <Scintilla.h>
-#include <FXScintilla.h>
 #include "scidoc.h"
 #include "shmenu.h"
 

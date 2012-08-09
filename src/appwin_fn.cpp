@@ -18,9 +18,7 @@
 
 
 #include <fx.h>
-#include <Scintilla.h>
 #include <SciLexer.h>
-#include <FXScintilla.h>
 
 #include "lang.h"
 #include "scidoc.h"

@@ -19,11 +19,8 @@
 
 #include <cctype>
 #include <fx.h>
-#include <Scintilla.h>
-#include <SciLexer.h>
-#include <FXScintilla.h>
-#include "scidoc.h"
 
+#include "scidoc.h"
 #include "compat.h"
 
 #include "intl.h"

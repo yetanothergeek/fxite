@@ -28,7 +28,6 @@
 #include "appwin_pub.h"
 #include "compat.h"
 #include "histbox.h"
-#include "scidoc.h"
 #include "lang.h"
 #include "prefs.h"
 #include "shady_tabs.h"
@@ -416,13 +415,13 @@ long LangGUI::onKeywordEdit(FXObject*o,FXSelector sel,void*p)
   SetPad(scframe, 0);
   FXScintilla*sc=new FXScintilla(scframe, NULL,0,TEXT_WORDWRAP|LAYOUT_FILL|HSCROLLER_NEVER);
   sc->sendMessage(SCI_SETHSCROLLBAR,false, 0);
-  sc->sendString(SCI_STYLESETFONT, STYLE_DEFAULT, scifont->getName().text());
+  sc->sendMessage(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<long>(scifont->getName().text()));
   sc->sendMessage(SCI_STYLESETSIZE, STYLE_DEFAULT, 10);
   sc->sendMessage(SCI_SETWRAPMODE,SC_WRAP_WORD,0);
   sc->sendMessage(SCI_SETMARGINWIDTHN,1,0);
   sc->sendMessage(SCI_SETMARGINLEFT,0,4);
   sc->sendMessage(SCI_SETMARGINRIGHT,0,4);
-  sc->sendString(SCI_APPENDTEXT,strlen(words),words);
+  sc->sendMessage(SCI_APPENDTEXT,strlen(words),reinterpret_cast<long>(words));
   FXHorizontalFrame *btns=new FXHorizontalFrame(vframe, PACK_UNIFORM|LAYOUT_FILL_X|LAYOUT_SIDE_BOTTOM);
   new FXButton(btns,_(" &OK "), NULL, &kwdlg, FXDialogBox::ID_ACCEPT);
   new FXButton(btns,_(" &Cancel "), NULL, &kwdlg, FXDialogBox::ID_CANCEL);
@@ -430,7 +429,7 @@ long LangGUI::onKeywordEdit(FXObject*o,FXSelector sel,void*p)
   if (kwdlg.execute(PLACEMENT_SCREEN)) {
     FXString newwords;
     newwords.length(sc->sendMessage(SCI_GETLENGTH,0,0)+1);
-    sc->sendString(SCI_GETTEXT,newwords.length(), newwords.text());
+    sc->sendMessage(SCI_GETTEXT,newwords.length(), reinterpret_cast<long>(newwords.text()));
     const char*whitechars="\t\r\n";
     const char *c;
     for (c=whitechars; *c; c++) {

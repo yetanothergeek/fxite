@@ -21,8 +21,6 @@
 #include <cerrno>
 #include <fx.h>
 #include <fxkeys.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
 
 #include "scidoc.h"
 #include "export.h"

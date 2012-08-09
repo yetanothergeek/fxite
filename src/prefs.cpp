@@ -20,8 +20,6 @@
 #include <cctype>
 #include <cerrno>
 #include <fx.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
 
 #include "compat.h"
 #include "scidoc.h"

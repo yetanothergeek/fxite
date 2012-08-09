@@ -23,9 +23,6 @@
 #include <fx.h>
 #include <fxkeys.h>
 #include <FXAccelTable.h>
-#include <Scintilla.h>
-#include <SciLexer.h>
-#include <FXScintilla.h>
 
 #include "compat.h"
 #include "scisrch.h"

@@ -16,6 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef SCIDOC_H
+#define SCIDOC_H
+
+#include <Scintilla.h>
+#include <FXScintilla.h>
 
 typedef struct _StyleDef StyleDef;
 typedef struct _LangStyle LangStyle;
@@ -199,4 +204,6 @@ public:
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))
+
+#endif
 

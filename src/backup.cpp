@@ -20,9 +20,6 @@
 #include <unistd.h>
 #include <cerrno>
 #include <fx.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
-
 
 #include "scidoc.h"
 #include "compat.h"

@@ -21,9 +21,6 @@
 #include <fx.h>
 #include <fxkeys.h>
 
-#include <Scintilla.h>
-#include <FXScintilla.h>
-
 #include "compat.h"
 #include "appname.h"
 #include "appmain.h"

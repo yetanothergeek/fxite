@@ -21,13 +21,9 @@
 #include <cerrno>
 #include <fxkeys.h>
 #include <fx.h>
-#include <Scintilla.h>
-#include <SciLexer.h>
-#include <FXScintilla.h>
 
 #include "lang.h"
 #include "prefs.h"
-
 #include "compat.h"
 #include "scisrch.h"
 

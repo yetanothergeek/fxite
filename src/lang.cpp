@@ -19,9 +19,7 @@
 
 
 #include <fx.h>
-#include <Scintilla.h>
 #include <SciLexer.h>
-#include <FXScintilla.h>
 
 #include "compat.h"
 #include "scidoc.h"

@@ -22,8 +22,6 @@
 
 #include <lua.hpp>
 #include <fx.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
 #include <FX88591Codec.h>
 #include <FXUTF16Codec.h>
 

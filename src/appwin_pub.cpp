@@ -17,10 +17,8 @@
 */
 
 #include <fx.h>
-#include "appwin.h"
 
-#include <Scintilla.h>
-#include <FXScintilla.h>
+#include "appwin.h"
 #include "scidoc.h"
 
 #include "appwin_pub.h"

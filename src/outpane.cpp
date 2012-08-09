@@ -18,8 +18,6 @@
 
 #include <fx.h>
 #include <fxkeys.h>
-#include <Scintilla.h>
-#include <FXScintilla.h>
 
 #include "scidoc.h"
 #include "appwin_pub.h"
