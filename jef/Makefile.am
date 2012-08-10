@@ -10,6 +10,7 @@ libjeffx_a_SOURCES=\
   histbox.cpp \
   ini_sort.c \
   interproc.cpp \
+  listdlls.c \
   run_unx.cpp \
   run_w32.cpp \
   runcmd.cpp \
@@ -24,6 +25,7 @@ noinst_HEADERS=\
   histbox.h \
   interproc.h \
   intl.h \
+  listdlls.h \
   runcmd.h \
   shady_tabs.h \
   sl.h

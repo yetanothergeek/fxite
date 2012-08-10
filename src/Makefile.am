@@ -18,7 +18,7 @@ fxite_SOURCES=\
   lang.cpp luacmds.cpp luafuncs.cpp macro.cpp prefdlg.cpp prefs.cpp readtags.c \
   recorder.cpp scidoc.cpp search.cpp shmenu.cpp doctabs.cpp tagread.cpp scisrch.cpp \
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
-  menuspec.cpp isutf8.c winshcut.c listdlls.c luafx.cpp \
+  menuspec.cpp isutf8.c winshcut.c luafx.cpp \
   migration.cpp filedlg.cpp theme.cpp prefdlg_ext.cpp \
   prefdlg_sntx.cpp prefdlg_tbar.cpp toolbar.cpp outpane.cpp statusbar.cpp \
   mainmenu.cpp appwin_pub.cpp
@@ -28,7 +28,7 @@ noinst_HEADERS=\
   appmain.h appwin.h export.h filer.h help.h helptext.h help_lua.h lang.h \
   luacmds.h luafuncs.h macro.h prefdlg.h prefs.h readtags.h recorder.h scidoc.h scisrch.h search.h \
   shmenu.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
-  fxasq_lua.h luasci.h menuspec.h listdlls.h luafx.h appname.h \
+  fxasq_lua.h luasci.h menuspec.h luafx.h appname.h \
   filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h toolbar.h outpane.h statusbar.h\
   mainmenu.h appwin_pub.h
 

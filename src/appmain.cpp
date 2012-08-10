@@ -194,7 +194,7 @@ long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,lon
         FXint i;
         for (i=0; i<nFiles; ++i) { ::DragQueryFile(hdrop, i, files[i], sizeof(files[i])); }
         ::DragFinish(hdrop);
-        for (i=0; i<nFiles; ++i) { mainwin->OpenFile(files[i], NULL, false, true); }
+        for (i=0; i<nFiles; ++i) { TopWinPub::OpenFile(files[i], NULL, false, true); }
         break;
       }
   }
