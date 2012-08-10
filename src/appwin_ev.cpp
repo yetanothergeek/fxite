@@ -17,29 +17,20 @@
 */
 
 
-#include <unistd.h>
-#include <cerrno>
-#include <cstdio>
 #include <fx.h>
-#include <fxkeys.h>
-#include <FXAccelTable.h>
 
 #include "compat.h"
-#include "scisrch.h"
 #include "scidoc.h"
 #include "doctabs.h"
 #include "search.h"
 #include "filer.h"
 #include "prefs.h"
-#include "histbox.h"
 #include "tagread.h"
-#include "shmenu.h"
 #include "recorder.h"
 #include "help.h"
 #include "backup.h"
 #include "menuspec.h"
 #include "appname.h"
-#include "toolbar.h"
 #include "outpane.h"
 #include "statusbar.h"
 #include "mainmenu.h"

@@ -30,7 +30,6 @@
 #include "filer.h"
 #include "backup.h"
 #include "menuspec.h"
-#include "shmenu.h"
 #include "search.h"
 #include "toolbar.h"
 #include "mainmenu.h"
