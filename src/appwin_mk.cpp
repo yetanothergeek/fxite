@@ -410,7 +410,7 @@ void TopWindow::AddFileToTagsMenu(const FXString &filename)
 
 bool TopWindow::RemoveFileFromTagsMenu(const FXString &filename)
 {
-  menubar->RemoveFileFromTagsList(filename);
+  return menubar->RemoveFileFromTagsList(filename);
 }
 
 
