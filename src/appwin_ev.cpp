@@ -407,7 +407,7 @@ long TopWindow::onFindTag(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowCallTip(FXObject*o, FXSelector sel, void*p )
 {
-  ShowCallTip(FocusedDoc(), menubar->TagsMenu());
+  TagHandler::ShowCallTip(FocusedDoc(), menubar->TagsMenu());
   return 1;
 }
 
@@ -415,15 +415,7 @@ long TopWindow::onShowCallTip(FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onAutoComplete(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc* sci=FocusedDoc();
-  FXString part=FXString::null;
-  completions.clear();
-  if (sci->PrefixAtPos(part)) {
-    for (FXWindow *w=TagFiles(); w; w=w->getNext()) {
-      ParseAutoCompleteFile(&completions,part[0],((FXMenuCommand*)w)->getText().text());
-    }
-    ShowAutoComplete(sci);
-  }
+  completions->Start(FocusedDoc(), TagFiles());
   return 1;
 }
 
@@ -587,7 +579,7 @@ long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
           break;
         }
         case SCN_CHARADDED: {
-          CharAdded(sci,line,pos,scn->ch);
+          if (!completions->Continue(sci))  { CharAdded(sci,line,pos,scn->ch); }
           break;
         }
         case SCN_DOUBLECLICK: {

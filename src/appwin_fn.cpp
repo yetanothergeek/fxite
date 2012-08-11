@@ -666,40 +666,6 @@ UserMenu**TopWindow::UserMenus() const
 
 
 
-void TopWindow::ShowAutoComplete(SciDoc*sci)
-{
-  FXString part=FXString::null;
-  if (completions.no()&&sci->PrefixAtPos(part)) {
-    FXint partlen=part.length();
-    FXint len=0; // save lots of reallocs by calculating overall length first
-    for (FXint i=completions.first(); i<=completions.last(); i=completions.next(i)) {
-      const char*ctag=completions.key(i);
-      int taglen=strlen(ctag);
-      if ((taglen>partlen)&&(strncmp(part.text(),ctag,partlen)==0)) {
-        completions.replace(ctag,(void*)((FXival)1)); // flag it for inclusion
-        len+=taglen+1; // count its length
-      }
-    }
-    if (len) {
-      FXString list=FXString::null;
-      list.length(len);
-      list.trunc(0);
-      for (FXint i=completions.first(); i<=completions.last(); i=completions.next(i)) {
-        if (completions.data(i)) {
-          const char*ctag=completions.key(i);
-          completions.replace(ctag,NULL); // reset our flag
-          list.append(ctag);
-          list.append(' ');
-        }
-      }
-      if (list.text()[list.length()-1]==' ') { list.trunc(list.length()-1); }
-      sci->sendString(SCI_AUTOCSHOW,part.length(),list.text());
-    }
-  }
-}
-
-
-
 void TopWindow::AdjustIndent(SciDoc*sci, char ch)
 {
   getApp()->runWhileEvents();
@@ -712,11 +678,6 @@ void TopWindow::AdjustIndent(SciDoc*sci, char ch)
 
 void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 {
-  if (sci->sendMessage(SCI_AUTOCACTIVE,0,0)) {
-    sci->sendMessage(SCI_AUTOCCANCEL,0,0);
-    ShowAutoComplete(sci);
-    return;
-  }
   if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
   if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
   switch (ch) {
@@ -1092,35 +1053,10 @@ void TopWindow::FindTag()
   FXString filename;
   FXString locn;
   FXString pattern;
-  if ( ::FindTag(FocusedDoc(), menubar->TagsMenu(), filename, locn, pattern) ) {
-    if (!filename.empty()) {
-       OpenFile(filename.text(), locn.empty()?NULL:locn.text(),false,true);
-       if (locn.empty() &&!pattern.empty()) {
-         SciDoc*sci=ControlDoc();
-         sci->sendMessage(SCI_SETTARGETSTART,0,0);
-         sci->sendMessage(SCI_SETTARGETEND,sci->sendMessage(SCI_GETTEXTLENGTH,0,0),0);
-         long oldflags=sci->sendMessage(SCI_GETSEARCHFLAGS,0,0);
-         sci->sendMessage(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX|SCFIND_MATCHCASE, 0);
-         pattern.erase(0,1);
-         pattern.trunc(pattern.length()-1);
-         const char *esc_chars="*()";
-         const char *c;
-         for (c=esc_chars; *c; c++) {
-           char esc[3]="\\ ";
-           char orig[2]=" ";
-           esc[1]=*c;
-           orig[0]=*c;
-           if ( (pattern.find(*c)>=0) && (pattern.find(esc)==-1)) {
-             pattern.substitute(orig,esc,true);
-           }
-         }
-         long found=sci->sendString(SCI_SEARCHINTARGET,pattern.length(),pattern.text());
-         if (found>=0) {
-           sci->GoToPos(found);
-         }
-         sci->sendMessage(SCI_SETSEARCHFLAGS,oldflags,0);
-       }
-    }
+  if ( !TagHandler::FindTag(FocusedDoc(), TagFiles(), filename, locn, pattern) ) { return; }
+  if ( filename.empty()) { return; }
+  if (OpenFile(filename.text(), locn.text(),false,true)) {
+    if (locn.empty()) { TagHandler::GoToTag(ControlDoc(),pattern); }
   }
 }
 

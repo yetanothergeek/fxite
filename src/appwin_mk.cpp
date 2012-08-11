@@ -40,6 +40,7 @@
 #include "outpane.h"
 #include "statusbar.h"
 #include "mainmenu.h"
+#include "tagread.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -109,6 +110,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   filedlgs->patterns(prefs->FileFilters);
 
   backups=new BackupMgr(this, ConfigDir());
+  completions=new AutoCompleter();
 
   macros=NULL;
   recorder=NULL;
@@ -161,7 +163,7 @@ TopWindow::~TopWindow()
   if (prefdlg) { delete prefdlg; }
   delete getIcon();
   delete getMiniIcon();
-  completions.clear();
+  delete completions;
   global_top_window_instance=NULL;
 }
 
@@ -192,10 +194,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
 #endif
     tabbook->ForEachTab(FileAlreadyOpenCB,&fn);
     if (fn.empty()) {
-      if (rowcol) {
-        sci=ControlDoc();
-        sci->GoToStringCoords(rowcol);
-      }
+      if (rowcol && *rowcol) { ControlDoc()->GoToStringCoords(rowcol); }
       if (hooked) { RunHookScript("opened"); }
       return true;
     }
@@ -267,7 +266,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   menubar->AppendDocList(sci->Filename(), tab);
   if (shown()) {
     sci->create();
-    if (rowcol) { sci->GoToStringCoords(rowcol); }
+    if (rowcol && *rowcol) { sci->GoToStringCoords(rowcol); }
   }
 
   //  If the only thing we had open prior to this file was a single,

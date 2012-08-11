@@ -17,7 +17,22 @@
 */
 
 
-bool FindTag(SciDoc*sci, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat);
-void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu);
-void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename);
+class TagHandler: public FXObject {
+public:
+  static bool FindTag(SciDoc*sci, FXMenuCaption*tagfiles, FXString &outfile, FXString &outcoords, FXString &outpat);
+  static void GoToTag(SciDoc*sci, FXString &pattern);
+  static void ShowCallTip(SciDoc*sci, FXMenuCaption*tagfiles);
+};
+
+
+
+class AutoCompleter:public FXDict {
+private:
+  void Show(SciDoc*sci);
+  void Parse(char startchar, const char*filename);
+public:
+  void Start(SciDoc*sci, FXMenuCaption*tagfiles);
+  bool Continue(SciDoc*sci);
+  ~AutoCompleter();
+};
 

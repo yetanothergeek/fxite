@@ -36,7 +36,7 @@ class ToolBarFrame;
 class OutputList;
 class StatusBar;
 class MainMenu;
-
+class AutoCompleter;
 
 
 class TopWindow: public MainWinWithClipBrd {
@@ -102,7 +102,7 @@ private:
   DocTab* bookmarked_tab;
   long bookmarked_pos;
   bool skipfocus;
-  FXDict completions;
+  AutoCompleter* completions;
 
   void CreateMenus();
   void UpdateToolbar();
@@ -123,7 +123,6 @@ private:
   void EnableUserFilters(bool enabled);
   void CharAdded(SciDoc*sci, long line, long pos, int ch);
   void OpenSelected();
-  void ShowAutoComplete(SciDoc*sci);
   bool SetLanguage(FXMenuRadio *mnu);
   void InvertColors(bool inverted);
   void CycleSplitter();

@@ -243,17 +243,17 @@ static FXListItem *NewListItem(tagEntry *te)
 
 
 static bool FindTag(FXWindow*shell,
-  const FXString &tagname, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat)
+  const FXString &tagname, FXMenuCaption*tagfiles, FXString &outfile, FXString &outcoords, FXString &outpat)
 {
   outfile="";
   outcoords="";
   outpat="";
-  if (unloadtagsmenu->getMenu()->numChildren() && !tagname.empty()) {
+  if (tagfiles && !tagname.empty()) {
     FXWindow*w;
     MytagEntry*mt=NULL;
     TagDialog dlg(shell,tagname);
     tagEntry te;
-    for (w=unloadtagsmenu->getMenu()->getFirst(); w; w=w->getNext()) {
+    for (w=tagfiles; w; w=w->getNext()) {
       const char* filename=((FXMenuCommand*)w)->getText().text();
       if (IsCallTipFile(filename)) { continue; }
       tagFileInfo ti;
@@ -300,12 +300,39 @@ static bool FindTag(FXWindow*shell,
 
 
 
-bool FindTag(SciDoc*sci, FXMenuCascade* unloadtagsmenu, FXString &outfile, FXString &outcoords, FXString &outpat)
+bool TagHandler::FindTag(SciDoc*sci, FXMenuCaption* tagfiles, FXString &outfile, FXString &outcoords, FXString &outpat)
 {
   FXString s;
   sci->GetSelText(s);
   if (s.empty()) { sci->WordAtPos(s); }
-  return FindTag(sci->getShell(),s,unloadtagsmenu,outfile,outcoords,outpat);
+  return ::FindTag(sci->getShell(),s,tagfiles,outfile,outcoords,outpat);
+}
+
+
+
+void TagHandler::GoToTag(SciDoc*sci, FXString &pattern)
+{
+  if (pattern.empty()) { return; }
+  sci->sendMessage(SCI_SETTARGETSTART,0,0);
+  sci->sendMessage(SCI_SETTARGETEND,sci->sendMessage(SCI_GETTEXTLENGTH,0,0),0);
+  long oldflags=sci->sendMessage(SCI_GETSEARCHFLAGS,0,0);
+  sci->sendMessage(SCI_SETSEARCHFLAGS, SCFIND_REGEXP|SCFIND_POSIX|SCFIND_MATCHCASE, 0);
+  pattern.erase(0,1);
+  pattern.trunc(pattern.length()-1);
+  const char *esc_chars="*()";
+  const char *c;
+  for (c=esc_chars; *c; c++) {
+    char esc[3]="\\ ";
+    char orig[2]=" ";
+    esc[1]=*c;
+    orig[0]=*c;
+    if ( (pattern.find(*c)>=0) && (pattern.find(esc)==-1)) {
+      pattern.substitute(orig,esc,true);
+    }
+  }
+  long found=sci->sendString(SCI_SEARCHINTARGET,pattern.length(),pattern.text());
+  if (found>=0) { sci->GoToPos(found); }
+  sci->sendMessage(SCI_SETSEARCHFLAGS,oldflags,0);
 }
 
 
@@ -370,7 +397,7 @@ static bool IsTagFile(const char*filename,const FXString &tagname, FXString &cal
 
 
 
-void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu)
+void TagHandler::ShowCallTip(SciDoc*sci, FXMenuCaption* tagfiles)
 {
   FXString tagname;
   FXString calltip="";
@@ -388,7 +415,7 @@ void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu)
   if (!tagname.empty()) {
     FXWindow*w;
     tagEntry te;
-    for (w=unloadtagsmenu->getMenu()->getFirst(); w; w=w->getNext()) {
+    for (w=tagfiles; w; w=w->getNext()) {
       const char*filename=((FXMenuCommand*)w)->getText().text();
       if (IsTagFile(filename,tagname,calltip)) {
         tagFileInfo ti;
@@ -448,7 +475,7 @@ void ShowCallTip(SciDoc*sci, FXMenuCascade* unloadtagsmenu)
 
 
 
-void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
+void AutoCompleter::Parse(char startchar, const char*filename)
 {
   FXFile file(filename,FXIO::Reading);
   if (file.isOpen()) {
@@ -464,7 +491,7 @@ void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
             char*p2=strchr(p1,'\t');
             if (p2&&p3&&(p3>p2)) {
               *p2='\0';
-              dict->insert(p1,NULL);
+              insert(p1,NULL);
             } else { break; }
           }
           if (*p3) { p1=p3+1; } else { break; }
@@ -485,7 +512,7 @@ void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
             if (!p2) { p2=p3; }
             if (*p1==startchar) {
               *p2='\0';
-              dict->insert(p1,NULL);
+              insert(p1,NULL);
             }
             if (p2<p3) { p1=p2+1; } else { break; }
           } while (1);
@@ -493,7 +520,72 @@ void ParseAutoCompleteFile(FXDict*dict, char startchar, const char*filename)
       }
     }
     file.close();
-    free(lines);
+    ::free(lines);
   }
 }
 
+
+
+void AutoCompleter::Show(SciDoc*sci)
+{
+  FXString part=FXString::null;
+  if (no()&&sci->PrefixAtPos(part)) {
+    FXint partlen=part.length();
+    FXint len=0; // save lots of reallocs by calculating overall length first
+    for (FXint i=first(); i<=last(); i=next(i)) {
+      const char*ctag=key(i);
+      int taglen=strlen(ctag);
+      if ((taglen>partlen)&&(strncmp(part.text(),ctag,partlen)==0)) {
+        replace(ctag,(void*)((FXival)1)); // flag it for inclusion
+        len+=taglen+1; // count its length
+      }
+    }
+    if (len) {
+      FXString list=FXString::null;
+      list.length(len);
+      list.trunc(0);
+      for (FXint i=first(); i<=last(); i=next(i)) {
+        if (data(i)) {
+          const char*ctag=key(i);
+          replace(ctag,NULL); // reset our flag
+          list.append(ctag);
+          list.append(' ');
+        }
+      }
+      if (list.text()[list.length()-1]==' ') { list.trunc(list.length()-1); }
+      sci->sendString(SCI_AUTOCSHOW,part.length(),list.text());
+    }
+  }
+}
+
+
+
+void AutoCompleter::Start(SciDoc*sci, FXMenuCaption*tagfiles)
+{
+  FXString part=FXString::null;
+  clear();
+  if (sci->PrefixAtPos(part)) {
+    for (FXWindow *w=tagfiles; w; w=w->getNext()) {
+      Parse(part[0],((FXMenuCommand*)w)->getText().text());
+    }
+    Show(sci);
+  }
+}
+
+
+
+bool AutoCompleter::Continue(SciDoc*sci)
+{
+  if (sci->sendMessage(SCI_AUTOCACTIVE,0,0)) {
+    sci->sendMessage(SCI_AUTOCCANCEL,0,0);
+    Show(sci);
+    return true;
+  } else { return false; }
+}
+
+
+
+AutoCompleter::~AutoCompleter()
+{
+  clear();
+}
