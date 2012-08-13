@@ -39,6 +39,8 @@ FXbool LocaleIsUTF8();
 
 
 #ifdef WIN32
+# define SetupXAtoms(win,class_name,app_name)
+# define IsDesktopCurrent(tw) (true)
 # define NULL_FILE "NUL"
   bool IsWin9x();
   const char* SystemErrorStr();
@@ -49,6 +51,8 @@ FXbool LocaleIsUTF8();
 # define NULL_FILE "/dev/null"
 # define IsDir(dn) (FXStat::isDirectory(dn))
 # define SystemErrorStr() (strerror(errno))
+void SetupXAtoms(FXTopWindow*win, const char*class_name, const char* app_name);
+bool IsDesktopCurrent(FXMainWindow*tw);
 #endif
 
 
@@ -64,4 +68,7 @@ FXbool LocaleIsUTF8();
 #  error *** Building FXiTe for Windows requires at least FOX-1.7.24 ***
 # endif
 #endif
+
+
+FXID GetNetActiveWindow();
 

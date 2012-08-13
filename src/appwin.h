@@ -44,28 +44,12 @@ private:
   FXDECLARE(TopWindow)
   TopWindow(){}
   static void TranslatorCB(const char*text, void*user_data);
-  static bool ZoomStepCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool ZoomSpecCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool LineNumsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool WhiteSpaceCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool ShowCaretLineCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static void SetSciDocPrefs(SciDoc*sci, Settings*prefs);
-  static bool FileStillOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
-  static bool StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   bool IsDocValid(SciDoc*sci);
   void SetTabTag(SciDoc*sci, char mark, bool set);
   void Freeze(FXWindow*win, bool frozen);
   void ClosedDialog();
   static const char* DontFreezeMe();
   bool IsCommandReady();
-  void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
   void UpdateEolMenu(SciDoc*sci);
 
   SciDoc*recording;
@@ -125,7 +109,6 @@ private:
   void OpenSelected();
   bool SetLanguage(FXMenuRadio *mnu);
   void InvertColors(bool inverted);
-  void CycleSplitter();
   void RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b);
   void FindTag();
   void SetFileFormat(FXSelector sel);
@@ -394,7 +377,6 @@ public:
   void ClearOutput();
   UserMenu**UserMenus() const;
   bool FindText(const char*searchstring, FXuint searchmode, bool forward);
-  FXID GetActiveWindow();
   void AdjustIndent(SciDoc*sci,char ch);
   static TopWindow* instance();
   static const FXString& ConfigDir();
@@ -402,6 +384,7 @@ public:
   FXMenuCaption*TagFiles();
   void RemoveTBarBtnData(void*p);
   void ActiveWidget(FXWindow*aw) { active_widget=aw; }
+  bool FoundBookmarkedTab(DocTab*tab);
 };
 
 #endif

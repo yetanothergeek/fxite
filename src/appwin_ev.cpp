@@ -34,6 +34,8 @@
 #include "outpane.h"
 #include "statusbar.h"
 #include "mainmenu.h"
+#include "scidoc_util.h"
+#include "foreachtab.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -253,7 +255,7 @@ long TopWindow::onFileExport(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCycleSplitter(FXObject*o, FXSelector sel, void*p)
 {
-  CycleSplitter();
+  SciDocUtils::CycleSplitter(ControlDoc(), prefs);
   return 1;
 }
 
@@ -494,7 +496,7 @@ long TopWindow::onTimer(FXObject*o, FXSelector sel, void*p)
       SaveTicks++;
     } else {
       SaveTicks=0;
-      tabbook->ForEachTab(AutoSaveCB,backups);
+      tabbook->ForEachTab(TabCallbacks::AutoSaveCB,backups);
     }
   }
   if (prefs->Autosave||prefs->WatchExternChanges) { getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL); }
@@ -630,7 +632,7 @@ long TopWindow::onPackTabWidth(FXObject*o,FXSelector sel,void*p)
 {
   prefs->DocTabsPacked=(FXSELID(sel) == ID_TABS_COMPACT);
   tabbook->setTabsCompact(prefs->DocTabsPacked);
-  RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_COMPACT);
+  MenuMgr::RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_COMPACT);
   return 1;
 }
 
@@ -744,32 +746,10 @@ long TopWindow::onFileNew(FXObject*o, FXSelector sel, void*p )
 }
 
 
-class WkDirDlg: public FXDirDialog {
-private:
-  class DirSel: public FXDirSelector {
-    public:
-    FXDirList* list()  { return dirbox; }
-  };
-public:
-  WkDirDlg(FXWindow* win,const FXString& name):FXDirDialog(win,name) {}
-  void setDirectory(const FXString& path) {
-    FXDirDialog::setDirectory((FXPath::simplify(path)));
-    if (FXPath::isTopDirectory(getDirectory())) {
-      FXDirList*list=((DirSel*)dirbox)->list();
-      list->expandTree(list->getFirstItem());
-    }
-  }
-};
-
 
 long TopWindow::onSelectDir(FXObject*o, FXSelector sel, void*p)
 {
-  WkDirDlg dlg(this, _("Set Working Directory"));
-  dlg.setHeight(420);
-  dlg.setDirectory(FXSystem::getCurrentDirectory()+PATHSEP);
-  if (dlg.execute(PLACEMENT_OWNER)) {
-    FXSystem::setCurrentDirectory(dlg.getDirectory());
-  }
+  filedlgs->SetWorkingDirectory(this);
   return 1;
 }
 
@@ -948,7 +928,6 @@ long TopWindow::onFindSelected(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
 {
   FXival z;
-  SciDoc*sci=FocusedDoc();
   if (sel) {
     switch (FXSELID(sel)) {
       case ID_ZOOM_IN:{
@@ -972,12 +951,12 @@ long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
         break;
       }
     }
-    tabbook->ForEachTab(ZoomStepCB, &z);
+    tabbook->ForEachTab(TabCallbacks::ZoomStepCB, &z);
   } else {
     z=(FXival)p;
-   tabbook->ForEachTab(ZoomSpecCB, &z);
+   tabbook->ForEachTab(TabCallbacks::ZoomSpecCB, &z);
   }
-  if (sci) { prefs->ZoomFactor=sci->GetZoom(); }
+  prefs->ZoomFactor=FocusedDoc()->GetZoom();
   return 1;
 }
 
@@ -1057,12 +1036,9 @@ long TopWindow::onPrefsDialog(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCtrlTab(FXObject*o, FXSelector sel, void*p)
 {
-  if (!prefs->UseTabs) {
-    SciDoc*sci=FocusedDoc();
-    if (sci) {
-      sci->sendString(SCI_REPLACESEL,0,"\t");
-      return 1;
-    }
+  if (!FocusedDoc()->UseTabs()) {
+    FocusedDoc()->sendString(SCI_REPLACESEL,0,"\t");
+    return 1;
   }
   return 0;
 }

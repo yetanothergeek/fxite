@@ -68,5 +68,6 @@ public:
   static void WritePopupMenu(FXRegistry*reg, const char* popup_sect);
   static char**GetPopupCommands();
   static void FreePopupCommands();
+  static void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
 };
 

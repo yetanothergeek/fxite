@@ -41,6 +41,8 @@
 #include "statusbar.h"
 #include "mainmenu.h"
 #include "tagread.h"
+#include "scidoc_util.h"
+#include "foreachtab.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -192,7 +194,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
 #ifdef WIN32
      FileDialogs::ReadShortcut(this,fn);
 #endif
-    tabbook->ForEachTab(FileAlreadyOpenCB,&fn);
+    tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,&fn);
     if (fn.empty()) {
       if (rowcol && *rowcol) { ControlDoc()->GoToStringCoords(rowcol); }
       if (hooked) { RunHookScript("opened"); }
@@ -236,7 +238,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   sci->SetShowEdge(prefs->ShowRightEdge);
   sci->SetWordWrap(prefs->WordWrap);
   sci->SetZoom(prefs->ZoomFactor);
-  SetSciDocPrefs(sci,prefs);
+  SciDocUtils::SetSciDocPrefs(sci,prefs);
 
   sci->DoStaleTest(true);
 
@@ -434,7 +436,7 @@ bool TopWindow::SetLanguage(const FXString &name)
 void TopWindow::ShowLineNumbers(bool showit)
 {
   prefs->ShowLineNumbers=showit;
-  tabbook->ForEachTab(LineNumsCB, (void*)(FXival)showit);
+  tabbook->ForEachTab(TabCallbacks::LineNumsCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_LINENUMS,showit);
 }
 
@@ -489,7 +491,7 @@ bool TopWindow::ShowOutputPane()
 void TopWindow::ShowWhiteSpace(bool showit)
 {
   prefs->ShowWhiteSpace=showit;
-  tabbook->ForEachTab(WhiteSpaceCB, (void*)(FXival)showit);
+  tabbook->ForEachTab(TabCallbacks::WhiteSpaceCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_WHITESPACE,prefs->ShowWhiteSpace);
 }
 
@@ -521,7 +523,7 @@ bool TopWindow::ShowToolbar()
 void TopWindow::ShowMargin(bool showit)
 {
   prefs->ShowRightEdge = showit;
-  tabbook->ForEachTab(ShowMarginCB, (void*)(FXival)showit);
+  tabbook->ForEachTab(TabCallbacks::ShowMarginCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_MARGIN, showit);
 }
 
@@ -537,7 +539,7 @@ bool TopWindow::ShowMargin()
 void TopWindow::ShowIndent(bool showit)
 {
   prefs->ShowIndentGuides = showit;
-  tabbook->ForEachTab(ShowIndentCB, (void*)(FXival)showit);
+  tabbook->ForEachTab(TabCallbacks::ShowIndentCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_INDENT,showit);
 }
 
@@ -553,7 +555,7 @@ bool TopWindow::ShowIndent()
 void TopWindow::ShowCaretLine(bool showit)
 {
   prefs->ShowCaretLine = showit;
-  tabbook->ForEachTab(ShowCaretLineCB, (void*)prefs);
+  tabbook->ForEachTab(TabCallbacks::ShowCaretLineCB, (void*)prefs);
   menubar->SetCheck(ID_SHOW_CARET_LINE,showit);
 }
 
@@ -571,15 +573,15 @@ void TopWindow::UpdateEolMenu(SciDoc*sci)
 {
   switch (sci->sendMessage(SCI_GETEOLMODE,0,0)) {
     case SC_EOL_CRLF: {
-      RadioUpdate(ID_FMT_DOS,ID_FMT_DOS,ID_FMT_UNIX);
+      MenuMgr::RadioUpdate(ID_FMT_DOS,ID_FMT_DOS,ID_FMT_UNIX);
       break;
     }
     case SC_EOL_CR: {
-      RadioUpdate(ID_FMT_MAC,ID_FMT_DOS,ID_FMT_UNIX);
+      MenuMgr::RadioUpdate(ID_FMT_MAC,ID_FMT_DOS,ID_FMT_UNIX);
       break;
     }
     case SC_EOL_LF: {
-      RadioUpdate(ID_FMT_UNIX,ID_FMT_DOS,ID_FMT_UNIX);
+      MenuMgr::RadioUpdate(ID_FMT_UNIX,ID_FMT_DOS,ID_FMT_UNIX);
       break;
     }
   }
@@ -710,7 +712,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
       }
     }
   }
-  if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
+  if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
   need_status=1;
   command_busy=false;
   return success;
@@ -773,10 +775,10 @@ bool TopWindow::RunMacro(const FXString &script, bool isfilename)
   getApp()->runWhileEvents();
   bool rv=isfilename?macros->DoFile(script):macros->DoString(script);
   if (!destroying) {
-    tabbook->ForEachTab(ResetUndoLevelCB,NULL);
+    tabbook->ForEachTab(TabCallbacks::ResetUndoLevelCB,NULL);
     DisableUI(false);
     statusbar->Normal();
-    if (FocusedDoc() && (GetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
+    if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
   command_busy=false;
@@ -933,7 +935,7 @@ void TopWindow::ParseCommands(FXString &commands)
                 ParseCommands(session_data);
                 if (!prefs->LastFocused.empty()) {
                   if (FXStat::isFile(prefs->LastFocused)) {
-                    tabbook->ForEachTab(FileAlreadyOpenCB,&prefs->LastFocused);
+                    tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,&prefs->LastFocused);
                   }
                 }
               }
@@ -992,110 +994,6 @@ void TopWindow::ParseCommands(FXString &commands)
 }
 
 
-
-#ifndef WIN32
-#define NET_WM_ICON
-#endif
-
-#ifdef NET_WM_ICON
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/Xproto.h>
-#include <X11/Xatom.h>
-
-#ifdef FOX_1_6
-#include <unistd.h>
-static FXString GetHostName()
-{
-  FXchar name[1024];
-  if(gethostname(name,sizeof(name))==0){
-    return FXString(name);
-  }
-  return "localhost";
-}
-#else
-#define GetHostName() FXSystem::getHostName()
-#endif
-
-void SetupXAtoms(FXTopWindow*win, const char*class_name)
-{
-  FXIcon*ico=win->getIcon();
-  Display*d=(Display*)(win->getApp()->getDisplay());
-  Atom net_wm_icon = XInternAtom(d, "_NET_WM_ICON", 0);
-  Atom cardinal = XInternAtom(d, "CARDINAL", False);
-  if (net_wm_icon&&cardinal) {
-    FXint w=ico->getWidth();
-    FXint h=ico->getHeight();
-    unsigned long *icon_buf=NULL;
-    FXint icon_buf_size=(w*h)+2;
-    icon_buf=(unsigned long*)malloc(icon_buf_size*sizeof(unsigned long));
-    FXint j=0;
-    icon_buf[j++]=w;
-    icon_buf[j++]=h;
-    FXint x,y;
-    for (y=0; y<h; y++) {
-      for (x=0; x<w; x++) {
-        FXColor px=ico->getPixel(x,y);
-#if defined(FOX_1_7) && ((FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>25))
-        icon_buf[j++]=px?px:FXRGBA(255,255,255,0);
-#else
-        icon_buf[j++]=px?FXRGB(FXBLUEVAL(px),FXGREENVAL(px),FXREDVAL(px)):FXRGBA(255,255,255,0);
-#endif
-      }
-    }
-    XChangeProperty(d, win->id(), net_wm_icon, cardinal, 32,
-      PropModeReplace, (const FXuchar*) icon_buf, icon_buf_size);
-    free(icon_buf);
-  }
-
-  Atom net_wm_pid = XInternAtom(d, "_NET_WM_PID", 0);
-  pid_t pid=fxgetpid();
-  XChangeProperty(d, win->id(), net_wm_pid, cardinal, 32,
-    PropModeReplace, (const FXuchar*) &pid, sizeof(pid));
-  FXString hn=GetHostName();
-  if (!hn.empty()) {
-    Atom wm_client_machine = XInternAtom(d, "WM_CLIENT_MACHINE", 0);
-    XChangeProperty(d, win->id(), wm_client_machine, XA_STRING, 8,
-      PropModeReplace, (const FXuchar*) hn.text(), hn.length());
-  }
-  FXString cn=class_name;
-  cn.append(".");
-  cn.append(APP_NAME);
-  Atom wm_class = XInternAtom(d, "WM_CLASS", 0);
-  XChangeProperty(d, win->id(), wm_class, XA_STRING, 8,
-    PropModeReplace, (const FXuchar*) cn.text(), cn.length());
-}
-
-
-
-FXID TopWindow::GetActiveWindow()
-{
-  FXID rv=0;
-  Display*dpy=(Display*)getApp()->getDisplay();
-  Window root=getApp()->getRootWindow()->id();
-  static Atom xa=XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-  Atom rtype;
-  int fmt;
-  unsigned long n;
-  unsigned long rem;
-  FXuchar *xw;
-  if (XGetWindowProperty(dpy,root,xa,0,sizeof(Window),False,XA_WINDOW,&rtype,&fmt,&n,&rem,&xw)==Success) {
-    rv=*((Window*)xw);
-    XFree(xw);
-  }
-  return rv;
-}
-
-#else
-#include <windows.h>
-#define SetupXAtoms(win,class_name)
-FXID TopWindow::GetActiveWindow()
-{
-  return GetForegroundWindow();
-}
-#endif
-
-
 const
 #include "fxite.xpm"
 
@@ -1132,7 +1030,7 @@ void TopWindow::create()
   if (!ico) { ico=new FXXPMIcon(a,icon32x32_xpm,0,IMAGE_KEEP); }
   ico->create();
   setIcon(ico);
-  SetupXAtoms(this, a->ServerName().text());
+  SetupXAtoms(this, a->ServerName().text(), APP_NAME);
   if (prefs->Maximize) { maximize(); }
   FXFont fnt(a, prefs->FontName, prefs->FontSize/10);
   GetFontDescription(prefs->fontdesc,&fnt);

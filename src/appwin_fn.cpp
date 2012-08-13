@@ -36,6 +36,8 @@
 #include "tagread.h"
 #include "toolmgr.h"
 #include "compat.h"
+#include "scidoc_util.h"
+#include "foreachtab.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -49,47 +51,25 @@ void TopWindow::ClosedDialog()
   FocusedDoc()->setFocus();
 }
 
+
+
 void TopWindow::Cut()
 {
-  SciDoc*sci=FocusedDoc();
-  sci->setFocus();
-  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_CUT,0,0); }
+  SciDocUtils::Cut(FocusedDoc());
 }
 
 
 
 void TopWindow::Copy()
 {
-  SciDoc*sci=FocusedDoc();
-  sci->setFocus();
-  // If any text is already selected, make sure the selection is "alive"
-  long start=sci->sendMessage(SCI_GETSELECTIONSTART,0,0);
-  long end=sci->sendMessage(SCI_GETSELECTIONEND,0,0);
-  if (start!=end) {
-    sci->sendMessage(SCI_SETSELECTIONSTART,start,0);
-    sci->sendMessage(SCI_SETSELECTIONEND,end,0);
-  }
-  if (sci->GetSelLength()>0) { sci->sendMessage(SCI_COPY,0,0); }
+  SciDocUtils::Copy(FocusedDoc());
 }
 
 
 
 void TopWindow::Paste()
 {
-  SciDoc*sci=FocusedDoc();
-  sci->setFocus();
-  if (sci->sendMessage(SCI_CANPASTE,0,0)) {
-    // If any text is already selected, make sure the selection is "alive"
-    long start=sci->sendMessage(SCI_GETSELECTIONSTART,0,0);
-    long end=sci->sendMessage(SCI_GETSELECTIONEND,0,0);
-    if (start!=end) {
-      sci->sendMessage(SCI_SETSELECTIONSTART,start,0);
-      sci->sendMessage(SCI_SETSELECTIONEND,end,0);
-    }
-    sci->sendMessage(SCI_PASTE,0,0);
-    sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
-    sci->ScrollWrappedInsert();
-  }
+  SciDocUtils::Paste(FocusedDoc());
 }
 
 
@@ -129,28 +109,6 @@ void TopWindow::TranslatorCB(const char*text, void*user_data)
 }
 
 
-// Update a set of radio buttons
-void TopWindow::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
-{
-  for (FXSelector i=min; i<=max; i++) {
-    MenuSpec*spec=MenuMgr::LookupMenu(i);
-    if (spec && spec->ms_mc) {
-      ((FXMenuRadio*)(spec->ms_mc))->setCheck(curr==i);
-      FXButton*btn=(FXButton*)spec->ms_mc->getUserData();
-      if (btn) {
-        if (curr==i) {
-          btn->setFrameStyle(btn->getFrameStyle()|FRAME_THICK|FRAME_RAISED);
-          btn->setState(btn->getState()|STATE_ENGAGED);
-        } else {
-          btn->setFrameStyle(FRAME_NONE);
-          btn->setState(btn->getState()&~STATE_ENGAGED);
-        }
-      }
-    }
-  }
-}
-
-
 
 void TopWindow::EnableUserFilters(bool enabled)
 {
@@ -171,16 +129,15 @@ void TopWindow::UpdateToolbar()
 {
   toolbar_frm->CreateButtons(this);
   switch (prefs->DocTabPosition) {
-    case 'T': RadioUpdate(ID_TABS_TOP,    ID_TABS_TOP, ID_TABS_RIGHT); break;
-    case 'B': RadioUpdate(ID_TABS_BOTTOM, ID_TABS_TOP, ID_TABS_RIGHT); break;
-    case 'L': RadioUpdate(ID_TABS_LEFT,   ID_TABS_TOP, ID_TABS_RIGHT); break;
-    case 'R': RadioUpdate(ID_TABS_RIGHT,  ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'T': MenuMgr::RadioUpdate(ID_TABS_TOP,    ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'B': MenuMgr::RadioUpdate(ID_TABS_BOTTOM, ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'L': MenuMgr::RadioUpdate(ID_TABS_LEFT,   ID_TABS_TOP, ID_TABS_RIGHT); break;
+    case 'R': MenuMgr::RadioUpdate(ID_TABS_RIGHT,  ID_TABS_TOP, ID_TABS_RIGHT); break;
   }
-  RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
+  MenuMgr::RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
   menubar->Recording(recording,recorder);
   toolbar_frm->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
 }
-
 
 
 
@@ -197,145 +154,6 @@ bool TopWindow::ShowSaveAsDlg(SciDoc*sci)
 
 
 
-// Check each document to see if any of them should be auto-saved.
-bool TopWindow::AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  if (sci->NeedBackup()) {
-    ((BackupMgr*)user_data)->SaveBackup(sci);
-  }
-  return true;
-}
-
-
-
-/* Zoom each document In/Out/Close/Far/Default */
-bool TopWindow::ZoomStepCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->ZoomStep(*((int*)user_data));
-  return true;
-}
-
-
-
-/* Zoom each document to a specified amount (Used by Lua) */
-bool TopWindow::ZoomSpecCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->SetZoom(*((int*)user_data));
-  return true;
-}
-
-
-
-bool TopWindow::LineNumsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->ShowLineNumbers((bool)user_data);
-  return true;
-}
-
-
-
-bool TopWindow::WhiteSpaceCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  sci->ShowWhiteSpace((bool)user_data);
-  return true;
-}
-
-
-
-bool TopWindow::ShowMarginCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
-    sci->SetShowEdge((bool)user_data);
-  }
-  return true;
-}
-
-
-
-bool TopWindow::ShowIndentCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
-    sci->SetShowIndent((bool)user_data);
-  }
-  return true;
-}
-
-
-
-bool TopWindow::ShowCaretLineCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  Settings*p=(Settings*)user_data;
-  for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
-    sci->CaretLineBG(p->ShowCaretLine?p->caretlineStyle()->bg:NULL);
-  }
-  return true;
-}
-
-
-
-/* Mark all open documents as needing their settings updated. */
-bool TopWindow::PrefsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  ((SciDoc*)page->getFirst())->NeedStyled(true);
-  return true;
-}
-
-
-
-void TopWindow::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
-{
-  sci->setFont(prefs->fontdesc.face, prefs->fontdesc.size / 10);
-  sci->sendMessage(SCI_SETEXTRAASCENT,prefs->FontAscent,0);
-  sci->sendMessage(SCI_SETEXTRADESCENT,prefs->FontDescent,0);
-  sci->CaretLineBG(prefs->ShowCaretLine?prefs->caretlineStyle()->bg:NULL);
-  sci->RightMarginBG(prefs->rightmarginStyle()->bg);
-  sci->CaretWidth(prefs->CaretWidth);
-  sci->SmartHome(prefs->SmartHome);
-  sci->SetWrapAware(prefs->WrapAwareHomeEnd);
-  sci->SmoothScroll(prefs->SmoothScroll);
-  sci->TabWidth(prefs->TabWidth);
-  sci->UseTabs(prefs->UseTabs);
-  sci->WhiteSpaceBG(prefs->whitespaceStyle()->bg);
-  sci->WhiteSpaceFG(prefs->whitespaceStyle()->fg);
-  sci->SetEdgeColumn(prefs->RightEdgeColumn);
-  sci->SetShowIndent(prefs->ShowIndentGuides);
-
-  sci->CaretFG(prefs->caretStyle()->bg);
-  sci->SelectionBG(prefs->selectionStyle()->bg);
-  if (prefs->ShowWhiteSpace) { sci->ShowWhiteSpace(true); }
-  if (prefs->ShowLineNumbers) { sci->ShowLineNumbers(true); }
-
-  sci->sendMessage(SCI_SETVIRTUALSPACEOPTIONS,
-    (SCVS_RECTANGULARSELECTION|(prefs->CaretPastEOL?SCVS_USERACCESSIBLE:0)), 0);
-
-}
-
-
-
-/*
-  For each tab callback to add a chore to update the settings of the first
-  document it finds that needs updating -
-  CheckStyle() invokes this callback, and in turn, this callback adds a chore
-  that invokes CheckStyle(). This exchange continues until all documents have
-  had their settings updated.
-*/
-bool TopWindow::StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  if (sci->NeedStyled()) {
-    TopWindow*tw=(TopWindow*)user_data;
-    tw->getApp()->addChore(tw, ID_CHECK_STYLE, sci);
-    return false;
-  }
-  return true;
-}
-
-
 /*
   This chore updates a document's settings, and adds a chore to do the same
   for the next document that needs updating. (See StyleNextDocCB() for more.)
@@ -344,32 +162,12 @@ long TopWindow::CheckStyle(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=(SciDoc*)p;
   if (sci && sci->NeedStyled()) {
-    SetSciDocPrefs(sci, prefs);
+    SciDocUtils::SetSciDocPrefs(sci, prefs);
     sci->UpdateStyle();
     sci->NeedStyled(false);
   }
-  tabbook->ForEachTab(StyleNextDocCB,this,false);
+  tabbook->ForEachTab(TabCallbacks::StyleNextDocCB,this,false);
   return 1;
-}
-
-
-
-/*
-  ForEachTab callback that checks to see if a file is already open
-  If we find the document, then we activate that tab and set the
-  user_data string to empty as a sign that we found it.
-*/
-bool TopWindow::FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  FXString*fn=(FXString*)user_data;
-  SciDoc*sci=(SciDoc*)page->getFirst();
-  if (strcmp(sci->Filename().text(),fn->text())==0) {
-    DocTabs*tabbook=(DocTabs*)tab->getParent();
-    tabbook->ActivateTab(index);
-    fn->clear();
-    return false;
-  }
-  return true;
 }
 
 
@@ -453,56 +251,16 @@ bool TopWindow::IsCommandReady()
 
 
 
-/*
-  ForEachTab callback that checks to see if a file is still open
-  If we find the document, then we set the SciDoc** pointed to
-  by the user_data to NULL as a sign that we found it.
-*/
-bool TopWindow::FileStillOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  SciDoc**sci=(SciDoc**)user_data;
-  if (*sci==page->getFirst()) {
-    *sci=NULL;
-    return false;
-  }
-  return true;
-}
-
-
-
 /* Return true if the document is still open */
 bool TopWindow::IsDocValid(SciDoc*sci)
 {
   if (sci) {
     SciDoc*closed=sci;
-    tabbook->ForEachTab(FileStillOpenCB,&closed);
+    tabbook->ForEachTab(TabCallbacks::FileStillOpenCB,&closed);
     return (!closed);
   } else {
     return false;
   }
-}
-
-
-
-// In case a Lua script left the SCI_*UNDOACTION level in an unbalanced state.
-bool TopWindow::ResetUndoLevelCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  ((SciDoc*)(page->getFirst()))->SetUserUndoLevel(0);
-  return true;
-}
-
-
-
-bool TopWindow::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
-{
-  TopWindow*tw=(TopWindow*)user_data;
-  if (tw->bookmarked_tab == tab) {
-    tw->tabbook->ActivateTab(tab);
-    SciDoc*sci=tw->FocusedDoc();
-    sci->GoToPos(tw->bookmarked_pos);
-    return false;
-  }
-  return true;
 }
 
 
@@ -512,66 +270,6 @@ bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forwar
 {
   return srchdlgs->FindPhrase(ControlDoc(),searchstring,searchmode,forward);
 }
-
-
-
-#ifdef WIN32
-# define IsDesktopCurrent(tw) (true)
-#else
-
-/*
-  We don't want to pop up the notification dialog for external changes unless our application
-  currently has the focus, and that's easy enough to do with the Fox API - But - we also don't
-  want to pop up the dialog unless our application is on the current virtual desktop, and the
-  only way I can see to do that is via the X11 API. I guess this stuff is fairly expensive,
-  so we wait to call it until we are sure the dialog would otherwise need to be displayed.
-*/
-# include <X11/Xlib.h>
-# include <X11/Xatom.h>
-
-static int GetXIntProp(FXWindow *win, Atom prop)
-{
-  int num = 0;
-  Atom type_ret;
-  int format_ret;
-  unsigned long items_ret;
-  unsigned long after_ret;
-  unsigned char *prop_ret=NULL;
-  XGetWindowProperty( (Display*)win->getApp()->getDisplay(), win->id(), prop, 0, 0x7fffffff, False,
-                        XA_CARDINAL, &type_ret, &format_ret, &items_ret, &after_ret, &prop_ret);
-  if (prop_ret) {
-    num = *((int*)prop_ret);
-    XFree(prop_ret);
-  }
-  return num;
-}
-
-
-
-static bool IsDesktopCurrent(TopWindow*tw)
-{
-  static bool failed=false;
-  static Atom NET_WM_DESKTOP=None;
-  static Atom NET_CURRENT_DESKTOP=None;
-  if (!failed) {
-    if (NET_WM_DESKTOP==None) {
-      NET_WM_DESKTOP=XInternAtom((Display*)tw->getApp()->getDisplay(), "_NET_WM_DESKTOP",true);
-    }
-    if (NET_CURRENT_DESKTOP==None) {
-      NET_CURRENT_DESKTOP=XInternAtom((Display*)tw->getApp()->getDisplay(), "_NET_CURRENT_DESKTOP",true);
-    }
-    if ((NET_CURRENT_DESKTOP==None)||(NET_WM_DESKTOP==None)) {
-      failed=true;
-    } else {
-      int this_desk=GetXIntProp(tw,NET_WM_DESKTOP);
-      int that_desk=GetXIntProp(tw->getApp()->getRootWindow(),NET_CURRENT_DESKTOP);
-      bool rv=(this_desk==that_desk);
-      return rv;
-    }
-  }
-  return true;
-}
-#endif
 
 
 
@@ -680,245 +378,15 @@ void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
 {
   if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
   if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
-  switch (ch) {
-    case '\r': {
-      if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
-    }
-    case '\n': {
-      int prev_line=line-1;
-      bool tmp_tab=false;
-      if ( (sci->GetLineLength(prev_line)>0) && !sci->UseTabs() ) {
-        long prev_pos=sci->sendMessage(SCI_POSITIONFROMLINE,prev_line,0);
-        if (sci->sendMessage(SCI_GETCHARAT,prev_pos,0)=='\t') {
-          tmp_tab=true; // If previous line has a tab, override the editor preference.
-        }
-      }
-      long prev_indent=sci->sendMessage(SCI_GETLINEINDENTATION, prev_line, 0);
-      long curr_indent=sci->sendMessage(SCI_GETLINEINDENTATION, line, 0);
-      int tab_width=sci->TabWidth();
-      if (prefs->AutoIndent==AUTO_INDENT_SMART) {
-        long prev_pos=pos-2;
-        long eolmode=sci->sendMessage(SCI_GETEOLMODE,0,0);
-        if (eolmode==SC_EOL_CRLF) { prev_pos--; }
-        int prev_char=sci->sendMessage(SCI_GETCHARAT,prev_pos,0);
-        if (prev_char=='{') {
-          if (sci->sendMessage(SCI_GETCHARAT,pos,0)=='}') {
-            sci->sendString(SCI_INSERTTEXT,pos,
-              (eolmode==SC_EOL_LF)?"\n":(eolmode==SC_EOL_CRLF)?"\r\n":"\r");
-            sci->SetLineIndentation(line+1,prev_indent);
-            sci->sendMessage(SCI_GOTOPOS,pos,0);
-          }
-          prev_indent += sci->UseTabs()?tab_width:prefs->IndentWidth;
-        }
-      }
-      if ( curr_indent < prev_indent ) {
-        if (tmp_tab) {
-          sci->UseTabs(true);
-          sci->SetLineIndentation(line,prev_indent);
-          sci->UseTabs(false);
-        } else {
-          sci->SetLineIndentation(line,prev_indent);
-        }
-        if (sci->UseTabs()||tmp_tab) {
-          sci->GoToPos(sci->sendMessage(SCI_POSITIONFROMLINE,line,0)+(prev_indent/tab_width));
-        }
-      }
-      break;
-    }
-    case '}': {
-      if (prefs->AutoIndent==AUTO_INDENT_SMART) {
-        getApp()->runWhileEvents();
-        int opener=sci->sendMessage(SCI_BRACEMATCH,pos-1,0);
-        if (opener>=0) {
-          long match_line=sci->sendMessage(SCI_LINEFROMPOSITION,opener,0);
-          if (match_line<line) {
-            long match_indent=sci->sendMessage(SCI_GETLINEINDENTATION, match_line, 0);
-            sci->sendMessage(SCI_SETLINEINDENTATION, line, match_indent);
-          }
-        }
-      }
-    }
-  }
+  SciDocUtils::CharAdded(sci, line, pos, ch, prefs->AutoIndent==AUTO_INDENT_SMART, prefs->IndentWidth);
   if (recording) { recording->sendMessage(SCI_STARTRECORD,0,0); }
-}
-
-
-
-// Check for an already-selected filename
-static void GetFilenameFromSelection(TopWindow*tw,SciDoc*sci, FXString &filename)
-{
-#ifdef WIN32
-  sci->GetSelText(filename);
-#else // On X11 platforms, try first to get a filename from the X-Selection
-  FXuchar*xsel=NULL;
-  FXuint xlen=0;
-  FXDragType types[] = { tw->textType, tw->utf8Type, tw->stringType, 0 };
-  for ( FXDragType*type=types; *type; type++ ) {
-    if (tw->getDNDData(FROM_SELECTION,*type, xsel, xlen) && xsel && *xsel) {
-      FXuchar*eol=(FXuchar*)memchr(xsel,'\n', xlen);
-      FXuint n = eol ? (eol-xsel) : xlen;
-      filename.assign((FXchar*)xsel,n);
-      filename=filename.simplify();
-      if (!FXStat::exists(filename.contains(':')?filename.section(':',0):filename)) {
-        filename=FXString::null;
-      }
-      break;
-    }
-    if ( filename.empty() ) { sci->GetSelText(filename); }
-  }
-#endif
-}
-
-
-
-// Try to find a filename at the current position in the document.
-static bool GetFilenameAtCursor(SciDoc*sci, FXString &filename)
-{
-  long max=sci->GetTextLength();
-  if (max<=0) { return false; }
-  TextRange range;
-  memset(&range,0,sizeof(range));
-  range.chrg.cpMin=sci->GetCaretPos();
-  if ( (range.chrg.cpMin>0) && (sci->CharAt(range.chrg.cpMin)<='*') && (sci->CharAt(range.chrg.cpMin-1)>'*') ) {
-    // Caret is at the end of a phrase, back up one before looking for start...
-    range.chrg.cpMin--;
-  }
-  // Read backwards till we find the start of our phrase...
-  while ( (range.chrg.cpMin>0) && (sci->CharAt(range.chrg.cpMin)>'*') ) { range.chrg.cpMin--; }
-  if ( (range.chrg.cpMin<max) && (sci->CharAt(range.chrg.cpMin)<='*') ) { range.chrg.cpMin++; }
-  if (range.chrg.cpMin>=max) { return false; }
-  range.chrg.cpMax=range.chrg.cpMin+1;
-  // Now read forward, looking for the end of our phrase...
-  while ( (range.chrg.cpMax<max) && (sci->CharAt(range.chrg.cpMax)>'*') ) { range.chrg.cpMax++; }
-  long len=range.chrg.cpMax-range.chrg.cpMin;
-  if (len<=0) { return false; }
-  range.lpstrText=(char*)calloc(len+1,1);
-  sci->sendMessage(SCI_GETTEXTRANGE,0,reinterpret_cast<sptr_t>(&range));
-  filename=range.lpstrText;
-  free(range.lpstrText);
-  return filename.empty()?false:true;
-}
-
-
-
-// Look for file: first in active document's directory; then in current working directory
-static bool OpenLocalIncludeFile(TopWindow*tw, SciDoc*sci, const FXString &filename, const FXString &line)
-{
-  if (!sci->Filename().empty()) {
-    FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
-    if (FXStat::exists(fullpath)) {
-      tw->OpenFile(fullpath.text(),line.text(),false,true);
-      return true;
-    }
-  }
-  if (FXStat::exists(filename)) {
-    tw->OpenFile(filename.text(),line.text(),false,true);
-    return true;
-  }
-  return false;
-}
-
-
-
-// Look for file in system include directories
-static bool OpenSystemIncludeFile(TopWindow*tw, SciDoc*sci, const FXString &filename, const FXString &line)
-{
-  const FXString paths=Settings::SystemIncludePaths();
-  for (FXint i=0; i<paths.contains('\n'); i++) {
-    FXString fullpath=paths.section('\n',i);
-    if (fullpath.empty()) { continue; }
-    fullpath+=PATHSEPSTRING;
-    fullpath+=filename;
-    if (FXStat::exists(fullpath)) {
-      tw->OpenFile(fullpath.text(),line.text(),false,true);
-      return true;
-    }
-  }
-  return false;
-}
-
-
-
-// Look for line number after filename in the form of FILE.EXT:NNN
-static void ParseLineNumberFromFilename(FXString &filename, FXString &line)
-{
-  #ifdef WIN32 // Ignore colon in drive spec on WIN32
-  FXint colons=filename.contains(':');
-  if (FXPath::isAbsolute(filename)) {
-    if (colons>1) {
-      line=filename.section(':',2);
-      filename=filename.section(':',0,2);
-    }
-  } else {
-    if (colons>0) {
-      line=filename.section(':',1) ;
-      filename=filename.section(':',0);
-    }
-  }
-#else
-  if (filename.contains(':')) {
-    line=filename.section(':',1) ;
-    filename=filename.section(':',0);
-  }
-#endif
-  for (FXint i=0; i<line.length(); i++) {
-    if (!Ascii::isDigit(line[i])) { // If it's not all digits, forget it.
-      line=FXString::null;
-      break;
-    }
-  }
 }
 
 
 
 void TopWindow::OpenSelected()
 {
-  SciDoc* sci=FocusedDoc();
-  FXString filename=FXString::null;
-  FXString line=FXString::null;
-  GetFilenameFromSelection(this,sci,filename);
-  if (filename.empty()) {
-    // Even if nothing is selected, look around for something that might be a filename...
-    if (!GetFilenameAtCursor(sci,filename)) { return; }
-  }
-  ParseLineNumberFromFilename(filename,line);
-  if (sci->sendMessage(SCI_GETLEXER,0,0)==SCLEX_CPP) {
-    bool syshdr=false;
-    if ( (filename[0]=='<') && (filename[filename.length()-1]=='>') ) {
-      filename.erase(0,1);
-      filename.trunc(filename.length()-1);
-      if (filename.empty()) { return; }
-      syshdr=true;
-    }
-    if (FXPath::isAbsolute(filename)&&FXStat::exists(filename)) {
-      OpenFile(filename.text(),line.text(),false,true);
-      return;
-    }
-    if (syshdr) {
-      if (OpenSystemIncludeFile(this,sci,filename,line)) { return; }
-      if (OpenLocalIncludeFile( this,sci,filename,line)) { return; }
-    } else {
-      if (OpenLocalIncludeFile( this,sci,filename,line)) { return; }
-      if (OpenSystemIncludeFile(this,sci,filename,line)) { return; }
-    }
-  } else {
-    if (FXStat::exists(filename)) {
-      OpenFile(filename.text(),line.text(),false,true);
-      return;
-    } else {
-      if ( (!FXPath::isAbsolute(filename)) && (!sci->Filename().empty()) ) {
-        FXString fullpath=FXPath::directory(sci->Filename())+PATHSEPSTRING+filename;
-        if (FXStat::exists(fullpath)) {
-          OpenFile(fullpath.text(),line.text(),false,true);
-          return;
-        }
-      }
-    }
-  }
-  // Looks like we failed - pretty up the filename so we can use it in an error message
-  filename=filename.section("\n",0);
-  filename.trunc(128);
-  FXMessageBox::error(this, MBOX_OK, _("File not found"), "%s:\n%s", _("Cannot find file"), filename.text());
+  SciDocUtils::OpenSelected(this, FocusedDoc());
 }
 
 
@@ -927,57 +395,9 @@ void TopWindow::InvertColors(bool inverted)
 {
   prefs->InvertColors=inverted;
   toolbar_frm->SetToolbarColors();
-  tabbook->ForEachTab(PrefsCB,NULL);
+  tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());
   menubar->SetCheck(ID_INVERT_COLORS,prefs->InvertColors); 
-}
-
-
-
-void TopWindow::CycleSplitter()
-{
-  SciDoc*sci=ControlDoc();
-  switch (prefs->SplitView) {
-    case SPLIT_NONE: {
-      switch (sci->GetSplit()) {
-        case SPLIT_NONE: {
-          sci->SetSplit(SPLIT_BELOW);
-          break;
-        }
-        case SPLIT_BELOW: {
-          sci->SetSplit(SPLIT_BESIDE);
-          break;
-        }
-        case SPLIT_BESIDE: {
-          sci->SetSplit(SPLIT_NONE);
-          break;
-        }
-      }
-      break;
-    }
-    case SPLIT_BELOW:
-    case SPLIT_BESIDE: {
-      switch (sci->GetSplit()) {
-        case SPLIT_NONE: {
-          sci->SetSplit(prefs->SplitView);
-          break;
-        }
-        case SPLIT_BELOW:
-        case SPLIT_BESIDE: {
-          sci->SetSplit(SPLIT_NONE);
-          break;
-        }
-      }
-      break;
-    }
-  }
-  sci=(SciDoc*)sci->getNext();
-  if (sci) {
-    SetSciDocPrefs(sci,prefs);
-    sci->setFocus();
-  } else {
-    ControlDoc()->setFocus();
-  }
 }
 
 
@@ -1081,7 +501,7 @@ void TopWindow::SetFileFormat(FXSelector sel)
   }
   FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
   FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
-  RadioUpdate(sel,ID_FMT_DOS,ID_FMT_UNIX);
+  MenuMgr::RadioUpdate(sel,ID_FMT_DOS,ID_FMT_UNIX);
 }
 
 
@@ -1106,7 +526,7 @@ void TopWindow::SetTabOrientation(FXSelector sel)
       prefs->DocTabPosition='R';
       break;
   }
-  RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
+  MenuMgr::RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
 }
 
 
@@ -1120,7 +540,7 @@ void TopWindow::ShowPrefsDialog()
   ClosedDialog();
   SetSrchDlgsPrefs();
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
-  tabbook->ForEachTab(PrefsCB, NULL);
+  tabbook->ForEachTab(TabCallbacks::PrefsCB, NULL);
   CheckStyle(NULL,0,ControlDoc());
   if ((prefs->WatchExternChanges||prefs->Autosave) && !getApp()->hasTimeout(this,ID_TIMER)) {
     getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL);
@@ -1235,6 +655,18 @@ void TopWindow::Indent(FXSelector sel)
 
 
 
+bool TopWindow::FoundBookmarkedTab(DocTab*tab)
+{
+  if (bookmarked_tab == tab) {
+    tabbook->ActivateTab(tab);
+    FocusedDoc()->GoToPos(bookmarked_pos);
+    return true;
+  }
+  return false;
+}
+
+
+
 void TopWindow::SetBookmark()
 {
   SciDoc*sci=ControlDoc();
@@ -1252,7 +684,7 @@ void TopWindow::GoToBookmark()
       FocusedDoc()->GoToPos(bookmarked_pos);
     }
   } else {
-    tabbook->ForEachTab(BookmarkCB,this);
+    tabbook->ForEachTab(TabCallbacks::BookmarkCB,this);
   }
 }
 

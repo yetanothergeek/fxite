@@ -25,6 +25,7 @@
 #include "scidoc.h"
 #include "prefs.h"
 #include "lang.h"
+#include "appname.h"
 #include "appwin_pub.h"
 #include "search.h"
 #include "histbox.h"
@@ -670,18 +671,10 @@ long PrefsDialog::onTabSwitch(FXObject*o,FXSelector sel,void*p)
 
 
 
-#ifndef WIN32
-extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
-#else
-#define SetupXAtoms(win,class_name)
-#endif
-
-
-
 void PrefsDialog::create()
 {
   FXDialogBox::create();
-  SetupXAtoms(this, "prefs");
+  SetupXAtoms(this, "prefs", APP_NAME);
   show(PLACEMENT_DEFAULT);
   acclist->setWidth((acclist->getParent()->getWidth()/3)*2);
   acclist->setHeaderSize(0,(acclist->getWidth()/2)-8);

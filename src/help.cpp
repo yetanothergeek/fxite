@@ -482,13 +482,6 @@ bool SciHelp::find(const FXString &what)
 
 
 
-#ifndef WIN32
-extern void SetupXAtoms(FXTopWindow*win, const char*class_name);
-#else
-#define SetupXAtoms(win,class_name)
-#endif
-
-
 #define PAD(w,p) \
   w->setPadTop(p); \
    w->setPadBottom(p); \
@@ -537,7 +530,7 @@ public:
     setIcon(win->getIcon());
     changeFocus(sc->srchbox);
     create();
-    SetupXAtoms(this, "help");
+    SetupXAtoms(this, "help", APP_NAME);
     show();
     getApp()->runWhileEvents();
   }

@@ -282,3 +282,39 @@ bool FileDialogs::AskReload(SciDoc*sci) {
   return true;
 }
 
+
+
+class WkDirDlg: public FXDirDialog {
+private:
+  class DirSel: public FXDirSelector {
+    public:
+    FXDirList* list()  { return dirbox; }
+  };
+public:
+  WkDirDlg(FXWindow* win):FXDirDialog(win, _("Set Working Directory")) {
+    setHeight(420);
+    setDirectory(FXSystem::getCurrentDirectory()+PATHSEP);
+  }
+  void setDirectory(const FXString& path) {
+    FXDirDialog::setDirectory((FXPath::simplify(path)));
+    if (FXPath::isTopDirectory(getDirectory())) {
+      FXDirList*list=((DirSel*)dirbox)->list();
+      list->expandTree(list->getFirstItem());
+    }
+  }
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR) {
+    FXuint rv=FXDirDialog::execute(placement);
+    if (rv) {
+      FXSystem::setCurrentDirectory(getDirectory());
+    }
+    return rv;
+  }
+};
+
+
+
+void FileDialogs::SetWorkingDirectory(FXWindow*w)
+{
+  WkDirDlg(w).execute(PLACEMENT_OWNER);
+}
+

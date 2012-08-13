@@ -857,3 +857,26 @@ void MenuMgr::WriteToolbarButtons(FXRegistry*reg, const char* tbar_section)
   FreeTBarUsrCmds();
 }
 
+
+
+// Update a set of radio buttons
+void MenuMgr::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
+{
+  for (FXSelector i=min; i<=max; i++) {
+    MenuSpec*spec=MenuMgr::LookupMenu(i);
+    if (spec && spec->ms_mc) {
+      ((FXMenuRadio*)(spec->ms_mc))->setCheck(curr==i);
+      FXButton*btn=(FXButton*)spec->ms_mc->getUserData();
+      if (btn) {
+        if (curr==i) {
+          btn->setFrameStyle(btn->getFrameStyle()|FRAME_THICK|FRAME_RAISED);
+          btn->setState(btn->getState()|STATE_ENGAGED);
+        } else {
+          btn->setFrameStyle(FRAME_NONE);
+          btn->setState(btn->getState()&~STATE_ENGAGED);
+        }
+      }
+    }
+  }
+}
+
