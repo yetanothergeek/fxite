@@ -880,6 +880,7 @@ FXbool TopWindow::close(FXbool notify)
   topwin_closing=true;
   delete srchdlgs;
   delete prefs;
+  delete menubar;
   return FXMainWindow::close(notify);
 }
 
