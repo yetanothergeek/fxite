@@ -61,11 +61,11 @@ FXIMPLEMENT(ToolbarPrefs,DualListForm,ToolbarPrefsMap,ARRAYNUMBER(ToolbarPrefsMa
 
 
 
-ToolbarPrefs::ToolbarPrefs(FXComposite*p, UserMenu**ums, FXSelector last, FXObject* tgt, FXSelector sel):
+ToolbarPrefs::ToolbarPrefs(FXComposite*p, UserMenu**ums, FXSelector lastid, FXObject* tgt, FXSelector sel):
   DualListForm(p,tgt,sel,TBAR_MAX_BTNS)
 {
   user_menus=ums;
-  invalid=last;
+  invalid=lastid;
   udata = (void*)((FXival)ToolbarChangedLayout);
   prefs=Settings::instance();
 
@@ -237,10 +237,10 @@ public:
 
 
 
-PopupPrefs::PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector last, FXObject*tgt, FXSelector sel):DualListForm(p,tgt,sel,POPUP_MAX_CMDS)
+PopupPrefs::PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector lastid, FXObject*tgt, FXSelector sel):DualListForm(p,tgt,sel,POPUP_MAX_CMDS)
 {
   user_menus=ums;
-  invalid=last;
+  invalid=lastid;
   FXHorizontalFrame* AvailBtns=new FXHorizontalFrame( left_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   custom_btn=new FXButton( AvailBtns, _("Custom &Tools..."),

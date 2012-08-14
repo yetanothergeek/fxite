@@ -59,7 +59,7 @@ private:
   UserMenu**user_menus;
   FXSelector invalid;
 public:
-  PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector last, FXObject*tgt=NULL, FXSelector sel=0);
+  PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector lastid, FXObject*tgt=NULL, FXSelector sel=0);
   long onInsertCustomItem( FXObject*o, FXSelector sel, void*p);
   long onInsertSeparator(  FXObject*o, FXSelector sel, void*p);
   enum {
