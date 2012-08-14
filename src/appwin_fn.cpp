@@ -18,7 +18,6 @@
 
 
 #include <fx.h>
-#include <SciLexer.h>
 
 #include "lang.h"
 #include "scidoc.h"
@@ -705,28 +704,5 @@ void TopWindow::RescanUserMenu()
   menubar->RescanUserMenus();
   MenuMgr::PurgeTBarCmds();
   UpdateToolbar();
-}
-
-
-
-// Prints the names of the compiled-in lexers to stdout,
-// along with the number of word lists per lexer
-// ( Only used during development, to help with the
-//   syntax-highlighting interface. )
-
-class WordList;
-class Accessor;
-#include <cctype>
-#include <ILexer.h>
-#include <LexerModule.h>
-#include <Catalogue.h>
-
-void TopWindow::DumpLexers() {
-  for (int i=0; i<=SCLEX_AUTOMATIC; i++) {
-    const LexerModule*lex=Catalogue::Find(i);
-    if (lex) {
-      fprintf(stdout, "%d %s %d\n", i, lex->languageName, lex->GetNumWordLists());
-    }
-  }
 }
 

@@ -372,7 +372,6 @@ public:
   Settings* GetPrefs() { return prefs; }
   void SetKillCommandAccelKey(FXHotKey acckey);
   FXHotKey GetKillCommandAccelKey() { return killkey; }
-  static void DumpLexers();
   void AddOutput(const FXString&line);
   void ClearOutput();
   UserMenu**UserMenus() const;
