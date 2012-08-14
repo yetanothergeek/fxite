@@ -111,7 +111,7 @@ void TopWindow::TranslatorCB(const char*text, void*user_data)
 
 void TopWindow::EnableUserFilters(bool enabled)
 {
-  toolbar_frm->EnableFilterBtn(enabled);
+  toolbar->EnableFilterBtn(enabled);
   menubar->EnableFilterMenu(enabled);
 }
 
@@ -119,14 +119,14 @@ void TopWindow::EnableUserFilters(bool enabled)
 
 void TopWindow::RemoveTBarBtnData(void*p)
 {
-  toolbar_frm->NullifyButtonData(p);
+  toolbar->NullifyButtonData(p);
 }
 
 
 
 void TopWindow::UpdateToolbar()
 {
-  toolbar_frm->CreateButtons(this);
+  toolbar->CreateButtons(this);
   switch (prefs->DocTabPosition) {
     case 'T': MenuMgr::RadioUpdate(ID_TABS_TOP,    ID_TABS_TOP, ID_TABS_RIGHT); break;
     case 'B': MenuMgr::RadioUpdate(ID_TABS_BOTTOM, ID_TABS_TOP, ID_TABS_RIGHT); break;
@@ -135,7 +135,7 @@ void TopWindow::UpdateToolbar()
   }
   MenuMgr::RadioUpdate(prefs->DocTabsPacked?ID_TABS_COMPACT:ID_TABS_UNIFORM,ID_TABS_UNIFORM,ID_TABS_COMPACT);
   menubar->Recording(recording,recorder);
-  toolbar_frm->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
+  toolbar->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
 }
 
 
@@ -393,7 +393,7 @@ void TopWindow::OpenSelected()
 void TopWindow::InvertColors(bool inverted)
 {
   prefs->InvertColors=inverted;
-  toolbar_frm->SetToolbarColors();
+  toolbar->SetToolbarColors();
   tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());
   menubar->SetCheck(ID_INVERT_COLORS,prefs->InvertColors); 
@@ -549,10 +549,10 @@ void TopWindow::ShowPrefsDialog()
     UpdateToolbar();
   }
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) {
-    toolbar_frm->handle(toolbar_frm,FXSEL(SEL_CONFIGURE,0),NULL);
+    toolbar->handle(toolbar,FXSEL(SEL_CONFIGURE,0),NULL);
   }
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
-    toolbar_frm->SetTBarFont();
+    toolbar->SetTBarFont();
   }
   filedlgs->patterns(prefs->FileFilters);
   if (Theme::changed() & ThemeChangedColors) {
@@ -563,7 +563,7 @@ void TopWindow::ShowPrefsDialog()
     statusbar->Colorize();
   }
   tabbook->ActivateTab(tabbook->ActiveTab());
-  toolbar_frm->SetToolbarColors();
+  toolbar->SetToolbarColors();
   EnableUserFilters(FocusedDoc()->GetSelLength());  
 }
 

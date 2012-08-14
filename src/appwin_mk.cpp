@@ -88,7 +88,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
 
   vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
 
-  toolbar_frm=new ToolBarFrame(vbox);
+  toolbar=new ToolBarFrame(vbox);
 
   hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
@@ -507,7 +507,7 @@ bool TopWindow::ShowWhiteSpace()
 void TopWindow::ShowToolbar(bool showit)
 {
   prefs->ShowToolbar=showit;
-  if (showit) { toolbar_frm->show(); } else { toolbar_frm->hide(); }
+  if (showit) { toolbar->show(); } else { toolbar->hide(); }
   menubar->SetCheck(ID_SHOW_TOOLBAR,showit);
 }
 

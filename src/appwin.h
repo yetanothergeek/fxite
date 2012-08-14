@@ -60,7 +60,7 @@ private:
   DocTabs*    tabbook;
   FXSplitter* hsplit;
   OutputList*outlist;
-  ToolBarFrame*toolbar_frm;
+  ToolBarFrame*toolbar;
   SearchDialogs* srchdlgs;
   FileDialogs*   filedlgs;
   Settings* prefs;
