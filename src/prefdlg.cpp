@@ -168,7 +168,7 @@ static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acck
     acckey=0;
     if (dlg.getString(acctxt, w->getShell(), _("Edit keybinding"), msg )) {
       if (acctxt.empty()) {
-        if (spec->sel==TopWinPub::KillCmdID()) {
+        if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
           FXMessageBox::error(w->getShell(), MBOX_OK, _("Empty keybinding"), "%s \"%s\"",
             _("You cannot remove the keybinding for"), spec->pref);
           acctxt=orig.text();
@@ -238,7 +238,7 @@ long PrefsDialog::onAccelEdit(FXObject*o, FXSelector s, void*p)
           memset(spec->accel,0,sizeof(spec->accel));
           strncpy(spec->accel, acctxt.text(),sizeof(spec->accel)-1);
           if (oldkey && table->hasAccel(oldkey)) { table->removeAccel(oldkey); }
-          if (spec->sel==TopWinPub::KillCmdID()){
+          if (spec->sel==(FXint)TopWinPub::KillCmdID()){
             TopWinPub::SetKillCommandAccelKey(acckey);
           } else  {
             if (spec->ms_mc) {
@@ -343,7 +343,7 @@ void PrefsDialog::MakeKeybindingsTab()
   acclist->appendHeader(_("action"));
   acclist->appendHeader(_("keybinding"));
   FXString spaces;
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=TopWinPub::LastID(); spec++) {
+  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=(FXint)TopWinPub::LastID(); spec++) {
     FXString txt;
     txt.format("%s\t%s", spec->pref, spec->accel);
     acclist->appendItem(new KBindListItem(txt, NULL, NULL, (void*)spec));
