@@ -16,35 +16,16 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef OUTPANE_H
-#define OUTPANE_H
-
-class TopWindow;
-
-class OutputList: public FXList {
-  FXDECLARE(OutputList)
-  OutputList() {}
+class PopUpMnuCmd: public FXMenuCommand {
+  FXDECLARE(PopUpMnuCmd)
+  PopUpMnuCmd() {}
 protected:
-  Settings* prefs;
-public:
-  OutputList(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=LIST_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  ~OutputList();
-  long onUserInput(     FXObject*o, FXSelector sel, void*p );
-  long onSelectPopCmd(  FXObject*o, FXSelector sel, void*p );
-  void GoToError();
-  bool Focus();
-  FXint fillItems(const FXString& strings);
-  FXint appendItem(const FXString& text);
-  void SelectFirstError();
-  virtual void show();
-  virtual void hide();
-  enum {
-    ID_SOMETHING=FXList::ID_LAST,
-    ID_SELECT_ALL,
-    ID_COPY_SELECTED,
-    ID_LAST
-  };
-};
-
+#ifdef FOX_1_6
+ FXlong CreationTime;
+#else
+ FXTime CreationTime;
 #endif
-
+public:
+  PopUpMnuCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel);
+  long onButtonRelease(FXObject*o,FXSelector sel,void*p);
+};

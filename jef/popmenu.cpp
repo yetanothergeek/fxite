@@ -16,35 +16,23 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef OUTPANE_H
-#define OUTPANE_H
 
-class TopWindow;
+#include <fx.h>
+#include "popmenu.h"
 
-class OutputList: public FXList {
-  FXDECLARE(OutputList)
-  OutputList() {}
-protected:
-  Settings* prefs;
-public:
-  OutputList(FXComposite *p,FXObject* tgt=NULL,FXSelector sel=0,FXuint opts=LIST_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  ~OutputList();
-  long onUserInput(     FXObject*o, FXSelector sel, void*p );
-  long onSelectPopCmd(  FXObject*o, FXSelector sel, void*p );
-  void GoToError();
-  bool Focus();
-  FXint fillItems(const FXString& strings);
-  FXint appendItem(const FXString& text);
-  void SelectFirstError();
-  virtual void show();
-  virtual void hide();
-  enum {
-    ID_SOMETHING=FXList::ID_LAST,
-    ID_SELECT_ALL,
-    ID_COPY_SELECTED,
-    ID_LAST
-  };
-};
+FXDEFMAP(PopUpMnuCmd) PopUpMnuCmdMap[]={ FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,PopUpMnuCmd::onButtonRelease) };
+FXIMPLEMENT(PopUpMnuCmd,FXMenuCommand,PopUpMnuCmdMap,ARRAYNUMBER(PopUpMnuCmdMap));
 
-#endif
 
+
+PopUpMnuCmd::PopUpMnuCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel):
+     FXMenuCommand(p,text,ic,tgt,sel), CreationTime(FXThread::time())
+{ 
+  CreationTime=FXThread::time();
+}
+
+
+long PopUpMnuCmd::onButtonRelease(FXObject*o,FXSelector sel,void*p)
+{
+  return (FXThread::time()-CreationTime)<500000000 ? 1 : FXMenuCommand::onButtonRelease(o,sel,p);
+}

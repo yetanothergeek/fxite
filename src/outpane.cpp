@@ -23,20 +23,20 @@
 #include "appwin_pub.h"
 #include "compat.h"
 #include "prefs.h"
+#include "popmenu.h"
 
 #include "intl.h"
 #include "outpane.h"
-
 
 
 FXDEFMAP(OutputList) OutputListMap[]={
   FXMAPFUNC(SEL_COMMAND,            0,                            OutputList::onUserInput),
   FXMAPFUNC(SEL_DOUBLECLICKED,      0,                            OutputList::onUserInput),
   FXMAPFUNC(SEL_KEYPRESS,           0,                            OutputList::onUserInput),
-  FXMAPFUNC(SEL_RIGHTBUTTONRELEASE, 0,                            OutputList::onUserInput),
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS,   0,                            OutputList::onUserInput),
   FXMAPFUNC(SEL_FOCUSIN,            0,                            OutputList::onUserInput),
-  FXMAPFUNC(SEL_COMMAND,            OutputList::ID_SELECT_ALL,    OutputList::onPopup),
-  FXMAPFUNC(SEL_COMMAND,            OutputList::ID_COPY_SELECTED, OutputList::onPopup),
+  FXMAPFUNC(SEL_COMMAND,            OutputList::ID_SELECT_ALL,    OutputList::onSelectPopCmd),
+  FXMAPFUNC(SEL_COMMAND,            OutputList::ID_COPY_SELECTED, OutputList::onSelectPopCmd),
 };
 
 FXIMPLEMENT(OutputList,FXList,OutputListMap,ARRAYNUMBER(OutputListMap));
@@ -46,12 +46,16 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
 {
   FXEvent* ev=(FXEvent*)p;
   switch (FXSELTYPE(sel)) {
-    case SEL_RIGHTBUTTONRELEASE: {
+    case SEL_RIGHTBUTTONPRESS: {
       if(!ev->moved){
+        FXMenuPane *outpop=new FXMenuPane(this);
+        new PopUpMnuCmd(outpop,_("Select &All"),NULL,this,ID_SELECT_ALL);
+        new PopUpMnuCmd(outpop,_("&Copy"),NULL,this,ID_COPY_SELECTED);
         outpop->create();
-        outpop->popup(NULL,ev->root_x,ev->root_y);
+        outpop->popup(NULL,ev->root_x-4,ev->root_y-2);
+        outpop->grabKeyboard();
         getApp()->runModalWhileShown(outpop);
-        outpop->destroy();
+        delete outpop;
       }
       return 1;
     }
@@ -150,7 +154,7 @@ bool OutputList::Focus()
 
 
 
-long OutputList::onPopup(FXObject*o, FXSelector sel, void*p)
+long OutputList::onSelectPopCmd(FXObject*o, FXSelector sel, void*p)
 {
   FXint count=getNumItems();
   if (count==0) { return 1; }
@@ -227,16 +231,13 @@ OutputList::OutputList(FXComposite*p,FXObject*tgt,FXSelector sel,FXuint opts,FXi
 FXList(new FXGroupBox(p,"",LAYOUT_SIDE_TOP|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0),tgt,sel,opts,x,y,w,h)
 {
   prefs=Settings::instance();
-  outpop=new FXMenuPane(this);
-  new FXMenuCommand(outpop,_("Select &All"),NULL,this,ID_SELECT_ALL);
-  new FXMenuCommand(outpop,_("&Copy"),NULL,this,ID_COPY_SELECTED);
 }
 
 
 
 OutputList::~OutputList()
 {
-  delete outpop;
+
 }
 
 

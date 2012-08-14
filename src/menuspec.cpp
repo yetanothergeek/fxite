@@ -24,6 +24,7 @@
 #include "lang.h"
 #include "scidoc.h"
 #include "shmenu.h"
+#include "popmenu.h"
 
 #include "intl.h"
 #include "menuspec.h"
@@ -636,27 +637,6 @@ void MenuMgr::WritePopupMenu(FXRegistry*reg, const char* popup_sect) {
   }
   FreePopupCommands();
 }
-
-
-
-class PopUpMnuCmd: public FXMenuCommand {
-  FXDECLARE(PopUpMnuCmd)
-  PopUpMnuCmd() {}
-  protected:
-#ifdef FOX_1_6
- FXlong CreationTime;
-#else
- FXTime CreationTime;
-#endif
-public:
-  PopUpMnuCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel):
-     FXMenuCommand(p,text,ic,tgt,sel), CreationTime(FXThread::time()) { }
-  long onButtonRelease(FXObject*o,FXSelector sel,void*p) {
-    return (FXThread::time()-CreationTime)<500000000 ? 1 : FXMenuCommand::onButtonRelease(o,sel,p);
-  }
-};
-FXDEFMAP(PopUpMnuCmd) PopUpMnuCmdMap[]={ FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,PopUpMnuCmd::onButtonRelease) };
-FXIMPLEMENT(PopUpMnuCmd,FXMenuCommand,PopUpMnuCmdMap,ARRAYNUMBER(PopUpMnuCmdMap));
 
 
 
