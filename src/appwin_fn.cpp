@@ -99,16 +99,6 @@ void TopWindow::SetWordWrap(SciDoc*sci, bool wrapped)
 
 
 
-//  Used by the macro recorder to translate "machine language" into a Lua macro.
-void TopWindow::TranslatorCB(const char*text, void*user_data)
-{
-  FXString*all=(FXString*)user_data;
-  all->append(text);
-  all->append('\n');
-}
-
-
-
 void TopWindow::EnableUserFilters(bool enabled)
 {
   toolbar->EnableFilterBtn(enabled);

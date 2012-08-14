@@ -43,7 +43,6 @@ class TopWindow: public MainWinWithClipBrd {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
-  static void TranslatorCB(const char*text, void*user_data);
   bool IsDocValid(SciDoc*sci);
   void SetTabTag(SciDoc*sci, char mark, bool set);
   void Freeze(FXWindow*win, bool frozen);

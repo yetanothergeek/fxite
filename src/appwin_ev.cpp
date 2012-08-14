@@ -295,11 +295,7 @@ long TopWindow::onHelpAbout(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onMacroPlayback(FXObject*o, FXSelector sel, void*p)
 {
-  if (recorder&&!recording) {
-    FXString src;
-    recorder->translate(TranslatorCB,&src);
-    RunMacro(src, false);
-  }
+  if (recorder&&!recording) { RunMacro(recorder->translate(), false); }
   return 1;
 }
 
@@ -308,12 +304,9 @@ long TopWindow::onMacroPlayback(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onMacroShow(FXObject*o, FXSelector sel, void*p)
 {
   if (recorder&&!recording) {
-    FXString src;
-    recorder->translate(TranslatorCB,&src);
     NewFile(false);
-    SciDoc*sci=ControlDoc();
-    sci->setLanguage("lua");
-    sci->SetText(src.text());
+    ControlDoc()->setLanguage("lua");
+    ControlDoc()->SetText(recorder->translate().text());
   }
   return 1;
 }

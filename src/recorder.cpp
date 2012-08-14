@@ -589,3 +589,22 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
   }
 }
 
+
+
+//  Used by the macro recorder to translate "machine language" into a Lua macro.
+static void TranslatorCB(const char*text, void*user_data)
+{
+  FXString*all=(FXString*)user_data;
+  all->append(text);
+  all->append('\n');
+}
+
+
+
+const FXString MacroRecorder::translate()
+{
+  FXString out;
+  translate(TranslatorCB,&out);
+  return out;
+}
+

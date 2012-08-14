@@ -30,6 +30,7 @@ public:
   void record(int message, uptr_t wParam, sptr_t lParam);
   void playback(PlaybackFunc callback, void* user_data);
   void translate(TranslateFunc callback, void* user_data);
+  const FXString translate();
   void clear();
   MacroRecorder();
   ~MacroRecorder();
