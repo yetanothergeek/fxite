@@ -46,7 +46,7 @@
 
 FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_TIMEOUT,   TopWindow::ID_TIMER,            TopWindow::onTimer),
-  FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_SCINTILLA,        TopWindow::onScintilla),
+  FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_SCINTILLA,        TopWindow::onScintillaCmd),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TAB_SWITCHED,     TopWindow::onSwitchTabs),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TAB_ACTIVATE,     TopWindow::onTabActivate),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_OPEN_FILES,       TopWindow::onFileOpen),
@@ -114,8 +114,8 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TBAR_CUSTOM_CMD,  TopWindow::onTBarCustomCmd),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_SELECT_ALL, TopWindow::onPopupSelectAll),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_DELETE_SEL, TopWindow::onPopupDeleteSel),
-  FXMAPFUNC(SEL_FOCUSIN,   TopWindow::ID_SCINTILLA,        TopWindow::onScintilla),
-  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,        TopWindow::onScintilla),
+  FXMAPFUNC(SEL_FOCUSIN,   TopWindow::ID_SCINTILLA,        TopWindow::onScintillaFocus),
+  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,        TopWindow::onScintillaPick),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_CHECK_STALE,      TopWindow::CheckStale),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_CHECK_STYLE,      TopWindow::CheckStyle),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_FOCUS_DOC,        TopWindow::onFocusDoc),
@@ -525,84 +525,81 @@ long TopWindow::onSplitChanged(FXObject*o, FXSelector sel, void*p)
 
 
 
-long TopWindow::onScintilla(FXObject*o,FXSelector s,void*p)
+long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
 {
-
   SciDoc* sci=(SciDoc*)o;
-  switch (FXSELTYPE(s)) {
-    case SEL_COMMAND: {
-      SCNotification* scn = static_cast<SCNotification*>(p);
-      if ((!need_status)&&(scn->nmhdr.code==SCN_PAINTED)) { return 1; }
-      if (need_status) {need_status--;}
-      if (sci->Loading()) { return 1; }
-      long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
-      long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
-      long col=sci->sendMessage(SCI_GETCOLUMN,pos,0);
-      switch (scn->nmhdr.code) {
-        case SCN_UPDATEUI: {
-          if ( prefs->BraceMatch ) { sci->MatchBrace(); }
-          break;
-        }
-        case SCN_SAVEPOINTLEFT: {
-          if (!sci->Loading()) {
-            SetTabDirty(sci,true);
-          }
-          break;
-        }
-        case SCN_SAVEPOINTREACHED: {
-          if (!sci->Loading()) {
-            SetTabDirty(sci,false);
-            backups->RemoveBackup(sci);
-          }
-          break;
-        }
-        case SCN_PAINTED: {
-          break;
-        }
-        case SCN_MODIFIED: {
-          if (!sci->Loading()) {
-            if (scn->modificationType & (SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT)) {
-              sci->NeedBackup(true);
-            }
-          }
-          break;
-        }
-        case SCN_CHARADDED: {
-          if (!completions->Continue(sci))  { CharAdded(sci,line,pos,scn->ch); }
-          break;
-        }
-        case SCN_DOUBLECLICK: {
-          break;
-        }
-        case SCN_MACRORECORD: {
-          recorder->record(scn->message,scn->wParam, scn->lParam);
-          break;
-        }
-        default: {
+  SCNotification* scn = static_cast<SCNotification*>(p);
+  if ((!need_status)&&(scn->nmhdr.code==SCN_PAINTED)) { return 1; }
+  if (need_status) {need_status--;}
+  if (sci->Loading()) { return 1; }
+  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
+  long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
+  long col=sci->sendMessage(SCI_GETCOLUMN,pos,0);
+  switch (scn->nmhdr.code) {
+    case SCN_UPDATEUI: {
+      if ( prefs->BraceMatch ) { sci->MatchBrace(); }
+      break;
+    }
+    case SCN_SAVEPOINTLEFT: {
+      if (!sci->Loading()) {
+        SetTabDirty(sci,true);
+      }
+      break;
+    }
+    case SCN_SAVEPOINTREACHED: {
+      if (!sci->Loading()) {
+        SetTabDirty(sci,false);
+        backups->RemoveBackup(sci);
+      }
+      break;
+    }
+    case SCN_PAINTED: {
+      break;
+    }
+    case SCN_MODIFIED: {
+      if (!sci->Loading()) {
+        if (scn->modificationType & (SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT)) {
+          sci->NeedBackup(true);
         }
       }
-      UpdateTitle(line,col);
-      if ( sci->GetSelLength() ) {
-        EnableUserFilters(true);
-      } else {
-        EnableUserFilters(false);
-      }
-      return 1;
+      break;
     }
-    case SEL_FOCUSIN: {
-      getApp()->addChore(this, ID_CHECK_STALE);
-      if (sci->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,sci); }
-      active_widget=sci;
-      return 1;
+    case SCN_CHARADDED: {
+      if (!completions->Continue(sci))  { CharAdded(sci,line,pos,scn->ch); }
+      break;
     }
-    case SEL_PICKED: {
-      MenuMgr::ShowPopupMenu((FXPoint*)p);
-      return 1;
+    case SCN_DOUBLECLICK: {
+      break;
     }
-    default: { return 1; }
+    case SCN_MACRORECORD: {
+      recorder->record(scn->message,scn->wParam, scn->lParam);
+      break;
+    }
+    default: {
+    }
   }
+  UpdateTitle(line,col);
+  EnableUserFilters(sci->GetSelLength()>0);
+  return 1;
 }
 
+
+
+long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
+{
+  MenuMgr::ShowPopupMenu((FXPoint*)p);
+  return 1;
+}
+
+
+
+long TopWindow::onScintillaFocus(FXObject*o,FXSelector s,void*p)
+{
+  getApp()->addChore(this, ID_CHECK_STALE);
+  if (((SciDoc*)o)->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,o); }
+  active_widget=(SciDoc*)o;
+  return 1;
+}
 
 
 // Switch tab orientations

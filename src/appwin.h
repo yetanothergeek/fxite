@@ -137,7 +137,9 @@ public:
   long onFileNew(        FXObject*o, FXSelector sel, void*p );
   long onSelectDir(      FXObject*o, FXSelector sel, void*p );
   long onQuit(           FXObject*o, FXSelector sel, void*p );
-  long onScintilla(      FXObject*o, FXSelector sel, void*p );
+  long onScintillaCmd(      FXObject*o, FXSelector sel, void*p );
+  long onScintillaFocus( FXObject*o, FXSelector sel, void*p );
+  long onScintillaPick(  FXObject*o, FXSelector sel, void*p );
   long onCloseTab(       FXObject*o, FXSelector sel, void*p );
   long onCloseAll(       FXObject*o, FXSelector sel, void*p );
   long onUndo(           FXObject*o, FXSelector sel, void*p );
