@@ -57,7 +57,6 @@ FXIMPLEMENT(FXiTe,FXApp,AppMap,ARRAYNUMBER(AppMap));
 
 AppClass::AppClass(const FXString& name, const FXString& title):FXApp(name,title)
 {
-  mainwin=NULL;
   quitting=false;
   commands=FXString::null;
 //  addSignal(SIGINT,  this, App::ID_CLOSEALL);
@@ -78,7 +77,7 @@ long AppClass::onCmdCloseAll(FXObject*o,FXSelector sel,void*p)
 #endif
   if (quitting) { return 1; }
   quitting=true;
-  mainwin->close();
+  TopWinPub::close();
   quitting=false;
   return 1;
 }
@@ -427,9 +426,9 @@ void AppClass::init(int& argc, char** argv, bool connect)
     setToolTipTime(2000000000);
     setToolTipPause(250000000);
 #endif
-    mainwin=TopWinPub::instantiate(this);
-    if (getRootWindow() && getRootWindow()->id()) { mainwin->create(); } else { create(); }
-    ipc->StartServer(mainwin, this,ID_IPC_EXEC);
+    TopWinPub::instantiate(this);
+    if (getRootWindow() && getRootWindow()->id()) { TopWinPub::create(); } else { create(); }
+    ipc->StartServer(TopWinPub::instance(),this,ID_IPC_EXEC);
 #if !(defined(WIN32) || defined(__minix))
     fclose(stdin);
     stdin=fopen(NULL_FILE, "r");

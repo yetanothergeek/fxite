@@ -52,6 +52,8 @@ public:
   static const FXString &ConfigDir();
   static void ParseCommands(FXString &commands);
   static FXMainWindow* instantiate(FXApp*a);
+  static void create();
+  static FXbool close(FXbool notify=FALSE);
   static FXMainWindow* instance();
   static void DumpLexers();
   static bool FindText(const char*searchstring, FXuint searchmode, bool forward);

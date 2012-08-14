@@ -132,6 +132,20 @@ FXMainWindow* TopWinPub::instantiate(FXApp*a)
 
 
 
+void TopWinPub::create()
+{
+  tw->create();
+}
+
+
+
+FXbool TopWinPub::close(FXbool notify)
+{
+  return tw->close(notify);
+}
+
+
+
 void TopWinPub::DumpLexers()
 {
   TW::DumpLexers();
