@@ -383,6 +383,7 @@ FXIMPLEMENT(SearchDialogs, FXObject, NULL, 0);
 SearchDialogs::SearchDialogs(FXWindow*shell) {
   defaultsearchmode=0;
   searchdirn=SCI_SEARCHNEXT;
+  searchstring=FXString::null;
   find_dlg=new SciReplDlg(shell, true);
   _shell=shell;
 }

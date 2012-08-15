@@ -45,7 +45,7 @@ public:
   void *getUserData() { return user_data; }
   void setUserData(void*p) { user_data=p; }
   void SetWorkingDirectory(FXWindow*w);
-  FileDialogs(FXObject*tgt, FXSelector sel);
+  FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats=FXString::null);
 #ifdef WIN32
   static bool ReadShortcut(FXWindow*w, FXString &filename);
 #endif

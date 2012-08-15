@@ -400,6 +400,20 @@ void DocTabs::setTabStyle(FXuint style)
 }
 
 
+
+// T, B, L, R: Top, Bottom, Left, Right
+void DocTabs::setTabStyleByChar(FXuchar c)
+{
+  switch (c) {
+    case 'B': { setTabStyle(TABBOOK_BOTTOMTABS); break; }
+    case 'L': { setTabStyle(TABBOOK_LEFTTABS);   break; }
+    case 'R': { setTabStyle(TABBOOK_RIGHTTABS);  break; }
+    default:  { setTabStyle(TABBOOK_TOPTABS);    break; }
+  }
+}
+
+
+
 // Set tab header widths based on largest tab label string, or not
 void DocTabs::setTabsCompact(bool compact)
 {

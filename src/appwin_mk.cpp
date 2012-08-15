@@ -70,57 +70,49 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
 {
   FXASSERT(!global_top_window_instance);
   global_top_window_instance=this;
-  StyleDef*sd=GetStyleFromId(Settings::globalStyle(), STYLE_CALLTIP);
-  tips=new FXToolTip(getApp(),0);
-  RgbToHex(getApp()->getTipbackColor(), sd->bg);
-  RgbToHex(getApp()->getTipforeColor(), sd->fg);
-  prefs=new Settings(this, ConfigDir());
-
   active_widget=NULL;
-  need_status=0;
-  command_busy=false;
-  SciDoc::DefaultStyles(prefs->Styles());
-  CreateMenus();
-  new FXHorizontalSeparator(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
-
-  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
-
-  FXVerticalFrame*vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
-
-  toolbar=new ToolBarFrame(vbox);
-
-  hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
-  tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
-  switch (prefs->DocTabPosition) {
-    case 'B': { tabbook->setTabStyle(TABBOOK_BOTTOMTABS); break; }
-    case 'L': { tabbook->setTabStyle(TABBOOK_LEFTTABS); break; }
-    case 'R': { tabbook->setTabStyle(TABBOOK_RIGHTTABS); break; }
-  }
-  tabbook->setTabsCompact(prefs->DocTabsPacked);
-  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
-
-  outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
-  hsplit->setSplit(1,prefs->OutputPaneHeight);
-  ShowOutputPane(prefs->ShowOutputPane);
-
-  srchdlgs=new SearchDialogs(this);
-  srchdlgs->searchstring="";
-  SetSrchDlgsPrefs();
-
-  filedlgs=new FileDialogs(this,ID_FILE_SAVED);
-  filedlgs->patterns(prefs->FileFilters);
-
-  backups=new BackupMgr(this, ConfigDir());
-  completions=new AutoCompleter();
-
   macros=NULL;
   recorder=NULL;
   recording=NULL;
+  saved_accels=NULL;
+  need_status=0;
+  command_busy=false;
   skipfocus=false;
   destroying=false;
   close_all_confirmed=false;
   kill_commands_confirmed=false;
   topwin_closing=false;
+  StyleDef*sd=GetStyleFromId(Settings::globalStyle(), STYLE_CALLTIP);
+  tips=new FXToolTip(getApp(),0);
+  RgbToHex(getApp()->getTipbackColor(), sd->bg);
+  RgbToHex(getApp()->getTipforeColor(), sd->fg);
+  prefs=new Settings(this, ConfigDir());
+  SciDoc::DefaultStyles(prefs->Styles());
+  menubar=new MainMenu(this);
+  FXVerticalFrame*vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
+  toolbar=new ToolBarFrame(vbox);
+  hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
+  tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
+  tabbook->setTabStyleByChar(prefs->DocTabPosition);
+  tabbook->setTabsCompact(prefs->DocTabsPacked);
+  tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
+  outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
+  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
+  ShowOutputPane(prefs->ShowOutputPane);
+  ShowStatusBar(prefs->ShowStatusBar);
+
+  backups=new BackupMgr(this, ConfigDir());
+  completions=new AutoCompleter();
+  filedlgs=new FileDialogs(this,ID_FILE_SAVED,prefs->FileFilters);
+  srchdlgs=new SearchDialogs(this);
+  SetSrchDlgsPrefs();
+  InitKillKey();
+}
+
+
+
+void TopWindow::InitKillKey()
+{
   MenuSpec*killcmd=MenuMgr::LookupMenu(ID_KILL_COMMAND);
   killkey=parseAccel(killcmd->accel);
   if (killkey && FXSELID(killkey)) {
@@ -134,9 +126,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
       _("disabling support for macros and external commands.")
       );
     temp_accels=NULL;
-  }
-  saved_accels=NULL;
-  ShowStatusBar(prefs->ShowStatusBar);
+  }  
 }
 
 
@@ -1067,12 +1057,5 @@ void TopWindow::ClearOutput()
 
 FXMenuCaption*TopWindow::TagFiles() {
   return (FXMenuCaption*)(menubar->TagsMenu()->getMenu()->getFirst());
-}
-
-
-
-void TopWindow::CreateMenus()
-{
-  menubar=new MainMenu(this);
 }
 

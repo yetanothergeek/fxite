@@ -58,6 +58,7 @@ MainMenu::MainMenu(FXComposite* p):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
   tw=(TopWindow*)p;
   prefs=Settings::instance();
   CreateMenus();
+  new FXHorizontalSeparator(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
 }
 
 

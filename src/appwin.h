@@ -85,7 +85,6 @@ private:
   static const char* DontFreezeMe();
   bool IsCommandReady();
   void UpdateEolMenu(SciDoc* sci);
-  void CreateMenus();
   void UpdateToolbar();
   void UpdateTitle(long line, long col);
   bool AskReload(SciDoc* sci);
@@ -120,6 +119,7 @@ private:
   void GoToBookmark();
   bool NewFile(bool hooked);
   bool CloseAll(bool close_last);
+  void InitKillKey();
 public:
   long CheckStale(       FXObject* o, FXSelector sel, void* p );
   long CheckStyle(       FXObject* o, FXSelector sel, void* p );

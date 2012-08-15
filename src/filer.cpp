@@ -36,9 +36,9 @@
 FXIMPLEMENT(FileDialogs, FXObject, NULL, 0);
 
 
-FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel):FXObject()
+FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats):FXObject()
 {
-  _patterns=_("All Files (*)");
+  _patterns=pats.empty()?_("All Files (*)"):pats.text();
   user_data=NULL;
   target=tgt;
   message=sel;

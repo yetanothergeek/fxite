@@ -80,6 +80,7 @@ public:
   void MoveTabLast()  { MoveTab(MOVETOLAST); }
 
   void setTabStyle(FXuint style);
+  void setTabStyleByChar(FXuchar c);
   void setTabsCompact(bool compact);
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
