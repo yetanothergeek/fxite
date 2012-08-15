@@ -282,6 +282,12 @@ void SciDocUtils::OpenSelected(FXMainWindow*tw, SciDoc*sci)
 
 void SciDocUtils::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
 {
+  sci->sendMessage(SCI_SETMULTIPLESELECTION,false,0);
+  sci->sendMessage(SCI_SETADDITIONALSELECTIONTYPING,true,0);
+  sci->ShowLineNumbers(prefs->ShowLineNumbers);
+  sci->ShowWhiteSpace(prefs->ShowWhiteSpace);
+  sci->SetShowEdge(prefs->ShowRightEdge);
+  sci->SetZoom(prefs->ZoomFactor);
   sci->setFont(prefs->fontdesc.face, prefs->fontdesc.size / 10);
   sci->sendMessage(SCI_SETEXTRAASCENT,prefs->FontAscent,0);
   sci->sendMessage(SCI_SETEXTRADESCENT,prefs->FontDescent,0);
@@ -396,5 +402,15 @@ void SciDocUtils::Paste(SciDoc*sci)
   }
 }
 
+
+
+SciDoc* SciDocUtils::NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Settings*prefs)
+{
+  SciDoc*sci=new SciDoc(p,trg,sel);
+  SetSciDocPrefs(sci,prefs);
+  sci->SetWordWrap(prefs->WordWrap);
+  sci->DoStaleTest(true);
+  return sci;
+}
 
 

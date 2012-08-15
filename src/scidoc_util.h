@@ -26,5 +26,6 @@ public:
   static void Cut(SciDoc*sci);
   static void Copy(SciDoc*sci);
   static void Paste(SciDoc*sci);
+  static SciDoc* NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Settings*prefs);
 };
 

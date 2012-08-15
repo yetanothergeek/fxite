@@ -44,7 +44,8 @@ public:
   bool AskReload(SciDoc*sci);
   void *getUserData() { return user_data; }
   void setUserData(void*p) { user_data=p; }
-  void SetWorkingDirectory(FXWindow*w);
+  static void SetWorkingDirectory(FXWindow*w);
+  static bool FileExistsOrConfirmCreate(FXMainWindow*w, const FXString &fn);
   FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats=FXString::null);
 #ifdef WIN32
   static bool ReadShortcut(FXWindow*w, FXString &filename);

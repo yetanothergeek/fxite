@@ -167,7 +167,6 @@ void TopWindow::SetSrchDlgsPrefs()
 }
 
 
-
 // Create a new tab and editor panel
 bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, bool hooked)
 {
@@ -175,7 +174,6 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
   FXString fn="";
   SciDoc*sci=NULL;
   if ( tabbook->Count() >= prefs->MaxFiles ) { return false; }
-
   if (filename) {
     fn=FXPath::simplify(FXPath::absolute(filename));
 #ifdef WIN32
@@ -188,56 +186,16 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
       return true;
     }
   }
-
-  if ((!fn.empty())&&(!FXStat::exists(fn))) {
-    for (FXint i=0; (i<1024) && (!getApp()->getFocusWindow()); i++) {
-      setFocus();
-      getApp()->runWhileEvents();
-    }
-    if (FXMessageBox::question( this, MBOX_YES_NO, _("File not found"),
-          "%s:\n%s\n %s",
-          _("Can't find the file"),
-          fn.text(),
-          _("Would you like to create it?")
-     )==MBOX_CLICKED_YES) {
-       if (!FXStat::exists(fn)) { /* <-maybe someone created it while we were waiting for a response? */
-         FXFile fh(fn, FXFile::Writing);
-         if (!(fh.isOpen() && fh.close())) {
-           FXMessageBox::error(this, MBOX_OK, _("File error"),
-            "%s:\n%s\n%s",
-             _("Failed to create the file"),
-             fn.text(),
-             SystemErrorStr());
-           return false;
-         }
-       }
-    } else { return false; }
-  }
-
+  if (!FileDialogs::FileExistsOrConfirmCreate(this,fn)) { return false; }
   DocTab*tab=tabbook->NewTab(fn.empty()?_("Untitled"):FXPath::name(fn));
-  sci=new SciDoc((FXComposite*)tab->getNext(),this,ID_SCINTILLA);
-
-  sci->sendMessage(SCI_SETMULTIPLESELECTION,false,0);
-  sci->sendMessage(SCI_SETADDITIONALSELECTIONTYPING,true,0);
-
-  sci->ShowLineNumbers(prefs->ShowLineNumbers);
-  sci->ShowWhiteSpace(prefs->ShowWhiteSpace);
-  sci->SetShowEdge(prefs->ShowRightEdge);
-  sci->SetWordWrap(prefs->WordWrap);
-  sci->SetZoom(prefs->ZoomFactor);
-  SciDocUtils::SetSciDocPrefs(sci,prefs);
-
-  sci->DoStaleTest(true);
-
+  sci=SciDocUtils::NewSci((FXComposite*)tab->getNext(),this,ID_SCINTILLA,prefs);
   if (!fn.empty()) {
     if (!sci->LoadFromFile(fn.text())) {
       if (!sci->GetLastError().contains(SciDoc::BinaryFileMessage())) {
          FXMessageBox::error(this, MBOX_OK, _("Error opening file"), "%s:\n%s\n%s",
              _("Could not open file"),  fn.text(),  sci->GetLastError().text());
       }
-      delete sci;
-      delete tab->getNext();
-      delete tab;
+      DoneSci(sci);
       return false;
     }
     if (!sci->SetLanguageForHeader(fn)) {
@@ -249,7 +207,6 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
     sci->SetUTF8(!prefs->DefaultToAscii);
     sci->UpdateStyle();
   }
-
   SetTabLocked(sci,readonly);
   tabbook->ActivateTab(tabbook->Count()-1);
   menubar->AppendDocList(sci->Filename(), tab);

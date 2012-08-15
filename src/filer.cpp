@@ -318,3 +318,34 @@ void FileDialogs::SetWorkingDirectory(FXWindow*w)
   WkDirDlg(w).execute(PLACEMENT_OWNER);
 }
 
+
+
+bool FileDialogs::FileExistsOrConfirmCreate(FXMainWindow*w, const FXString &fn)
+{
+  if ((!fn.empty())&&(!FXStat::exists(fn))) {
+    for (FXint i=0; (i<1024) && (!w->getApp()->getFocusWindow()); i++) {
+      w->setFocus();
+      w->getApp()->runWhileEvents();
+    }
+    if (FXMessageBox::question( w, MBOX_YES_NO, _("File not found"),
+          "%s:\n%s\n %s",
+          _("Can't find the file"),
+          fn.text(),
+          _("Would you like to create it?")
+     )==MBOX_CLICKED_YES) {
+       if (!FXStat::exists(fn)) { /* <-maybe someone created it while we were waiting for a response? */
+         FXFile fh(fn, FXFile::Writing);
+         if (!(fh.isOpen() && fh.close())) {
+           FXMessageBox::error(w, MBOX_OK, _("File error"),
+            "%s:\n%s\n%s",
+             _("Failed to create the file"),
+             fn.text(),
+             SystemErrorStr());
+           return false;
+         }
+       }
+    } else { return false; }
+  }
+  return true;
+}
+
