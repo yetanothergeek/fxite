@@ -85,7 +85,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
 
   statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
 
-  vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
+  FXVerticalFrame*vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
 
   toolbar=new ToolBarFrame(vbox);
 
