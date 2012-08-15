@@ -522,10 +522,8 @@ void TopWindow::SetTabOrientation(FXSelector sel)
 
 void TopWindow::ShowPrefsDialog()
 {
-  if (!prefdlg) { prefdlg=new PrefsDialog(this, prefs); }
-  prefdlg->execute(PLACEMENT_DEFAULT);
-  delete prefdlg;
-  prefdlg=NULL;
+  PrefsDialog prefdlg(this, prefs);
+  prefdlg.execute(PLACEMENT_DEFAULT);
   ClosedDialog();
   SetSrchDlgsPrefs();
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);

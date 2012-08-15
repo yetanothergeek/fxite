@@ -63,7 +63,6 @@ private:
   SearchDialogs* srchdlgs;
   FileDialogs*   filedlgs;
   Settings* prefs;
-  PrefsDialog *prefdlg;
   MacroRunner* macros;
   MacroRecorder* recorder;
   BackupMgr* backups;

@@ -29,7 +29,6 @@
 #include "search.h"
 #include "doctabs.h"
 #include "prefs.h"
-#include "prefdlg.h"
 #include "lang.h"
 #include "runcmd.h"
 #include "macro.h"
@@ -116,7 +115,6 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
 
   macros=NULL;
   recorder=NULL;
-  prefdlg=NULL;
   recording=NULL;
   skipfocus=false;
   destroying=false;
@@ -162,7 +160,6 @@ TopWindow::~TopWindow()
   if (temp_accels) { delete temp_accels; }
   if (saved_accels)  { delete saved_accels; }
   if (recorder) { delete recorder; }
-  if (prefdlg) { delete prefdlg; }
   delete getIcon();
   delete getMiniIcon();
   delete completions;
