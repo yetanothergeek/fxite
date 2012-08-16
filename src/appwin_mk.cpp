@@ -87,7 +87,8 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   prefs=new Settings(this, ConfigDir());
   SciDoc::DefaultStyles(prefs->Styles());
   menubar=new MainMenu(this);
-  FXVerticalFrame*vbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
+  FXVerticalFrame*outer=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
+  FXVerticalFrame*vbox=new FXVerticalFrame(outer,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
   toolbar=new ToolBarFrame(vbox);
   hsplit=new FXSplitter(vbox,this, ID_SPLIT_CHANGED, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   tabbook=new DocTabs(hsplit,this,ID_TAB_SWITCHED,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
@@ -95,7 +96,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   tabbook->setTabsCompact(prefs->DocTabsPacked);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
   outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
-  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)CommandUtils::DontFreezeMe());
+  statusbar=new StatusBar(outer,ID_KILL_COMMAND,(void*)CommandUtils::DontFreezeMe());
   ShowOutputPane(prefs->ShowOutputPane);
   ShowStatusBar(prefs->ShowStatusBar);
   backups=new BackupMgr(this, ConfigDir());
