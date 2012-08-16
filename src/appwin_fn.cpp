@@ -192,54 +192,6 @@ void TopWindow::SetTabLocked(SciDoc*sci, bool locked)
 
 
 
-static const char* dont_freeze_me = "don't taze me, bro!";
-
-
-void TopWindow::Freeze(FXWindow*win, bool frozen)
-{
-  FXWindow*w;
-  for (w=win->getFirst(); w; w=w->getNext()) {
-    if (w->getUserData()==dont_freeze_me) { continue; }
-    if (frozen) {
-      w->disable();
-      w->repaint();
-    } else {w->enable();}
-    Freeze(w,frozen);
-  }
-}
-
-
-
-const char* TopWindow::DontFreezeMe()
-{
-  return dont_freeze_me;
-}
-
-
-
-bool TopWindow::IsCommandReady()
-{
-  if (command_busy) {
-    FXMessageBox::error(this, MBOX_OK, _("Command error"),
-      _("Multiple commands cannot be executed at the same time."));
-    return false;
-  }
-  if (!temp_accels) {
-    FXMessageBox::error(this, MBOX_OK, _("Command support disabled"),
-      _("Support for running macros and external commands has been\n"
-        "disabled, because the interrupt key sequence is invalid.\n\n"
-        "To fix this, go to:\n"
-        "  Edit->Preferences->Keybindings\n"
-        "and enter a valid setting for \"%s\""),
-      MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND)->pref
-    );
-    return false;
-  }
-  return true;
-}
-
-
-
 // Exposes "userland" search behavior to scripting engine.
 bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forward)
 {

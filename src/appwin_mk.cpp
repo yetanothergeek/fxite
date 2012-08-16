@@ -42,6 +42,7 @@
 #include "tagread.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
+#include "cmd_utils.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -71,12 +72,9 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   FXASSERT(!global_top_window_instance);
   global_top_window_instance=this;
   active_widget=NULL;
-  macros=NULL;
   recorder=NULL;
   recording=NULL;
-  saved_accels=NULL;
   need_status=0;
-  command_busy=false;
   skipfocus=false;
   destroying=false;
   close_all_confirmed=false;
@@ -97,7 +95,7 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   tabbook->setTabsCompact(prefs->DocTabsPacked);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
   outlist=new OutputList(hsplit,NULL,0,LAYOUT_SIDE_TOP|LAYOUT_FILL);
-  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
+  statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)CommandUtils::DontFreezeMe());
   ShowOutputPane(prefs->ShowOutputPane);
   ShowStatusBar(prefs->ShowStatusBar);
   backups=new BackupMgr(this, ConfigDir());
@@ -105,49 +103,23 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   filedlgs=new FileDialogs(this,ID_FILE_SAVED,prefs->FileFilters);
   srchdlgs=new SearchDialogs(this);
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
-  InitKillKey();
-}
-
-
-
-void TopWindow::InitKillKey()
-{
-  MenuSpec*killcmd=MenuMgr::LookupMenu(ID_KILL_COMMAND);
-  killkey=parseAccel(killcmd->accel);
-  if (killkey && FXSELID(killkey)) {
-    temp_accels=new FXAccelTable();
-    temp_accels->addAccel(killkey,this,FXSEL(SEL_COMMAND,ID_KILL_COMMAND),0);
-   } else {
-    FXMessageBox::warning(getApp(), MBOX_OK, _("Configuration error"),
-      "%s \"%s\"\n%s",
-      _("Failed to parse accelerator for"),
-      killcmd->pref,
-      _("disabling support for macros and external commands.")
-      );
-    temp_accels=NULL;
-  }  
+  cmdutils=new CommandUtils(this);
 }
 
 
 
 void TopWindow::SetKillCommandAccelKey(FXHotKey acckey)
 {
-  killkey=acckey;
-  delete temp_accels;
-  temp_accels=new FXAccelTable();
-  temp_accels->addAccel(acckey,this,FXSEL(SEL_COMMAND,ID_KILL_COMMAND),0);
+  cmdutils->SetKillCommandAccelKey(acckey);
 }
-
 
 
 TopWindow::~TopWindow()
 {
   destroying=true;
-  delete macros;
   delete filedlgs;
   delete backups;
-  delete temp_accels;
-  delete saved_accels;
+  delete cmdutils;
   delete recorder;
   delete getIcon();
   delete getMiniIcon();
@@ -487,38 +459,6 @@ void TopWindow::UpdateTitle(long line, long col)
 
 
 
-void TopWindow::DisableUI(bool disabled)
-{
-  if (destroying) { return; }
-  if (disabled) {
-    saved_accels=getAccelTable();
-    setAccelTable(temp_accels);
-    temp_accels=NULL;
-  } else {
-    temp_accels=getAccelTable();
-    setAccelTable(saved_accels);
-    saved_accels=NULL;
-  }
-  Freeze(this,disabled);
-}
-
-
-
-static void SetShellEnv(const char*file, long line)
-{
-  char linenum[8]="\0\0\0\0\0\0\0";
-  snprintf(linenum,sizeof(linenum)-1, "%ld", line+1);
-#ifdef WIN32
-  FXSystem::setEnvironment("l",linenum);
-  FXSystem::setEnvironment("f",file);
-#else
-  setenv("l",linenum,1);
-  setenv("f",file,1);
-#endif
-}
-
-
-
 class MyCmdIO: public CmdIO {
   virtual bool IsCancelled() { return ((TopWindow*)win)->IsMacroCancelled(); }
 public:
@@ -529,9 +469,9 @@ public:
 
 bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString &input)
 {
-  if (!IsCommandReady()) { return false; }
-  command_busy=true;
-  SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
+  if (!cmdutils->IsCommandReady()) { return false; }
+  cmdutils->CommandBusy(true);
+  cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool rv=false;
   if (!cmd.empty()) {
     MyCmdIO cmdio(this, prefs->ShellCommand.text());
@@ -539,19 +479,19 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
     command_timeout=false;
     getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
-    DisableUI(true);
+    cmdutils->DisableUI(true);
     if (cmdio.filter(cmd.text(), input, output, &command_timeout)) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
       sci->ScrollWrappedInsert();
       rv=true;
     }
-    DisableUI(false);
+    cmdutils->DisableUI(false);
     statusbar->Normal();
     getApp()->endWaitCursor();
   }
   sci->setFocus();
   need_status=1;
-  command_busy=false;
+  cmdutils->CommandBusy(false);
   return rv;
 }
 
@@ -559,9 +499,9 @@ bool TopWindow::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString
 
 bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
 {
-  if (!IsCommandReady()) { return false; }
-  command_busy=true;
-  SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
+  if (!cmdutils->IsCommandReady()) { return false; }
+  cmdutils->CommandBusy(true);
+  cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool success=false;
   if (!cmd.empty()) {
     MyCmdIO cmdio(this, prefs->ShellCommand.text());
@@ -572,10 +512,10 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
     getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
-    DisableUI(true);
+    cmdutils->DisableUI(true);
     getApp()->runWhileEvents();
     success=cmdio.lines(cmd.text(), this, ID_CMDIO, &command_timeout, true);
-    DisableUI(false);
+    cmdutils->DisableUI(false);
     statusbar->Normal();
     getApp()->endWaitCursor();
     if (success) {
@@ -591,7 +531,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
   }
   if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
   need_status=1;
-  command_busy=false;
+  cmdutils->CommandBusy(false);
   return success;
 }
 
@@ -611,54 +551,32 @@ bool TopWindow::InsertFile(SciDoc *sci, const FXString &filename)
 
 
 
-/*
-  Usually, the application will catch the kill command key sequence by itself,
-  but if the event queue gets really full e.g. when appending large amounts
-  of data to the output window, the key event may get buried underneath
-  everything else that's happening. This function "manually" checks for
-  the key sequence and returns true if the user is trying to cancel.
-*/
 bool TopWindow::IsMacroCancelled()
 {
-  if (command_timeout) { return true; }
-  FXApp*a=getApp();
-  if (a->getKeyState(FXSELID(killkey))) {
-    FXushort mods=FXSELTYPE(killkey);
-    if (mods&CONTROLMASK) {
-      if (!(a->getKeyState(KEY_Control_L) || a->getKeyState(KEY_Control_R))) { return false; }
-    }
-    if (mods&SHIFTMASK) {
-      if (!(a->getKeyState(KEY_Shift_L) || a->getKeyState(KEY_Shift_R))) {  return false; }
-    }
-    if (mods&ALTMASK) {
-      if (!(a->getKeyState(KEY_Alt_L) || a->getKeyState(KEY_Alt_R))) { return false; }
-    }
-    command_timeout=true;
-  }
-  return command_timeout;
+  return cmdutils->IsMacroCancelled(command_timeout);
 }
 
 
 
 bool TopWindow::RunMacro(const FXString &script, bool isfilename)
 {
-  if (!IsCommandReady()) { return false; }
-  command_busy=true;
-  if (!macros) { macros = new MacroRunner(); }
+  if (!cmdutils->IsCommandReady()) { return false; }
+  cmdutils->CommandBusy(true);
+  MacroRunner macros;
   command_timeout=false;
   statusbar->Running(_("macro"));
   update();
-  DisableUI(true);
+  cmdutils->DisableUI(true);
   getApp()->runWhileEvents();
-  bool rv=isfilename?macros->DoFile(script):macros->DoString(script);
+  bool rv=isfilename?macros.DoFile(script):macros.DoString(script);
   if (!destroying) {
     tabbook->ForEachTab(TabCallbacks::ResetUndoLevelCB,NULL);
-    DisableUI(false);
+    cmdutils->DisableUI(false);
     statusbar->Normal();
     if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
-  command_busy=false;
+  cmdutils->CommandBusy(false);
   return rv;
 }
 

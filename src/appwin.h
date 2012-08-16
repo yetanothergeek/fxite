@@ -37,7 +37,7 @@ class OutputList;
 class StatusBar;
 class MainMenu;
 class AutoCompleter;
-
+class CommandUtils;
 
 class TopWindow: public MainWinWithClipBrd {
 private:
@@ -56,33 +56,27 @@ private:
   FileDialogs* filedlgs;
   AutoCompleter* completions;
   Settings* prefs;
-  MacroRunner* macros;
   MacroRecorder* recorder;
   BackupMgr* backups;
+  CommandUtils* cmdutils;
   FXint StaleTicks;
   FXint SaveTicks;
-  FXAccelTable* saved_accels;
-  FXAccelTable* temp_accels;
   FXString session_data;
   FXWindow* active_widget;
   bool destroying;
   bool close_all_confirmed;
   bool kill_commands_confirmed;
   bool command_timeout;
-  bool command_busy;
   FXint need_status;
   FXString save_hook;
-  FXHotKey killkey;
   FXString bookmarked_file;
   DocTab* bookmarked_tab;
   long bookmarked_pos;
   bool skipfocus;
 
   void SetTabTag(SciDoc* sci, char mark, bool set);
-  void Freeze(FXWindow* win, bool frozen);
   void ClosedDialog();
   static const char* DontFreezeMe();
-  bool IsCommandReady();
   void UpdateEolMenu(SciDoc* sci);
   void UpdateToolbar();
   void UpdateTitle(long line, long col);
@@ -96,7 +90,6 @@ private:
   void SetTabLocked(SciDoc* sci, bool locked);
   bool SaveAll(bool break_on_fail);
   bool ShowSaveAsDlg(SciDoc* sci);
-  void DisableUI(bool disabled);
   void DoneSci(SciDoc* sci);
   void EnableUserFilters(bool enabled);
   void OpenSelected();
@@ -115,7 +108,6 @@ private:
   void GoToBookmark();
   bool NewFile(bool hooked);
   bool CloseAll(bool close_last);
-  void InitKillKey();
 public:
   long CheckStale(       FXObject* o, FXSelector sel, void* p );
   long CheckStyle(       FXObject* o, FXSelector sel, void* p );
