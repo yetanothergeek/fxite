@@ -284,6 +284,48 @@ bool FileDialogs::AskReload(SciDoc*sci) {
 
 
 
+bool FileDialogs::AskReloadForExternalChanges(SciDoc*sci)
+{
+  if ( FXMessageBox::question(sci->getShell(), MBOX_YES_NO, _("File changed"),
+         "%s\n%s\n\n%s",
+         sci->Filename().text(),
+         _("was modified externally."),
+         _("Reload from disk?")
+       )==MBOX_CLICKED_YES ) { return AskReload(sci); } else { return false; }
+}
+
+
+
+bool FileDialogs::AskSaveMissingFile(SciDoc*sci)
+{
+  return FXMessageBox::question(sci->getShell(), MBOX_YES_NO, _("File status error"),
+               "%s:\n%s\n(%s)\n\n%s",
+               _("Error checking the status of"),
+               sci->Filename().text(), sci->GetLastError().text(),
+               _("Save to disk now?")
+               )==MBOX_CLICKED_YES;
+}
+
+
+
+bool FileDialogs::AskSaveModifiedCommand(SciDoc*sci, const FXString &script)
+{
+  if (sci->Dirty() && (sci->Filename()==script)) {
+    switch (FXMessageBox::warning(sci->getShell(),
+          MBOX_YES_NO_CANCEL,_("Unsaved changes"),
+          _("The disk file for the \"%s\" command is currently\n"
+            " open in the editor, and has unsaved changes.\n\n"
+            "  Save the file before continuing?"), sci->Filename().text()))
+    {
+      case MBOX_CLICKED_YES: { return SaveFile(sci,sci->Filename()); }
+      case MBOX_CLICKED_NO: { return true; }
+      default: { return false; }
+    }
+  } else { return true; }
+}
+
+
+
 class WkDirDlg: public FXDirDialog {
 private:
   class DirSel: public FXDirSelector {

@@ -42,6 +42,9 @@ public:
   bool GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi=true);
   bool GetOpenTagFilename(SciDoc*sci, FXString &filename);
   bool AskReload(SciDoc*sci);
+  bool AskReloadForExternalChanges(SciDoc*sci);
+  bool AskSaveMissingFile(SciDoc*sci);
+  bool AskSaveModifiedCommand(SciDoc*sci, const FXString &script);
   void *getUserData() { return user_data; }
   void setUserData(void*p) { user_data=p; }
   static void SetWorkingDirectory(FXWindow*w);

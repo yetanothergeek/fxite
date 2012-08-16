@@ -262,16 +262,8 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
         CheckingStale=true;
         FXPopup *popup=getApp()->getPopupWindow();
         if (popup) { popup->popdown(); }
-        if ( FXMessageBox::question(this, MBOX_YES_NO, _("File changed"),
-             "%s\n%s\n\n%s",
-             sci->Filename().text(),
-             _("was modified externally."),
-             _("Reload from disk?")
-             )==MBOX_CLICKED_YES )
-        {
-          if (filedlgs->AskReload(sci)) {
-            if (sci->GetReadOnly()) { SetTabLocked(sci,true); }
-          }
+        if (filedlgs->AskReloadForExternalChanges(sci)) {
+          if (sci->GetReadOnly()) { SetTabLocked(sci,true); }
         } else {
           sci->DoStaleTest(false);
         }
@@ -286,16 +278,8 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
         CheckingStale=true;
         FXPopup *popup=getApp()->getPopupWindow();
         if (popup) { popup->popdown(); }
-        if ( FXMessageBox::question(this, MBOX_YES_NO, _("File status error"),
-             "%s:\n%s\n(%s)\n\n%s",
-             _("Error checking the status of"),
-             sci->Filename().text(), sci->GetLastError().text(),
-             _("Save to disk now?")
-             )==MBOX_CLICKED_YES )
-        {
-          if (!filedlgs->SaveFile(sci,sci->Filename())) {
-            ShowSaveAsDlg(sci);
-          }
+        if (filedlgs->AskSaveMissingFile(sci)) {
+          if (!filedlgs->SaveFile(sci,sci->Filename())) { ShowSaveAsDlg(sci); }
         } else {
           sci->DoStaleTest(false);
         }
@@ -316,11 +300,7 @@ long TopWindow::CheckStale(FXObject*o, FXSelector sel, void*p)
 SciDoc*TopWindow::ControlDoc()
 {
   FXWindow *page=tabbook->ActivePage();
-  if (page) {
-    return (SciDoc*)page->getFirst();
-  } else {
-    return NULL;
-  }
+  return page?((SciDoc*)page->getFirst()):NULL;
 }
 
 
@@ -375,22 +355,7 @@ void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
   //  unsaved changes, prompt the user to save the changes.
   FXWindow*tab,*page;
   for (tab=tabbook->getFirst(); tab && (page=tab->getNext()); tab=page->getNext()) {
-    SciDoc*sci=(SciDoc*)page->getFirst();
-    if (sci->Dirty() && (sci->Filename()==script)) {
-      FXuint answer=FXMessageBox::warning(this,
-        MBOX_YES_NO_CANCEL,_("Unsaved changes"),
-        _("The disk file for the \"%s\" command is currently\n"
-          " open in the editor, and has unsaved changes.\n\n"
-          "  Save the file before continuing?"), mc->getText().text());
-      switch (answer) {
-        case MBOX_CLICKED_YES: {
-          if (!filedlgs->SaveFile(sci,sci->Filename())) { return; }
-          break;
-        }
-        case MBOX_CLICKED_NO: { break; }
-        default: { return; }
-      }
-    }
+    if (!filedlgs->AskSaveModifiedCommand((SciDoc*)page->getFirst(), script)) { return; }
   }
   FXString input="";
   SciDoc *sci=FocusedDoc();
