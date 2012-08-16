@@ -122,8 +122,6 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_FOCUSIN,   0,                              TopWindow::onFocusIn),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
-  FXMAPFUNC(SEL_IO_WRITE,  TopWindow::ID_CMDIO,            TopWindow::onCmdIO),
-  FXMAPFUNC(SEL_IO_EXCEPT, TopWindow::ID_CMDIO,            TopWindow::onCmdIO),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_TOP,         TopWindow::ID_TABS_RIGHT,      TopWindow::onTabOrient),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_UNIFORM,     TopWindow::ID_TABS_COMPACT,    TopWindow::onPackTabWidth),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TAB_TOFIRST,      TopWindow::ID_TAB_DOWN,        TopWindow::onMoveTab),
@@ -153,14 +151,6 @@ long TopWindow::onTestSomething(FXObject*o, FXSelector sel, void*p)
   } else {
     getApp()->addChore(this, ID_TEST_SOMETHING);
   }
-  return 1;
-}
-
-
-
-long TopWindow::onCmdIO(FXObject*o, FXSelector sel, void*p)
-{
-  outlist->fillItems(*((FXString*)p));
   return 1;
 }
 

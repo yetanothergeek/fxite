@@ -31,6 +31,7 @@ public:
   ~OutputList();
   long onUserInput(     FXObject*o, FXSelector sel, void*p );
   long onSelectPopCmd(  FXObject*o, FXSelector sel, void*p );
+  long onCmdIO(FXObject*o, FXSelector sel, void*p);
   void GoToError();
   bool Focus();
   FXint fillItems(const FXString& strings);
@@ -42,6 +43,7 @@ public:
     ID_SOMETHING=FXList::ID_LAST,
     ID_SELECT_ALL,
     ID_COPY_SELECTED,
+    ID_CMDIO,
     ID_LAST
   };
 };

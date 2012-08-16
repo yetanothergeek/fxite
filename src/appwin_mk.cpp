@@ -500,7 +500,7 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
     statusbar->Running(_("command"));
     cmdutils->DisableUI(true);
     getApp()->runWhileEvents();
-    success=cmdio.lines(cmd.text(), this, ID_CMDIO, &command_timeout, true);
+    success=cmdio.lines(cmd.text(), outlist, outlist->ID_CMDIO, &command_timeout, true);
     cmdutils->DisableUI(false);
     statusbar->Normal();
     getApp()->endWaitCursor();

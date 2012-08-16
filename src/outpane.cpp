@@ -37,6 +37,10 @@ FXDEFMAP(OutputList) OutputListMap[]={
   FXMAPFUNC(SEL_FOCUSIN,            0,                            OutputList::onUserInput),
   FXMAPFUNC(SEL_COMMAND,            OutputList::ID_SELECT_ALL,    OutputList::onSelectPopCmd),
   FXMAPFUNC(SEL_COMMAND,            OutputList::ID_COPY_SELECTED, OutputList::onSelectPopCmd),
+  FXMAPFUNC(SEL_IO_WRITE,           OutputList::ID_CMDIO,         OutputList::onCmdIO),
+  FXMAPFUNC(SEL_IO_EXCEPT,          OutputList::ID_CMDIO,         OutputList::onCmdIO),
+
+
 };
 
 FXIMPLEMENT(OutputList,FXList,OutputListMap,ARRAYNUMBER(OutputListMap));
@@ -85,6 +89,14 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
     default: { return FXList::handle(o,sel,p); }
   }
   GoToError();
+  return 1;
+}
+
+
+
+long OutputList::onCmdIO(FXObject*o, FXSelector sel, void*p)
+{
+  fillItems(*((FXString*)p));
   return 1;
 }
 
