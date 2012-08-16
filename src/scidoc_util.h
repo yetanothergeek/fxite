@@ -19,13 +19,15 @@
 
 class SciDocUtils {
 public:
-  static void CharAdded(SciDoc*sci, long line, long pos, int ch, bool smart, int indent_width);
+  static void CharAdded(SciDoc*sci, long line, long pos, int ch, Settings*prefs, SciDoc*recording);
+  static void AdjustIndent(SciDoc*sci, char ch, Settings*prefs, SciDoc*recording);
   static void OpenSelected(FXMainWindow*tw, SciDoc*sci);
   static void SetSciDocPrefs(SciDoc*sci, Settings*prefs);
   static void CycleSplitter(SciDoc*sci, Settings*prefs);
   static void Cut(SciDoc*sci);
   static void Copy(SciDoc*sci);
   static void Paste(SciDoc*sci);
+  static void Indent(SciDoc*sci, bool forward, bool single_space, int indent_width);
   static SciDoc* NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Settings*prefs);
 };
 

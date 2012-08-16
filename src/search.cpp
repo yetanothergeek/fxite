@@ -398,6 +398,16 @@ SearchDialogs::~SearchDialogs()
 
 
 
+void SearchDialogs::SetPrefs(FXuint mode, FXuint wrap, bool verbose)
+{
+  searchmode=mode;
+  defaultsearchmode=mode;
+  searchwrap=(SearchWrapPolicy)wrap;
+  searchverbose=verbose;
+}
+
+
+
 bool SearchDialogs::SearchFailed()
 {
   if (searchverbose) {

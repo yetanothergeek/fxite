@@ -58,6 +58,27 @@ bool TabCallbacks::ZoomSpecCB(FXint index, DocTab*tab, FXWindow*page, void*user_
 
 
 
+void TabCallbacks::SetZoom(SciDoc*sci, FXSelector sel, void*p, DocTabs*tabbook, Settings*prefs)
+{
+  FXival z;
+  if (sel) {
+    switch (FXSELID(sel)) {
+      case TopWindow::ID_ZOOM_IN:   { z =  1;  break; }
+      case TopWindow::ID_ZOOM_OUT:  { z = -1; break; }
+      case TopWindow::ID_ZOOM_FAR:  { z = -2; break; }
+      case TopWindow::ID_ZOOM_NEAR: { z =  2;  break; }
+      case TopWindow::ID_ZOOM_NONE: { z =  0;  break; }
+    }
+    tabbook->ForEachTab(ZoomStepCB, &z);
+  } else {
+    z=(FXival)p;
+   tabbook->ForEachTab(ZoomSpecCB, &z);
+  }
+  prefs->ZoomFactor=sci->GetZoom();  
+}
+
+
+
 bool TabCallbacks::LineNumsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
   SciDoc*sci=(SciDoc*)page->getFirst();
@@ -186,5 +207,19 @@ bool TabCallbacks::BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_
 {
   TopWindow*tw=(TopWindow*)user_data;
   return !tw->FoundBookmarkedTab(tab);
+}
+
+
+
+/* Return true if the document is still open */
+bool TabCallbacks::IsDocValid(SciDoc*sci, DocTabs*tabbook)
+{
+  if (sci) {
+    SciDoc*closed=sci;
+    tabbook->ForEachTab(FileStillOpenCB,&closed);
+    return (!closed);
+  } else {
+    return false;
+  }
 }
 

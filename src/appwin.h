@@ -78,7 +78,6 @@ private:
   long bookmarked_pos;
   bool skipfocus;
 
-  bool IsDocValid(SciDoc* sci);
   void SetTabTag(SciDoc* sci, char mark, bool set);
   void Freeze(FXWindow* win, bool frozen);
   void ClosedDialog();
@@ -98,10 +97,8 @@ private:
   bool SaveAll(bool break_on_fail);
   bool ShowSaveAsDlg(SciDoc* sci);
   void DisableUI(bool disabled);
-  void SetSrchDlgsPrefs();
   void DoneSci(SciDoc* sci);
   void EnableUserFilters(bool enabled);
-  void CharAdded(SciDoc* sci, long line, long pos, int ch);
   void OpenSelected();
   bool SetLanguage(FXMenuRadio* mnu);
   void InvertColors(bool inverted);
@@ -114,7 +111,6 @@ private:
   void ShowCommandDialog();
   void ShowToolManagerDialog();
   void RescanUserMenu();
-  void Indent(FXSelector sel);
   void SetBookmark();
   void GoToBookmark();
   bool NewFile(bool hooked);

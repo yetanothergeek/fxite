@@ -100,12 +100,11 @@ TopWindow::TopWindow(FXApp *a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL
   statusbar=new StatusBar(this,ID_KILL_COMMAND,(void*)DontFreezeMe());
   ShowOutputPane(prefs->ShowOutputPane);
   ShowStatusBar(prefs->ShowStatusBar);
-
   backups=new BackupMgr(this, ConfigDir());
   completions=new AutoCompleter();
   filedlgs=new FileDialogs(this,ID_FILE_SAVED,prefs->FileFilters);
   srchdlgs=new SearchDialogs(this);
-  SetSrchDlgsPrefs();
+  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
   InitKillKey();
 }
 
@@ -134,7 +133,7 @@ void TopWindow::InitKillKey()
 void TopWindow::SetKillCommandAccelKey(FXHotKey acckey)
 {
   killkey=acckey;
-  if (temp_accels) { delete temp_accels; }
+  delete temp_accels;
   temp_accels=new FXAccelTable();
   temp_accels->addAccel(acckey,this,FXSEL(SEL_COMMAND,ID_KILL_COMMAND),0);
 }
@@ -147,24 +146,15 @@ TopWindow::~TopWindow()
   delete macros;
   delete filedlgs;
   delete backups;
-  if (temp_accels) { delete temp_accels; }
-  if (saved_accels)  { delete saved_accels; }
-  if (recorder) { delete recorder; }
+  delete temp_accels;
+  delete saved_accels;
+  delete recorder;
   delete getIcon();
   delete getMiniIcon();
   delete completions;
   global_top_window_instance=NULL;
 }
 
-
-
-void TopWindow::SetSrchDlgsPrefs()
-{
-  srchdlgs->searchmode=prefs->SearchOptions;
-  srchdlgs->defaultsearchmode=prefs->SearchOptions;
-  srchdlgs->searchwrap=(SearchWrapPolicy)prefs->SearchWrap;
-  srchdlgs->searchverbose=prefs->SearchVerbose;
-}
 
 
 // Create a new tab and editor panel
@@ -262,9 +252,7 @@ bool TopWindow::SaveAll(bool break_on_fail)
 
 void TopWindow::DoneSci(SciDoc*sci)
 {
-  if (recording==sci) {
-    onMacroRecord(NULL,0,NULL);
-  }
+  if (recording==sci) { onMacroRecord(NULL,0,NULL); }
   if (sci->hasClipboard()) { SaveClipboard(); }
   FXWindow*page=sci->getParent();
   FXWindow*tab=page->getPrev();
@@ -377,6 +365,17 @@ bool TopWindow::SetLanguage(const FXString &name)
 
 
 
+bool TopWindow::ShowLineNumbers() { return prefs->ShowLineNumbers; }
+bool TopWindow::ShowStatusBar()   { return prefs->ShowStatusBar; }
+bool TopWindow::ShowOutputPane()  { return prefs->ShowOutputPane; }
+bool TopWindow::ShowWhiteSpace()  { return prefs->ShowWhiteSpace; }
+bool TopWindow::ShowToolbar()     { return prefs->ShowToolbar; }
+bool TopWindow::ShowMargin()      { return prefs->ShowRightEdge; }
+bool TopWindow::ShowIndent()      { return prefs->ShowIndentGuides; }
+bool TopWindow::ShowCaretLine()   { return prefs->ShowCaretLine; }
+
+
+
 void TopWindow::ShowLineNumbers(bool showit)
 {
   prefs->ShowLineNumbers=showit;
@@ -386,25 +385,11 @@ void TopWindow::ShowLineNumbers(bool showit)
 
 
 
-bool TopWindow::ShowLineNumbers()
-{
-  return prefs->ShowLineNumbers;
-}
-
-
-
 void TopWindow::ShowStatusBar(bool showit)
 {
   prefs->ShowStatusBar=showit;
   menubar->SetCheck(ID_SHOW_STATUSBAR,showit);
   statusbar->Show(showit);
-}
-
-
-
-bool TopWindow::ShowStatusBar()
-{
-  return prefs->ShowStatusBar;
 }
 
 
@@ -425,25 +410,11 @@ void TopWindow::ShowOutputPane(bool showit)
 
 
 
-bool TopWindow::ShowOutputPane()
-{
-  return prefs->ShowOutputPane;
-}
-
-
-
 void TopWindow::ShowWhiteSpace(bool showit)
 {
   prefs->ShowWhiteSpace=showit;
   tabbook->ForEachTab(TabCallbacks::WhiteSpaceCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_WHITESPACE,prefs->ShowWhiteSpace);
-}
-
-
-
-bool TopWindow::ShowWhiteSpace()
-{
-  return prefs->ShowWhiteSpace;
 }
 
 
@@ -457,25 +428,11 @@ void TopWindow::ShowToolbar(bool showit)
 
 
 
-bool TopWindow::ShowToolbar()
-{
-  return prefs->ShowToolbar;
-}
-
-
-
 void TopWindow::ShowMargin(bool showit)
 {
   prefs->ShowRightEdge = showit;
   tabbook->ForEachTab(TabCallbacks::ShowMarginCB, (void*)(FXival)showit);
   menubar->SetCheck(ID_SHOW_MARGIN, showit);
-}
-
-
-
-bool TopWindow::ShowMargin()
-{
-  return prefs->ShowRightEdge;
 }
 
 
@@ -489,13 +446,6 @@ void TopWindow::ShowIndent(bool showit)
 
 
 
-bool TopWindow::ShowIndent()
-{
-  return prefs->ShowIndentGuides;
-}
-
-
-
 void TopWindow::ShowCaretLine(bool showit)
 {
   prefs->ShowCaretLine = showit;
@@ -505,29 +455,12 @@ void TopWindow::ShowCaretLine(bool showit)
 
 
 
-bool TopWindow::ShowCaretLine()
-{
-  return prefs->ShowCaretLine;
-}
-
-
-
-
 void TopWindow::UpdateEolMenu(SciDoc*sci)
 {
   switch (sci->sendMessage(SCI_GETEOLMODE,0,0)) {
-    case SC_EOL_CRLF: {
-      MenuMgr::RadioUpdate(ID_FMT_DOS,ID_FMT_DOS,ID_FMT_UNIX);
-      break;
-    }
-    case SC_EOL_CR: {
-      MenuMgr::RadioUpdate(ID_FMT_MAC,ID_FMT_DOS,ID_FMT_UNIX);
-      break;
-    }
-    case SC_EOL_LF: {
-      MenuMgr::RadioUpdate(ID_FMT_UNIX,ID_FMT_DOS,ID_FMT_UNIX);
-      break;
-    }
+    case SC_EOL_CRLF: { MenuMgr::RadioUpdate(ID_FMT_DOS,  ID_FMT_DOS, ID_FMT_UNIX);  break; }
+    case SC_EOL_CR:   { MenuMgr::RadioUpdate(ID_FMT_MAC,  ID_FMT_DOS, ID_FMT_UNIX);  break; }
+    case SC_EOL_LF:   { MenuMgr::RadioUpdate(ID_FMT_UNIX, ID_FMT_DOS, ID_FMT_UNIX); break; }
   }
 }
 

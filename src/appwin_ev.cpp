@@ -360,7 +360,7 @@ long TopWindow::onFileSaved(FXObject*o, FXSelector sel, void*p)
       tabbook->ActivateTab((DocTab*)(saved->getParent()->getPrev()));
     }
     RunHookScript("saved");
-    if ( IsDocValid(active) && (active!=saved) ) {
+    if ( TabCallbacks::IsDocValid(active,tabbook) && (active!=saved) ) {
       tabbook->ActivateTab((DocTab*)(active->getParent()->getPrev()));
     }
   }
@@ -541,9 +541,7 @@ long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
       break;
     }
     case SCN_SAVEPOINTLEFT: {
-      if (!sci->Loading()) {
-        SetTabDirty(sci,true);
-      }
+      if (!sci->Loading()) { SetTabDirty(sci,true); }
       break;
     }
     case SCN_SAVEPOINTREACHED: {
@@ -557,15 +555,13 @@ long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
       break;
     }
     case SCN_MODIFIED: {
-      if (!sci->Loading()) {
-        if (scn->modificationType & (SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT)) {
+      if ((scn->modificationType&(SC_MOD_INSERTTEXT|SC_MOD_DELETETEXT))&&(!sci->Loading())) {
           sci->NeedBackup(true);
-        }
       }
       break;
     }
     case SCN_CHARADDED: {
-      if (!completions->Continue(sci))  { CharAdded(sci,line,pos,scn->ch); }
+      if (!completions->Continue(sci)) { SciDocUtils::CharAdded(sci,line,pos,scn->ch,prefs,recording); }
       break;
     }
     case SCN_DOUBLECLICK: {
@@ -574,8 +570,6 @@ long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
     case SCN_MACRORECORD: {
       recorder->record(scn->message,scn->wParam, scn->lParam);
       break;
-    }
-    default: {
     }
   }
   UpdateTitle(line,col);
@@ -625,22 +619,10 @@ long TopWindow::onPackTabWidth(FXObject*o,FXSelector sel,void*p)
 long TopWindow::onMoveTab(FXObject*o, FXSelector sel, void*p)
 {
   switch (FXSELID(sel)) {
-    case ID_TAB_TOLAST: {
-      tabbook->MoveTabLast();
-      break;
-    }
-    case ID_TAB_TOFIRST: {
-      tabbook->MoveTabFirst();
-      break;
-    }
-    case ID_TAB_UP: {
-      tabbook->MoveTabUp();
-      break;
-    }
-    case ID_TAB_DOWN: {
-      tabbook->MoveTabDown();
-      break;
-    }
+    case ID_TAB_TOLAST:  { tabbook->MoveTabLast();  break; }
+    case ID_TAB_TOFIRST: { tabbook->MoveTabFirst(); break; }
+    case ID_TAB_UP:      { tabbook->MoveTabUp();    break; }
+    case ID_TAB_DOWN:    { tabbook->MoveTabDown();  break; }
   }
   return 1;
 }
@@ -911,36 +893,7 @@ long TopWindow::onFindSelected(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
 {
-  FXival z;
-  if (sel) {
-    switch (FXSELID(sel)) {
-      case ID_ZOOM_IN:{
-        z=1;
-        break;
-      }
-      case ID_ZOOM_OUT:{
-        z=-1;
-        break;
-      }
-      case ID_ZOOM_FAR:{
-        z=-2;
-        break;
-      }
-      case ID_ZOOM_NEAR:{
-        z=2;
-        break;
-      }
-      case ID_ZOOM_NONE:{
-        z=0;
-        break;
-      }
-    }
-    tabbook->ForEachTab(TabCallbacks::ZoomStepCB, &z);
-  } else {
-    z=(FXival)p;
-   tabbook->ForEachTab(TabCallbacks::ZoomSpecCB, &z);
-  }
-  prefs->ZoomFactor=FocusedDoc()->GetZoom();
+  TabCallbacks::SetZoom(FocusedDoc(),sel,p,tabbook,prefs);
   return 1;
 }
 
@@ -1031,7 +984,9 @@ long TopWindow::onCtrlTab(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onIndent(FXObject*o, FXSelector sel, void*p)
 {
-  Indent(FXSELID(sel));
+  sel=FXSELID(sel);
+  SciDocUtils::Indent(FocusedDoc(), ID_INDENT_STEP==sel||ID_INDENT_FULL==sel,
+                                    ID_INDENT_STEP==sel||ID_UNINDENT_STEP==sel, prefs->IndentWidth);
   return 1;
 }
 

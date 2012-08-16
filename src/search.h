@@ -59,6 +59,7 @@ public:
   FXuint searchdirn;
   FXuint defaultsearchmode;
   FXString searchstring;
+  void SetPrefs(FXuint mode, FXuint wrap, bool verbose);
   bool ShowFindDialog(SciDoc*sci);
   void ShowReplaceDialog(SciDoc*sci);
   bool FindNext(SciDoc*sci);

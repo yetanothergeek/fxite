@@ -240,20 +240,6 @@ bool TopWindow::IsCommandReady()
 
 
 
-/* Return true if the document is still open */
-bool TopWindow::IsDocValid(SciDoc*sci)
-{
-  if (sci) {
-    SciDoc*closed=sci;
-    tabbook->ForEachTab(TabCallbacks::FileStillOpenCB,&closed);
-    return (!closed);
-  } else {
-    return false;
-  }
-}
-
-
-
 // Exposes "userland" search behavior to scripting engine.
 bool TopWindow::FindText(const char*searchstring, FXuint searchmode, bool forward)
 {
@@ -355,20 +341,7 @@ UserMenu**TopWindow::UserMenus() const
 
 void TopWindow::AdjustIndent(SciDoc*sci, char ch)
 {
-  getApp()->runWhileEvents();
-  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
-  long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
-  CharAdded(sci,line,pos,ch);
-}
-
-
-
-void TopWindow::CharAdded(SciDoc*sci, long line, long pos, int ch)
-{
-  if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
-  if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
-  SciDocUtils::CharAdded(sci, line, pos, ch, prefs->AutoIndent==AUTO_INDENT_SMART, prefs->IndentWidth);
-  if (recording) { recording->sendMessage(SCI_STARTRECORD,0,0); }
+  SciDocUtils::AdjustIndent(sci, ch, prefs, recording);
 }
 
 
@@ -499,22 +472,19 @@ void TopWindow::SetTabOrientation(FXSelector sel)
 {
   switch(sel){
     case ID_TABS_TOP:
-      tabbook->setTabStyle(TABBOOK_TOPTABS);
       prefs->DocTabPosition='T';
       break;
     case ID_TABS_BOTTOM:
-      tabbook->setTabStyle(TABBOOK_BOTTOMTABS);
       prefs->DocTabPosition='B';
       break;
     case ID_TABS_LEFT:
-      tabbook->setTabStyle(TABBOOK_LEFTTABS);
       prefs->DocTabPosition='L';
       break;
     case ID_TABS_RIGHT:
-      tabbook->setTabStyle(TABBOOK_RIGHTTABS);
       prefs->DocTabPosition='R';
       break;
   }
+  tabbook->setTabStyleByChar(prefs->DocTabPosition);
   MenuMgr::RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
 }
 
@@ -525,7 +495,7 @@ void TopWindow::ShowPrefsDialog()
   PrefsDialog prefdlg(this, prefs);
   prefdlg.execute(PLACEMENT_DEFAULT);
   ClosedDialog();
-  SetSrchDlgsPrefs();
+  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
   tabbook->ForEachTab(TabCallbacks::PrefsCB, NULL);
   CheckStyle(NULL,0,ControlDoc());
@@ -602,10 +572,10 @@ void TopWindow::ShowFilterDialog(bool is_filter)
 void TopWindow::ShowCommandDialog()
 {
   SciDoc *sci=FocusedDoc();
-  HistBox *dlg= new HistBox(this, _("Run command"), _("Command:"), "Commands");
-  dlg->setNumColumns(48);
-  if ( dlg->execute(PLACEMENT_OWNER) ) {
-    FXString cmd=dlg->getText();
+  HistBox dlg(this, _("Run command"), _("Command:"), "Commands");
+  dlg.setNumColumns(48);
+  if ( dlg.execute(PLACEMENT_OWNER) ) {
+    FXString cmd=dlg.getText();
     if (AvoidMultiLineCommand(this,cmd)) {
       if ( (!prefs->SaveBeforeExecCmd) || SaveAll(true) ) {
         ClosedDialog();
@@ -614,29 +584,6 @@ void TopWindow::ShowCommandDialog()
     }
   } else {
     ClosedDialog();
-  }
-  delete dlg;
-}
-
-
-
-void TopWindow::Indent(FXSelector sel)
-{
-  SciDoc*sci=FocusedDoc();
-  long msg=((ID_INDENT_STEP==sel)||(ID_INDENT_FULL==sel))?SCI_TAB:SCI_BACKTAB;
-  int tab_width=sci->TabWidth();
-  if ((ID_INDENT_STEP==sel)||(ID_UNINDENT_STEP==sel))
-  {
-    FXbool use_tabs=sci->UseTabs();
-    sci->UseTabs(false);
-    sci->sendMessage(SCI_SETTABWIDTH,1,0);
-    sci->sendMessage(msg,0,0);
-    sci->TabWidth(tab_width);
-    sci->UseTabs(use_tabs);
-  } else {
-    sci->TabWidth(sci->UseTabs()?tab_width:prefs->IndentWidth);
-    sci->sendMessage(msg,0,0);
-    sci->TabWidth(tab_width);
   }
 }
 

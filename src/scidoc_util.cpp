@@ -29,8 +29,13 @@
 #include "scidoc_util.h"
 
 
-void SciDocUtils::CharAdded(SciDoc*sci, long line, long pos, int ch, bool smart, int indent_width)
+
+void SciDocUtils::CharAdded(SciDoc*sci, long line, long pos, int ch, Settings*prefs, SciDoc*recording)
 {
+  if ( (line<=0) || (prefs->AutoIndent==AUTO_INDENT_NONE)) { return; }
+  bool smart=prefs->AutoIndent==AUTO_INDENT_SMART;
+  int indent_width=prefs->IndentWidth;
+  if (recording) { recording->sendMessage(SCI_STOPRECORD,0,0); }
   switch (ch) {
     case '\r': {
       if (sci->sendMessage(SCI_GETEOLMODE,0,0)!=SC_EOL_CR) { break; } // or fall through for Mac.
@@ -90,9 +95,18 @@ void SciDocUtils::CharAdded(SciDoc*sci, long line, long pos, int ch, bool smart,
       }
     }
   }
+  if (recording) { recording->sendMessage(SCI_STARTRECORD,0,0); }
 }
 
 
+
+void SciDocUtils::AdjustIndent(SciDoc*sci, char ch, Settings*prefs, SciDoc*recording)
+{
+  sci->getApp()->runWhileEvents();
+  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
+  long line=sci->sendMessage(SCI_LINEFROMPOSITION,pos,0);
+  CharAdded(sci, line, pos, ch, prefs, recording);
+}
 
 
 
@@ -220,11 +234,6 @@ static void ParseLineNumberFromFilename(FXString &filename, FXString &line)
     }
   }
 }
-
-
-
-
-
 
 
 
@@ -399,6 +408,27 @@ void SciDocUtils::Paste(SciDoc*sci)
     sci->sendMessage(SCI_PASTE,0,0);
     sci->sendMessage(SCI_CONVERTEOLS,sci->sendMessage(SCI_GETEOLMODE,0,0),0);
     sci->ScrollWrappedInsert();
+  }
+}
+
+
+
+void SciDocUtils::Indent(SciDoc*sci, bool forward, bool single_space, int indent_width)
+{
+  long msg=forward?SCI_TAB:SCI_BACKTAB;
+  int tab_width=sci->TabWidth();
+  if (single_space)
+  {
+    FXbool use_tabs=sci->UseTabs();
+    sci->UseTabs(false);
+    sci->sendMessage(SCI_SETTABWIDTH,1,0);
+    sci->sendMessage(msg,0,0);
+    sci->TabWidth(tab_width);
+    sci->UseTabs(use_tabs);
+  } else {
+    sci->TabWidth(sci->UseTabs()?tab_width:indent_width);
+    sci->sendMessage(msg,0,0);
+    sci->TabWidth(tab_width);
   }
 }
 
