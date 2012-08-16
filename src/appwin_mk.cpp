@@ -157,7 +157,7 @@ bool TopWindow::OpenFile(const char*filename, const char*rowcol, bool readonly, 
          FXMessageBox::error(this, MBOX_OK, _("Error opening file"), "%s:\n%s\n%s",
              _("Could not open file"),  fn.text(),  sci->GetLastError().text());
       }
-      DoneSci(sci);
+      SciDocUtils::DoneSci(sci,recording,ID_MACRO_RECORD);
       return false;
     }
     if (!sci->SetLanguageForHeader(fn)) {
@@ -222,20 +222,6 @@ bool TopWindow::SaveAll(bool break_on_fail)
 
 
 
-void TopWindow::DoneSci(SciDoc*sci)
-{
-  if (recording==sci) { onMacroRecord(NULL,0,NULL); }
-  if (sci->hasClipboard()) { SaveClipboard(); }
-  FXWindow*page=sci->getParent();
-  FXWindow*tab=page->getPrev();
-  delete sci;
-  delete (FXMenuCommand*)tab->getUserData();
-  delete tab;
-  delete page;
-}
-
-
-
 bool TopWindow::CloseFile(bool close_last, bool hooked)
 {
   FXint i=tabbook->getCurrent();
@@ -255,9 +241,9 @@ bool TopWindow::CloseFile(bool close_last, bool hooked)
   backups->RemoveBackup(sci);
   if (tabbook->numChildren()==2) {
     if (!close_last) { NewFile(false); }
-    DoneSci(sci);
+    SciDocUtils::DoneSci(sci,recording,ID_MACRO_RECORD);
   } else {
-    DoneSci(sci);
+    SciDocUtils::DoneSci(sci,recording,ID_MACRO_RECORD);
     FXWindow *w=tabbook->childAtIndex(i*2);
     if (!w) {
       i--;
@@ -533,20 +519,6 @@ bool TopWindow::RunCommand(SciDoc *sci, const FXString &cmd)
   need_status=1;
   cmdutils->CommandBusy(false);
   return success;
-}
-
-
-
-bool TopWindow::InsertFile(SciDoc *sci, const FXString &filename)
-{
-  if (sci->InsertFile(filename.text())) {
-     sci->ScrollWrappedInsert();
-    return true;
-  } else {
-    FXMessageBox::error(this, MBOX_OK, _("Error opening file"), "%s:\n%s\n%s",
-       _("Could not open file"), filename.text(), sci->GetLastError().text());
-  }
-  return false;
 }
 
 

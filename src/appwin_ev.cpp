@@ -332,7 +332,7 @@ long TopWindow::onInsertFile(FXObject*o, FXSelector sel, void*p )
   SciDoc*sci=FocusedDoc();
   if (!sci->GetReadOnly()) {
     if (filedlgs->GetOpenFilenames(sci,filename,false)&&!filename->empty()) {
-      InsertFile(sci,*filename);
+      SciDocUtils::InsertFile(sci,*filename);
       delete[] filename;
     }
   }

@@ -444,3 +444,29 @@ SciDoc* SciDocUtils::NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Setting
 }
 
 
+
+bool SciDocUtils::InsertFile(SciDoc *sci, const FXString &filename)
+{
+  if (sci->InsertFile(filename.text())) {
+     sci->ScrollWrappedInsert();
+    return true;
+  } else {
+    FXMessageBox::error(sci->getShell(), MBOX_OK, _("Error opening file"), "%s:\n%s\n%s",
+       _("Could not open file"), filename.text(), sci->GetLastError().text());
+  }
+  return false;
+}
+
+
+
+void SciDocUtils::DoneSci(SciDoc*sci, SciDoc*recording, FXSelector id_macro_record)
+{
+  if (recording==sci) { TopWinPub::instance()->handle(NULL,FXSEL(SEL_COMMAND,id_macro_record),NULL); }
+  if (sci->hasClipboard()) { TopWinPub::SaveClipboard(); }
+  FXWindow*page=sci->getParent();
+  FXWindow*tab=page->getPrev();
+  delete sci;
+  delete (FXMenuCommand*)tab->getUserData();
+  delete tab;
+  delete page;
+}

@@ -334,7 +334,7 @@ void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
       if (PathMatch("*.exec.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
         FilterSelection(sci, script, input);
       } else {
-        InsertFile(sci,script);
+        SciDocUtils::InsertFile(sci,script);
       }
       break;
     }

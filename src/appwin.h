@@ -83,14 +83,12 @@ private:
   bool AskReload(SciDoc* sci);
   bool FilterSelection(SciDoc* sci, const FXString &cmd, const FXString &input);
   bool RunCommand(SciDoc* sci, const FXString &cmd);
-  bool InsertFile(SciDoc* sci, const FXString &filename);
   bool RunMacro(const FXString &script, bool isfilename);
   bool RunHookScript(const char* hookname);
   void SetTabDirty(SciDoc* sci, bool dirty);
   void SetTabLocked(SciDoc* sci, bool locked);
   bool SaveAll(bool break_on_fail);
   bool ShowSaveAsDlg(SciDoc* sci);
-  void DoneSci(SciDoc* sci);
   void EnableUserFilters(bool enabled);
   void OpenSelected();
   bool SetLanguage(FXMenuRadio* mnu);
