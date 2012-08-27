@@ -25,8 +25,6 @@ class TopWindow: public TopWindowBase {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
-  void UpdateTitle(long line, long col);
-  void InvertColors(bool inverted);
   void RunUserCmd(FXMenuCommand* mc,FXSelector sel,FXuval b);
   void SetFileFormat(FXSelector sel);
   void SetTabOrientation(FXSelector sel);
@@ -224,15 +222,6 @@ public:
     ID_LAST
   };
   TopWindow(FXApp* a);
-  void SetWordWrap(SciDoc* sci, bool wrapped);
-  void ShowLineNumbers(bool showit);
-  void ShowStatusBar(bool showit);
-  void ShowOutputPane(bool showit);
-  void ShowWhiteSpace(bool showit);
-  void ShowToolbar(bool showit);
-  void ShowMargin(bool showit);
-  void ShowIndent(bool showit);
-  void ShowCaretLine(bool showit);
   static TopWindow* instance() { return (TopWindow*)TopWindowBase::instance(); }
 };
 

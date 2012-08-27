@@ -97,7 +97,6 @@ protected:
   void AskReload();
   bool SaveAll(bool break_on_fail);
   bool CloseAll(bool close_last);
-  virtual void ShowOutputPane(bool showit) {}
   const FXString &SessionFile();
   bool SetLanguage(FXMenuRadio* mnu);
   void SetBookmark();
@@ -108,6 +107,8 @@ protected:
   void FindTag();
   void GoToBookmark();
   void UpdateToolbar();
+  void UpdateTitle(long line, long col);
+  void InvertColors(bool inverted);
 public:
   TopWindowBase(FXApp* a);
   virtual ~TopWindowBase();
@@ -144,6 +145,15 @@ public:
   bool FoundBookmarkedTab(DocTab* tab);
   bool Destroying() { return destroying; }
   void ActiveWidget(FXWindow* aw) { active_widget=aw; }
+  void SetWordWrap(SciDoc* sci, bool wrapped);
+  void ShowLineNumbers(bool showit);
+  void ShowStatusBar(bool showit);
+  void ShowOutputPane(bool showit);
+  void ShowWhiteSpace(bool showit);
+  void ShowToolbar(bool showit);
+  void ShowMargin(bool showit);
+  void ShowIndent(bool showit);
+  void ShowCaretLine(bool showit);
   long onTimer(     FXObject* o, FXSelector sel, void* p );
   long onCloseWait( FXObject* o, FXSelector sel, void* p );
   long CheckStale(  FXObject* o, FXSelector sel, void* p );

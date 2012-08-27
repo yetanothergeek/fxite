@@ -863,7 +863,7 @@ bool TopWindowBase::SetReadOnly(SciDoc*sci, bool rdonly)
     return false;
   }
   SetTabLocked(sci,rdonly);
-  menubar->SetReadOnly(rdonly);
+  menubar->SetReadOnlyCheckmark(rdonly);
   need_status=32;
   return true;
 }
@@ -1254,5 +1254,124 @@ void TopWindowBase::ParseCommands(FXString &commands)
   }
   commands=FXString::null;
   if (tabbook->numChildren()==0) { NewFile(false); }
+}
+
+
+
+void TopWindowBase::UpdateTitle(long line, long col)
+{
+  SciDoc*sci=ControlDoc();
+  if (sci) {
+    DocTab *tab=tabbook->ActiveTab();
+    FXString s;
+    s.format("%s  %s - %s", tab->getText().text(), FXPath::directory(sci->Filename()).text(), EXE_NAME);
+    setTitle(s);
+    menubar->SetLanguageCheckmark(sci->getLanguage());
+    menubar->SetReadOnlyCheckmark(sci->sendMessage(SCI_GETREADONLY,0,0));
+    menubar->SetWordWrapCheckmark(sci->GetWordWrap());
+    statusbar->FileInfo(sci->Filename(),sci->GetUTF8(),line,col);
+    MenuMgr::UpdateEolMenu(sci);
+  } else {
+    setTitle(EXE_NAME);
+    statusbar->Clear();
+  }
+}
+
+
+
+void TopWindowBase::ShowLineNumbers(bool showit)
+{
+  prefs->ShowLineNumbers=showit;
+  tabbook->ForEachTab(TabCallbacks::LineNumsCB, (void*)(FXival)showit);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowStatusBar(bool showit)
+{
+  prefs->ShowStatusBar=showit;
+  statusbar->Show(showit);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowOutputPane(bool showit)
+{
+  prefs->ShowOutputPane=showit;
+  if (showit) {
+    if (prefs->OutputPaneHeight<16) { prefs->OutputPaneHeight=16; }
+    hsplit->setSplit(1, prefs->OutputPaneHeight);
+    outlist->show();
+  } else {
+    outlist->hide();
+    hsplit->setSplit(1,0);
+  }
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowWhiteSpace(bool showit)
+{
+  prefs->ShowWhiteSpace=showit;
+  tabbook->ForEachTab(TabCallbacks::WhiteSpaceCB, (void*)(FXival)showit);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowToolbar(bool showit)
+{
+  prefs->ShowToolbar=showit;
+  if (showit) { toolbar->show(); } else { toolbar->hide(); }
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowMargin(bool showit)
+{
+  prefs->ShowRightEdge = showit;
+  tabbook->ForEachTab(TabCallbacks::ShowMarginCB, (void*)(FXival)showit);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowIndent(bool showit)
+{
+  prefs->ShowIndentGuides = showit;
+  tabbook->ForEachTab(TabCallbacks::ShowIndentCB, (void*)(FXival)showit);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::ShowCaretLine(bool showit)
+{
+  prefs->ShowCaretLine = showit;
+  tabbook->ForEachTab(TabCallbacks::ShowCaretLineCB, (void*)prefs);
+  menubar->SyncPrefsCheckmarks();
+}
+
+
+
+void TopWindowBase::SetWordWrap(SciDoc*sci, bool wrapped)
+{
+  sci->SetWordWrap(wrapped);
+  menubar->SetWordWrapCheckmark(wrapped);
+}
+
+
+
+void TopWindowBase::InvertColors(bool inverted)
+{
+  prefs->InvertColors=inverted;
+  toolbar->SetToolbarColors();
+  tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
+  CheckStyle(NULL,0,ControlDoc());
+  menubar->SyncPrefsCheckmarks(); 
 }
 

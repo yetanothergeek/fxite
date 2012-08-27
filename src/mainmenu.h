@@ -123,6 +123,9 @@ public:
   void SetCheck(FXSelector sel, bool checked);
   void Recording(bool recording, bool recorded);
   void RescanUserMenus();
+  void SyncPrefsCheckmarks();
+  void SetWordWrapCheckmark(bool wrapped);
+  void SetReadOnlyCheckmark(bool rdonly);
   void SetLanguageCheckmark(LangStyle*ls);
   FXMenuRadio*GetMenuForLanguage(const FXString &name) const;
   void UnloadTagFile(FXMenuCommand*mc);
@@ -133,7 +136,6 @@ public:
   void RemoveRecentFile(const FXString &filename);
   void EnableFileFormats();
   void EnableFilterMenu(bool enabled);
-  void SetReadOnly(bool rdonly);
   void UpdateDocTabSettings();
   UserMenu**UserMenus() const;
   FXMenuCascade*TagsMenu() const;

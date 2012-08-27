@@ -32,8 +32,10 @@
 #include "appname.h"
 #include "outpane.h"
 #include "mainmenu.h"
+#include "statusbar.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
+#include "compat.h"
 
 #include "intl.h"
 #include "appwin.h"
@@ -148,6 +150,30 @@ long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 {
   InvertColors((bool)(FXival)p);
   return 1;
+}
+
+
+
+void TopWindow::SetFileFormat(FXSelector sel)
+{
+  int EolMode=SC_EOL_LF;
+  switch (sel) {
+    case ID_FMT_DOS:{
+      EolMode=SC_EOL_CRLF;
+      break;
+    }
+    case ID_FMT_MAC:{
+      EolMode=SC_EOL_CR;
+      break;
+    }
+    case ID_FMT_UNIX:{
+      EolMode=SC_EOL_LF;
+      break;
+    }
+  }
+  FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
+  FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
+  MenuMgr::RadioUpdate(sel,ID_FMT_DOS,ID_FMT_UNIX);
 }
 
 
@@ -300,6 +326,57 @@ long TopWindow::onFileSaved(FXObject*o, FXSelector sel, void*p)
 {
   FileSaved((SciDoc*)p);
   return 1;
+}
+
+
+
+void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
+{
+  FXString script=(char*)(mc->getUserData());
+  if ( b==2 ) { // Right-clicked, open file instead of executing
+    OpenFile(script.text(), NULL, false, true);
+    return;
+  }
+  //  If this file is currently open in the editor, and has
+  //  unsaved changes, prompt the user to save the changes.
+  FXWindow*tab,*page;
+  for (tab=tabbook->getFirst(); tab && (page=tab->getNext()); tab=page->getNext()) {
+    if (!filedlgs->AskSaveModifiedCommand((SciDoc*)page->getFirst(), script)) { return; }
+  }
+  FXString input="";
+  SciDoc *sci=FocusedDoc();
+  switch (FXSELID(sel)) {
+    case ID_USER_COMMAND: {
+      if (PathMatch("*.save.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
+        if (!SaveAll(true)) { return; }
+      }
+#ifdef WIN32
+     script.prepend('"');
+     script.append('"');
+#endif
+      RunCommand(sci, script);
+      break;
+    }
+    case ID_USER_FILTER: {
+      if (sci->GetSelLength()>0) {
+        sci->GetSelText(input);
+        FilterSelection(sci, script, input);
+      }
+      break;
+    }
+    case ID_USER_SNIPPET: {
+      if (PathMatch("*.exec.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
+        FilterSelection(sci, script, input);
+      } else {
+        SciDocUtils::InsertFile(sci,script);
+      }
+      break;
+    }
+    case ID_USER_MACRO: {
+      RunMacro(script, true);
+      break;
+    }
+  }  
 }
 
 
@@ -482,6 +559,28 @@ long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
 {
   MenuMgr::ShowPopupMenu((FXPoint*)p);
   return 1;
+}
+
+
+
+void TopWindow::SetTabOrientation(FXSelector sel)
+{
+  switch(sel){
+    case ID_TABS_TOP:
+      prefs->DocTabPosition='T';
+      break;
+    case ID_TABS_BOTTOM:
+      prefs->DocTabPosition='B';
+      break;
+    case ID_TABS_LEFT:
+      prefs->DocTabPosition='L';
+      break;
+    case ID_TABS_RIGHT:
+      prefs->DocTabPosition='R';
+      break;
+  }
+  tabbook->setTabStyleByChar(prefs->DocTabPosition);
+  MenuMgr::RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
 }
 
 
@@ -926,5 +1025,19 @@ long TopWindow::onChangeCase(FXObject*o, FXSelector sel, void*p)
 {
   ChangeCase(FXSELID(sel)==ID_TOUPPER);
   return 1;
+}
+
+
+
+TopWindow::TopWindow(FXApp *a):TopWindowBase(a)
+{
+  hsplit->setSelector(ID_SPLIT_CHANGED);
+  tabbook->setSelector(ID_TAB_SWITCHED);
+  statusbar->SetKillID(ID_KILL_COMMAND);
+  filedlgs->setSelector(ID_FILE_SAVED);
+  SciDocUtils::SetScintillaSelector(ID_SCINTILLA);
+  SciDocUtils::SetMacroRecordSelector(ID_MACRO_RECORD);
+  ShowOutputPane(prefs->ShowOutputPane);
+  ShowStatusBar(prefs->ShowStatusBar);
 }
 

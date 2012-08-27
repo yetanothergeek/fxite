@@ -713,23 +713,36 @@ static inline void SyncCheck(FXMenuCheck *chk, bool checked)
 void MainMenu::SetCheck(FXSelector sel, bool checked)
 {
   switch (sel) {
-    case TW::ID_READONLY:        { SETCHK(readonly_chk);  }
-    case TW::ID_SHOW_CARET_LINE: { SETCHK(caretline_chk); }
-    case TW::ID_SHOW_INDENT:     { SETCHK(guides_chk);    }
-    case TW::ID_SHOW_LINENUMS:   { SETCHK(linenums_chk);  }
-    case TW::ID_SHOW_MARGIN:     { SETCHK(margin_chk);    }
-    case TW::ID_SHOW_OUTLIST:    { SETCHK(outpane_chk);   }
-    case TW::ID_SHOW_STATUSBAR:  { SETCHK(status_chk);    }
-    case TW::ID_SHOW_TOOLBAR:    { SETCHK(toolbar_chk);   }
-    case TW::ID_SHOW_WHITESPACE: { SETCHK(white_chk);     }
-    case TW::ID_WORDWRAP:        { SETCHK(wordwrap_chk);  }
+    case TW::ID_READONLY:        { SETCHK(readonly_chk);  }////
+    case TW::ID_SHOW_CARET_LINE: { SETCHK(caretline_chk); }//
+    case TW::ID_SHOW_INDENT:     { SETCHK(guides_chk);    }//
+    case TW::ID_SHOW_LINENUMS:   { SETCHK(linenums_chk);  }//
+    case TW::ID_SHOW_MARGIN:     { SETCHK(margin_chk);    }//
+    case TW::ID_SHOW_OUTLIST:    { SETCHK(outpane_chk);   }//
+    case TW::ID_SHOW_STATUSBAR:  { SETCHK(status_chk);    }//
+    case TW::ID_SHOW_TOOLBAR:    { SETCHK(toolbar_chk);   }//
+    case TW::ID_SHOW_WHITESPACE: { SETCHK(white_chk);     }//
+    case TW::ID_WORDWRAP:        { SETCHK(wordwrap_chk);  }////
     case TW::ID_INVERT_COLORS:   { SETCHK(invert_chk);    }
   }
 }
 
 
+void MainMenu::SyncPrefsCheckmarks()
+{
+SyncCheck(linenums_chk,  prefs->ShowLineNumbers);
+SyncCheck(status_chk,    prefs->ShowStatusBar);
+SyncCheck(outpane_chk,   prefs->ShowOutputPane);
+SyncCheck(white_chk,     prefs->ShowWhiteSpace);
+SyncCheck(toolbar_chk,   prefs->ShowToolbar);
+SyncCheck(margin_chk,    prefs->ShowRightEdge);
+SyncCheck(guides_chk,    prefs->ShowIndentGuides);
+SyncCheck(caretline_chk, prefs->ShowCaretLine);
+SyncCheck(invert_chk,    prefs->InvertColors);
+}
 
-void MainMenu::SetReadOnly(bool rdonly)
+
+void MainMenu::SetReadOnlyCheckmark(bool rdonly)
 {
   SyncCheck(readonly_chk,rdonly);
   if (rdonly) { fileformatcasc->disable(); } else { fileformatcasc->enable(); }
@@ -737,6 +750,14 @@ void MainMenu::SetReadOnly(bool rdonly)
   SetMenuEnabled(fmt_mac_mnu,!rdonly);
   SetMenuEnabled(fmt_unx_mnu,!rdonly);
 }
+
+
+
+void MainMenu::SetWordWrapCheckmark(bool wrapped)
+{
+  SyncCheck(wordwrap_chk,wrapped);
+}
+
 
 
 void MainMenu::UpdateDocTabSettings()

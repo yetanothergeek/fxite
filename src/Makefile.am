@@ -18,7 +18,6 @@ appmain.cpp \
 appname.cpp \
 appwin_base.cpp \
 appwin_ev.cpp \
-appwin_mk.cpp \
 appwin_pub.cpp \
 backup.cpp \
 cmd_utils.cpp \
