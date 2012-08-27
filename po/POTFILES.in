@@ -7,8 +7,8 @@ jef/run_w32.cpp
 jef/runcmd.cpp
 src/appmain.cpp
 src/appname.cpp
+src/appwin_base.cpp
 src/appwin_ev.cpp
-src/appwin_fn.cpp
 src/appwin_mk.cpp
 src/backup.cpp
 src/doctabs.cpp

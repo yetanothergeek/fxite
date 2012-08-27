@@ -38,7 +38,8 @@ public:
   void Normal();
   void Clear();
   void Show(bool showit);
-  StatusBar( FXComposite *p, FXSelector kill_id, void* dont_freeze );
+  void SetKillID(FXSelector kill_id);
+  StatusBar( FXComposite *p, void* dont_freeze );
 };
 
 #endif

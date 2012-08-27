@@ -14,14 +14,14 @@ icon_DATA = fxite.xpm
 fxite_LDFLAGS=$(FXSCINTILLA_LIBS) $(LUA_LIBS) $(LDFLAGS)
 
 fxite_SOURCES=\
-  appmain.cpp appname.cpp appwin_ev.cpp appwin_mk.cpp appwin_fn.cpp filer.cpp \
+  appmain.cpp appname.cpp appwin_ev.cpp appwin_mk.cpp filer.cpp \
   lang.cpp luacmds.cpp luafuncs.cpp macro.cpp prefdlg.cpp prefs.cpp readtags.c \
   recorder.cpp scidoc.cpp search.cpp shmenu.cpp doctabs.cpp tagread.cpp scisrch.cpp \
   export.cpp help.cpp toolmgr.cpp tooltree.cpp backup.cpp fxasq.cpp fxasq_c.cpp fxasq_lua.c \
   menuspec.cpp isutf8.c winshcut.c luafx.cpp \
   migration.cpp filedlg.cpp theme.cpp prefdlg_ext.cpp \
   prefdlg_sntx.cpp prefdlg_tbar.cpp toolbar.cpp outpane.cpp statusbar.cpp \
-  mainmenu.cpp appwin_pub.cpp scidoc_util.cpp foreachtab.cpp cmd_utils.cpp
+  mainmenu.cpp appwin_pub.cpp scidoc_util.cpp foreachtab.cpp cmd_utils.cpp appwin_base.cpp
 
 
 noinst_HEADERS=\
@@ -30,7 +30,7 @@ noinst_HEADERS=\
   shmenu.h doctabs.h tagread.h toolmgr.h tooltree.h langlist.h backup.h fxasq.h fxasq_c.h \
   fxasq_lua.h luasci.h menuspec.h luafx.h appname.h \
   filedlg.h theme.h prefdlg_ext.h prefdlg_sntx.h prefdlg_tbar.h toolbar.h outpane.h statusbar.h\
-  mainmenu.h appwin_pub.h scidoc_util.h foreachtab.h cmd_utils.h
+  mainmenu.h appwin_pub.h scidoc_util.h foreachtab.h cmd_utils.h appwin_base.h
 
 
 

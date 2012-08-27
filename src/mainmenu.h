@@ -134,8 +134,8 @@ public:
   void EnableFileFormats();
   void EnableFilterMenu(bool enabled);
   void SetReadOnly(bool rdonly);
+  void UpdateDocTabSettings();
   UserMenu**UserMenus() const;
-
   FXMenuCascade*TagsMenu() const;
 };
 

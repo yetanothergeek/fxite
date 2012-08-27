@@ -860,3 +860,14 @@ void MenuMgr::RadioUpdate(FXSelector curr, FXSelector min, FXSelector max)
   }
 }
 
+
+
+void MenuMgr::UpdateEolMenu(SciDoc*sci)
+{
+  switch (sci->sendMessage(SCI_GETEOLMODE,0,0)) {
+    case SC_EOL_CRLF: { RadioUpdate(TW::ID_FMT_DOS,  TW::ID_FMT_DOS, TW::ID_FMT_UNIX);  break; }
+    case SC_EOL_CR:   { RadioUpdate(TW::ID_FMT_MAC,  TW::ID_FMT_DOS, TW::ID_FMT_UNIX);  break; }
+    case SC_EOL_LF:   { RadioUpdate(TW::ID_FMT_UNIX, TW::ID_FMT_DOS, TW::ID_FMT_UNIX); break; }
+  }
+}
+

@@ -28,6 +28,12 @@
 #include "intl.h"
 #include "scidoc_util.h"
 
+static FXSelector id_scintilla=0;
+static FXSelector id_macro_record=0;
+
+void SciDocUtils::SetScintillaSelector(FXSelector sel) { id_scintilla=sel; }
+
+void SciDocUtils::SetMacroRecordSelector(FXSelector sel) { id_macro_record=sel; }
 
 
 void SciDocUtils::CharAdded(SciDoc*sci, long line, long pos, int ch, Settings*prefs, SciDoc*recording)
@@ -434,9 +440,9 @@ void SciDocUtils::Indent(SciDoc*sci, bool forward, bool single_space, int indent
 
 
 
-SciDoc* SciDocUtils::NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Settings*prefs)
+SciDoc* SciDocUtils::NewSci(FXComposite*p, FXObject*trg, Settings*prefs)
 {
-  SciDoc*sci=new SciDoc(p,trg,sel);
+  SciDoc*sci=new SciDoc(p,trg,id_scintilla);
   SetSciDocPrefs(sci,prefs);
   sci->SetWordWrap(prefs->WordWrap);
   sci->DoStaleTest(true);
@@ -459,7 +465,7 @@ bool SciDocUtils::InsertFile(SciDoc *sci, const FXString &filename)
 
 
 
-void SciDocUtils::DoneSci(SciDoc*sci, SciDoc*recording, FXSelector id_macro_record)
+void SciDocUtils::DoneSci(SciDoc*sci, SciDoc*recording)
 {
   if (recording==sci) { TopWinPub::instance()->handle(NULL,FXSEL(SEL_COMMAND,id_macro_record),NULL); }
   if (sci->hasClipboard()) { TopWinPub::SaveClipboard(); }

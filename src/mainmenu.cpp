@@ -738,3 +738,15 @@ void MainMenu::SetReadOnly(bool rdonly)
   SetMenuEnabled(fmt_unx_mnu,!rdonly);
 }
 
+
+void MainMenu::UpdateDocTabSettings()
+{
+  switch (prefs->DocTabPosition) {
+    case 'T': MenuMgr::RadioUpdate(TW::ID_TABS_TOP,    TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'B': MenuMgr::RadioUpdate(TW::ID_TABS_BOTTOM, TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'L': MenuMgr::RadioUpdate(TW::ID_TABS_LEFT,   TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'R': MenuMgr::RadioUpdate(TW::ID_TABS_RIGHT,  TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+  }
+  MenuMgr::RadioUpdate(prefs->DocTabsPacked?TW::ID_TABS_COMPACT:TW::ID_TABS_UNIFORM,TW::ID_TABS_UNIFORM,TW::ID_TABS_COMPACT);
+}
+

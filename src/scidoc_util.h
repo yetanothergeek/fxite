@@ -17,6 +17,7 @@
 */
 
 
+
 class SciDocUtils {
 public:
   static void CharAdded(SciDoc*sci, long line, long pos, int ch, Settings*prefs, SciDoc*recording);
@@ -29,7 +30,9 @@ public:
   static void Copy(SciDoc*sci);
   static void Paste(SciDoc*sci);
   static void Indent(SciDoc*sci, bool forward, bool single_space, int indent_width);
-  static SciDoc* NewSci(FXComposite*p, FXObject*trg, FXSelector sel, Settings*prefs);
-  static void DoneSci(SciDoc*sci, SciDoc*recording, FXSelector id_macro_record);
+  static SciDoc* NewSci(FXComposite*p, FXObject*trg, Settings*prefs);
+  static void DoneSci(SciDoc*sci, SciDoc*recording);
+  static void SetScintillaSelector(FXSelector sel);
+  static void SetMacroRecordSelector(FXSelector sel);
 };
 

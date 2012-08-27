@@ -38,7 +38,7 @@ typedef struct _MenuSpec {
 #define POPUP_MAX_CMDS 24
 
 class UsrMnuCmd;
-
+class SciDoc;
 
 
 class MenuMgr {
@@ -69,5 +69,6 @@ public:
   static char**GetPopupCommands();
   static void FreePopupCommands();
   static void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
+  static void UpdateEolMenu(SciDoc*sci);
 };
 

@@ -31,7 +31,7 @@ FXIMPLEMENT(StatusBar,FXHorizontalFrame,StatusBarMap,ARRAYNUMBER(StatusBarMap));
 
 
 
-StatusBar::StatusBar(FXComposite *p, FXSelector kill_id, void* dont_freeze):
+StatusBar::StatusBar(FXComposite *p, void* dont_freeze):
     FXHorizontalFrame(p,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_RAISED, 0,0,0,0, 3,3,3,3, 7,3)
 {
   coords=new FXTextField(this,12,NULL,FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
@@ -48,8 +48,14 @@ StatusBar::StatusBar(FXComposite *p, FXSelector kill_id, void* dont_freeze):
   mode->hide();
   mode->setUserData(dont_freeze);
 
-  id_kill=kill_id;
   Colorize();
+}
+
+
+
+void StatusBar::SetKillID(FXSelector kill_id)
+{
+  id_kill=kill_id;
 }
 
 

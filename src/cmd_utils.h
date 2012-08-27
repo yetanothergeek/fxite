@@ -1,7 +1,7 @@
 #ifndef RUNCMD_H
 #define RUNCMD_H
 
-class TopWindow;
+class TopWindowBase;
 
 class CommandUtils: public FXObject {
 private:
@@ -22,7 +22,7 @@ public:
   bool IsCommandReady();
   bool IsMacroCancelled(bool &command_timeout);
   static void SetShellEnv(const char*file, long line);
-  CommandUtils(TopWindow*w);
+  CommandUtils(TopWindowBase*w);
   ~CommandUtils();
 };
 

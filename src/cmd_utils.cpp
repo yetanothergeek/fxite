@@ -54,12 +54,12 @@ void CommandUtils::InitKillKey()
 
 
 
-CommandUtils::CommandUtils(TopWindow*win)
+CommandUtils::CommandUtils(TopWindowBase*win)
 {
   saved_accels=NULL;
   temp_accels=NULL;
   command_busy=false;
-  tw=win;
+  tw=(TopWindow*)win;
   InitKillKey();
 }
 

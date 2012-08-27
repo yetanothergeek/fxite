@@ -19,7 +19,6 @@
 
 #include <fx.h>
 
-#include "compat.h"
 #include "scidoc.h"
 #include "doctabs.h"
 #include "search.h"
@@ -32,7 +31,6 @@
 #include "menuspec.h"
 #include "appname.h"
 #include "outpane.h"
-#include "statusbar.h"
 #include "mainmenu.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
@@ -40,12 +38,9 @@
 #include "intl.h"
 #include "appwin.h"
 
-#define STALECHECK 5 /* seconds between checks for external changes. */
-
 
 
 FXDEFMAP(TopWindow) TopWindowMap[]={
-  FXMAPFUNC(SEL_TIMEOUT,   TopWindow::ID_TIMER,            TopWindow::onTimer),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_SCINTILLA,        TopWindow::onScintillaCmd),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TAB_SWITCHED,     TopWindow::onSwitchTabs),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TAB_ACTIVATE,     TopWindow::onTabActivate),
@@ -102,8 +97,6 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_CONFIGURE_TOOLS,  TopWindow::onConfigureTools),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_INSERT_FILE,      TopWindow::onInsertFile),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_HELP_ABOUT,       TopWindow::onHelpAbout),
-  FXMAPFUNC(SEL_TIMEOUT,   TopWindow::ID_CLOSEWAIT,        TopWindow::onCloseWait),
-  FXMAPFUNC(SEL_CHORE,     TopWindow::ID_CLOSEWAIT,        TopWindow::onCloseWait),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_FILE_SAVED,       TopWindow::onFileSaved),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_OPEN_PREVIOUS,    TopWindow::onOpenPrevious),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_OPEN_SELECTED,    TopWindow::onOpenSelected),
@@ -114,12 +107,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TBAR_CUSTOM_CMD,  TopWindow::onTBarCustomCmd),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_SELECT_ALL, TopWindow::onPopupSelectAll),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_DELETE_SEL, TopWindow::onPopupDeleteSel),
-  FXMAPFUNC(SEL_FOCUSIN,   TopWindow::ID_SCINTILLA,        TopWindow::onScintillaFocus),
-  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,        TopWindow::onScintillaPick),
-  FXMAPFUNC(SEL_CHORE,     TopWindow::ID_CHECK_STALE,      TopWindow::CheckStale),
-  FXMAPFUNC(SEL_CHORE,     TopWindow::ID_CHECK_STYLE,      TopWindow::CheckStyle),
-  FXMAPFUNC(SEL_CHORE,     TopWindow::ID_FOCUS_DOC,        TopWindow::onFocusDoc),
-  FXMAPFUNC(SEL_FOCUSIN,   0,                              TopWindow::onFocusIn),
+  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,  TopWindow::onScintillaPick),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_TOP,         TopWindow::ID_TABS_RIGHT,      TopWindow::onTabOrient),
@@ -139,7 +127,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
 };
 
 
-FXIMPLEMENT(TopWindow,MainWinWithClipBrd,TopWindowMap,ARRAYNUMBER(TopWindowMap))
+FXIMPLEMENT(TopWindow,TopWindowBase,TopWindowMap,ARRAYNUMBER(TopWindowMap))
 
 
 
@@ -185,19 +173,6 @@ long TopWindow::onBookmark(FXObject*o, FXSelector sel, void*p)
     }
   }
   return 1;
-}
-
-
-
-long TopWindow::onFocusIn(FXObject*o, FXSelector sel, void*p)
-{
-  long rv=FXMainWindow::onFocusIn(o,sel,p);
-  if (active_widget==outlist) {
-    outlist->setFocus();
-  } else if (FocusedDoc()) {
-    FocusedDoc()->setFocus();
-  }
-  return rv;
 }
 
 
@@ -299,18 +274,7 @@ long TopWindow::onMacroShow(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onMacroRecord(FXObject*o, FXSelector sel, void*p)
 {
-  if (recording) {
-    recording->sendMessage(SCI_STOPRECORD, 0, 0);
-    recording=NULL;
-  } else {
-    if (!recorder) {recorder=new MacroRecorder(); }
-    recorder->clear();
-    recording=ControlDoc();
-    recording->sendMessage(SCI_STARTRECORD, 0, 0);
-  }
-  statusbar->Recording(recording);
-  menubar->Recording(recording,recorder);
-  ControlDoc()->setFocus();
+  ToggleRecorder();
   return 1;
 }
 
@@ -318,15 +282,7 @@ long TopWindow::onMacroRecord(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onInsertFile(FXObject*o, FXSelector sel, void*p )
 {
-  FXString* filename=NULL;
-  SciDoc*sci=FocusedDoc();
-  if (!sci->GetReadOnly()) {
-    if (filedlgs->GetOpenFilenames(sci,filename,false)&&!filename->empty()) {
-      SciDocUtils::InsertFile(sci,*filename);
-      delete[] filename;
-    }
-  }
-  sci->setFocus();
+  ShowInsertFileDlg();
   return 1;
 }
 
@@ -342,18 +298,7 @@ long TopWindow::onRescanUserMenu(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFileSaved(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc *active=ControlDoc();
-  SciDoc* saved=(SciDoc*)p;
-  FXStat st;
-  if ( FXStat::stat(save_hook,st) && (st.size()>0) && st.isFile() ) {
-    if (active!=saved) {
-      tabbook->ActivateTab((DocTab*)(saved->getParent()->getPrev()));
-    }
-    RunHookScript("saved");
-    if ( TabCallbacks::IsDocValid(active,tabbook) && (active!=saved) ) {
-      tabbook->ActivateTab((DocTab*)(active->getParent()->getPrev()));
-    }
-  }
+  FileSaved((SciDoc*)p);
   return 1;
 }
 
@@ -403,9 +348,7 @@ long TopWindow::onAutoComplete(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onLoadTags(FXObject*o, FXSelector sel, void*p)
 {
   FXString filename="";
-  if ( filedlgs->GetOpenTagFilename(ControlDoc(), filename) ) {
-    AddFileToTagsMenu(filename);
-  }
+  if (filedlgs->GetOpenTagFilename(ControlDoc(),filename)) { AddFileToTagsMenu(filename); }
   return 1;
 }
 
@@ -457,43 +400,9 @@ long TopWindow::onSwitchTabs(FXObject*o, FXSelector sel, void*p)
 
 
 
-long TopWindow::onTimer(FXObject*o, FXSelector sel, void*p)
-{
-  if (prefs->WatchExternChanges) {
-    if (StaleTicks < STALECHECK)  {
-      StaleTicks++;
-    } else {
-      if (getApp()->getActiveWindow() && (getApp()->getActiveWindow()->getShell()==this)) {
-        CheckStale(NULL,0,NULL);
-      }
-    }
-  }
-  if (prefs->Autosave) {
-    if (SaveTicks < prefs->AutosaveInterval) {
-      SaveTicks++;
-    } else {
-      SaveTicks=0;
-      tabbook->ForEachTab(TabCallbacks::AutoSaveCB,backups);
-    }
-  }
-  if (prefs->Autosave||prefs->WatchExternChanges) { getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL); }
-  return 1;
-}
-
-
-
 long TopWindow::onReload(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=ControlDoc();
-  if (sci->Filename().empty()) {
-    FXMessageBox::error(this,MBOX_OK,_("Unamed file"), _("File has no name, can't reload."));
-    return 1;
-  }
-  if (!sci->Dirty()) {
-    if ( FXMessageBox::question(this, MBOX_YES_NO, _("Reload file"),
-    _("Reload current document?"))!=MBOX_CLICKED_YES ) { return 1; }
-  }
-  filedlgs->AskReload(sci);
+  AskReload();
   return 1;
 }
 
@@ -575,15 +484,6 @@ long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
   return 1;
 }
 
-
-
-long TopWindow::onScintillaFocus(FXObject*o,FXSelector s,void*p)
-{
-  getApp()->addChore(this, ID_CHECK_STALE);
-  if (((SciDoc*)o)->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,o); }
-  active_widget=(SciDoc*)o;
-  return 1;
-}
 
 
 // Switch tab orientations
@@ -732,7 +632,7 @@ long TopWindow::onUndo(FXObject*o, FXSelector sel, void*p)
 {
   DOC_SEND(SCI_UNDO);
   sci->SetEolModeFromContent();
-  UpdateEolMenu(sci);
+  MenuMgr::UpdateEolMenu(sci);
   return 1;
 }
 
@@ -742,7 +642,7 @@ long TopWindow::onRedo(FXObject*o, FXSelector sel, void*p)
 {
   DOC_SEND(SCI_REDO);
   sci->SetEolModeFromContent();
-  UpdateEolMenu(sci);
+  MenuMgr::UpdateEolMenu(sci);
   return 1;
 }
 
@@ -1024,35 +924,7 @@ long TopWindow::onGoToError(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onChangeCase(FXObject*o, FXSelector sel, void*p)
 {
-  SciDoc*sci=FocusedDoc();
-  if (sci->GetSelLength()>0) {
-    switch (FXSELID(sel)) {
-      case ID_TOUPPER: {
-        sci->SelectionToUpper();
-        if (recording==sci) { recorder->record(SCI_UPPERCASE,0,0); }
-        break;
-      }
-      case ID_TOLOWER: {
-        sci->SelectionToLower();
-        if (recording==sci) { recorder->record(SCI_LOWERCASE,0,0); }
-        break;
-      }
-    }
-  }
+  ChangeCase(FXSELID(sel)==ID_TOUPPER);
   return 1;
-}
-
-
-
-long TopWindow::onFocusDoc(FXObject*o, FXSelector sel, void*p ) {
-  if (skipfocus) {
-    skipfocus=false;
-  } else {
-    if (getApp()->getActiveWindow()==this) {
-      SciDoc*sci=FocusedDoc();
-      if (sci) { sci->setFocus(); }
-    }
-  }
-  return 0;
 }
 

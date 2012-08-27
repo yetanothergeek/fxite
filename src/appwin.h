@@ -18,97 +18,19 @@
 #ifndef APPWIN_H
 #define APPWIN_H
 
-#include "histbox.h"
+#include "appwin_base.h"
 
-class SciDoc;
-class DocTab;
-class DocTabs;
-class SearchDialogs;
-class FileDialogs;
-class Settings;
-class PrefsDialog;
-class UserMenu;
-class MacroRunner;
-class MacroRecorder;
-class BackupMgr;
-class ToolsDialog;
-class ToolBarFrame;
-class OutputList;
-class StatusBar;
-class MainMenu;
-class AutoCompleter;
-class CommandUtils;
 
-class TopWindow: public MainWinWithClipBrd {
+class TopWindow: public TopWindowBase {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
-
-  SciDoc* recording;
-  FXToolTip* tips;
-  MainMenu* menubar;
-  StatusBar* statusbar;
-  DocTabs* tabbook;
-  FXSplitter* hsplit;
-  OutputList* outlist;
-  ToolBarFrame* toolbar;
-  SearchDialogs* srchdlgs;
-  FileDialogs* filedlgs;
-  AutoCompleter* completions;
-  Settings* prefs;
-  MacroRecorder* recorder;
-  BackupMgr* backups;
-  CommandUtils* cmdutils;
-  FXint StaleTicks;
-  FXint SaveTicks;
-  FXString session_data;
-  FXWindow* active_widget;
-  bool destroying;
-  bool close_all_confirmed;
-  bool kill_commands_confirmed;
-  bool command_timeout;
-  FXint need_status;
-  FXString save_hook;
-  FXString bookmarked_file;
-  DocTab* bookmarked_tab;
-  long bookmarked_pos;
-  bool skipfocus;
-
-  void SetTabTag(SciDoc* sci, char mark, bool set);
-  void ClosedDialog();
-  static const char* DontFreezeMe();
-  void UpdateEolMenu(SciDoc* sci);
-  void UpdateToolbar();
   void UpdateTitle(long line, long col);
-  bool AskReload(SciDoc* sci);
-  bool FilterSelection(SciDoc* sci, const FXString &cmd, const FXString &input);
-  bool RunCommand(SciDoc* sci, const FXString &cmd);
-  bool RunMacro(const FXString &script, bool isfilename);
-  bool RunHookScript(const char* hookname);
-  void SetTabDirty(SciDoc* sci, bool dirty);
-  void SetTabLocked(SciDoc* sci, bool locked);
-  bool SaveAll(bool break_on_fail);
-  bool ShowSaveAsDlg(SciDoc* sci);
-  void EnableUserFilters(bool enabled);
-  void OpenSelected();
-  bool SetLanguage(FXMenuRadio* mnu);
   void InvertColors(bool inverted);
   void RunUserCmd(FXMenuCommand* mc,FXSelector sel,FXuval b);
-  void FindTag();
   void SetFileFormat(FXSelector sel);
   void SetTabOrientation(FXSelector sel);
-  void ShowPrefsDialog();
-  void ShowFilterDialog(bool is_filter);
-  void ShowCommandDialog();
-  void ShowToolManagerDialog();
-  void RescanUserMenu();
-  void SetBookmark();
-  void GoToBookmark();
-  bool NewFile(bool hooked);
-  bool CloseAll(bool close_last);
 public:
-  long CheckStale(       FXObject* o, FXSelector sel, void* p );
-  long CheckStyle(       FXObject* o, FXSelector sel, void* p );
   long onTabOrient(      FXObject* o, FXSelector sel, void* p );
   long onPackTabWidth(   FXObject* o, FXSelector sel, void* p );
   long onSwitchTabs(     FXObject* o, FXSelector sel, void* p );
@@ -124,7 +46,6 @@ public:
   long onSelectDir(      FXObject* o, FXSelector sel, void* p );
   long onQuit(           FXObject* o, FXSelector sel, void* p );
   long onScintillaCmd(   FXObject* o, FXSelector sel, void* p );
-  long onScintillaFocus( FXObject* o, FXSelector sel, void* p );
   long onScintillaPick(  FXObject* o, FXSelector sel, void* p );
   long onCloseTab(       FXObject* o, FXSelector sel, void* p );
   long onCloseAll(       FXObject* o, FXSelector sel, void* p );
@@ -164,7 +85,6 @@ public:
   long onChangeCase(     FXObject* o, FXSelector sel, void* p );
   long onSetLanguage(    FXObject* o, FXSelector sel, void* p );
   long onReload(         FXObject* o, FXSelector sel, void* p );
-  long onTimer(          FXObject* o, FXSelector sel, void* p );
   long onReadOnly(       FXObject* o, FXSelector sel, void* p );
   long onWordWrap(       FXObject* o, FXSelector sel, void* p );
   long onLoadTags(       FXObject* o, FXSelector sel, void* p );
@@ -176,7 +96,6 @@ public:
   long onRescanUserMenu( FXObject* o, FXSelector sel, void* p );
   long onConfigureTools( FXObject* o, FXSelector sel, void* p );
   long onInsertFile(     FXObject* o, FXSelector sel, void* p );
-  long onCloseWait(      FXObject* o, FXSelector sel, void* p );
   long onMacroRecord(    FXObject* o, FXSelector sel, void* p );
   long onMacroPlayback(  FXObject* o, FXSelector sel, void* p );
   long onMacroShow(      FXObject* o, FXSelector sel, void* p );
@@ -190,13 +109,11 @@ public:
   long onFileExport(     FXObject* o, FXSelector sel, void* p );
   long onShowHelp(       FXObject* o, FXSelector sel, void* p );
   long onTBarCustomCmd(  FXObject* o, FXSelector sel, void* p );
-  long onFocusIn(        FXObject* o, FXSelector sel, void* p );
-  long onFocusDoc(       FXObject* o, FXSelector sel, void* p );
   long onPopupSelectAll( FXObject* o, FXSelector sel, void* p );
   long onPopupDeleteSel( FXObject* o, FXSelector sel, void* p );
   long onTestSomething(  FXObject* o, FXSelector sel, void* p );
   enum {
-    ID_TABS_TOP=FXMainWindow::ID_LAST,
+    ID_TABS_TOP=TopWindowBase::ID_LAST,
     ID_TABS_BOTTOM,
     ID_TABS_LEFT,
     ID_TABS_RIGHT,
@@ -210,7 +127,6 @@ public:
     ID_TAB_UP,
     ID_TAB_DOWN,
     ID_TAB_ACTIVATE,
-    ID_SCINTILLA,
     ID_OPEN_FILES,
     ID_OPEN_PREVIOUS,
     ID_OPEN_SELECTED,
@@ -273,7 +189,6 @@ public:
     ID_TOLOWER,
     ID_SET_LANGUAGE,
     ID_RELOAD,
-    ID_TIMER,
     ID_READONLY,
     ID_WORDWRAP,
     ID_INSERT_FILE,
@@ -291,7 +206,6 @@ public:
     ID_MACRO_RECORD,
     ID_MACRO_PLAYBACK,
     ID_MACRO_TRANSLATE,
-    ID_CLOSEWAIT,
     ID_HELP_ABOUT,
     ID_FILE_SAVED,
     ID_CYCLE_SPLITTER,
@@ -300,69 +214,26 @@ public:
     ID_EXPORT_HTML,
     ID_SHOW_HELP,
     ID_SHOW_LUA_HELP,
-    ID_CHECK_STALE,
-    ID_CHECK_STYLE,
     ID_FMT_DOS,
     ID_FMT_MAC,
     ID_FMT_UNIX,
     ID_TBAR_CUSTOM_CMD,
-    ID_FOCUS_DOC,
     ID_POPUP_SELECT_ALL,
     ID_POPUP_DELETE_SEL,
     ID_TEST_SOMETHING,
     ID_LAST
   };
   TopWindow(FXApp* a);
-  virtual ~TopWindow();
-  virtual void create();
-  virtual FXbool close(FXbool notify=FALSE);
-  bool OpenFile(const char* caption, const char* rowcol, bool readonly, bool hooked);
-  void ParseCommands(FXString &commands);
-  bool CloseFile(bool close_last, bool hooked);
-  bool IsMacroCancelled();
-  bool Destroying() { return destroying; }
-  bool Closing();
-  bool SetReadOnly(SciDoc* sci, bool rdonly);
   void SetWordWrap(SciDoc* sci, bool wrapped);
-  void Cut();
-  void Copy();
-  void Paste();
-  SciDoc* ControlDoc();
-  SciDoc* FocusedDoc();
-  DocTabs* Tabs() {return tabbook; }
-  FileDialogs* FileDlgs() { return filedlgs; }
-  bool SetLanguage(const FXString &name);
   void ShowLineNumbers(bool showit);
-  bool ShowLineNumbers();
   void ShowStatusBar(bool showit);
-  bool ShowStatusBar();
   void ShowOutputPane(bool showit);
-  bool ShowOutputPane();
   void ShowWhiteSpace(bool showit);
-  bool ShowWhiteSpace();
   void ShowToolbar(bool showit);
-  bool ShowToolbar();
   void ShowMargin(bool showit);
-  bool ShowMargin();
   void ShowIndent(bool showit);
-  bool ShowIndent();
   void ShowCaretLine(bool showit);
-  bool ShowCaretLine();
-  void AddFileToTagsMenu(const FXString &filename);
-  bool RemoveFileFromTagsMenu(const FXString &filename);
-  void SetKillCommandAccelKey(FXHotKey acckey);
-  void AddOutput(const FXString&line);
-  void ClearOutput();
-  UserMenu** UserMenus() const;
-  bool FindText(const char* searchstring, FXuint searchmode, bool forward);
-  void AdjustIndent(SciDoc* sci,char ch);
-  static TopWindow* instance();
-  static const FXString& ConfigDir();
-  static const FXString& Connector();
-  FXMenuCaption* TagFiles();
-  void RemoveTBarBtnData(void* p);
-  void ActiveWidget(FXWindow* aw) { active_widget=aw; }
-  bool FoundBookmarkedTab(DocTab* tab);
+  static TopWindow* instance() { return (TopWindow*)TopWindowBase::instance(); }
 };
 
 #endif

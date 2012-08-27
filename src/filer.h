@@ -49,6 +49,7 @@ public:
   void setUserData(void*p) { user_data=p; }
   static void SetWorkingDirectory(FXWindow*w);
   static bool FileExistsOrConfirmCreate(FXMainWindow*w, const FXString &fn);
+  void setSelector(FXSelector sel) { message=sel; }
   FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats=FXString::null);
 #ifdef WIN32
   static bool ReadShortcut(FXWindow*w, FXString &filename);

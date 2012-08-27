@@ -23,10 +23,12 @@
 
 #include "appwin.h"
 #include "filer.h"
+#include "prefs.h"
 
 #include "intl.h"
 
 static TopWindow*tw=NULL;
+static Settings*prefs=NULL;
 
 
 static int edit_indent(lua_State* L){
@@ -336,7 +338,7 @@ static int view_line_numbers(lua_State* L)
 {
   bool show;
   if (lua_gettop(L)==0) {
-    show=!tw->ShowLineNumbers();
+    show=!prefs->ShowLineNumbers;
   } else {
     luaL_argcheck(L, lua_isboolean(L,1), 1, _("expected boolean"));
     show=lua_toboolean(L,1);
@@ -351,7 +353,7 @@ static int view_status(lua_State* L)
 {
   bool show;
   if (lua_gettop(L)==0) {
-    show=!tw->ShowStatusBar();
+    show=!prefs->ShowStatusBar;
   } else {
     luaL_argcheck(L, lua_isboolean(L,1), 1, _("expected boolean"));
     show=lua_toboolean(L,1);
@@ -366,7 +368,7 @@ static int view_output_pane(lua_State* L)
 {
   bool show;
   if (lua_gettop(L)==0) {
-    show=!tw->ShowOutputPane();
+    show=!prefs->ShowOutputPane;
   } else {
     luaL_argcheck(L, lua_isboolean(L,1), 1, _("expected boolean"));
     show=lua_toboolean(L,1);
@@ -381,7 +383,7 @@ static int view_white_space(lua_State* L)
 {
   bool show;
   if (lua_gettop(L)==0) {
-    show=!tw->ShowWhiteSpace();
+    show=!prefs->ShowWhiteSpace;
   } else {
     luaL_argcheck(L, lua_isboolean(L,1), 1, _("expected boolean"));
     show=lua_toboolean(L,1);
@@ -396,7 +398,7 @@ static int view_toolbar(lua_State* L)
 {
   bool show;
   if (lua_gettop(L)==0) {
-    show=!tw->ShowToolbar();
+    show=!prefs->ShowToolbar;
   } else {
     luaL_argcheck(L, lua_isboolean(L,1), 1, _("expected boolean"));
     show=lua_toboolean(L,1);
@@ -585,7 +587,10 @@ static const struct luaL_reg fxte_commands[] = {
 
 const luaL_reg* LuaCommands(FXMainWindow*topwin)
 {
-  if (!tw) { tw=(TopWindow*)topwin; }
+  if (!tw) {
+    tw=(TopWindow*)topwin;
+    prefs=tw->Prefs();
+  }
   return fxte_commands;
 }
 
