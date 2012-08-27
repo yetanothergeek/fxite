@@ -120,7 +120,6 @@ private:
 public:
   MainMenu(FXComposite* p);
   ~MainMenu();
-  void SetCheck(FXSelector sel, bool checked);
   void Recording(bool recording, bool recorded);
   void RescanUserMenus();
   void SyncPrefsCheckmarks();

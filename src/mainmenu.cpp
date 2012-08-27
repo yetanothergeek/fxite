@@ -708,26 +708,6 @@ static inline void SyncCheck(FXMenuCheck *chk, bool checked)
 
 
 
-#define SETCHK(m) SyncCheck(m,checked); return;
-
-void MainMenu::SetCheck(FXSelector sel, bool checked)
-{
-  switch (sel) {
-    case TW::ID_READONLY:        { SETCHK(readonly_chk);  }////
-    case TW::ID_SHOW_CARET_LINE: { SETCHK(caretline_chk); }//
-    case TW::ID_SHOW_INDENT:     { SETCHK(guides_chk);    }//
-    case TW::ID_SHOW_LINENUMS:   { SETCHK(linenums_chk);  }//
-    case TW::ID_SHOW_MARGIN:     { SETCHK(margin_chk);    }//
-    case TW::ID_SHOW_OUTLIST:    { SETCHK(outpane_chk);   }//
-    case TW::ID_SHOW_STATUSBAR:  { SETCHK(status_chk);    }//
-    case TW::ID_SHOW_TOOLBAR:    { SETCHK(toolbar_chk);   }//
-    case TW::ID_SHOW_WHITESPACE: { SETCHK(white_chk);     }//
-    case TW::ID_WORDWRAP:        { SETCHK(wordwrap_chk);  }////
-    case TW::ID_INVERT_COLORS:   { SETCHK(invert_chk);    }
-  }
-}
-
-
 void MainMenu::SyncPrefsCheckmarks()
 {
 SyncCheck(linenums_chk,  prefs->ShowLineNumbers);
