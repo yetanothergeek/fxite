@@ -25,9 +25,6 @@ class TopWindow: public TopWindowBase {
 private:
   FXDECLARE(TopWindow)
   TopWindow(){}
-  void RunUserCmd(FXMenuCommand* mc,FXSelector sel,FXuval b);
-  void SetFileFormat(FXSelector sel);
-  void SetTabOrientation(FXSelector sel);
 public:
   long onTabOrient(      FXObject* o, FXSelector sel, void* p );
   long onPackTabWidth(   FXObject* o, FXSelector sel, void* p );
@@ -222,7 +219,6 @@ public:
     ID_LAST
   };
   TopWindow(FXApp* a);
-  static TopWindow* instance() { return (TopWindow*)TopWindowBase::instance(); }
 };
 
 #endif

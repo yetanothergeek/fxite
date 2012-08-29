@@ -154,33 +154,9 @@ long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 
 
 
-void TopWindow::SetFileFormat(FXSelector sel)
-{
-  int EolMode=SC_EOL_LF;
-  switch (sel) {
-    case ID_FMT_DOS:{
-      EolMode=SC_EOL_CRLF;
-      break;
-    }
-    case ID_FMT_MAC:{
-      EolMode=SC_EOL_CR;
-      break;
-    }
-    case ID_FMT_UNIX:{
-      EolMode=SC_EOL_LF;
-      break;
-    }
-  }
-  FocusedDoc()->sendMessage(SCI_SETEOLMODE,EolMode,0);
-  FocusedDoc()->sendMessage(SCI_CONVERTEOLS,EolMode,0);
-  MenuMgr::RadioUpdate(sel,ID_FMT_DOS,ID_FMT_UNIX);
-}
-
-
-
 long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
 {
-  SetFileFormat(FXSELID(sel));
+  MenuMgr::SetFileFormat(FocusedDoc(), FXSELID(sel));
   return 1;
 }
 
@@ -330,25 +306,27 @@ long TopWindow::onFileSaved(FXObject*o, FXSelector sel, void*p)
 
 
 
-void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
+long TopWindow::onUserCmd(FXObject*o, FXSelector sel, void*p)
 {
+  FXMenuCommand*mc=(FXMenuCommand*)o;
+  FXuval b=(FXuval)p;
   FXString script=(char*)(mc->getUserData());
   if ( b==2 ) { // Right-clicked, open file instead of executing
     OpenFile(script.text(), NULL, false, true);
-    return;
+    return 1;
   }
   //  If this file is currently open in the editor, and has
   //  unsaved changes, prompt the user to save the changes.
   FXWindow*tab,*page;
   for (tab=tabbook->getFirst(); tab && (page=tab->getNext()); tab=page->getNext()) {
-    if (!filedlgs->AskSaveModifiedCommand((SciDoc*)page->getFirst(), script)) { return; }
+    if (!filedlgs->AskSaveModifiedCommand((SciDoc*)page->getFirst(), script)) { return 1; }
   }
   FXString input="";
   SciDoc *sci=FocusedDoc();
   switch (FXSELID(sel)) {
     case ID_USER_COMMAND: {
       if (PathMatch("*.save.*", FXPath::name(script), FILEMATCH_CASEFOLD)) {
-        if (!SaveAll(true)) { return; }
+        if (!SaveAll(true)) { return 1; }
       }
 #ifdef WIN32
      script.prepend('"');
@@ -376,14 +354,7 @@ void TopWindow::RunUserCmd(FXMenuCommand*mc,FXSelector sel,FXuval b)
       RunMacro(script, true);
       break;
     }
-  }  
-}
-
-
-
-long TopWindow::onUserCmd(FXObject*o, FXSelector sel, void*p)
-{
-  RunUserCmd((FXMenuCommand*)o,sel,(FXuval)p);
+  }
   return 1;
 }
 
@@ -392,7 +363,7 @@ long TopWindow::onUserCmd(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onTBarCustomCmd(FXObject*o, FXSelector sel, void*p)
 {
   MenuSpec*spec=(MenuSpec*)(((FXButton*)o)->getUserData());
-  RunUserCmd(spec->ms_mc, FXSEL(SEL_COMMAND,spec->ms_mc->getSelector()),0);
+  handle(spec->ms_mc, FXSEL(SEL_COMMAND,spec->ms_mc->getSelector()),0);
   return 1;
 }
 
@@ -563,32 +534,11 @@ long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
 
 
 
-void TopWindow::SetTabOrientation(FXSelector sel)
-{
-  switch(sel){
-    case ID_TABS_TOP:
-      prefs->DocTabPosition='T';
-      break;
-    case ID_TABS_BOTTOM:
-      prefs->DocTabPosition='B';
-      break;
-    case ID_TABS_LEFT:
-      prefs->DocTabPosition='L';
-      break;
-    case ID_TABS_RIGHT:
-      prefs->DocTabPosition='R';
-      break;
-  }
-  tabbook->setTabStyleByChar(prefs->DocTabPosition);
-  MenuMgr::RadioUpdate(sel, ID_TABS_TOP, ID_TABS_RIGHT);
-}
-
-
-
 // Switch tab orientations
 long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 {
-  SetTabOrientation(FXSELID(sel));
+  prefs->DocTabPosition=MenuMgr::SetTabOrientation(FXSELID(sel));
+  tabbook->setTabStyleByChar(prefs->DocTabPosition);
   FocusedDoc()->setFocus();
   return 1;
 }

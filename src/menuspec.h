@@ -70,5 +70,7 @@ public:
   static void FreePopupCommands();
   static void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
   static void UpdateEolMenu(SciDoc*sci);
+  static void SetFileFormat(SciDoc*sci, FXSelector sel);
+  static char SetTabOrientation(FXSelector sel);
 };
 

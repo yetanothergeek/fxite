@@ -642,7 +642,7 @@ void MenuMgr::WritePopupMenu(FXRegistry*reg, const char* popup_sect) {
 
 void MenuMgr::ShowPopupMenu(FXPoint*pt)
 {
-  TopWindow*tw=TopWindow::instance();
+  TopWindowBase*tw=TopWindowBase::instance();
   SciDoc*sci=tw->FocusedDoc();
   FXMenuPane *mnu=new FXMenuPane(tw);
   static FXint toolpathlen=tw->ConfigDir().length()+6;
@@ -868,6 +868,44 @@ void MenuMgr::UpdateEolMenu(SciDoc*sci)
     case SC_EOL_CRLF: { RadioUpdate(TW::ID_FMT_DOS,  TW::ID_FMT_DOS, TW::ID_FMT_UNIX);  break; }
     case SC_EOL_CR:   { RadioUpdate(TW::ID_FMT_MAC,  TW::ID_FMT_DOS, TW::ID_FMT_UNIX);  break; }
     case SC_EOL_LF:   { RadioUpdate(TW::ID_FMT_UNIX, TW::ID_FMT_DOS, TW::ID_FMT_UNIX); break; }
+  }
+}
+
+
+
+void MenuMgr::SetFileFormat(SciDoc*sci, FXSelector sel)
+{
+  long EolMode=SC_EOL_LF;
+  switch (sel) {
+    case TW::ID_FMT_DOS:{
+      EolMode=SC_EOL_CRLF;
+      break;
+    }
+    case TW::ID_FMT_MAC:{
+      EolMode=SC_EOL_CR;
+      break;
+    }
+    case TW::ID_FMT_UNIX:{
+      EolMode=SC_EOL_LF;
+      break;
+    }
+  }
+  sci->sendMessage(SCI_SETEOLMODE,EolMode,0);
+  sci->sendMessage(SCI_CONVERTEOLS,EolMode,0);
+  RadioUpdate(sel,TW::ID_FMT_DOS,TW::ID_FMT_UNIX);
+}
+
+
+
+char MenuMgr::SetTabOrientation(FXSelector sel)
+{
+  RadioUpdate(sel, TW::ID_TABS_TOP, TW::ID_TABS_RIGHT);
+  switch(sel){
+    case TW::ID_TABS_TOP:    return 'T';
+    case TW::ID_TABS_BOTTOM: return 'B';
+    case TW::ID_TABS_LEFT:   return 'L';
+    case TW::ID_TABS_RIGHT:  return 'R';
+    default: return 'T';
   }
 }
 
