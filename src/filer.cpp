@@ -22,7 +22,7 @@
 #include <fx.h>
 #include <fxkeys.h>
 
-#include "scidoc.h"
+#include "scidoc_util.h"
 #include "export.h"
 #include "prefs.h"
 #include "compat.h"
@@ -36,9 +36,8 @@
 FXIMPLEMENT(FileDialogs, FXObject, NULL, 0);
 
 
-FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats):FXObject()
+FileDialogs::FileDialogs(FXObject*tgt, FXSelector sel):FXObject()
 {
-  _patterns=pats.empty()?_("All Files (*)"):pats.text();
   user_data=NULL;
   target=tgt;
   message=sel;
@@ -53,10 +52,10 @@ bool FileDialogs::ReadShortcut(FXWindow*w, FXString &filename)
 
 static void GetPathForDlg(SciDoc*sci, FXString &path)
 {
-  if (sci->Filename().empty()) {
+  if (SciDocUtils::Filename(sci).empty()) {
     path=FXSystem::getCurrentDirectory();
   } else {
-    path=FXPath::directory(sci->Filename());
+    path=FXPath::directory(SciDocUtils::Filename(sci));
   }
 #ifndef WIN32
   path.append(PATHSEP);
@@ -72,8 +71,8 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself, const FXString &suggest
   FXString result="";
   FXString path;
   GetPathForDlg(sci,path);
-  FileDlg dlg(sci->getShell(),_("Save file as"));
-  dlg.setPatternList(_patterns);
+  FileDlg dlg((FXMainWindow*)target,_("Save file as"));
+  dlg.setPatternList(prefs->FileFilters);
   dlg.setCurrentPattern(prefs->FileFilterIndex);
   if (!suggestion.empty()) { dlg.setFilename(suggestion); }
   dlg.setDirectory(path);
@@ -83,7 +82,7 @@ bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself, const FXString &suggest
   }
   if (!result.empty()) {
     if (FXStat::exists(result)) {
-      switch (FXMessageBox::question(sci->getShell(), MBOX_YES_NO_CANCEL, _("Overwrite?"),
+      switch (FXMessageBox::question((FXMainWindow*)target, MBOX_YES_NO_CANCEL, _("Overwrite?"),
                 "%s:\n%s\n\n%s", _("File exists"), result.text(), _("Do you want to replace it?"))
              ) {
         case MBOX_CLICKED_YES: { break; }
@@ -108,15 +107,15 @@ bool FileDialogs::Export(SciDoc*sci,
   if (filename) {
     saveName=filename;
   } else {
-    FileDlg dlg(sci->getShell(),title);
-    if (sci->Filename().empty()) {
+    FileDlg dlg((FXMainWindow*)target,title);
+    if (SciDocUtils::Filename(sci).empty()) {
       path=FXSystem::getCurrentDirectory();
       tmp=_("Untitled");
       tmp.append(ext);
       dlg.setFilename(tmp);
     } else {
-      path=FXPath::directory(sci->Filename());
-      tmp=FXPath::name(sci->Filename());
+      path=FXPath::directory(SciDocUtils::Filename(sci));
+      tmp=FXPath::name(SciDocUtils::Filename(sci));
       tmp.substitute('.','_');
       tmp.append(ext);
       dlg.setFilename(tmp);
@@ -132,7 +131,7 @@ bool FileDialogs::Export(SciDoc*sci,
   }
   if (!saveName.empty()) {
     if (FXStat::exists(saveName)) {
-      switch (FXMessageBox::question(sci->getShell(), MBOX_YES_NO_CANCEL, _("Overwrite?"),
+      switch (FXMessageBox::question((FXMainWindow*)target, MBOX_YES_NO_CANCEL, _("Overwrite?"),
                 "%s:\n%s\n\n%s", _("File exists"), saveName.text(), _("Do you want to replace it?")
                 )) {
         case MBOX_CLICKED_YES: { break; }
@@ -145,7 +144,7 @@ bool FileDialogs::Export(SciDoc*sci,
       func(sci,fp);
       if (fclose(fp)==0) { return true; }
     }
-    FXMessageBox::error(sci->getShell(),MBOX_OK,
+    FXMessageBox::error((FXMainWindow*)target,MBOX_OK,
       _("Export error"), "%s:\n%s\n\n%s", _("Failed to save file"), saveName.text(), SystemErrorStr());
   }
   return false;
@@ -167,18 +166,15 @@ bool FileDialogs::ExportPdf(SciDoc*sci, const char* filename) {
 
 
 
-bool FileDialogs::SaveFile(SciDoc*sci, FXString filename, bool as_itself)
+bool FileDialogs::SaveFile(SciDoc*sci, const FXString &filename, bool as_itself)
 {
   if (filename.empty()) { return SaveFileAs(sci,as_itself); }
-  if (sci->SaveToFile(filename.text(),as_itself)) {
-    if (as_itself) {
-      ((DocTab*)(sci->getParent()->getPrev()))->setText(FXPath::name(filename));
-    }
+  if (SciDocUtils::SaveToFile(sci,filename.text(),as_itself)) {
     if (target && message) { target->handle(this, FXSEL(SEL_COMMAND,message), (void*)sci); }
     return true;
   } else {
-    FXMessageBox::error( sci->getShell(),MBOX_OK,_("Error saving file"), "%s:\n%s\n%s", _("Failed to save file"),
-                           filename.text(), sci->GetLastError().text() );
+    FXMessageBox::error( (FXMainWindow*)target,MBOX_OK,_("Error saving file"), "%s:\n%s\n%s", _("Failed to save file"),
+                           filename.text(), SciDocUtils::GetLastError(sci).text() );
     return false;
   }
 }
@@ -188,14 +184,14 @@ bool FileDialogs::SaveFile(SciDoc*sci, FXString filename, bool as_itself)
 bool FileDialogs::TryClose(SciDoc*sci, const char*alt)
 {
   if (!sci) return false;
-  if (sci->Dirty()) {
-    switch ( FXMessageBox::question(sci->getShell(), MBOX_YES_NO_CANCEL, _("Save file?"),
+  if (SciDocUtils::Dirty(sci)) {
+    switch ( FXMessageBox::question((FXMainWindow*)target, MBOX_YES_NO_CANCEL, _("Save file?"),
                 _("File has been modified:\n%s\n\nSave before closing?"),
-                sci->Filename().empty()?(alt?alt:_("Untitled")):sci->Filename().text())
+                SciDocUtils::Filename(sci).empty()?(alt?alt:_("Untitled")):SciDocUtils::Filename(sci).text())
            )
     {
       case MBOX_CLICKED_YES: {
-        if (!SaveFile(sci,sci->Filename())) { return false; }
+        if (!SaveFile(sci,SciDocUtils::Filename(sci))) { return false; }
         break;
       }
       case MBOX_CLICKED_NO: {
@@ -218,8 +214,8 @@ bool FileDialogs::GetOpenFilenames(SciDoc*sci, FXString* &filenames, bool multi)
   const char* caption=multi?_("Select files to open"):_("Select file to open");
   FXString path="";
   GetPathForDlg(sci,path);
-  FileDlg dlg(sci->getShell(), caption, multi);
-  dlg.setPatternList(_patterns);
+  FileDlg dlg((FXMainWindow*)target, caption, multi);
+  dlg.setPatternList(prefs->FileFilters);
   dlg.setCurrentPattern(prefs->FileFilterIndex);
   dlg.setDirectory(path);
   dlg.setSelectMode(multi&&prefs->FileOpenMulti?SELECTFILE_MULTIPLE:SELECTFILE_EXISTING);
@@ -245,7 +241,7 @@ bool FileDialogs::GetOpenTagFilename(SciDoc*sci, FXString &filename)
   const char* caption=_("Open tags file");
   FXString path="";
   GetPathForDlg(sci,path);
-  FileDlg dlg(sci->getShell(), caption);
+  FileDlg dlg((FXMainWindow*)target, caption);
   dlg.setPatternList(_("Tag Files (TAGS,tags)\nAll Files (*)"));
   dlg.setDirectory(path);
   dlg.setSelectMode(SELECTFILE_EXISTING);
@@ -258,37 +254,24 @@ bool FileDialogs::GetOpenTagFilename(SciDoc*sci, FXString &filename)
 
 
 bool FileDialogs::AskReload(SciDoc*sci) {
-  if (sci->Dirty()) {
-    if ( FXMessageBox::warning(sci->getShell(),
+  if (SciDocUtils::Dirty(sci)) {
+    if ( FXMessageBox::warning((FXMainWindow*)target,
            MBOX_YES_NO, _("Unsaved changes"), "%s - \n%s\n\n%s",
            _("Existing buffer has unsaved changes"),
            _("These changes will be lost if you proceed!"),
            _("Proceed with reloading?")
        )!=MBOX_CLICKED_YES ) { return false; }
   }
-  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
-  SciDoc*sci2=sci->Slave();
-  long pos2=sci2?sci2->sendMessage(SCI_GETCURRENTPOS,0,0):0;
-  if ( !sci->LoadFromFile(sci->Filename().text()) ) {
-    FXMessageBox::error(sci->getShell(),
-      MBOX_OK,_("Reload failed"), "%s\n%s", sci->Filename().text(), sci->GetLastError().text());
-    return false;
-  }
-  sci->sendMessage(SCI_GOTOPOS,pos,0);
-  if (sci2) { sci2->sendMessage(SCI_GOTOPOS,pos2,0); }
-  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
-  tab->setText(FXPath::name(sci->Filename()));
-  sci->DoStaleTest(true);
-  return true;
+  return SciDocUtils::Reload(sci);
 }
 
 
 
 bool FileDialogs::AskReloadForExternalChanges(SciDoc*sci)
 {
-  if ( FXMessageBox::question(sci->getShell(), MBOX_YES_NO, _("File changed"),
+  if ( FXMessageBox::question((FXMainWindow*)target, MBOX_YES_NO, _("File changed"),
          "%s\n%s\n\n%s",
-         sci->Filename().text(),
+         SciDocUtils::Filename(sci).text(),
          _("was modified externally."),
          _("Reload from disk?")
        )==MBOX_CLICKED_YES ) { return AskReload(sci); } else { return false; }
@@ -298,10 +281,10 @@ bool FileDialogs::AskReloadForExternalChanges(SciDoc*sci)
 
 bool FileDialogs::AskSaveMissingFile(SciDoc*sci)
 {
-  return FXMessageBox::question(sci->getShell(), MBOX_YES_NO, _("File status error"),
+  return FXMessageBox::question((FXMainWindow*)target, MBOX_YES_NO, _("File status error"),
                "%s:\n%s\n(%s)\n\n%s",
                _("Error checking the status of"),
-               sci->Filename().text(), sci->GetLastError().text(),
+               SciDocUtils::Filename(sci).text(), SciDocUtils::GetLastError(sci).text(),
                _("Save to disk now?")
                )==MBOX_CLICKED_YES;
 }
@@ -310,14 +293,14 @@ bool FileDialogs::AskSaveMissingFile(SciDoc*sci)
 
 bool FileDialogs::AskSaveModifiedCommand(SciDoc*sci, const FXString &script)
 {
-  if (sci->Dirty() && (sci->Filename()==script)) {
-    switch (FXMessageBox::warning(sci->getShell(),
+  if (SciDocUtils::Dirty(sci) && (SciDocUtils::Filename(sci)==script)) {
+    switch (FXMessageBox::warning((FXMainWindow*)target,
           MBOX_YES_NO_CANCEL,_("Unsaved changes"),
           _("The disk file for the \"%s\" command is currently\n"
             " open in the editor, and has unsaved changes.\n\n"
-            "  Save the file before continuing?"), sci->Filename().text()))
+            "  Save the file before continuing?"), SciDocUtils::Filename(sci).text()))
     {
-      case MBOX_CLICKED_YES: { return SaveFile(sci,sci->Filename()); }
+      case MBOX_CLICKED_YES: { return SaveFile(sci,SciDocUtils::Filename(sci)); }
       case MBOX_CLICKED_NO: { return true; }
       default: { return false; }
     }

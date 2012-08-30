@@ -26,12 +26,6 @@ typedef struct _StyleDef StyleDef;
 typedef struct _LangStyle LangStyle;
 
 
-enum {
-  SPLIT_NONE,
-  SPLIT_BELOW,
-  SPLIT_BESIDE
-};
-
 class SciSearch;
 
 
@@ -109,8 +103,8 @@ public:
   int Stale(); /* 0=ok; 1=modified; 2=deleted; */
   void DoStaleTest(bool doit) { check_stale=doit; if (Master()) { Master()->DoStaleTest(doit); } }
   bool DoStaleTest() { return Master()?Master()->DoStaleTest():check_stale; }
-  FXString Filename() { return Master()?Master()->Filename():_filename; }
-  FXString GetLastError() { return Master()?Master()->GetLastError():_lasterror; }
+  const FXString Filename() { return Master()?Master()->Filename():_filename; }
+  const FXString GetLastError() { return Master()?Master()->GetLastError():_lasterror; }
 
   bool InsertFile(const char*filename) { return DoLoadFromFile(filename, true); }
   bool LoadFromFile(const char*filename) { return DoLoadFromFile(filename, false); }

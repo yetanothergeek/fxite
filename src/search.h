@@ -43,6 +43,7 @@ typedef enum {
 } SearchWrapPolicy;
 
 class SciReplDlg;
+class SciDoc;
 
 class SearchDialogs: public FXObject {
   FXDECLARE(SearchDialogs);

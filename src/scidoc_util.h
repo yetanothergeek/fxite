@@ -16,7 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef SCIDOC_UTIL_H
+#define SCIDOC_UTIL_H
 
+class SciDoc;
+class Settings;
 
 class SciDocUtils {
 public:
@@ -34,5 +38,17 @@ public:
   static void DoneSci(SciDoc*sci, SciDoc*recording);
   static void SetScintillaSelector(FXSelector sel);
   static void SetMacroRecordSelector(FXSelector sel);
+  static FXString Filename(SciDoc*sci);
+  static bool SaveToFile(SciDoc*sci, const char*filename, bool as_itself=true);
+  static bool Reload(SciDoc*sci);
+  static bool Dirty(SciDoc*sci);
+  static void SetFocus(SciDoc*sci);
+  static void KillFocus(SciDoc*sci);
+  static FXival ID(SciDoc*sci);
+  static void NeedBackup(SciDoc*sci, bool need);
+  static void CopyText(SciDoc*sci, const FXString &txt);
+  static const FXString GetLastError(SciDoc*sci);
 };
+
+#endif
 

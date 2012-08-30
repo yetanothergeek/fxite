@@ -476,3 +476,90 @@ void SciDocUtils::DoneSci(SciDoc*sci, SciDoc*recording)
   delete tab;
   delete page;
 }
+
+
+
+FXString SciDocUtils::Filename(SciDoc*sci)
+{
+  return sci->Filename();
+}
+
+
+
+void SciDocUtils::SetFocus(SciDoc*sci)
+{
+  sci->setFocus();
+}
+
+
+
+void SciDocUtils::KillFocus(SciDoc*sci)
+{
+  sci->killFocus();
+}
+
+
+
+void SciDocUtils::CopyText(SciDoc*sci, const FXString &txt)
+{
+  sci->sendString(SCI_COPYTEXT, txt.length(), txt.text());
+}
+
+
+
+bool SciDocUtils::Reload(SciDoc*sci)
+{
+  long pos=sci->sendMessage(SCI_GETCURRENTPOS,0,0);
+  SciDoc*sci2=sci->Slave();
+  long pos2=sci2?sci2->sendMessage(SCI_GETCURRENTPOS,0,0):0;
+  if ( !sci->LoadFromFile(sci->Filename().text()) ) {
+    FXMessageBox::error(sci->getShell(),
+      MBOX_OK,_("Reload failed"), "%s\n%s", sci->Filename().text(), sci->GetLastError().text());
+    return false;
+  }
+  sci->sendMessage(SCI_GOTOPOS,pos,0);
+  if (sci2) { sci2->sendMessage(SCI_GOTOPOS,pos2,0); }
+  FXTabItem*tab=(FXTabItem*)sci->getParent()->getPrev();
+  tab->setText(FXPath::name(sci->Filename()));
+  sci->DoStaleTest(true);
+  return true;
+}
+
+
+
+bool SciDocUtils::Dirty(SciDoc*sci)
+{
+  return sci->Dirty();
+}
+
+
+
+bool SciDocUtils::SaveToFile(SciDoc*sci, const char*filename, bool as_itself)
+{
+  if (!sci->SaveToFile(filename,as_itself)) { return false; }
+  if (as_itself) {
+    ((FXTabItem*)(sci->getParent()->getPrev()))->setText(FXPath::name(filename));
+  }
+  return true;
+}
+
+
+
+const FXString SciDocUtils::GetLastError(SciDoc*sci)
+{
+  return sci->GetLastError();
+}
+
+
+
+FXival  SciDocUtils::ID(SciDoc*sci)
+{
+  return (FXival)sci->id();
+}
+
+
+void SciDocUtils::NeedBackup(SciDoc*sci, bool need)
+{
+  sci->NeedBackup(need);
+}
+

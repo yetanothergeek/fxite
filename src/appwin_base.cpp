@@ -132,7 +132,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   srchdlgs=new SearchDialogs(this);
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
   cmdutils=new CommandUtils(this);
-  filedlgs=new FileDialogs(this,0,prefs->FileFilters);
+  filedlgs=new FileDialogs(this,0);
 }
 
 
@@ -1112,7 +1112,6 @@ void TopWindowBase::ShowPrefsDialog()
   if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
     toolbar->SetTBarFont();
   }
-  filedlgs->patterns(prefs->FileFilters);
   if (Theme::changed() & ThemeChangedColors) {
     Theme::apply(this);
     Theme::apply(srchdlgs->FindDialog());

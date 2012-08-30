@@ -22,7 +22,6 @@
 #include <SciLexer.h>
 
 #include "compat.h"
-#include "scidoc.h"
 #include "prefs.h"
 
 #include "lang.h"

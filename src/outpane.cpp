@@ -19,7 +19,7 @@
 #include <fx.h>
 #include <fxkeys.h>
 
-#include "scidoc.h"
+#include "scidoc_util.h"
 #include "appwin_pub.h"
 #include "compat.h"
 #include "prefs.h"
@@ -69,7 +69,7 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
       if ((code==KEY_Return)||(code==KEY_KP_Enter)) { break; } else {
         if (code==KEY_Tab) {
           killFocus();
-          TopWinPub::ControlDoc()->setFocus();
+          SciDocUtils::SetFocus(TopWinPub::ControlDoc());
           return 1;
         } else {
           if (ev->state&CONTROLMASK) {
@@ -123,10 +123,10 @@ void OutputList::GoToError()
               break;
             } else {
               SciDoc*sci=TopWinPub::ControlDoc();
-              if (sci && (!sci->Filename().empty()) && (!FXPath::isAbsolute(filename))) {
+              if (sci && (!SciDocUtils::Filename(sci).empty()) && (!FXPath::isAbsolute(filename))) {
                 filename=FXPath::name(filename);
                 filename.prepend(PATHSEP);
-                filename.prepend(FXPath::directory(sci->Filename()));
+                filename.prepend(FXPath::directory(SciDocUtils::Filename(sci)));
                 if (FXStat::isFile(filename)) {
                   TopWinPub::OpenFile(filename.text(), linenum.text(),false,true);
                   break;
@@ -149,11 +149,11 @@ bool OutputList::Focus()
   isfocused=!isfocused;
   if (!isfocused) {
     killFocus();
-    TopWinPub::ControlDoc()->setFocus();
+    SciDocUtils::SetFocus(TopWinPub::ControlDoc());
     return false;
   } else {
     if (!prefs->ShowOutputPane) { TopWinPub::ShowOutputPane(true); }
-    TopWinPub::FocusedDoc()->killFocus();
+    SciDocUtils::KillFocus(TopWinPub::FocusedDoc());
     setFocus();
     if (getCurrentItem()<0) { setCurrentItem(0); }
     if (!isItemSelected(getCurrentItem())) {
@@ -193,7 +193,7 @@ long OutputList::onSelectPopCmd(FXObject*o, FXSelector sel, void*p)
           outclip.append(newline);
         }
       }
-      TopWinPub::ControlDoc()->sendString(SCI_COPYTEXT,outclip.length(), outclip.text());
+      SciDocUtils::CopyText(TopWinPub::ControlDoc(),outclip);
     }
     default: { return 0; }
   }

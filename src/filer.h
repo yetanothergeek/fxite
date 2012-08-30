@@ -23,7 +23,6 @@ class FileDialogs: public FXObject {
   FXDECLARE(FileDialogs);
   FileDialogs() {}
 private:
-  FXString _patterns;
   void *user_data;
   FXSelector message;
   FXObject *target;
@@ -32,10 +31,8 @@ private:
   bool Export(SciDoc*sci,
     const char*title, const char*patts, const char*ext, ExportFunc func, const char*filename=NULL);
 public:
-  void patterns(FXString &pats) { _patterns=pats.text(); }
-  FXString patterns() { return _patterns; }
   bool TryClose(SciDoc*sci, const char *alt);
-  bool SaveFile(SciDoc*sci, FXString filename, bool as_itself=true);
+  bool SaveFile(SciDoc*sci, const FXString &filename, bool as_itself=true);
   bool SaveFileAs(SciDoc*sci, bool as_itself=true, const FXString &suggestion=FXString::null);
   bool ExportPdf(SciDoc*sci, const char* filename=NULL);
   bool ExportHtml(SciDoc*sci, const char* filename=NULL);
@@ -50,7 +47,7 @@ public:
   static void SetWorkingDirectory(FXWindow*w);
   static bool FileExistsOrConfirmCreate(FXMainWindow*w, const FXString &fn);
   void setSelector(FXSelector sel) { message=sel; }
-  FileDialogs(FXObject*tgt, FXSelector sel, const FXString &pats=FXString::null);
+  FileDialogs(FXObject*tgt, FXSelector sel);
 #ifdef WIN32
   static bool ReadShortcut(FXWindow*w, FXString &filename);
 #endif

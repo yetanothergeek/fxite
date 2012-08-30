@@ -20,9 +20,9 @@
 #include <cctype>
 #include <cerrno>
 #include <fx.h>
+#include <Scintilla.h>
 
 #include "compat.h"
-#include "scidoc.h"
 #include "lang.h"
 #include "search.h"
 #include "appwin_pub.h"

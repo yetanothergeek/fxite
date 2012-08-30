@@ -21,7 +21,7 @@
 #include <cerrno>
 #include <fx.h>
 
-#include "scidoc.h"
+#include "scidoc_util.h"
 #include "compat.h"
 
 #include "intl.h"
@@ -86,27 +86,27 @@ bool BackupMgr::SaveBackup(SciDoc*sci)
 {
   FXString savename;
   FXString untitled;
-  untitled.format(FN_FMT, backupdir.text(), abs(getpid()), sci->id());
-  if (sci->Filename().empty()) {
+  untitled.format(FN_FMT, backupdir.text(), abs(getpid()), SciDocUtils::ID(sci));
+  if (SciDocUtils::Filename(sci).empty()) {
     savename=untitled;
   } else {
     if (FXStat::isFile(untitled)) {
       RemoveBackup(untitled);
     }
 #ifdef WIN32
-    savename=sci->Filename().text();
+    savename=SciDocUtils::Filename(sci).text();
     savename.substitute(':', '%', true);
     savename.prepend(backupdir.text());
 #else
-    savename.format("%s%s", backupdir.text(), sci->Filename().text());
+    savename.format("%s%s", backupdir.text(), SciDocUtils::Filename(sci).text());
 #endif
   }
   if (MakePath(FXPath::directory(savename))) {
-    if (sci->SaveToFile(savename.text(),false)) {
-      sci->NeedBackup(false);
+    if (SciDocUtils::SaveToFile(sci,savename.text(),false)) {
+      SciDocUtils::NeedBackup(sci, false);
       return true;
     } else {
-      lasterror=sci->GetLastError();
+      lasterror=SciDocUtils::GetLastError(sci);
       ErrorMessage(_("Failed to save backup"), savename);
       return false;
     }
@@ -133,17 +133,17 @@ void BackupMgr::RemoveBackup(const FXString&filename) {
 void BackupMgr::RemoveBackup(SciDoc*sci)
 {
   FXString untitled;
-  sci->NeedBackup(false);
-  untitled.format(FN_FMT, backupdir.text(), abs(getpid()), sci->id());
+  SciDocUtils::NeedBackup(sci,false);
+  untitled.format(FN_FMT, backupdir.text(), abs(getpid()), SciDocUtils::ID(sci));
   RemoveBackup(untitled);
-  if (!sci->Filename().empty()) {
+  if (!SciDocUtils::Filename(sci).empty()) {
     FXString savename;
 #ifdef WIN32
-    savename=sci->Filename().text();
+    savename=SciDocUtils::Filename(sci).text();
     savename.substitute(':', '%', true);
     savename.prepend(backupdir.text());
 #else
-    savename.format("%s%s", backupdir.text(), sci->Filename().text());
+    savename.format("%s%s", backupdir.text(), SciDocUtils::Filename(sci).text());
 #endif
     RemoveBackup(savename);
   }

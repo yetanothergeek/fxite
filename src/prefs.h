@@ -221,3 +221,10 @@ enum {
   ToolbarChangedWrap   = 1<<2
 };
 
+
+enum {
+  SPLIT_NONE,
+  SPLIT_BELOW,
+  SPLIT_BESIDE
+};
+

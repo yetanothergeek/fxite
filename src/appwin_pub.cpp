@@ -19,8 +19,6 @@
 #include <fx.h>
 
 #include "appwin.h"
-#include "scidoc.h"
-
 #include "appwin_pub.h"
 
 #define TW TopWindow
