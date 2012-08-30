@@ -589,3 +589,4 @@ AutoCompleter::~AutoCompleter()
 {
   clear();
 }
+
