@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2010 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -22,7 +22,6 @@
 #include <SciLexer.h>
 
 #include "compat.h"
-#include "prefs.h"
 
 #include "lang.h"
 
@@ -157,41 +156,5 @@ StyleDef* GetStyleFromId(StyleDef*styles, int id)
     if (sd->id==id) { return sd; }
   }
   return NULL;
-}
-
-
-static long InvertColor(long rgb)
-{
-  long r,g,b;
-  r=FXREDVAL(rgb);
-  g=FXGREENVAL(rgb);
-  b=FXBLUEVAL(rgb);
-  r=255-r;
-  g=255-g;
-  b=255-b;
-  if ((r>0)&&(r<0x80)) { r+=0x40; }
-  if ((g>0)&&(g<0x80)) { g+=0x40; }
-  if ((b>0)&&(b<0x80)) { b+=0x40; }
-  return FXRGB(r,g,b);
-}
-
-
-
-#define invert ( Settings::instance()? Settings::instance()->InvertColors : false )
-
-
-void RgbToHex(FXColor rgb, ColorName &clr)
-{
-  if (invert) { rgb=InvertColor(rgb); }
-  snprintf(clr, 8, "#%02x%02x%02x", FXREDVAL(rgb), FXGREENVAL(rgb), FXBLUEVAL(rgb));
-}
-
-
-
-long HexToRGB(const char* rgb)
-{
-  int r=0, g=0, b=0;
-  sscanf(rgb+1,"%2x%2x%2x",&r,&g,&b);
-  return invert? InvertColor(FXRGB(r, g, b)) : FXRGB(r, g, b);
 }
 

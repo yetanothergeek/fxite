@@ -150,6 +150,13 @@ public:
 
   StyleDef *Styles() { return styles; }
 
+  static const FXchar* CaretFG();
+  static const FXchar* CaretLineBG();
+  static const FXchar* RightMarginBG();
+  static const FXchar* WhiteSpaceBG();
+  static const FXchar* WhiteSpaceFG();
+  static const FXchar* SelectionBG();
+
   static StyleDef *globalStyle();
   static StyleDef *whitespaceStyle();
   static StyleDef *caretlineStyle();

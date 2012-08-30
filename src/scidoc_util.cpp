@@ -22,7 +22,6 @@
 
 #include "prefs.h"
 #include "scidoc.h"
-#include "lang.h"
 #include "appwin_pub.h"
 
 #include "intl.h"
@@ -306,21 +305,21 @@ void SciDocUtils::SetSciDocPrefs(SciDoc*sci, Settings*prefs)
   sci->setFont(prefs->fontdesc.face, prefs->fontdesc.size / 10);
   sci->sendMessage(SCI_SETEXTRAASCENT,prefs->FontAscent,0);
   sci->sendMessage(SCI_SETEXTRADESCENT,prefs->FontDescent,0);
-  sci->CaretLineBG(prefs->ShowCaretLine?prefs->caretlineStyle()->bg:NULL);
-  sci->RightMarginBG(prefs->rightmarginStyle()->bg);
+  sci->CaretLineBG(prefs->ShowCaretLine?prefs->CaretLineBG():NULL);
+  sci->RightMarginBG(prefs->RightMarginBG());
   sci->CaretWidth(prefs->CaretWidth);
   sci->SmartHome(prefs->SmartHome);
   sci->SetWrapAware(prefs->WrapAwareHomeEnd);
   sci->SmoothScroll(prefs->SmoothScroll);
   sci->TabWidth(prefs->TabWidth);
   sci->UseTabs(prefs->UseTabs);
-  sci->WhiteSpaceBG(prefs->whitespaceStyle()->bg);
-  sci->WhiteSpaceFG(prefs->whitespaceStyle()->fg);
+  sci->WhiteSpaceBG(prefs->WhiteSpaceBG());
+  sci->WhiteSpaceFG(prefs->WhiteSpaceFG());
   sci->SetEdgeColumn(prefs->RightEdgeColumn);
   sci->SetShowIndent(prefs->ShowIndentGuides);
 
-  sci->CaretFG(prefs->caretStyle()->bg);
-  sci->SelectionBG(prefs->selectionStyle()->bg);
+  sci->CaretFG(prefs->CaretFG());
+  sci->SelectionBG(prefs->SelectionBG());
   if (prefs->ShowWhiteSpace) { sci->ShowWhiteSpace(true); }
   if (prefs->ShowLineNumbers) { sci->ShowLineNumbers(true); }
 

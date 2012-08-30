@@ -23,7 +23,6 @@
 
 #include "compat.h"
 #include "prefs.h"
-#include "lang.h"
 #include "appname.h"
 #include "appwin_pub.h"
 #include "search.h"

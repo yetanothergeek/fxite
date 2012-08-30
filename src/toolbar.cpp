@@ -19,7 +19,7 @@
 
 #include <fx.h>
 
-#include "lang.h"
+#include "color_funcs.h"
 #include "menuspec.h"
 #include "prefs.h"
 #include "appwin.h"

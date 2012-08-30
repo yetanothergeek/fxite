@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -16,7 +16,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef LANG_H
+#define LANG_H
 
+#include "color_funcs.h"
 
 typedef enum {
   Normal=0,
@@ -27,7 +30,6 @@ typedef enum {
 } SciDocFontStyle;
 
 
-typedef char ColorName[8];
 
 typedef struct _StyleDef {
   const char* key;   // Human-readable key name for config file
@@ -71,10 +73,8 @@ LangStyle*GetLangFromAppName(const char*app);
 void SetKeywordList(LangStyle*lang, int index, const FXString &keywords);
 void FreeAllKeywordLists();
 
-void RgbToHex(FXColor rgb, ColorName &clr);
-long HexToRGB(const char* rgb);
-
-
 
 StyleDef* GetStyleFromId(StyleDef*styles, int id);
+
+#endif
 

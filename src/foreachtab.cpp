@@ -21,7 +21,6 @@
 #include "scidoc.h"
 #include "backup.h"
 #include "prefs.h"
-#include "lang.h"
 #include "appwin.h"
 
 #include "foreachtab.h"
@@ -121,7 +120,7 @@ bool TabCallbacks::ShowCaretLineCB(FXint index, DocTab*tab, FXWindow*page, void*
 {
   Settings*p=(Settings*)user_data;
   for (SciDoc*sci=(SciDoc*)page->getFirst(); sci; sci=(SciDoc*)sci->getNext()) {
-    sci->CaretLineBG(p->ShowCaretLine?p->caretlineStyle()->bg:NULL);
+    sci->CaretLineBG(p->ShowCaretLine?p->CaretLineBG():NULL);
   }
   return true;
 }

@@ -21,6 +21,7 @@ appwin.cpp \
 appwin_pub.cpp \
 backup.cpp \
 cmd_utils.cpp \
+color_funcs.cpp \
 doctabs.cpp \
 export.cpp \
 filedlg.cpp \
@@ -69,6 +70,7 @@ appwin_base.h \
 appwin_pub.h \
 backup.h \
 cmd_utils.h \
+color_funcs.h \
 doctabs.h \
 export.h \
 filedlg.h \

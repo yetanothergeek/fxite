@@ -21,7 +21,7 @@
 #include <fx.h>
 #include "appname.h"
 #include "appwin.h"
-#include "lang.h"
+#include "color_funcs.h"
 #include "scidoc.h"
 #include "shmenu.h"
 #include "popmenu.h"

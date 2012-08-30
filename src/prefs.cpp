@@ -312,6 +312,15 @@ static StyleDef CaretStyle =       { "caret",       0,     "#000000", "#000000",
 
 
 
+const FXchar* Settings::CaretFG()       { return CaretStyle.fg; }
+const FXchar* Settings::CaretLineBG()   { return CaretLineStyle.bg; }
+const FXchar* Settings::RightMarginBG() { return RightMarginStyle.bg; }
+const FXchar* Settings::WhiteSpaceBG()  { return WhiteSpaceStyle.bg; }
+const FXchar* Settings::WhiteSpaceFG()  { return WhiteSpaceStyle.fg; }
+const FXchar* Settings::SelectionBG()   { return SelectionStyle.bg; }
+
+
+
 static ErrorPattern DefaultErrPats[8] = {
 #ifdef __minix
   { "^\"([^\\s\"]+)\",[^(]+(\\d+)",  "MINIX ACK" },
@@ -575,6 +584,7 @@ StyleDef* Settings::rightmarginStyle() { return &RightMarginStyle; }
 StyleDef* Settings::selectionStyle()   { return &SelectionStyle; }
 StyleDef* Settings::caretStyle()       { return &CaretStyle; }
 const FXchar *Settings::defaultFileFilters() { return default_file_filters; }
+
 
 
 // List of possible font names - we check if any system
