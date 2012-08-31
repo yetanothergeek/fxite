@@ -19,7 +19,7 @@
 
 
 #include <fx.h>
-#include "prefs.h"
+#include "prefs_base.h"
 #include "color_funcs.h"
 
 
@@ -42,7 +42,7 @@ static long InvertColor(long rgb)
 
 
 
-#define invert ( Settings::instance()? Settings::instance()->InvertColors : false )
+#define invert ( SettingsBase::instance()? SettingsBase::instance()->InvertColors : false )
 
 
 void RgbToHex(FXColor rgb, ColorName &clr)

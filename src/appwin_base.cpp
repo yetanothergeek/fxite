@@ -367,7 +367,7 @@ long TopWindowBase::CheckStyle(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=(SciDoc*)p;
   if (sci && sci->NeedStyled()) {
-    SciDocUtils::SetSciDocPrefs(sci, prefs);
+    SciDocUtils::SetSciDocPrefs(sci, (Settings*)prefs);
     sci->UpdateStyle();
     sci->NeedStyled(false);
   }
@@ -900,7 +900,7 @@ UserMenu**TopWindowBase::UserMenus() const
 
 void TopWindowBase::AdjustIndent(SciDoc*sci, char ch)
 {
-  SciDocUtils::AdjustIndent(sci, ch, prefs, recording);
+  SciDocUtils::AdjustIndent(sci, ch, (Settings*)prefs, recording);
 }
 
 
@@ -933,7 +933,7 @@ bool TopWindowBase::OpenFile(const char*filename, const char*rowcol, bool readon
   }
   if (!FileDialogs::FileExistsOrConfirmCreate(this,fn)) { return false; }
   DocTab*tab=tabbook->NewTab(fn.empty()?_("Untitled"):FXPath::name(fn));
-  sci=SciDocUtils::NewSci((FXComposite*)tab->getNext(),this,prefs);
+  sci=SciDocUtils::NewSci((FXComposite*)tab->getNext(),this,(Settings*)prefs);
   if (!fn.empty()) {
     if (!sci->LoadFromFile(fn.text())) {
       if (!sci->GetLastError().contains(SciDoc::BinaryFileMessage())) {
@@ -1092,7 +1092,7 @@ void TopWindowBase::UpdateToolbar()
 
 void TopWindowBase::ShowPrefsDialog()
 {
-  PrefsDialog prefdlg(this, prefs);
+  PrefsDialog prefdlg(this, (Settings*)prefs);
   prefdlg.execute(PLACEMENT_DEFAULT);
   ClosedDialog();
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);

@@ -23,7 +23,7 @@
 #include <fx.h>
 
 #include "lang.h"
-#include "prefs.h"
+#include "prefs_base.h"
 #include "compat.h"
 #include "scisrch.h"
 
@@ -82,7 +82,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   sendMessage(SCI_SETSCROLLWIDTHTRACKING,true,0);
   sendMessage(SCI_SETSCROLLWIDTH,4000,0);
   sendMessage(SCI_SETEDGECOLOUR,HexToRGB("#FF0000"),0);
-  sendMessage(SCI_SETEOLMODE,Settings::instance()->DefaultFileFormat,0);
+  sendMessage(SCI_SETEOLMODE,SettingsBase::instance()->DefaultFileFormat,0);
   sendMessage(SCI_SETXCARETPOLICY,CARET_SLOP,8);
 }
 
@@ -252,8 +252,8 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     _lasterror=_("is a directory");
     return false;
   }
-  bool DefaultToAscii=Settings::instance()->DefaultToAscii;
-  bool DefaultToSbcs=Settings::instance()->DefaultToSbcs;
+  bool DefaultToAscii=SettingsBase::instance()->DefaultToAscii;
+  bool DefaultToSbcs=SettingsBase::instance()->DefaultToSbcs;
   switch (get_file_encoding(filename)) {
     case 'B': { // Binary file
       if ( !ConfirmOpenBinary(this,filename) ) {
@@ -476,7 +476,7 @@ inline bool SciDoc::IsBrace(long &pos, int mode)
 
 void SciDoc::MatchBrace()
 {
-  int mode=Settings::instance()->BraceMatch;
+  int mode=SettingsBase::instance()->BraceMatch;
   long CurrPos=sendMessage(SCI_GETCURRENTPOS,0,0);
   if ((CurrPos>0)&&(mode==BRACEMATCH_EITHER)) {
     char ThisChar=sendMessage(SCI_GETCHARAT,CurrPos,0);
@@ -677,7 +677,7 @@ void SciDoc::UpdateStyle()
     }
     switch (_lang->tabs) {
       case TABS_DEFAULT: {
-        UseTabs(Settings::instance()->UseTabs);
+        UseTabs(SettingsBase::instance()->UseTabs);
         break;
       }
       case TABS_ALWAYS: {
@@ -692,18 +692,18 @@ void SciDoc::UpdateStyle()
         if (contents && ( (contents[0]=='\t') || strstr(contents,"\n\t") ) ) {
           UseTabs(true);
         } else {
-          UseTabs(Settings::instance()->UseTabs);
+          UseTabs(SettingsBase::instance()->UseTabs);
         }
       }
     }
-    TabWidth(_lang->tabwidth>0?_lang->tabwidth:Settings::instance()->TabWidth);
+    TabWidth(_lang->tabwidth>0?_lang->tabwidth:SettingsBase::instance()->TabWidth);
     SetProperty("lexer.cpp.track.preprocessor","0");
     SetProperty("lexer.cpp.update.preprocessor","0");
   } else {
     sendMessage(SCI_SETLEXER, 0, 0);
     sendMessage(SCI_SETLEXERLANGUAGE, 0, 0);
-    UseTabs(Settings::instance()->UseTabs);
-    TabWidth(Settings::instance()->TabWidth);
+    UseTabs(SettingsBase::instance()->UseTabs);
+    TabWidth(SettingsBase::instance()->TabWidth);
   }
   sendMessage(SCI_COLOURISE,0,-1);
   if (Slave()) { Slave()->UpdateStyle(); }
@@ -1067,7 +1067,7 @@ void SciDoc::ShowLineNumbers(bool showit)
 void SciDoc::ShowWhiteSpace(bool showit)
 {
   sendMessage(SCI_SETVIEWWS, showit?SCWS_VISIBLEALWAYS:SCWS_INVISIBLE, 0);
-  sendMessage(SCI_SETVIEWEOL, showit? (showit&&Settings::instance()->WhitespaceShowsEOL):0 , 0);
+  sendMessage(SCI_SETVIEWEOL, showit? (showit&&SettingsBase::instance()->WhitespaceShowsEOL):0 , 0);
   slave(ShowWhiteSpace,showit);
 }
 

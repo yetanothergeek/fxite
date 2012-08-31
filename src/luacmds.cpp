@@ -23,12 +23,12 @@
 
 #include "appwin.h"
 #include "filer.h"
-#include "prefs.h"
+#include "prefs_base.h"
 
 #include "intl.h"
 
 static TopWindow*tw=NULL;
-static Settings*prefs=NULL;
+static SettingsBase*prefs=NULL;
 
 
 static int edit_indent(lua_State* L){
@@ -589,7 +589,7 @@ const luaL_reg* LuaCommands(FXMainWindow*topwin)
 {
   if (!tw) {
     tw=(TopWindow*)topwin;
-    prefs=tw->Prefs();
+    prefs=(SettingsBase*)tw->Prefs();
   }
   return fxte_commands;
 }

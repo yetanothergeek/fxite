@@ -20,7 +20,7 @@
 #include <fx.h>
 #include <SciLexer.h>
 
-#include "prefs.h"
+#include "prefs_base.h"
 #include "shmenu.h"
 #include "lang.h"
 #include "menuspec.h"
@@ -56,7 +56,7 @@ static const char*usersnipflags[]={
 MainMenu::MainMenu(FXComposite* p):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
 { 
   tw=(TopWindow*)p;
-  prefs=Settings::instance();
+  prefs=SettingsBase::instance();
   CreateMenus();
   new FXHorizontalSeparator(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
 }

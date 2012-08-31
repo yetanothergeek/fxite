@@ -24,7 +24,7 @@
 
 #include "scidoc_util.h"
 #include "export.h"
-#include "prefs.h"
+#include "prefs_base.h"
 #include "compat.h"
 #include "filedlg.h"
 #include "doctabs.h"
@@ -64,7 +64,7 @@ static void GetPathForDlg(SciDoc*sci, FXString &path)
 
 
 
-#define prefs Settings::instance()
+#define prefs SettingsBase::instance()
 
 bool FileDialogs::SaveFileAs(SciDoc*sci, bool as_itself, const FXString &suggestion)
 {

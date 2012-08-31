@@ -21,7 +21,7 @@
 
 #include "color_funcs.h"
 #include "menuspec.h"
-#include "prefs.h"
+#include "prefs_base.h"
 #include "appwin.h"
 #include "compat.h"
 #include "toolbar.h"
@@ -32,6 +32,7 @@
 
 #define UsedWidthOf(f) ((f&&f->getLast())?(f->getLast()->getX()+f->getLast()->getWidth()):0)
 
+#define prefs SettingsBase::instance()
 
 /* Class that makes tool bar buttons restore document focus after they are clicked */
 class ToolBarBtn: public FXButton {
@@ -118,7 +119,7 @@ long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
 // Wrap or unwrap buttons as needed.
 void ToolBarFrame::reconf()
 {
-  bool prefwrap=Settings::instance()->WrapToolbar;
+  bool prefwrap=prefs->WrapToolbar;
   if ((!prefwrap)&&(!wraptoolbar)) { return; }
   FXint kids1=rows[0]->numChildren();
   FXint kids2=rows[1]->numChildren();
@@ -196,7 +197,7 @@ void ToolBarFrame::SetTBarBtnFontCB(FXButton*btn, void*user_data)
     FXFontDesc dsc;
     GetFontDescription(dsc, tbf->getApp()->getNormalFont());
     FXfloat scale=1.0;
-    switch (Settings::instance()->ToolbarButtonSize) {
+    switch (prefs->ToolbarButtonSize) {
       case 0:{ scale=0.75; break; }
       case 1:{ scale=0.90; break; }
       case 2:{ scale=1.00; break; }
@@ -237,7 +238,7 @@ ToolBarFrame::~ToolBarFrame()
 ToolBarFrame::ToolBarFrame(FXComposite *o):FXVerticalFrame(o,TBarOpts,0,0,0,0,0,0,0,0,1,1)
 {
   toolbar_font = NULL;
-  wraptoolbar=Settings::instance()->WrapToolbar;
+  wraptoolbar=prefs->WrapToolbar;
   rows[0]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
   rows[1]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
   rows[1]->hide();
@@ -298,7 +299,7 @@ void ToolBarFrame::create()
 {
   FXVerticalFrame::create();
   normalize();
-  if (!Settings::instance()->ShowToolbar) { hide(); }
+  if (!prefs->ShowToolbar) { hide(); }
 }
 
 

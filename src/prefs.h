@@ -19,7 +19,7 @@
 
 /*
 Steps to adding a new preference:
-  1. Add the variable to the public interface of the Settings class.
+  1. Add the variable to the public interface of the SettingsBase class.
   2. Add a corresponding ID_* entry to the class's selectors enumeration.
   3. Be sure the ID_* is picked up by the SettingsMap macros in prefs.cpp
   4. Add a case to the switch statement in Settings::onChangeSetting to catch the new selector.
@@ -31,9 +31,11 @@ Steps to adding a new preference:
 */
 
 
+#ifndef PREFS_H
+#define PREFS_H
 
+#include "prefs_base.h"
 
-typedef struct _StyleDef StyleDef;
 
 typedef enum {
   AUTO_INDENT_NONE=0,
@@ -47,21 +49,13 @@ typedef enum {
   REMEMBER_ALWAYS
 } FileFilterPolicy;
 
-typedef enum {
-  BRACEMATCH_NONE=0,
-  BRACEMATCH_INSIDE,
-  BRACEMATCH_OUTSIDE,
-  BRACEMATCH_EITHER,
-  BRACEMATCH_AFTER,
-} BraceMatchPolicy;
-
 
 typedef struct _ErrorPattern {
   char pat[64];
   char id[32];
 } ErrorPattern;
 
-class Settings: public FXObject {
+class Settings: public SettingsBase {
   FXDECLARE(Settings);
   static FXbool loaded;
   bool packtabs;
@@ -75,80 +69,6 @@ class Settings: public FXObject {
 public:
   Settings(FXMainWindow* w, const FXString& configdir);
   ~Settings();
-
-  FXulong ShowStatusBar:1;
-  FXulong ShowLineNumbers:1;
-  FXulong ShowToolbar:1;
-  FXulong ShowWhiteSpace:1;
-
-  FXulong ShowOutputPane:1;
-  FXulong InvertColors:1;
-  FXulong ShowRightEdge:1;
-  FXulong ShowIndentGuides:1;
-
-  FXulong DocTabsPacked:1;
-  FXulong Maximize:1;
-  FXulong SmartHome:1;
-  FXulong WrapAwareHomeEnd:1;
-
-  FXulong BraceMatch:3;
-  FXulong UseTabs:1;
-  FXulong CaretPastEOL:1;
-  FXulong WhitespaceShowsEOL:1;
-
-  FXulong PromptCloseMultiMenu:1;
-  FXulong PromptCloseMultiExit:1;
-  FXulong WatchExternChanges:1;
-  FXulong Autosave:1;
-
-  FXulong SaveBeforeFilterSel:1;
-  FXulong SaveBeforeInsCmd:1;
-  FXulong SaveBeforeExecCmd:1;
-  FXulong WrapToolbar:1;
-
-  FXulong DefaultToAscii:1;
-  FXulong DefaultToSbcs:1;
-  FXulong FileOpenMulti:1;
-  FXulong WordWrap:1;
-
-  FXulong ShowCaretLine:1;
-
-  FXint AutoIndent;
-  FXint FileFilterIndex;
-  FXint KeepFileFilter;
-
-  FXFontDesc fontdesc;
-  FXint ToolbarButtonSize;
-  FXint SplitView;
-  FXint OutputPaneHeight;
-  FXString FontName;
-  FXint FontSize;
-  FXuchar FontAscent;
-  FXuchar FontDescent;
-  FXint Left,Top,Width,Height;
-  FXint SearchWrap;
-  FXbool SearchVerbose;
-  FXint SearchOptions;
-  FXlong ZoomFactor;
-  FXint TabWidth;
-  FXint IndentWidth;
-  FXint CaretWidth;
-  FXint SmoothScroll;
-  FXint WheelLines;
-  FXint placement;
-  FXString FileFilters;
-  FXint RightEdgeColumn;
-  FXString ShellCommand;
-  FXchar DocTabPosition;
-  FXint MaxFiles;
-  FXint AutosaveInterval;
-  FXint DefaultFileFormat;
-  FXString LastFocused;
-  FXint ScreenWidth;
-  FXint ScreenHeight;
-  FXint TabTitleMaxWidth;
-
-  StyleDef *Styles() { return styles; }
 
   static const FXchar* CaretFG();
   static const FXchar* CaretLineBG();
@@ -229,9 +149,5 @@ enum {
 };
 
 
-enum {
-  SPLIT_NONE,
-  SPLIT_BELOW,
-  SPLIT_BESIDE
-};
+#endif
 

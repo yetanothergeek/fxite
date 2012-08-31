@@ -28,7 +28,7 @@ class UserMenu;
 class MainMenu: public FXMenuBar {
 private:
   TopWindow* tw;
-  Settings* prefs;
+  SettingsBase* prefs;
   void CreateMenus();
   void CreateLanguageMenu();
   void CreateTabsMenu();

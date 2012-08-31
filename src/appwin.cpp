@@ -23,7 +23,7 @@
 #include "doctabs.h"
 #include "search.h"
 #include "filer.h"
-#include "prefs.h"
+#include "prefs_base.h"
 #include "tagread.h"
 #include "recorder.h"
 #include "help.h"
@@ -216,7 +216,7 @@ long TopWindow::onFileExport(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onCycleSplitter(FXObject*o, FXSelector sel, void*p)
 {
-  SciDocUtils::CycleSplitter(ControlDoc(), prefs);
+  SciDocUtils::CycleSplitter(ControlDoc(), (Settings*)prefs);
   return 1;
 }
 
@@ -508,7 +508,7 @@ long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
       break;
     }
     case SCN_CHARADDED: {
-      if (!completions->Continue(sci)) { SciDocUtils::CharAdded(sci,line,pos,scn->ch,prefs,recording); }
+      if (!completions->Continue(sci)) { SciDocUtils::CharAdded(sci,line,pos,scn->ch,(Settings*)prefs,recording); }
       break;
     }
     case SCN_DOUBLECLICK: {
@@ -832,7 +832,7 @@ long TopWindow::onFindSelected(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onZoom(FXObject*o, FXSelector sel, void*p)
 {
-  TabCallbacks::SetZoom(FocusedDoc(),sel,p,tabbook,prefs);
+  TabCallbacks::SetZoom(FocusedDoc(),sel,p,tabbook,(Settings*)prefs);
   return 1;
 }
 

@@ -27,6 +27,7 @@ class DocTab;
 class DocTabs;
 class SearchDialogs;
 class FileDialogs;
+class SettingsBase;
 class Settings;
 class PrefsDialog;
 class UserMenu;
@@ -58,7 +59,7 @@ protected:
   SearchDialogs* srchdlgs;
   FileDialogs* filedlgs;
   AutoCompleter* completions;
-  Settings* prefs;
+  SettingsBase* prefs;
   MacroRecorder* recorder;
   BackupMgr* backups;
   CommandUtils* cmdutils;
@@ -120,7 +121,7 @@ public:
   bool IsMacroCancelled();
   static const FXString& ConfigDir();
   static const FXString& Connector();
-  Settings* Prefs() { return prefs; }
+  Settings* Prefs() { return (Settings*)prefs; }
   SciDoc* ControlDoc();
   SciDoc* FocusedDoc();
   bool OpenFile(const char* caption, const char* rowcol, bool readonly, bool hooked);

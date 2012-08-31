@@ -46,6 +46,7 @@ prefdlg_ext.cpp \
 prefdlg_sntx.cpp \
 prefdlg_tbar.cpp \
 prefs.cpp \
+prefs_base.cpp \
 readtags.c \
 recorder.cpp \
 scidoc.cpp \
@@ -97,6 +98,7 @@ prefdlg_ext.h \
 prefdlg_sntx.h \
 prefdlg_tbar.h \
 prefs.h \
+prefs_base.h \
 readtags.h \
 recorder.h \
 scidoc.h \

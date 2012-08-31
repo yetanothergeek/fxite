@@ -31,7 +31,7 @@
 #include "scidoc.h"
 #include "doctabs.h"
 #include "filer.h"
-#include "prefs.h"
+#include "prefs_base.h"
 #include "scisrch.h"
 #include "luasci.h"
 
@@ -355,7 +355,7 @@ static int go(lua_State* L)
     }
     case 1:{ strcmd=luaL_checkstring(L,1); }
   }
-  scicmd=GetSciNavCmd(strcmd,fwd,sel,rect,Settings::instance()->SmartHome);
+  scicmd=GetSciNavCmd(strcmd,fwd,sel,rect,SettingsBase::instance()->SmartHome);
   luaL_argcheck(L,SCI_NULL != scicmd, 1, _("invalid mode"));
   for (i=0; i<count; i++) { sci->sendMessage(scicmd, 0, 0); }
   return 0;
@@ -571,7 +571,7 @@ static int insert(lua_State*L)
   const char* txt=luaL_checkstring(L,1);
   bool adjust=((lua_gettop(L)>1) && lua_isboolean(L,2))?lua_toboolean(L,2):false;
   CheckReadOnly();
-  if (adjust && *txt && Settings::instance()->AutoIndent) { // Fix up indents for macro recorder
+  if (adjust && *txt && SettingsBase::instance()->AutoIndent) { // Fix up indents for macro recorder
     if (*txt=='}') {  // if text starts with a closing brace, align it first
       sci->sendString(SCI_REPLACESEL,0,"}");
       TopWinPub::AdjustIndent(sci,*txt);

@@ -573,10 +573,8 @@ static void ParseStyles(FXSettings*reg, const char*section, StyleDef *style)
 }
 
 
-static Settings*global_settings_instance=NULL;
 
-
-Settings* Settings::instance()         { return global_settings_instance; }
+Settings* Settings::instance()         { return (Settings*)SettingsBase::instance(); }
 StyleDef* Settings::globalStyle()      { return GlobalStyle; }
 StyleDef* Settings::whitespaceStyle()  { return &WhiteSpaceStyle; }
 StyleDef* Settings::caretlineStyle()   { return &CaretLineStyle; }
@@ -799,10 +797,8 @@ static FXint ReadRegInt(FXRegistry *reg, const char*key, FXint def, FXint min=0,
 #endif
 
 
-Settings::Settings(FXMainWindow*w, const FXString &configdir)
+Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
 {
-  FXASSERT(!global_settings_instance);
-  global_settings_instance=this;
   FXString tmp;
   reg=&(w->getApp()->reg());
   style_reg=new FXSettings();
@@ -1098,6 +1094,5 @@ Settings::~Settings()
   }
   delete style_reg;
   ini_sort(style_file.text());
-  global_settings_instance=NULL;
 }
 

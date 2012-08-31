@@ -20,6 +20,7 @@
 #define OUTPANE_H
 
 class TopWindow;
+class Settings;
 
 class OutputList: public FXList {
   FXDECLARE(OutputList)
