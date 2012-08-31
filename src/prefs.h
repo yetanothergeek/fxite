@@ -64,7 +64,6 @@ class Settings: public SettingsBase {
   FXRegistry*reg;
   FXSettings*style_reg;
   FXString style_file;
-  StyleDef *styles;
   Settings() {}
 public:
   Settings(FXMainWindow* w, const FXString& configdir);

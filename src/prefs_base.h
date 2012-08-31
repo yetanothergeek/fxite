@@ -20,7 +20,7 @@
 typedef struct _StyleDef StyleDef;
 
 class SettingsBase: public FXObject {
-private:
+protected:
   StyleDef *styles;
 public:
   SettingsBase();
