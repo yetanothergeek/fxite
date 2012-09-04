@@ -260,13 +260,13 @@ void DocTabs::MoveTab(FXint how){
     case MOVETOLAST: {
       tab->reparent(this, NULL);
       page->reparent(this, NULL);
-      setCurrent((numChildren()/2)-1);
+      setCurrent((numChildren()/2)-1,true);
       break;
     }
     case MOVETOFIRST: {
       page->reparent(this, getFirst());
       tab->reparent(this, page);
-      setCurrent(0);
+      setCurrent(0,true);
       break;
     }
     case MOVEUP: {
@@ -275,7 +275,7 @@ void DocTabs::MoveTab(FXint how){
       prv=prv->getPrev();
       page->reparent(this, prv);
       tab->reparent(this, page);
-      setCurrent(iCurr-1);
+      setCurrent(iCurr-1,true);
       break;
     }
     case MOVEDOWN: {
@@ -285,7 +285,7 @@ void DocTabs::MoveTab(FXint how){
       nxt=nxt->getNext();/* is tab, or NULL */
       page->reparent(this, nxt);
       tab->reparent(this, page);
-      setCurrent(iCurr+1);
+      setCurrent(iCurr+1,true);
       break;
     }
   }
@@ -438,7 +438,7 @@ void DocTabs::FocusNextTab(bool forward)
   } else {
     if (itab==0) { itab=ntabs-1; } else { itab--; }
   }
-  setCurrent(itab);
+  setCurrent(itab,true);
 }
 
 
