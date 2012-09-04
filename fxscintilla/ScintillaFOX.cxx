@@ -890,7 +890,7 @@ long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
   FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize*1000000);
 #endif
   _scint->Tick();
-  return 1;
+  return 0;
 }
 
 long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
