@@ -1047,7 +1047,6 @@ Settings::~Settings()
   WriteInt(SearchVerbose);
   WriteInt(SearchOptions);
   WriteInt(ZoomFactor);
-  WriteInt(DocTabsPacked);
   WriteInt(MaxFiles);
   WriteInt(PromptCloseMultiMenu);
   WriteInt(PromptCloseMultiExit);
