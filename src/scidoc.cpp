@@ -717,12 +717,8 @@ void SciDoc::UpdateStyle()
 
 void SciDoc::CaretLineBG(const char*bgcolor)
 {
-  if (bgcolor) {
-    memset(_caretlinebg,0,sizeof(_caretlinebg));
-    strncpy(_caretlinebg, bgcolor, sizeof(_caretlinebg)-1);
-  } else {
-    _caretlinebg[0]='\0';
-  }
+  memset(_caretlinebg,0,sizeof(_caretlinebg));
+  if (bgcolor) { strncpy(_caretlinebg, bgcolor, sizeof(_caretlinebg)-1); }
   sendMessage(SCI_SETCARETLINEBACK, HexToRGB(_caretlinebg), 0);
   sendMessage(SCI_SETCARETLINEVISIBLE, _caretlinebg[0]?1:0, 0);
   slave(CaretLineBG,bgcolor);
