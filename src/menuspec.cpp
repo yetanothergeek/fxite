@@ -115,6 +115,7 @@ static MenuSpec menu_specs[] = {
   {TW::ID_TABS_RIGHT,       "ViewTabsRight",   _("&Right"),             _("tabs rgt"),     "",             'm', {NULL}},
   {TW::ID_TABS_UNIFORM,     "ViewTabsUniform", _("&Uniform"),           _("tabs equal"),   "",             'm', {NULL}},
   {TW::ID_TABS_COMPACT,     "ViewTabsPacked",  _("&Packed"),            _("tabs pack"),    "",             'm', {NULL}},
+  {TW::ID_TABS_BY_POS,      "ViewTabsAuto",    _("&Automatic"),         _("tabs auto"),    "",             'm', {NULL}},
   {TW::ID_ZOOM_IN,          "ViewZoomIn",      _("&In "),               _("zoom in"),      "Ctrl+=",       'm', {NULL}},
   {TW::ID_ZOOM_OUT,         "ViewZoomOut",     _("&Out "),              _("zoom out"),     "Ctrl+-",       'm', {NULL}},
   {TW::ID_ZOOM_NONE,        "ViewZoomDef",     _("&Default "),          _("zoom none"),    "Ctrl+1",       'm', {NULL}},

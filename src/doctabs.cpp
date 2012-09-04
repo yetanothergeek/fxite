@@ -397,6 +397,7 @@ void DocTabs::setTabStyle(FXuint style)
       break;
   }
   ForEachTab(OrientTabsCB, &TabOrientation, false);
+  if (tabs_compact=='A') setTabsCompact('A');
 }
 
 
@@ -414,11 +415,19 @@ void DocTabs::setTabStyleByChar(FXuchar c)
 
 
 
-// Set tab header widths based on largest tab label string, or not
-void DocTabs::setTabsCompact(bool compact)
+// Set tab header widths:
+// 'U' -- Uniform   (All tabs the same width, based on the widest label)
+// 'P' -- Packed    (Tabs sized individually according to their label width)
+// 'A' -- Automatic ("Packed" when orientation is top or bottom, "Uniform" when it's left or right)
+void DocTabs::setTabsCompact(FXuchar compact)
 {
   FXuint packing_hints = getPackingHints();
-  if ( compact ) {
+  FXuint ts=getTabStyle();
+  tabs_compact=compact;
+  if (compact=='A') { 
+    compact=(ts==TABBOOK_TOPTABS||ts==TABBOOK_BOTTOMTABS)?'P':'U';
+  }
+  if ( compact=='P' ) {
     packing_hints &= ~PACK_UNIFORM_WIDTH;
   } else {
     packing_hints |= PACK_UNIFORM_WIDTH;

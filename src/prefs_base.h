@@ -36,7 +36,7 @@ public:
   FXulong ShowRightEdge:1;
   FXulong ShowIndentGuides:1;
 
-  FXulong DocTabsPacked:1;
+  FXulong ShowCaretLine:1;
   FXulong Maximize:1;
   FXulong SmartHome:1;
   FXulong WrapAwareHomeEnd:1;
@@ -61,7 +61,7 @@ public:
   FXulong FileOpenMulti:1;
   FXulong WordWrap:1;
 
-  FXulong ShowCaretLine:1;
+
 
   FXint AutoIndent;
   FXint FileFilterIndex;
@@ -90,6 +90,7 @@ public:
   FXint RightEdgeColumn;
   FXString ShellCommand;
   FXchar DocTabPosition;
+  FXchar DocTabsPacked;
   FXint MaxFiles;
   FXint AutosaveInterval;
   FXint DefaultFileFormat;

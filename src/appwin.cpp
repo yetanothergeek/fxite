@@ -113,7 +113,7 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_TOP,         TopWindow::ID_TABS_RIGHT,      TopWindow::onTabOrient),
-  FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_UNIFORM,     TopWindow::ID_TABS_COMPACT,    TopWindow::onPackTabWidth),
+  FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_UNIFORM,     TopWindow::ID_TABS_BY_POS,     TopWindow::onPackTabWidth),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TAB_TOFIRST,      TopWindow::ID_TAB_DOWN,        TopWindow::onMoveTab),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TAB_NEXT,         TopWindow::ID_TAB_PREV,        TopWindow::onNextTab),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_DEL_WORD_LEFT,    TopWindow::ID_DEL_LINE_RIGHT,  TopWindow::onDeleteChunk),
@@ -547,9 +547,13 @@ long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 
 long TopWindow::onPackTabWidth(FXObject*o,FXSelector sel,void*p)
 {
-  prefs->DocTabsPacked=(FXSELID(sel) == ID_TABS_COMPACT);
+  switch (FXSELID(sel)) {
+    case ID_TABS_UNIFORM: { prefs->DocTabsPacked='U'; break; }
+    case ID_TABS_COMPACT: { prefs->DocTabsPacked='P'; break; }
+    case ID_TABS_BY_POS:  { prefs->DocTabsPacked='A'; break; }
+  }
   tabbook->setTabsCompact(prefs->DocTabsPacked);
-  MenuMgr::RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_COMPACT);
+  MenuMgr::RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_BY_POS);
   return 1;
 }
 

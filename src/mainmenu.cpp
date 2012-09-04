@@ -249,8 +249,12 @@ void MainMenu::CreateTabsMenu()
 
   FXMenuRadio*tU=MkMnuRad(tabwidthmenu,ID_TABS_UNIFORM);
   FXMenuRadio*tP=MkMnuRad(tabwidthmenu,ID_TABS_COMPACT);
-
-  (prefs->DocTabsPacked?tP:tU)->setCheck();
+  FXMenuRadio*tA=MkMnuRad(tabwidthmenu,ID_TABS_BY_POS);
+  switch (prefs->DocTabsPacked) {
+    case 'U': { tU->setCheck(); break; }
+    case 'P': { tP->setCheck(); break; }
+    case 'A': { tA->setCheck(); break; }
+  }
 }
 
 
@@ -748,6 +752,10 @@ void MainMenu::UpdateDocTabSettings()
     case 'L': MenuMgr::RadioUpdate(TW::ID_TABS_LEFT,   TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
     case 'R': MenuMgr::RadioUpdate(TW::ID_TABS_RIGHT,  TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
   }
-  MenuMgr::RadioUpdate(prefs->DocTabsPacked?TW::ID_TABS_COMPACT:TW::ID_TABS_UNIFORM,TW::ID_TABS_UNIFORM,TW::ID_TABS_COMPACT);
+  switch (prefs->DocTabsPacked) {
+    case 'U':MenuMgr::RadioUpdate(TW::ID_TABS_UNIFORM,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+    case 'P':MenuMgr::RadioUpdate(TW::ID_TABS_COMPACT,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+    case 'A':MenuMgr::RadioUpdate(TW::ID_TABS_BY_POS,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+  }
 }
 

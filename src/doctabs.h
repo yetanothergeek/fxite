@@ -52,6 +52,7 @@ private:
   DocTabs(){}
   void MoveTab(FXint how);
   FXint tab_width_max;
+  FXuchar tabs_compact;
   bool dnd_accept;
   static bool UpdateTabWidths(FXint index, DocTab*tab, FXWindow*page, void*user_data);
 public:
@@ -81,7 +82,7 @@ public:
 
   void setTabStyle(FXuint style);
   void setTabStyleByChar(FXuchar c);
-  void setTabsCompact(bool compact);
+  void setTabsCompact(FXuchar compact);
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
   FXint Count() { return numChildren()/2; }

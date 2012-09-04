@@ -870,7 +870,6 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
   ReadInt(SearchVerbose,true);
   ReadInt(SearchOptions,0);
   ReadInt(ZoomFactor,0);
-  ReadInt(DocTabsPacked,true);
   ReadIntRng(MaxFiles,128,1,999);
   ReadInt(PromptCloseMultiMenu,true);
   ReadInt(PromptCloseMultiExit,true);
@@ -933,6 +932,14 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
     DocTabPosition='T';
   } else {
     DocTabPosition=tmp.text()[0];
+  }
+
+  tmp=reg->readStringEntry(view_sect,"DocTabsPacked","A");
+  if (tmp=="0") { tmp="U"; } else if (tmp=="1") { tmp="P"; }
+  if (tmp.empty() || !strchr("UPA",tmp.text()[0])) {
+    DocTabsPacked='A';
+  } else {
+    DocTabsPacked=tmp.text()[0];
   }
 
   ReadStr(FileFilters, default_file_filters);
@@ -1074,6 +1081,11 @@ Settings::~Settings()
   if (!(DocTabPosition && strchr("TBLR",DocTabPosition))) { DocTabPosition='T'; }
   char dtp[2]={DocTabPosition,'\0'};
   reg->writeStringEntry(view_sect,"DocTabPosition",dtp);
+
+  if (!(DocTabsPacked && strchr("UPA",DocTabsPacked))) { DocTabsPacked='T'; }
+  dtp[0]=DocTabsPacked;
+  reg->writeStringEntry(view_sect,"DocTabsPacked",dtp);
+
   WriteStr(FontName);
   WriteStr(FileFilters);
   WriteStr(ShellCommand);
