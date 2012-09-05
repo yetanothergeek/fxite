@@ -19,19 +19,25 @@
 
 #include "shady_tabs.h"
 
+typedef enum {
+  DOCTAB_CLEAN,
+  DOCTAB_DIRTY,
+  DOCTAB_LOCKED,
+  DOCTAB_SAME,
+} DocTabState;
+
 class DocTab: public FXTabItem {
   private:
     FXDECLARE(DocTab)
     DocTab(){}
     bool dnd_accept;
     FXCursor*defaultDragCursor;
-    FXString realtext;
+    DocTabState _state;
   public:
     long onDnd(FXObject* sender,FXSelector sel, void*p);
     DocTab(FXTabBar*bar, const FXString&text);
     void setDefaultDragCursor(FXCursor*ddc) { defaultDragCursor=ddc; setDragCursor(ddc); }
-    void setText(const FXString &text);
-    FXString getText() const { return realtext; }
+    void SetIcon(DocTabState state);
     enum {
       ID_DND=FXTabItem::ID_LAST,
       ID_LAST
@@ -72,6 +78,9 @@ public:
   FXWindow*ActiveView();
   FXWindow*PageAt(FXint n);
 
+  virtual void setCurrent(FXint panel,FXbool notify=false);
+  virtual void show();
+
   bool ActivateTab(DocTab*tab);
   bool ActivateTab(FXint n);
 
@@ -83,8 +92,10 @@ public:
   void setTabStyle(FXuint style);
   void setTabStyleByChar(FXuchar c);
   void setTabsCompact(FXuchar compact);
+  FXuchar getTabsCompact() { return tabs_compact; }
   void FocusNextTab(bool forward);
   void ForEachTab(TabCallback cb, void *user_data, bool hourglass=true);
+
   FXint Count() { return numChildren()/2; }
   FXint MaxTabWidth() { return tab_width_max; }
   void MaxTabWidth(FXint w);

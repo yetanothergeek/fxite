@@ -451,32 +451,19 @@ long TopWindowBase::onFocusSci(FXObject*o,FXSelector s,void*p)
 
 
 
-// Set or unset the '*' or '#' prefix of a tab's title...
-void TopWindowBase::SetTabTag(SciDoc*sci, char mark, bool set)
-{
-  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
-  if (set) {
-    if (tab->getText()[0]!=mark) { tab->setText(tab->getText().prepend(mark)); }
-  } else {
-    if (tab->getText()[0]==mark) { tab->setText(tab->getText().erase(0,1)); }
-  }
-}
-
-
-
-// Add '*' prefix to tab's title to denote file has unsaved changes
 void TopWindowBase::SetTabDirty(SciDoc*sci, bool dirty)
 {
-  SetTabTag(sci,'*', dirty);
+  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
+  tab->SetIcon(dirty?DOCTAB_DIRTY:DOCTAB_CLEAN);
   sci->Dirty(dirty);
 }
 
 
 
-// Add '#' prefix to tab's title to denote document is marked read-only
 void TopWindowBase::SetTabLocked(SciDoc*sci, bool locked)
 {
-  SetTabTag(sci,'#', locked);
+  DocTab*tab=(DocTab*)sci->getParent()->getPrev();
+  tab->SetIcon(locked?DOCTAB_LOCKED:DOCTAB_CLEAN);
   sci->sendMessage(SCI_SETREADONLY,locked?1:0,0);
 }
 
@@ -1263,7 +1250,7 @@ void TopWindowBase::UpdateTitle(long line, long col)
   if (sci) {
     DocTab *tab=tabbook->ActiveTab();
     FXString s;
-    s.format("%s  %s - %s", tab->getText().text(), FXPath::directory(sci->Filename()).text(), EXE_NAME);
+    s.format("%s%s  %s - %s", sci->Dirty()?"*":"", tab->getText().text(), FXPath::directory(sci->Filename()).text(), EXE_NAME);
     setTitle(s);
     menubar->SetLanguageCheckmark(sci->getLanguage());
     menubar->SetReadOnlyCheckmark(sci->sendMessage(SCI_GETREADONLY,0,0));

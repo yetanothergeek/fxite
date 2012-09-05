@@ -244,6 +244,7 @@ DocTab*DocTabs::NewTab(FXString text)
   if (shown()) {
     tab->create();
     frame->create();
+    tab->setText(text);
   }
   return tab;
 }
@@ -398,6 +399,7 @@ void DocTabs::setTabStyle(FXuint style)
   }
   ForEachTab(OrientTabsCB, &TabOrientation, false);
   if (tabs_compact=='A') setTabsCompact('A');
+  setCurrent(getCurrent(),false);
 }
 
 
@@ -451,10 +453,24 @@ void DocTabs::FocusNextTab(bool forward)
 }
 
 
+static bool UpdateTabIconsCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  tab->SetIcon(DOCTAB_SAME);
+  return true;
+}
 
 
+void DocTabs::setCurrent(FXint panel,FXbool notify)
+{
+  ShadyTabs::setCurrent(panel,notify);
+  ForEachTab(UpdateTabIconsCB,NULL,false);
+}
 
 
+void DocTabs::show()
+{
+  setCurrent(getCurrent(),false);
+}
 
 
 #define TAB_DND_NAME "FxteDnDTab"
@@ -606,7 +622,7 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
 
 
 
-DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,FXString::null)
+DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,FXString::null,NULL,ICON_AFTER_TEXT|JUSTIFY_HZ_APART)
 {
   FXApp*a=bar->getApp();
   if (!FxteDnDTabType) {
@@ -621,23 +637,75 @@ DocTab::DocTab(FXTabBar*bar, const FXString&text):FXTabItem(bar,FXString::null)
   setDragCursor(getApp()->getDefaultCursor(DEF_ARROW_CURSOR));
   dropEnable();
   setText(text);
+  SetIcon(DOCTAB_CLEAN);
 }
 
 
+#define ICO_SIZE 8
 
-void DocTab::setText(const FXString &text)
+
+static const char clean_mask[] =
+  "________"
+  "________"
+  "________"
+  "________"
+  "________"
+  "________"
+  "________"
+  "________"
+;
+
+
+static const char dirty_mask[] =
+  "X__X__X_"
+  "_X___X__"
+  "__XXX___"
+  "XXXXXXX_"
+  "__XXX___"
+  "_X___X__"
+  "X__X__X_"
+  "________"
+;
+
+
+static const char locked_mask[] =
+  "___##___"
+  "__#__#__"
+  "_#____#_"
+  "_#____#_"
+  "_######_"
+  "_######_"
+  "_##__##_"
+  "_######_"
+;
+
+
+
+void DocTab::SetIcon(DocTabState state)
 {
-  FXint max_width=((DocTabs*)getParent())->MaxTabWidth();
-  realtext=text;
-  if (max_width>0) {
-    FXString shortened=text;
-    while ((!shortened.empty()) && font->getTextWidth(shortened)>max_width) {
-      shortened.trunc(shortened.length()-1);
-    }
-    FXTabItem::setText(shortened.length()==text.length()?shortened:shortened+"..");
-  } else {
-    FXTabItem::setText(text);
+  const char *mask=NULL;
+  if (state==DOCTAB_SAME) { state=_state; } else { _state=state; }
+  if (!xid) { return; }
+  switch (state) {
+    case DOCTAB_CLEAN:  { mask=clean_mask;   break; }
+    case DOCTAB_DIRTY:  { mask=dirty_mask;   break; }
+    case DOCTAB_LOCKED: { mask=locked_mask;  break; }
+    default:            { mask=clean_mask;   break; }
   }
-  setTipText(&text[(text[0]=='*' || text[0]=='#')?1:0]);
+  if (getIcon()) {
+    delete getIcon();
+    setIcon(NULL);
+  }
+  FXuint horiz=getTabOrientation()==TAB_TOP||getTabOrientation()==TAB_BOTTOM;
+  FXuchar packed=((DocTabs*)getParent())->getTabsCompact();
+  if (packed=='A') { packed=horiz?'P':'U'; }
+  if ((state==DOCTAB_CLEAN) && (packed=='P')) { return; }
+  FXColor ico_buf[ICO_SIZE*ICO_SIZE];
+  FXColor bg=state==DOCTAB_CLEAN?getBackColor():getApp()->getBackColor();
+  FXColor fg=getTextColor();
+  for (FXint i=0; i<ICO_SIZE*ICO_SIZE; i++) { ico_buf[i]=mask[i]=='_'?bg:fg; }
+  FXIcon *ico=new FXIcon(getApp(),ico_buf,0,IMAGE_OPAQUE,ICO_SIZE,ICO_SIZE);
+  ico->create();
+  setIcon(ico);
 }
 

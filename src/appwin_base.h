@@ -78,7 +78,6 @@ protected:
   long bookmarked_pos;
   bool skipfocus;
   void Closing(bool is_closing);
-  void SetTabTag(SciDoc* sci, char mark, bool set);
   void SetTabDirty(SciDoc* sci, bool dirty);
   void SetTabLocked(SciDoc* sci, bool locked);
   void RescanUserMenu();
