@@ -634,7 +634,7 @@ long TopWindow::onFileSaveAll(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFileSave(FXObject*o, FXSelector sel, void*p)
 {
-  filedlgs->SaveFile(ControlDoc(),ControlDoc()->Filename());
+  if (!ControlDoc()->GetReadOnly()) { filedlgs->SaveFile(ControlDoc(),ControlDoc()->Filename()); }
   return 1;
 }
 
