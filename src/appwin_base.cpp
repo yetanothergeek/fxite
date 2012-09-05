@@ -1079,8 +1079,9 @@ void TopWindowBase::UpdateToolbar()
 
 void TopWindowBase::ShowPrefsDialog()
 {
-  PrefsDialog prefdlg(this, (Settings*)prefs);
-  prefdlg.execute(PLACEMENT_DEFAULT);
+  PrefsDialog*prefdlg=new PrefsDialog(this, (Settings*)prefs);
+  prefdlg->execute(PLACEMENT_DEFAULT);
+  delete prefdlg;
   ClosedDialog();
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
