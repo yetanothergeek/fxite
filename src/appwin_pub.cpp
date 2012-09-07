@@ -268,3 +268,9 @@ void TopWinPub::AddOutput(const FXString&line)
   tw->AddOutput(line);
 }
 
+
+int TopWinPub::IsFileOpen(const FXString &filename, bool activate)
+{
+  return tw->IsFileOpen(filename,activate);
+}
+

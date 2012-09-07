@@ -911,8 +911,7 @@ bool TopWindowBase::OpenFile(const char*filename, const char*rowcol, bool readon
 #ifdef WIN32
      FileDialogs::ReadShortcut(this,fn);
 #endif
-    tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,&fn);
-    if (fn.empty()) {
+    if (IsFileOpen(fn,true)) {
       if (rowcol && *rowcol) { ControlDoc()->GoToStringCoords(rowcol); }
       if (hooked) { RunHookScript("opened"); }
       return true;
@@ -1184,7 +1183,7 @@ void TopWindowBase::ParseCommands(FXString &commands)
                 ParseCommands(session_data);
                 if (!prefs->LastFocused.empty()) {
                   if (FXStat::isFile(prefs->LastFocused)) {
-                    tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,&prefs->LastFocused);
+                    IsFileOpen(prefs->LastFocused,true);
                   }
                 }
               }
@@ -1360,5 +1359,14 @@ void TopWindowBase::InvertColors(bool inverted)
   tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());
   menubar->SyncPrefsCheckmarks(); 
+}
+
+// Returns: 0=File not open; 1=File open and clean; 2=File open and dirty;
+int TopWindowBase::IsFileOpen(const FXString &filename, bool activate)
+{
+  void*userdata[3]={(void*)&filename,&activate,NULL};
+  tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,userdata);
+  SciDoc*sci=(SciDoc*)userdata[2];
+  return sci?sci->Dirty()?2:1:0;
 }
 

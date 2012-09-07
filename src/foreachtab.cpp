@@ -157,18 +157,23 @@ bool TabCallbacks::StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*u
 
 
 /*
-  ForEachTab callback that checks to see if a file is already open
-  If we find the document, then we activate that tab and set the
-  user_data string to empty as a sign that we found it.
+  ForEachTab callback that checks to see if a file is already open.
+  The user_data is an array of 3 pointers: 
+     { FXString*filename, bool*activate, SciDoc*sci=NULL }
+  If we find the document, we set the NULL SciDoc* to the
+  found document and (optionally) activate that tab.
+  .
 */
 bool TabCallbacks::FileAlreadyOpenCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
 {
-  FXString*fn=(FXString*)user_data;
+  void**p=(void**)user_data;
+  FXString*filename=(FXString*)p[0];
+  bool activate=*((bool*)p[1]);
   SciDoc*sci=(SciDoc*)page->getFirst();
-  if (strcmp(sci->Filename().text(),fn->text())==0) {
+  if (FX::compare(sci->Filename(),*filename)==0) {
     DocTabs*tabbook=(DocTabs*)tab->getParent();
-    tabbook->ActivateTab(index);
-    fn->clear();
+    if (activate) { tabbook->ActivateTab(index); }
+    p[2]=sci;
     return false;
   }
   return true;
