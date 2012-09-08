@@ -589,6 +589,27 @@ long ToolsDialog::onNewScanChore(FXObject*o, FXSelector sel, void*p)
   return 1;
 }
 
+bool ToolsDialog::RenameFile(const FXString &oldpath, const FXString &newpath, bool &was_open)
+{
+  switch (TopWinPub::IsFileOpen(oldpath,false)) {
+    case 0: { break; }
+    case 1: {
+      TopWinPub::IsFileOpen(oldpath,true);
+      TopWinPub::CloseFile(false,false);
+      was_open=true;
+      break;
+    }
+    case 2: {
+      FXMessageBox::error(this, MBOX_OK, _("Active unsaved changes"), "%s\n%s",
+      _("Cannot proceed because the file to be renamed is currently"),
+      _("open in the editor, and has unsaved changes.")
+      );
+      return false;
+      break;
+    }
+  }
+  return FXFile::rename(oldpath,newpath);
+}
 
 
 bool ToolsDialog::SaveChanges()
@@ -606,11 +627,13 @@ bool ToolsDialog::SaveChanges()
         _("to"), newpath.text(),
         _("That name is already in use."));
     } else {
-      bool success=tree->PrevItem()->hasItems() ? FXDir::rename(oldpath,newpath) : FXFile::rename(oldpath,newpath);
+      bool was_open=false;
+      bool success=tree->PrevItem()->hasItems() ? FXDir::rename(oldpath,newpath) : RenameFile(oldpath,newpath,was_open);
       if (success) {
         tree->SetSavedPath(newpath.text());
         FXStat::mode(newpath, GetPermsForItem(tree->PrevItem()));
         tree->scan(true);
+        if (was_open) { TopWinPub::OpenFile(newpath.text(),NULL,false,false); }
         return true;
       } else {
           FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
@@ -730,11 +753,13 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
           _("aready exists.")
           );
       } else {
-        bool success=src->hasItems()?FXDir::rename(srcname,dstname):FXFile::rename(srcname,dstname);
+        bool was_open=false;
+        bool success=src->hasItems()?FXDir::rename(srcname,dstname):RenameFile(srcname,dstname,was_open);
         if (success) {
           tree->setCurrentItem(dst);
           tree->SetPrevItem(dst);
           tree->scan(true);
+          if (was_open) { TopWinPub::OpenFile(dstname.text(),NULL,false,false); }
         } else {
         FXMessageBox::error(this, MBOX_OK, _("Move failed"), "%s:\n%s:\n %s\n%s:\n %s\n\n%s",
           _("Failed to move item"),

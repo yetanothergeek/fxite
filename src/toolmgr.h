@@ -69,6 +69,7 @@ private:
   bool SaveChanges();
   void SetMoveOptions(FXTreeItem *item);
   FXuint GetPermsForItem(FXTreeItem *item=NULL);
+  bool RenameFile(const FXString &oldpath, const FXString &newpath, bool &was_open);
 public:
   ToolsDialog(FXTopWindow*win, UserMenu**menus);
   virtual void create();
