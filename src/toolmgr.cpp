@@ -604,6 +604,7 @@ bool ToolsDialog::RenameFile(const FXString &oldpath, const FXString &newpath, b
       _("Cannot proceed because the file to be renamed is currently"),
       _("open in the editor, and has unsaved changes.")
       );
+      was_open=true;
       return false;
       break;
     }
@@ -636,12 +637,14 @@ bool ToolsDialog::SaveChanges()
         if (was_open) { TopWinPub::OpenFile(newpath.text(),NULL,false,false); }
         return true;
       } else {
+        if (!was_open) {
           FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
             _("Failed to rename"),
             tree->PrevItem()->hasItems()?_("folder"):_("file"),
             _("from"), oldpath.text(),
             _("to"), newpath.text(),
             SystemErrorStr());
+        }
       }
     }
   }
@@ -761,13 +764,15 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
           tree->scan(true);
           if (was_open) { TopWinPub::OpenFile(dstname.text(),NULL,false,false); }
         } else {
-        FXMessageBox::error(this, MBOX_OK, _("Move failed"), "%s:\n%s:\n %s\n%s:\n %s\n\n%s",
-          _("Failed to move item"),
-          _("from"),
-           srcname.text(),
-          _("to"),
-           dstname.text(),
-           SystemErrorStr());
+          if(!was_open) {
+            FXMessageBox::error(this, MBOX_OK, _("Move failed"), "%s:\n%s:\n %s\n%s:\n %s\n\n%s",
+              _("Failed to move item"),
+              _("from"),
+               srcname.text(),
+              _("to"),
+               dstname.text(),
+               SystemErrorStr());
+          }
         }
       }
     }
