@@ -589,28 +589,70 @@ long ToolsDialog::onNewScanChore(FXObject*o, FXSelector sel, void*p)
   return 1;
 }
 
-bool ToolsDialog::RenameFile(const FXString &oldpath, const FXString &newpath, bool &was_open)
+
+
+bool ToolsDialog::RenameItem(const FXString &oldpath, const FXString &newpath)
 {
+  bool isdir=FXStat::isDirectory(oldpath);
+  bool dirty=false;
+  FXString filelist=FXString::null;
+  if (isdir) {
+    FXString oldprefix=oldpath+PATHSEPSTRING;
+    FXString newprefix=newpath+PATHSEPSTRING;
+    FXString *openfiles=TopWinPub::NamedFiles();
+    for (FXString*p=openfiles; !p->empty(); p++) {
+      if (FX::compare(oldprefix,*p,oldpath.length())==0) {
+        if (TopWinPub::IsFileOpen(*p,false)==2) {
+          dirty=true;
+          break;
+        }
+        FXString filename=p->text()+oldprefix.length();
+        filelist.append(newprefix+filename);
+        filelist.append('\n');
+        TopWinPub::IsFileOpen(*p,true);
+        TopWinPub::CloseFile(false,false);
+      }
+    }
+    delete[] openfiles;
+  }
   switch (TopWinPub::IsFileOpen(oldpath,false)) {
     case 0: { break; }
     case 1: {
       TopWinPub::IsFileOpen(oldpath,true);
       TopWinPub::CloseFile(false,false);
-      was_open=true;
+      filelist.append(newpath);
+      filelist.append('\n');
       break;
     }
     case 2: {
-      FXMessageBox::error(this, MBOX_OK, _("Active unsaved changes"), "%s\n%s",
-      _("Cannot proceed because the file to be renamed is currently"),
-      _("open in the editor, and has unsaved changes.")
-      );
-      was_open=true;
-      return false;
+      dirty=true;
       break;
     }
   }
-  return FXFile::rename(oldpath,newpath);
+
+  if (dirty) {
+    FXMessageBox::error(this, MBOX_OK, _("Active unsaved changes"), "%s\n%s",
+    _("Cannot proceed because a file to be renamed is currently"),
+    _("open in the editor, and has unsaved changes.")
+    );
+    return false;
+  }
+
+  bool result = isdir?FXDir::rename(oldpath,newpath):FXFile::rename(oldpath,newpath);
+  if (result) {
+    for (FXint i=0; i<filelist.contains('\n'); i++) { TopWinPub::OpenFile(filelist.section('\n',i).text(),NULL,false,false); }
+  } else {
+    FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
+      _("Failed to rename"),
+      tree->PrevItem()->hasItems()?_("folder"):_("file"),
+      _("from"), oldpath.text(),
+      _("to"), newpath.text(),
+      SystemErrorStr());
+  }
+
+  return result;
 }
+
 
 
 bool ToolsDialog::SaveChanges()
@@ -628,23 +670,12 @@ bool ToolsDialog::SaveChanges()
         _("to"), newpath.text(),
         _("That name is already in use."));
     } else {
-      bool was_open=false;
-      bool success=tree->PrevItem()->hasItems() ? FXDir::rename(oldpath,newpath) : RenameFile(oldpath,newpath,was_open);
+      bool success=RenameItem(oldpath,newpath);
       if (success) {
         tree->SetSavedPath(newpath.text());
         FXStat::mode(newpath, GetPermsForItem(tree->PrevItem()));
         tree->scan(true);
-        if (was_open) { TopWinPub::OpenFile(newpath.text(),NULL,false,false); }
         return true;
-      } else {
-        if (!was_open) {
-          FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
-            _("Failed to rename"),
-            tree->PrevItem()->hasItems()?_("folder"):_("file"),
-            _("from"), oldpath.text(),
-            _("to"), newpath.text(),
-            SystemErrorStr());
-        }
       }
     }
   }
@@ -756,23 +787,11 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
           _("aready exists.")
           );
       } else {
-        bool was_open=false;
-        bool success=src->hasItems()?FXDir::rename(srcname,dstname):RenameFile(srcname,dstname,was_open);
+        bool success=RenameItem(srcname,dstname);
         if (success) {
           tree->setCurrentItem(dst);
           tree->SetPrevItem(dst);
           tree->scan(true);
-          if (was_open) { TopWinPub::OpenFile(dstname.text(),NULL,false,false); }
-        } else {
-          if(!was_open) {
-            FXMessageBox::error(this, MBOX_OK, _("Move failed"), "%s:\n%s:\n %s\n%s:\n %s\n\n%s",
-              _("Failed to move item"),
-              _("from"),
-               srcname.text(),
-              _("to"),
-               dstname.text(),
-               SystemErrorStr());
-          }
         }
       }
     }
