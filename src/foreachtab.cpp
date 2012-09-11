@@ -227,3 +227,15 @@ bool TabCallbacks::IsDocValid(SciDoc*sci, DocTabs*tabbook)
   }
 }
 
+
+
+bool TabCallbacks::NamedFilesCB(FXint index, DocTab*tab, FXWindow*page, void*user_data)
+{
+  const FXString filename=((SciDoc*)(page->getFirst()))->Filename();
+  if (!filename.empty()) {
+    FXString*p=(FXString*)user_data;
+    while (!p->empty()) { p++; }
+    *p=filename;
+  }
+  return true;
+}

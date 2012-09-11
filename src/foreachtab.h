@@ -37,6 +37,7 @@ public:
   static bool AutoSaveCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool BookmarkCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
+  static bool NamedFilesCB(FXint index, DocTab*tab, FXWindow*page, void*user_data);
   static bool IsDocValid(SciDoc*sci, DocTabs*tabbook);
   static void SetZoom(SciDoc*sci, FXSelector sel, void*p, DocTabs*tabbook, Settings*prefs);
 };

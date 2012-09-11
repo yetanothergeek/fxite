@@ -40,6 +40,7 @@ public:
   static bool OpenFile(const char*caption, const char*rowcol, bool readonly, bool hooked);
   static bool CloseFile(bool close_last, bool hooked);
   static int IsFileOpen(const FXString &filename, bool activate);
+  static FXString* NamedFiles();
   static SciDoc* ControlDoc();
   static SciDoc* FocusedDoc();
   static void ActiveWidget(FXWindow*aw);

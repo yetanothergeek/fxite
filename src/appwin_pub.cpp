@@ -263,6 +263,7 @@ FXMenuCaption* TopWinPub::TagFiles()
 }
 
 
+
 void TopWinPub::AddOutput(const FXString&line)
 {
   tw->AddOutput(line);
@@ -272,5 +273,12 @@ void TopWinPub::AddOutput(const FXString&line)
 int TopWinPub::IsFileOpen(const FXString &filename, bool activate)
 {
   return tw->IsFileOpen(filename,activate);
+}
+
+
+
+FXString* TopWinPub::NamedFiles()
+{
+  return tw->NamedFiles();
 }
 

@@ -1361,6 +1361,8 @@ void TopWindowBase::InvertColors(bool inverted)
   menubar->SyncPrefsCheckmarks(); 
 }
 
+
+
 // Returns: 0=File not open; 1=File open and clean; 2=File open and dirty;
 int TopWindowBase::IsFileOpen(const FXString &filename, bool activate)
 {
@@ -1368,5 +1370,17 @@ int TopWindowBase::IsFileOpen(const FXString &filename, bool activate)
   tabbook->ForEachTab(TabCallbacks::FileAlreadyOpenCB,userdata);
   SciDoc*sci=(SciDoc*)userdata[2];
   return sci?sci->Dirty()?2:1:0;
+}
+
+
+
+// Caller should delete[] result when done!
+FXString* TopWindowBase::NamedFiles() const
+{
+  FXint n=tabbook->Count();
+  FXString *list=new FXString[n+1];
+  for (FXint i=0; i<=n; i++) { list[i]=FXString::null; }
+  tabbook->ForEachTab(TabCallbacks::NamedFilesCB,list);
+  return list;
 }
 

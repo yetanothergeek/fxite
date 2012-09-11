@@ -126,6 +126,7 @@ public:
   bool OpenFile(const char* caption, const char* rowcol, bool readonly, bool hooked);
   bool CloseFile(bool close_last, bool hooked);
   int IsFileOpen(const FXString &filename, bool activate);
+  FXString* NamedFiles() const;
   void Cut();
   void Copy();
   void Paste();
