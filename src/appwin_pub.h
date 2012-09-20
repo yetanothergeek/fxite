@@ -58,7 +58,7 @@ public:
   static FXbool close(FXbool notify=FALSE);
   static FXMainWindow* instance();
   static void DumpLexers();
-  static bool FindText(const char*searchstring, FXuint searchmode, bool forward);
+  static void FindText(const char*searchstring, FXuint searchmode, bool forward);
   static void Paste();
   static void AdjustIndent(SciDoc*sci,char ch);
   static DocTabs* Tabs();

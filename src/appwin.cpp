@@ -18,6 +18,7 @@
 
 
 #include <fx.h>
+#include <fxkeys.h>
 
 #include "scidoc.h"
 #include "doctabs.h"
@@ -109,7 +110,9 @@ FXDEFMAP(TopWindow) TopWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TBAR_CUSTOM_CMD,  TopWindow::onTBarCustomCmd),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_SELECT_ALL, TopWindow::onPopupSelectAll),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_POPUP_DELETE_SEL, TopWindow::onPopupDeleteSel),
-  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,  TopWindow::onScintillaPick),
+  FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_FOUND_SEARCH,     TopWindow::onFoundSearch),
+  FXMAPFUNC(SEL_PICKED,    TopWindow::ID_SCINTILLA,        TopWindow::onScintillaPick),
+  FXMAPFUNC(SEL_KEYPRESS,  TopWindow::ID_SCINTILLA,        TopWindow::onScintillaKey),
   FXMAPFUNC(SEL_COMMAND,   TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNC(SEL_CHORE,     TopWindow::ID_TEST_SOMETHING,   TopWindow::onTestSomething),
   FXMAPFUNCS(SEL_COMMAND,  TopWindow::ID_TABS_TOP,         TopWindow::ID_TABS_RIGHT,      TopWindow::onTabOrient),
@@ -534,6 +537,14 @@ long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
 
 
 
+long TopWindow::onScintillaKey(FXObject* o, FXSelector sel, void*p)
+{
+  if (((FXEvent*)p)->code==KEY_Escape) { srchdlgs->hide(); }
+  return 0;
+}
+
+
+
 // Switch tab orientations
 long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 {
@@ -771,8 +782,16 @@ long TopWindow::onPopupDeleteSel( FXObject*o, FXSelector sel, void*p )
 
 long TopWindow::onFind(FXObject*o, FXSelector sel, void*p)
 {
-  if (srchdlgs->ShowFindDialog(FocusedDoc())) { macro_record_search(); }
-  ClosedDialog();
+  skipfocus=true;
+  srchdlgs->ShowFindDialog();
+  return 1;
+}
+
+
+
+long TopWindow::onFoundSearch(FXObject* o, FXSelector sel, void* p )
+{
+  macro_record_search();
   return 1;
 }
 
@@ -780,15 +799,15 @@ long TopWindow::onFind(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFindNext(FXObject*o, FXSelector sel, void*p)
 {
-  if ( srchdlgs->FindNext(FocusedDoc()) ) { macro_record_search(); }
+  srchdlgs->FindNext();
   return 1;
 }
 
 
 
 long TopWindow::onFindPrev(FXObject*o, FXSelector sel, void*p)
-{
-  if ( srchdlgs->FindPrev(FocusedDoc()) ) { macro_record_search(); }
+{ 
+  srchdlgs->FindPrev();
   return 1;
 }
 
@@ -796,8 +815,8 @@ long TopWindow::onFindPrev(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onReplace(FXObject*o, FXSelector sel, void*p)
 {
-  srchdlgs->ShowReplaceDialog(FocusedDoc());
-  ClosedDialog();
+  skipfocus=true;
+  srchdlgs->ShowReplaceDialog();
   return 1;
 }
 
@@ -809,7 +828,7 @@ long TopWindow::onReplace(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onGoto(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=FocusedDoc();
-  if ( srchdlgs->ShowGoToDialog(sci) ) { macro_record_goto(); }
+  if ( srchdlgs->ShowGoToDialog() ) { macro_record_goto(); }
   ClosedDialog();
   return 1;
 }
@@ -819,7 +838,7 @@ long TopWindow::onGoto(FXObject*o, FXSelector sel, void*p)
 long TopWindow::onGotoSelected(FXObject*o, FXSelector sel, void*p)
 {
   SciDoc*sci=FocusedDoc();
-  if ( srchdlgs->GoToSelected(sci) ) { macro_record_goto(); }
+  if ( srchdlgs->GoToSelected() ) { macro_record_goto(); }
   return 1;
 }
 
@@ -827,7 +846,7 @@ long TopWindow::onGotoSelected(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFindSelected(FXObject*o, FXSelector sel, void*p)
 {
-  srchdlgs->FindSelected(FocusedDoc(), FXSELID(sel)==ID_NEXT_SELECTED);
+  srchdlgs->FindSelected(FXSELID(sel)==ID_NEXT_SELECTED);
   macro_record_search();
   return 1;
 }
@@ -989,6 +1008,7 @@ TopWindow::TopWindow(FXApp *a):TopWindowBase(a)
   tabbook->setSelector(ID_TAB_SWITCHED);
   statusbar->SetKillID(ID_KILL_COMMAND);
   filedlgs->setSelector(ID_FILE_SAVED);
+  srchdlgs->setSelector(ID_FOUND_SEARCH);
   SciDocUtils::SetScintillaSelector(ID_SCINTILLA);
   SciDocUtils::SetMacroRecordSelector(ID_MACRO_RECORD);
   ShowOutputPane(prefs->ShowOutputPane);

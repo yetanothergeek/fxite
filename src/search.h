@@ -22,8 +22,7 @@ class SciSearchOptions: public FXHorizontalFrame {
 protected:
   SciSearchOptions(){}
   FXCheckButton*matchcase;
-  FXCheckButton*wholeword;
-  FXCheckButton*regexp;
+  FXListBox*modelist;
 public:
   SciSearchOptions(FXComposite *p, FXObject *tgt=NULL, FXSelector sel=0);
   long onToggleChk(FXObject*o, FXSelector sel, void*p);
@@ -42,17 +41,28 @@ typedef enum {
   SEARCH_WRAP_ASK
 } SearchWrapPolicy;
 
-class SciReplDlg;
-class SciDoc;
+
+class SciReplPan;
+
 
 class SearchDialogs: public FXObject {
   FXDECLARE(SearchDialogs);
   SearchDialogs() {}
 private:
-  bool DoFind(SciReplDlg*dlg, SciDoc*sci, bool forward);
+  bool FindText(bool forward, bool wrap);
+  bool DoFind(bool forward);
   bool SearchFailed();
-  SciReplDlg *find_dlg;
-  FXWindow*_shell;
+  FXHorizontalFrame*srchpan;
+  SciReplPan*find_dlg;
+  SciReplPan*repl_dlg;
+  FXComposite*parent;
+  FXSelector message;
+  FXObject*target;
+  bool find_initial;
+  bool repl_initial;
+  bool repl_ready;
+  FXuint NextSearch(FXuint code);
+  FXuint NextReplace(FXuint code);
 public:
   SearchWrapPolicy searchwrap;
   bool searchverbose;
@@ -61,19 +71,30 @@ public:
   FXuint defaultsearchmode;
   FXString searchstring;
   void SetPrefs(FXuint mode, FXuint wrap, bool verbose);
-  bool ShowFindDialog(SciDoc*sci);
-  void ShowReplaceDialog(SciDoc*sci);
-  bool FindNext(SciDoc*sci);
-  bool FindPrev(SciDoc*sci);
-  bool FindPhrase(SciDoc*sci, const char* phrase, FXuint mode, bool forward);
-  void FindSelected(SciDoc*sci, bool forward);
-  bool GoToSelected(SciDoc*sci);
-  bool ShowGoToDialog(SciDoc*sci);
+  void ShowFindDialog();
+  void ShowReplaceDialog();
+  void FindNext();
+  void FindPrev();
+  void FindPhrase(const char* phrase, FXuint mode, bool forward);
+  void FindSelected(bool forward);
+  void setHaveSelection(bool have_sel);
+  bool GoToSelected();
+  bool ShowGoToDialog();
   FXDialogBox*FindDialog() { return (FXDialogBox*)find_dlg; }
-  SearchDialogs(FXWindow*shell);
+  SearchDialogs(FXComposite*p, FXObject*trg=NULL, FXSelector sel=0);
+  void setSelector(FXSelector sel) { message=sel; }
+  void setTarget(FXObject*trg) { target=trg; }
   virtual ~SearchDialogs();
+  long onSearch(FXObject*o, FXSelector sel, void *p);
+  long onReplDone(FXObject*o, FXSelector sel, void *p);
+  void hide();
+  enum {
+    ID_SEARCH=1,
+    ID_REPL_DONE,
+    ID_LAST
+  };
 };
 
 
-bool GetPrimarySelection(SciDoc*sci, FXString&target);
+bool GetPrimarySelection(FXString&target);
 

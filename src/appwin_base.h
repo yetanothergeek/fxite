@@ -142,7 +142,7 @@ public:
   void AddOutput(const FXString&line);
   void ClearOutput();
   UserMenu** UserMenus() const;
-  bool FindText(const char* searchstring, FXuint searchmode, bool forward);
+  void FindText(const char* searchstring, FXuint searchmode, bool forward);
   void AdjustIndent(SciDoc* sci,char ch);
   bool FoundBookmarkedTab(DocTab* tab);
   bool Destroying() { return destroying; }

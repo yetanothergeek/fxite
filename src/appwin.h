@@ -42,6 +42,7 @@ public:
   long onQuit(           FXObject* o, FXSelector sel, void* p );
   long onScintillaCmd(   FXObject* o, FXSelector sel, void* p );
   long onScintillaPick(  FXObject* o, FXSelector sel, void* p );
+  long onScintillaKey(   FXObject* o, FXSelector sel, void* p );
   long onCloseTab(       FXObject* o, FXSelector sel, void* p );
   long onCloseAll(       FXObject* o, FXSelector sel, void* p );
   long onUndo(           FXObject* o, FXSelector sel, void* p );
@@ -106,6 +107,7 @@ public:
   long onTBarCustomCmd(  FXObject* o, FXSelector sel, void* p );
   long onPopupSelectAll( FXObject* o, FXSelector sel, void* p );
   long onPopupDeleteSel( FXObject* o, FXSelector sel, void* p );
+  long onFoundSearch(    FXObject* o, FXSelector sel, void* p );
   long onTestSomething(  FXObject* o, FXSelector sel, void* p );
   enum {
     ID_TABS_TOP=TopWindowBase::ID_LAST,
@@ -216,6 +218,7 @@ public:
     ID_TBAR_CUSTOM_CMD,
     ID_POPUP_SELECT_ALL,
     ID_POPUP_DELETE_SEL,
+    ID_FOUND_SEARCH,
     ID_TEST_SOMETHING,
     ID_LAST
   };

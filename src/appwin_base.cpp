@@ -120,6 +120,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   outerbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
   innerbox=new FXVerticalFrame(outerbox,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
   toolbar=new ToolBarFrame(innerbox);
+  srchdlgs=new SearchDialogs(innerbox,this);
   hsplit=new FXSplitter(innerbox,this, 0, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   tabbook=new DocTabs(hsplit,this,0,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
   tabbook->setTabStyleByChar(prefs->DocTabPosition);
@@ -129,7 +130,6 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   statusbar=new StatusBar(outerbox,(void*)CommandUtils::DontFreezeMe());
   backups=new BackupMgr(this, ConfigDir());
   completions=new AutoCompleter();
-  srchdlgs=new SearchDialogs(this);
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
   cmdutils=new CommandUtils(this);
   filedlgs=new FileDialogs(this,0);
@@ -860,6 +860,7 @@ void TopWindowBase::EnableUserFilters(bool enabled)
 {
   toolbar->EnableFilterBtn(enabled);
   menubar->EnableFilterMenu(enabled);
+  srchdlgs->setHaveSelection(enabled);
 }
 
 
@@ -871,9 +872,9 @@ void TopWindowBase::RemoveTBarBtnData(void*p)
 
 
 // Exposes "userland" search behavior to scripting engine.
-bool TopWindowBase::FindText(const char*searchstring, FXuint searchmode, bool forward)
+void TopWindowBase::FindText(const char*searchstring, FXuint searchmode, bool forward)
 {
-  return srchdlgs->FindPhrase(ControlDoc(),searchstring,searchmode,forward);
+  srchdlgs->FindPhrase(searchstring,searchmode,forward);
 }
 
 

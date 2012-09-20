@@ -169,9 +169,9 @@ void TopWinPub::DumpLexers() {
 
 
 
-bool TopWinPub::FindText(const char*searchstring, FXuint searchmode, bool forward)
+void TopWinPub::FindText(const char*searchstring, FXuint searchmode, bool forward)
 {
-  return tw->FindText(searchstring,searchmode,forward);
+  tw->FindText(searchstring,searchmode,forward);
 }
 
 
