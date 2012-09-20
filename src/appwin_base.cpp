@@ -570,14 +570,9 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
     update();
     repaint();
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
-    getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
-    cmdutils->DisableUI(true);
-    getApp()->runWhileEvents();
     success=cmdio.lines(cmd.text(), outlist, outlist->ID_CMDIO, &command_timeout, true);
-    cmdutils->DisableUI(false);
     statusbar->Normal();
-    getApp()->endWaitCursor();
     if (success) {
       outlist->appendItem(_("Command succeeded."));
     } else {
@@ -605,12 +600,12 @@ bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
   command_timeout=false;
   statusbar->Running(_("macro"));
   update();
-  cmdutils->DisableUI(true);
+  statusbar->layout();
   getApp()->runWhileEvents();
   bool rv=isfilename?macros.DoFile(script):macros.DoString(script);
+  getApp()->runWhileEvents();
   if (!destroying) {
     tabbook->ForEachTab(TabCallbacks::ResetUndoLevelCB,NULL);
-    cmdutils->DisableUI(false);
     statusbar->Normal();
     if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
