@@ -293,7 +293,7 @@ bool IsDesktopCurrent(FXMainWindow*tw)
 
 
 
-// Try for "msecs" milliseconds give window "w" (or any of its children) the keyboard focus.
+// Try for "msecs" milliseconds to give window "w" (or any of its children) the keyboard focus.
 void WaitForWindowFocus(FXWindow*w, FXuint msecs)
 {
   FXApp*a=w->getApp();
