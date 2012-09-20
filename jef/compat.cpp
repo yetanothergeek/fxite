@@ -292,3 +292,24 @@ bool IsDesktopCurrent(FXMainWindow*tw)
 #endif
 
 
+
+// Try for "msecs" milliseconds give window "w" (or any of its children) the keyboard focus.
+void WaitForWindowFocus(FXWindow*w, FXuint msecs)
+{
+  FXApp*a=w->getApp();
+#ifdef FOX_1_6
+  FXlong timeout=FXThread::time()+1000000*msecs;
+#else
+  FXTime timeout=FXThread::time()+1000000*msecs;
+#endif
+  while (FXThread::time()<timeout) {
+    FXWindow*fw=a->getFocusWindow();
+    if (fw) {
+      if ((fw==w)||fw->isChildOf(w)) { break; } else { fw->killFocus(); }
+    }
+    w->raise();
+    w->setFocus();
+    a->runWhileEvents();
+  }
+}
+
