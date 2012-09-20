@@ -94,6 +94,7 @@ public:
   ~HistoryTextField();
   long onHistory(FXObject*o,FXSelector sel,void*p);
   long onKeyPress(FXObject*o,FXSelector sel,void*p);
+  long onChanged(FXObject*o,FXSelector sel,void*p);
   void setWatch(FXint *watch);
   void setWatch(FXuint *watch);
   void enslave(HistoryTextField*enslaved);

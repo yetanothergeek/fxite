@@ -274,6 +274,7 @@ FXIMPLEMENT(HistBox,FXInputDialog,NULL,0)
 FXDEFMAP(HistoryTextField) HistoryTextFieldMap[]={
   FXMAPFUNC(SEL_KEYPRESS,HistoryTextField::ID_HIST_KEY,HistoryTextField::onKeyPress),
   FXMAPFUNCS(SEL_COMMAND,HistoryTextField::ID_HIST_UP,HistoryTextField::ID_HIST_DN,HistoryTextField::onHistory),
+  FXMAPFUNC(SEL_CHANGED,HistoryTextField::ID_HIST_KEY,HistoryTextField::onChanged),
 };
 
 
@@ -308,9 +309,18 @@ long HistoryTextField::onHistory(FXObject*o,FXSelector sel,void*p)
   }
   setText(hist->text());
   if (hframe->getTarget()&&hframe->getSelector()&&hist->getModeVar()) {
-    hframe->getTarget()->tryHandle(this,FXSEL(SEL_CHANGED, hframe->getSelector()),(void*)((FXival)*(hist->getModeVar())));
+    hframe->getTarget()->tryHandle(this,FXSEL(SEL_PICKED, hframe->getSelector()),(void*)((FXival)*(hist->getModeVar())));
   }
   return 1;
+}
+
+
+
+long HistoryTextField::onChanged(FXObject*o,FXSelector sel,void*p)
+{
+  if (hframe->getTarget()&&hframe->getSelector()) {
+    return hframe->getTarget()->tryHandle(this,FXSEL(SEL_CHANGED,hframe->getSelector()),p);
+  } else { return 1; }
 }
 
 
