@@ -189,7 +189,6 @@ void TopWindowBase::create()
   GetFontDescription(prefs->fontdesc,&fnt);
   save_hook.format("%s%s%c%s%c%s.lua", ConfigDir().text(), "tools", PATHSEP, "hooks", PATHSEP, "saved");
   UpdateToolbar();
-  MainWinWithClipBrd::create();
   RunHookScript("startup");
   ParseCommands(a->Commands());
   a->addTimeout(this,ID_TIMER,ONE_SECOND,NULL);
@@ -201,7 +200,6 @@ void TopWindowBase::create()
     a->migration_errors="";
   }
 #endif
-
 }
 
 
@@ -1143,12 +1141,15 @@ void TopWindowBase::ParseCommands(FXString &commands)
   bool tagopt=false;
   bool macopt=false;
   bool session_restored=false;
+  bool quiet=((compare(commands,"-q\n",2)==0) || (commands.contains("\n-q\n")));
   int i=0;
-  if (!((compare(commands,"-q\n",2)==0) || (commands.contains("\n-q\n")))) {
-    hide();
-    show();
+  static bool parsed_initial=false;
+  if (!quiet) {
+    if (parsed_initial) { hide(); }
+    show(prefs->placement);
     getApp()->runWhileEvents();
   }
+  parsed_initial=true;
   while (1) {
     sect=commands.section('\n',i++);
     if (sect.empty()) { break; }
@@ -1241,6 +1242,7 @@ void TopWindowBase::ParseCommands(FXString &commands)
   }
   commands=FXString::null;
   if (tabbook->numChildren()==0) { NewFile(false); }
+  if (!quiet) { WaitForWindowFocus(this); }
 }
 
 

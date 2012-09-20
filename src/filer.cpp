@@ -345,14 +345,38 @@ void FileDialogs::SetWorkingDirectory(FXWindow*w)
 
 
 
+class MyMessageBox: public FXMessageBox {
+public:
+  virtual FXuint execute(FXuint placement) {
+    create();
+    show(placement);
+    getApp()->refresh();
+    WaitForWindowFocus(this,3000);
+    return getApp()->runModalFor(this);
+  }
+  MyMessageBox(FXWindow* w,const FXString&c,const FXString&t,FXIcon*i,FXuint o):FXMessageBox(w,c,t,i,o){}
+
+  static FXuint question(FXWindow* owner,FXuint opts,const char* caption,const char* message,...){
+    FXGIFIcon icon(owner->getApp(),NULL);
+    va_list arguments;
+    va_start(arguments,message);
+#ifdef FOX_1_6
+    const FXString fmt=FXStringVFormat(message,arguments);
+#else
+    const FXString fmt=FXString::vvalue(message,arguments);
+#endif
+    MyMessageBox box(owner,caption,fmt,&icon,opts|DECOR_TITLE|DECOR_BORDER);
+    va_end(arguments);
+    return box.execute(PLACEMENT_OWNER);
+  }
+};
+
+
 bool FileDialogs::FileExistsOrConfirmCreate(FXMainWindow*w, const FXString &fn)
 {
   if ((!fn.empty())&&(!FXStat::exists(fn))) {
-    for (FXint i=0; (i<1024) && (!w->getApp()->getFocusWindow()); i++) {
-      w->setFocus();
-      w->getApp()->runWhileEvents();
-    }
-    if (FXMessageBox::question( w, MBOX_YES_NO, _("File not found"),
+    WaitForWindowFocus(w);
+    if (MyMessageBox::question( w, MBOX_YES_NO, _("File not found"),
           "%s:\n%s\n %s",
           _("Can't find the file"),
           fn.text(),
