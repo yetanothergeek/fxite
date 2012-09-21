@@ -146,6 +146,8 @@ static char get_stream_encoding(FILE *file) {
     c = getc(file);
     if (c != EOF) {
       if ( (c<32) && ( (c==0) || (!strchr("\n\t\r\f\v\a",c)) ) ) {
+        /* If the very last byte is [SUB] it's probably an ancient CP/M text file. */
+        if ((c=='\032') && (getc(file)==EOF)) return 'T';
         /* Probably not a text file, so bail out now. */
         return 'B';
       }
