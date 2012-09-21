@@ -602,7 +602,7 @@ You should save the data in the form of:
 
 Note that the data is only stored in external memory ///after/// the script executes successfully. \
 If a script encounters errors, the table is left in the same state it was before the script was run. \
-Also note that the data is not saved to disk when the program exits (but of course you are free
+Also note that the data is not saved to disk when the program exits (but of course you are free \
 to save any data to disk manually).
 
 To clear the table completely, you can use:
