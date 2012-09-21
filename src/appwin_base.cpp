@@ -1138,13 +1138,11 @@ void TopWindowBase::ParseCommands(FXString &commands)
   bool session_restored=false;
   bool quiet=((compare(commands,"-q\n",2)==0) || (commands.contains("\n-q\n")));
   int i=0;
-  static bool parsed_initial=false;
   if (!quiet) {
-    if (parsed_initial) { hide(); }
+    hide();
     show(prefs->placement);
     getApp()->runWhileEvents();
   }
-  parsed_initial=true;
   while (1) {
     sect=commands.section('\n',i++);
     if (sect.empty()) { break; }
