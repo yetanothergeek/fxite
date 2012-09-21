@@ -167,10 +167,10 @@ static const char* helptext[]= {
 
 static void usage(const char*prog)
 {
-  fxmessage("\n");
-  fxmessage(_("Usage: %s [options] [files] ...\n"), FXPath::name(prog).text());
+  printf("\n");
+  printf(_("Usage: %s [options] [files] ...\n"), FXPath::name(prog).text());
   for (const char**s=helptext; *s; s++) {
-    fxmessage("%s\n", *s);
+    printf("%s\n", *s);
   }
 }
 
