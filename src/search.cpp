@@ -767,7 +767,10 @@ void SearchDialogs::ShowFindDialog()
     repl_dlg=NULL;
   }
   find_dlg->create();
-  find_dlg->show();
+  if (!find_dlg->shown()) {
+    find_dlg->Gui()->setSearchText(FXString::null);
+    find_dlg->show();
+  }
   parent->layout();
   find_dlg->setFocus();
   find_dlg->Gui()->setSearchMode(searchmode);
