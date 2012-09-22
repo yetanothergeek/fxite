@@ -141,7 +141,7 @@ public:
   void setSearchReverse(bool reverse) { rev_chk->setCheck(reverse); }
   void AppendHist(const FXString& search,const FXString& replace,FXuint mode);
   void DoExecute(bool first_time);
-  void HandleKeyPress(FXint code);
+  void HandleKeyPress(FXEvent*ev);
   virtual void create();
   virtual void destroy();
   FXVerticalFrame *TextFrame() { return txt_fields; }
@@ -358,17 +358,17 @@ long SciReplGui::onButton(FXObject*o, FXSelector sel, void*p)
 
 
 
-void SciReplGui::HandleKeyPress(FXint code)
+void SciReplGui::HandleKeyPress(FXEvent*ev)
 {
-  switch (code) {
+  switch (ev->code) {
     case KEY_less:
     case KEY_comma: {
-      handle(NULL,FXSEL(SEL_COMMAND,SciReplGui::ID_PREV),NULL);
+      if (ev->state&ALTMASK) { handle(NULL,FXSEL(SEL_COMMAND,SciReplGui::ID_PREV),NULL); }
       break;
     }
     case KEY_period:
     case KEY_greater: {
-      handle(NULL,FXSEL(SEL_COMMAND,SciReplGui::ID_NEXT),NULL);
+      if (ev->state&ALTMASK) { handle(NULL,FXSEL(SEL_COMMAND,SciReplGui::ID_NEXT),NULL); }
       break;
     }
     case KEY_Escape: {
@@ -543,7 +543,7 @@ void SciReplPan::FillX(bool fill_x)
 
 long SciReplPan::onKeyPress(FXObject*o, FXSelector sel, void*p)
 {
-  gui->HandleKeyPress(((FXEvent*)p)->code);
+  gui->HandleKeyPress(((FXEvent*)p));
   return FXHorizontalFrame::onKeyPress(o,sel,p);
 }
 
