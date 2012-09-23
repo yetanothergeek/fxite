@@ -539,7 +539,9 @@ long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
 
 long TopWindow::onScintillaKey(FXObject* o, FXSelector sel, void*p)
 {
-  if (((FXEvent*)p)->code==KEY_Escape) { srchdlgs->hide(); }
+  if (((FXEvent*)p)->code==KEY_Escape) {
+    if (!FocusedDoc()->sendMessage(SCI_AUTOCACTIVE,0,0)) { srchdlgs->hide(); }
+  }
   return 0;
 }
 
