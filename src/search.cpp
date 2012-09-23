@@ -125,6 +125,7 @@ private:
   void EnableSearch();
 public:
   SciReplGui(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, bool find_only=false);
+  ~SciReplGui() { target=NULL; stop(DONE); }
   void stop(FXuint stopval);
   long onSciOpts(FXObject*o, FXSelector sel, void*p);
   long onSrchHist(FXObject*o, FXSelector sel, void*p);
@@ -511,6 +512,7 @@ class SciReplPan: public FXHorizontalFrame {
   SciReplGui*gui;
 public:
   SciReplPan(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, bool find_only=false);
+  ~SciReplPan() { delete gui; }
   SciReplGui*Gui() { return gui; }
   long onKeyPress(FXObject*o, FXSelector sel, void*p);
   void FillX(bool fill_x);
@@ -608,6 +610,8 @@ SearchDialogs::~SearchDialogs()
 {
   delete find_dlg;
   find_dlg=NULL;
+  delete repl_dlg;
+  repl_dlg=NULL;
 }
 
 
