@@ -58,7 +58,7 @@ public:
   static FXbool close(FXbool notify=FALSE);
   static FXMainWindow* instance();
   static void DumpLexers();
-  static void FindText(const char*searchstring, FXuint searchmode, bool forward);
+  static void FindText(const char*searchfor, FXuint searchmode, bool forward);
   static void FindAndReplace(const char*searchfor, const char*replacewith, FXuint mode, bool forward);
   static void ReplaceAllInSelection(const char*searchfor, const char*replacewith,  FXuint mode);
   static void ReplaceAllInDocument(const char*searchfor, const char*replacewith,  FXuint mode);
