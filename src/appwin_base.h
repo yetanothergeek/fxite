@@ -143,6 +143,9 @@ public:
   void ClearOutput();
   UserMenu** UserMenus() const;
   void FindText(const char* searchstring, FXuint searchmode, bool forward);
+  void FindAndReplace(const char*searchfor, const char*replacewith, FXuint searchmode, bool forward);
+  void ReplaceAllInSelection(const char*searchfor, const char*replacewith, FXuint searchmode);
+  void ReplaceAllInDocument(const char*searchfor, const char*replacewith, FXuint searchmode);
   void AdjustIndent(SciDoc* sci,char ch);
   bool FoundBookmarkedTab(DocTab* tab);
   bool Destroying() { return destroying; }

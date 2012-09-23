@@ -169,10 +169,32 @@ void TopWinPub::DumpLexers() {
 
 
 
-void TopWinPub::FindText(const char*searchstring, FXuint searchmode, bool forward)
+void TopWinPub::FindText(const char*searchfor, FXuint searchmode, bool forward)
 {
-  tw->FindText(searchstring,searchmode,forward);
+  tw->FindText(searchfor,searchmode,forward);
 }
+
+
+
+void TopWinPub::FindAndReplace(const char*searchfor, const char*replacewith, FXuint searchmode, bool forward)
+{
+  tw->FindAndReplace(searchfor,replacewith,searchmode,forward);
+}
+
+
+
+void TopWinPub::ReplaceAllInSelection(const char*searchstring, const char*replacewith,  FXuint searchmode)
+{
+  tw->ReplaceAllInSelection(searchstring,replacewith,searchmode);
+}
+
+
+
+void TopWinPub::ReplaceAllInDocument(const char*searchstring, const char*replacewith,  FXuint searchmode)
+{
+  tw->ReplaceAllInDocument(searchstring,replacewith,searchmode);
+}
+
 
 
 void TopWinPub::Paste()

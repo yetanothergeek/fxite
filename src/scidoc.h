@@ -57,6 +57,7 @@ private:
   unsigned char need_styled:1;
   unsigned char _utf8:1;
   unsigned char smart_home:1;
+  unsigned char recording:1;
 protected:
   SciDoc(){}
   inline bool IsInsideBrace(long &pos);
@@ -73,6 +74,7 @@ public:
   SciSearch *search;
   long onKeyPress(FXObject *o, FXSelector sel, void *p);
   long onRightBtnPress(FXObject *o, FXSelector sel, void *p);
+  long onRecordReplace(FXObject *o, FXSelector sel, void *p);
   virtual void moveContents(FXint x,FXint y);
   SciDoc(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0);
   ~SciDoc();
@@ -195,6 +197,12 @@ public:
   void SelectionToUpper();
   void SelectionToLower();
   void ShowPopupMenu(int x, int y);
+  void EnableRecorder(bool enable_recorder);
+  bool RecorderEnabled() { return recording; }
+  enum {
+    ID_RECORD_REPLACE=FXScintilla::ID_LAST,
+    ID_LAST
+  };
 };
 
 #define sendString(iMessage, wParam, lParam) sendMessage(iMessage, wParam, reinterpret_cast<long>(lParam))

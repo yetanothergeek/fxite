@@ -33,11 +33,11 @@
 
 FXDEFMAP(SciDoc) SciDocMap[] = {
   FXMAPFUNC(SEL_KEYPRESS, 0, SciDoc::onKeyPress),
-  FXMAPFUNC(SEL_RIGHTBUTTONPRESS, 0, SciDoc::onRightBtnPress)
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS, 0, SciDoc::onRightBtnPress),
+  FXMAPFUNC(SEL_COMMAND, SciDoc::ID_RECORD_REPLACE, SciDoc::onRecordReplace),
 };
 
 FXIMPLEMENT(SciDoc,FXScintilla,SciDocMap,ARRAYNUMBER(SciDocMap));
-
 
 
 static const char* c_openers="{[(";
@@ -62,8 +62,9 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   _lang=NULL;
   _filetime=0;
   splitter_style=SPLIT_NONE;
-  search=new SciSearch(this);
+  search=new SciSearch(this,ID_RECORD_REPLACE);
   user_undo_level=0;
+  recording=false;
 
   sendMessage(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   sendMessage(SCI_SETMARGINWIDTHN, 1, 4);
@@ -1393,5 +1394,26 @@ void SciDoc::SelectionToUpper()
 void SciDoc::SelectionToLower()
 {
   SetCaseOfSelection(SCI_LOWERCASE);
+}
+
+
+
+void SciDoc::EnableRecorder(bool enable_recorder)
+{
+  if (enable_recorder) {
+    sendMessage(SCI_STARTRECORD, 0, 0);
+  } else {
+    sendMessage(SCI_STOPRECORD, 0, 0);
+  }
+  recording=enable_recorder;
+}
+
+
+
+long SciDoc::onRecordReplace(FXObject *o, FXSelector sel, void *p)
+{
+  if (!recording) { return 1;}
+  if (target) { target->handle(this,FXSEL(SEL_COMMAND,message), p); }
+  return 1;
 }
 

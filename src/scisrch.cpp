@@ -238,6 +238,30 @@ static FXString PrepareReplacement(const FXString &repl_in, FXuint opts)
 
 
 
+void SciSearch::NotifyRecorder(const FXString &searchfor, const FXString &replacewith, FXuint opts, FXint mode)
+{
+  if (sci->RecorderEnabled()) {
+    SCNotification scn;
+    if (mode) {
+      memset((void*)&scn,0,sizeof(SCNotification));
+      scn.nmhdr.code=SCN_MACRORECORD;
+      scn.message=SCI_SEARCHNEXT;
+      scn.lParam=(sptr_t)(void*)searchfor.text();
+      scn.wParam=opts;
+      sci->handle((FXObject*)this,FXSEL(SEL_COMMAND,message),(void*)&scn);
+    }
+
+    memset((void*)&scn,0,sizeof(SCNotification));
+    scn.nmhdr.code=SCN_MACRORECORD;
+    scn.message=SCI_REPLACETARGET;
+    scn.wParam=mode;
+    scn.lParam=(sptr_t)(void*)replacewith.text();
+    sci->handle((FXObject*)this,FXSEL(SEL_COMMAND,message),(void*)&scn);
+  }  
+}
+
+
+
 void SciSearch::ReplaceSelection(const FXString &replacewith, FXuint opts)
 {
   long start=SciMsg(SCI_GETSELECTIONSTART,0,0);
@@ -249,6 +273,7 @@ void SciSearch::ReplaceSelection(const FXString &replacewith, FXuint opts)
   FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
   SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
   SelectTarget(start<end);
+  NotifyRecorder(FXString::null,replacewith,opts,0);
 }
 
 
@@ -293,8 +318,11 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
       if (eol_only) {start++;}
     } else { break; }
   }
-  if (count>0) { SciMsg(SCI_GOTOPOS,start,0); }
+  if (count>0) {
+    SciMsg(SCI_GOTOPOS,start,0);
+  }
   SciMsg(SCI_ENDUNDOACTION,0,0);
+  NotifyRecorder(searchfor,replacewith,opts,2);
   return count;
 }
 
@@ -362,6 +390,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
     SciMsg(SCI_SETSELECTIONNEND,isel,swapped?start:end);
   }
   SciMsg(SCI_ENDUNDOACTION,0,0);
+  NotifyRecorder(searchfor,replacewith,opts,1);
   return count;
 }
 

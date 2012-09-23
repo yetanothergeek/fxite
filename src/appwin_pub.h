@@ -59,6 +59,9 @@ public:
   static FXMainWindow* instance();
   static void DumpLexers();
   static void FindText(const char*searchstring, FXuint searchmode, bool forward);
+  static void FindAndReplace(const char*searchfor, const char*replacewith, FXuint mode, bool forward);
+  static void ReplaceAllInSelection(const char*searchfor, const char*replacewith,  FXuint mode);
+  static void ReplaceAllInDocument(const char*searchfor, const char*replacewith,  FXuint mode);
   static void Paste();
   static void AdjustIndent(SciDoc*sci,char ch);
   static DocTabs* Tabs();

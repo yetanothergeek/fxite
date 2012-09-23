@@ -70,6 +70,7 @@ mm->allocd=1; \
 
 void MacroRecorder::record(int message, uptr_t wParam, sptr_t lParam)
 {
+FXString msgstring;
   MacroMessage*prev=list[0];
   switch (message) {
     case SCI_CUT:
@@ -127,7 +128,6 @@ void MacroRecorder::record(int message, uptr_t wParam, sptr_t lParam)
       return;
     }
 
-
     case SCI_SEARCHNEXT:
     case SCI_SEARCHPREV:
     {
@@ -148,7 +148,10 @@ void MacroRecorder::record(int message, uptr_t wParam, sptr_t lParam)
       }
       return;
     }
-
+    case SCI_REPLACETARGET: { // Hijacked message, see SciSearch::NotifyRecorder()
+      AddString();
+      return;
+    }
     case SCI_PASTE:
     case SCI_LINEDOWN:
     case SCI_LINEDOWNEXTEND:
@@ -341,7 +344,11 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
         break;
       }
       case SCI_GOTOPOS: {
-        text.format(_LUAMOD_".caret(%ld)", mm->wParam);
+        if ((i>1)&&(list[i-1]->message==SCI_SEARCHNEXT)&&(list[i-2]->message==SCI_REPLACETARGET)&&(list[i-2]->wParam==2)) {
+            // If message was generated inside SciSearch::ReplaceAllInDoc() just ignore it.
+        } else {
+          text.format(_LUAMOD_".caret(%ld)", mm->wParam);
+        }
         break;
       }
       case SCI_REPLACESEL: {
@@ -377,8 +384,26 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
         if (mm->wParam & SCFIND_WHOLEWORD) { flags.append(",\"wholeword\""); }
         if (mm->wParam & SCFIND_REGEXP)    { flags.append(",\"regexp\""); }
         if (flags[0]==',') { flags.erase(0,1); }
-        text.format( _LUAMOD_".gofind(\"%s\", {%s}%s)",
-                       what.text(), flags.text(), mm->message==SCI_SEARCHNEXT?"":", false"  );
+        if ((i>0)&&(list[i-1]->message==SCI_REPLACETARGET)) {
+          FXString with=(char*)list[i-1]->lParam;
+          requote(with);
+          const char*how=NULL;
+          switch (list[i-1]->wParam) {
+            case 0: { how=mm->message==SCI_SEARCHNEXT?"next":"prev"; break; }
+            case 1: { how="sel"; break; }
+            case 2: { how="all"; break; }
+          }
+          text.format(_LUAMOD_".replace(\"%s\",\"%s\", {%s},\"%s\")",
+                         what.text(), with.text(), flags.text(), how );
+          
+        } else {
+
+          text.format( _LUAMOD_".gofind(\"%s\", {%s}%s)",
+                         what.text(), flags.text(), mm->message==SCI_SEARCHNEXT?"":", false"  );
+        }
+        break;
+      }
+      case SCI_REPLACETARGET: {
         break;
       }
       case SCI_PASTE: {

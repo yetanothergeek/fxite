@@ -497,17 +497,16 @@ void TopWindowBase::ShowInsertFileDlg()
 void TopWindowBase::ToggleRecorder()
 {
   if (recording) {
-    recording->sendMessage(SCI_STOPRECORD, 0, 0);
     recording=NULL;
   } else {
     if (!recorder) {recorder=new MacroRecorder(); }
     recorder->clear();
     recording=ControlDoc();
-    recording->sendMessage(SCI_STARTRECORD, 0, 0);
   }
+  ControlDoc()->EnableRecorder(recording);
   statusbar->Recording(recording);
   menubar->Recording(recording,recorder);
-  ControlDoc()->setFocus();  
+  ControlDoc()->setFocus();
 }
 
 
@@ -865,9 +864,30 @@ void TopWindowBase::RemoveTBarBtnData(void*p)
 
 
 // Exposes "userland" search behavior to scripting engine.
-void TopWindowBase::FindText(const char*searchstring, FXuint searchmode, bool forward)
+void TopWindowBase::FindText(const char*searchfor, FXuint searchmode, bool forward)
 {
-  srchdlgs->FindPhrase(searchstring,searchmode,forward);
+  srchdlgs->FindPhrase(searchfor,searchmode,forward);
+}
+
+
+
+void TopWindowBase::FindAndReplace(const char*searchfor, const char*replacewith, FXuint searchmode, bool forward)
+{
+  srchdlgs->FindAndReplace(searchfor, replacewith, searchmode, forward);
+}
+
+
+
+void TopWindowBase::ReplaceAllInSelection(const char*searchfor, const char*replacewith, FXuint searchmode)
+{
+  srchdlgs->ReplaceAllInSelection(searchfor, replacewith, searchmode);
+}
+
+
+
+void TopWindowBase::ReplaceAllInDocument(const char*searchfor, const char*replacewith, FXuint searchmode)
+{
+  srchdlgs->ReplaceAllInDocument(searchfor, replacewith, searchmode);
 }
 
 

@@ -27,12 +27,14 @@ private:
   FXint begs[MAX_CAPTURES],ends[MAX_CAPTURES];
   const char*content;
   SciDoc*sci;
+  FXSelector message;
   void SelectTarget(bool forward);
   void EnsureAnchorDirection(bool forward);
   FXRexError rxerr;
   bool CheckRegex(const FXRex &rx, bool quiet=false);
+  void NotifyRecorder(const FXString &searchfor, const FXString &replacewith, FXuint opts, FXint mode);
 public:
-  SciSearch(SciDoc*scidoc) { sci=scidoc; }
+  SciSearch(SciDoc*scidoc, FXSelector sel) { sci=scidoc; message=sel; }
   int FindTextNoSel(const FXString &what, FXuint sciflags, long &beg, long &end);
   bool FindText(const FXString &what, FXuint sciflags, bool forward, bool wrap);
   void ReplaceSelection(const FXString &replacewith, FXuint opts);

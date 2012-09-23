@@ -153,6 +153,37 @@ static int gofind(lua_State* L)
 }
 
 
+// replace(search_for, replace_with, {options}[, scope] ) -- scope is one of "next" "prev" "sel" "all"
+static int replace(lua_State* L)
+{
+  DOC_REQD
+  int flags=0;
+  const char* search_for=luaL_checkstring(L,1);
+  const char* replace_with=luaL_checkstring(L,2);
+  if (!check_find_flags(L,3,flags)) { return 0; }
+  const char* scopes[]={"next","prev","sel","all",NULL};
+  int scope=luaL_checkoption(L,4,"next",scopes);
+  switch (scope) {
+    case 0:
+    case 1: {
+      TopWinPub::FindAndReplace(search_for,replace_with,flags,scope==0?true:false);
+      break;
+    }
+    case 2: {
+      TopWinPub::ReplaceAllInSelection(search_for,replace_with,flags);
+      break;
+    }
+    case 3: {
+      TopWinPub::ReplaceAllInDocument(search_for,replace_with,flags);
+      break;
+    }
+  }
+  return 0;
+}
+
+
+
+
 
 static int match(lua_State* L)
 {
@@ -1355,6 +1386,7 @@ static const struct luaL_reg fxte_funcs[] = {
   {"rowcol", rowcol},
   {"find", find},
   {"gofind", gofind},
+  {"replace", replace},
   {"match", match},
   {"word", word},
   {"xsel", xsel},

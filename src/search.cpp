@@ -622,12 +622,24 @@ void SearchDialogs::SetPrefs(FXuint mode, FXuint wrap, bool verbose)
 
 
 
+void SearchDialogs::SearchFailed(FXWindow*w)
+{
+  FXMessageBox::error(w->getShell(), MBOX_OK, _("Not found"), "%s.", _("Search term not found"));
+}
+
+
 bool SearchDialogs::SearchFailed()
 {
-  if (searchverbose) {
-    FXMessageBox::error(parent->getShell(), MBOX_OK, _("Not found"), "%s.", _("Search term not found"));
-  }
+  if (searchverbose) { SearchFailed(parent); }
   return false;
+}
+
+ 
+bool SearchDialogs::SearchWrapAsk(FXWindow*w)
+{
+  return (FXMessageBox::question(w->getShell(), MBOX_YES_NO, _("Wrap search?"), "%s:\n%s",
+            _("Search term not found"),
+            _("Wrap search and try again?"))==MBOX_CLICKED_YES);
 }
 
 
@@ -664,12 +676,7 @@ bool SearchDialogs::DoFind(bool forward)
       } else {
         if (pos==sci->sendMessage(SCI_GETLENGTH,0,0)) { return SearchFailed(); }
       }
-
-      if (FXMessageBox::question(sci->getShell(), MBOX_YES_NO, _("Wrap search?"), "%s:\n%s",
-            _("Search term not found"),
-            _("Wrap search and try again?"))==MBOX_CLICKED_YES) {
-        return (FindText(forward,true))?true:SearchFailed();
-      }
+      if (SearchWrapAsk(sci)) { return (FindText(forward,true))?true:SearchFailed(); }
     }
     default: { return false; }
   }
@@ -701,11 +708,42 @@ void SearchDialogs::FindPrev()
 
 
 
-void SearchDialogs::FindPhrase(const char* phrase, FXuint mode, bool forward)
+void SearchDialogs::FindPhrase(const char* searchfor, FXuint mode, bool forward)
 {
-  searchstring=phrase;
+  searchstring=searchfor;
   searchmode=mode;
   if (forward) { FindNext(); } else { FindPrev(); }
+}
+
+
+
+void SearchDialogs::FindAndReplace(const char*searchfor, const char*replacewith, FXuint mode, bool forward)
+{
+  searchstring=searchfor;
+  replacestring=replacewith;
+  searchmode=mode;
+  repl_ready=false;
+  NextReplace(SciReplGui::SEARCH,forward);
+}
+
+
+
+void SearchDialogs::ReplaceAllInSelection(const char*searchfor, const char*replacewith, FXuint mode)
+{
+  searchstring=searchfor;
+  replacestring=replacewith;
+  searchmode=mode;
+  NextReplace(SciReplGui::REPL_ALL_INSEL,true);
+}
+
+
+
+void SearchDialogs::ReplaceAllInDocument(const char*searchfor, const char*replacewith, FXuint mode)
+{
+  searchstring=searchfor;
+  replacestring=replacewith;
+  searchmode=mode;
+  NextReplace(SciReplGui::REPL_ALL_INDOC,true);
 }
 
 
@@ -818,16 +856,12 @@ void SearchDialogs::ShowReplaceDialog()
 
 
 
-FXuint SearchDialogs::NextReplace(FXuint code)
+FXuint SearchDialogs::NextReplace(FXuint code, bool forward)
 {
   SciDoc*sci=TopWinPub::FocusedDoc();
-  FXString replacestring;
-  searchmode=repl_dlg->Gui()->getSearchMode();
-  searchstring=repl_dlg->Gui()->getSearchText();
-  replacestring=repl_dlg->Gui()->getReplaceText();
   switch (code) {
     case SciReplGui::SEARCH:{ // Replace selection
-      if (!repl_ready) { repl_ready=DoFind(!repl_dlg->Gui()->getSearchReverse()); }
+      if (!repl_ready) { repl_ready=DoFind(forward); }
       if (repl_ready) {
         sci->search->ReplaceSelection(replacestring,searchmode);
         repl_ready=false;
@@ -835,7 +869,7 @@ FXuint SearchDialogs::NextReplace(FXuint code)
       break;
     }
     case SciReplGui::SEARCH_NEXT:{ // Find next
-      repl_ready=DoFind(!repl_dlg->Gui()->getSearchReverse());
+      repl_ready=DoFind(forward);
       break;
     }
     case SciReplGui::REPL_ALL_INDOC:{ // Replace all
@@ -876,7 +910,10 @@ long SearchDialogs::onSearch(FXObject*o, FXSelector sel, void *p)
     if (code==SciReplGui::DONE) {
       find_dlg->getApp()->addChore(this,ID_REPL_DONE,NULL);
     } else {
-      NextReplace(code);
+      searchmode=repl_dlg->Gui()->getSearchMode();
+      searchstring=repl_dlg->Gui()->getSearchText();
+      replacestring=repl_dlg->Gui()->getReplaceText();
+      NextReplace(code,!repl_dlg->Gui()->getSearchReverse());
     }
   } else {
     switch (code) {

@@ -51,7 +51,6 @@ class SearchDialogs: public FXObject {
 private:
   bool FindText(bool forward, bool wrap);
   bool DoFind(bool forward);
-  bool SearchFailed();
   FXHorizontalFrame*srchpan;
   SciReplPan*find_dlg;
   SciReplPan*repl_dlg;
@@ -62,8 +61,12 @@ private:
   bool repl_initial;
   bool repl_ready;
   FXuint NextSearch(FXuint code);
-  FXuint NextReplace(FXuint code);
+  FXuint NextReplace(FXuint code, bool forward);
+  FXString replacestring;
+  bool SearchFailed();
 public:
+  static void SearchFailed(FXWindow*w);
+  static bool SearchWrapAsk(FXWindow*w);
   SearchWrapPolicy searchwrap;
   bool searchverbose;
   FXuint searchmode;
@@ -75,7 +78,10 @@ public:
   void ShowReplaceDialog();
   void FindNext();
   void FindPrev();
-  void FindPhrase(const char* phrase, FXuint mode, bool forward);
+  void FindPhrase(const char* searchfor, FXuint mode, bool forward);
+  void FindAndReplace(const char*searchfor, const char*replacewith, FXuint searchmode, bool forward);
+  void ReplaceAllInSelection(const char*searchfor, const char*replacewith, FXuint searchmode);
+  void ReplaceAllInDocument(const char*searchfor, const char*replacewith, FXuint searchmode);
   void FindSelected(bool forward);
   void setHaveSelection(bool have_sel);
   bool GoToSelected();
