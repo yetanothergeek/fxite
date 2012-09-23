@@ -267,7 +267,6 @@ SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_on
     srch_hist->enslave(repl_hist);
   }
   setSearchText(FXString::null);
-  EnableSearch();
 }
 
 
@@ -441,6 +440,7 @@ long SciReplGui::onSciOpts(FXObject*o, FXSelector sel, void*p)
 void SciReplGui::setSearchText(const FXString& text)
 {
   srch_hist->setText(text);
+  EnableSearch();
 }
 
 
@@ -771,6 +771,7 @@ void SearchDialogs::FindSelected(bool forward)
     searchstring=srch;
     DoFind(forward);
     find_dlg->Gui()->AppendHist(searchstring,"",defaultsearchmode);
+    if (find_dlg->shown()) { find_dlg->Gui()->setSearchText(srch); }
   }
 }
 
