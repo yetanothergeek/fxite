@@ -28,7 +28,7 @@ protected:
   FXTextField* encname;
   FXLabel* mode;
   FXSelector id_kill;
-  void Mode(const char*msg, bool squeeze_docname=false);
+  void Mode(const char*msg);
   void Coords(long line, long col);
 public:
   void Colorize();

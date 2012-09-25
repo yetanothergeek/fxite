@@ -37,7 +37,8 @@ StatusBar::StatusBar(FXComposite *p, void* dont_freeze):
   coords=new FXTextField(this,12,NULL,FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
   coords->setEditable(false);
 
-  docname=new FXTextField(this, 64, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
+  FXHorizontalFrame*hf=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X|FRAME_NONE, 0,0,0,0, 0,0,0,0, 0,0);
+  docname=new FXTextField(hf, 1024, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY|LAYOUT_FILL_X);
   docname->setEditable(false);
 
   encname=new FXTextField(this, 6, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
@@ -83,7 +84,7 @@ void StatusBar::Running(const char*what)
 {
   FXString status;
   status.format(_("Running %s (press %s to cancel)"), what, MenuMgr::LookupMenu(id_kill)->accel);
-  Mode(status.text(), true);
+  Mode(status.text());
 }
 
 
@@ -128,13 +129,8 @@ void StatusBar::Colorize()
 
 
 
-void StatusBar::Mode(const char*msg, bool squeeze_docname)
+void StatusBar::Mode(const char*msg)
 {
-  if (squeeze_docname) {
-    docname->setNumColumns(24);
-  } else {
-    docname->setNumColumns(64);
-  }
   mode->setText(msg);
   if (msg&&*msg) {
     mode->show();
