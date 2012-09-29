@@ -382,7 +382,7 @@ long TopWindow::onFindTag(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onShowCallTip(FXObject*o, FXSelector sel, void*p )
 {
-  TagHandler::ShowCallTip(FocusedDoc(), menubar->TagsMenu());
+  TagHandler::ShowCallTip(FocusedDoc(), TagFiles());
   return 1;
 }
 
