@@ -77,6 +77,7 @@ public:
   FXuchar FontDescent;
   FXint Left,Top,Width,Height;
   FXint SearchWrap;
+  FXint SearchGui;
   FXbool SearchVerbose;
   FXint SearchOptions;
   FXlong ZoomFactor;

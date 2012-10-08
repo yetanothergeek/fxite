@@ -100,7 +100,7 @@ SciSearchOptions::SciSearchOptions(FXComposite *p, FXObject *tgt, FXSelector sel
 
 
 
-class SciReplGui: public FXObject {
+class SciReplGui: public FXMatrix {
 FXDECLARE(SciReplGui)
 SciReplGui(){}
 private:
@@ -124,13 +124,17 @@ private:
   FXSelector message;
   void EnableSearch();
 public:
-  SciReplGui(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, bool find_only=false);
+  SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only, bool floating);
   ~SciReplGui() { target=NULL; stop(DONE); }
   void stop(FXuint stopval);
   long onSciOpts(FXObject*o, FXSelector sel, void*p);
   long onSrchHist(FXObject*o, FXSelector sel, void*p);
   long onButton(FXObject*o, FXSelector sel, void*p);
   long onFakeBtnUp(FXObject*o, FXSelector sel, void*p);
+
+  long onKeyPress(FXObject*o, FXSelector sel, void*p);
+  long onConfigure(FXObject*o, FXSelector sel, void*p);
+
   void setSearchText(const FXString& text);
   FXString getSearchText() const;
   void setReplaceText(const FXString& text);
@@ -141,7 +145,7 @@ public:
   FXuint getSearchReverse() { return rev_chk->getCheck(); }
   void setSearchReverse(bool reverse) { rev_chk->setCheck(reverse); }
   void AppendHist(const FXString& search,const FXString& replace,FXuint mode);
-  void DoExecute(bool first_time);
+  void DoExecute();
   void HandleKeyPress(FXEvent*ev);
   virtual void create();
   virtual void destroy();
@@ -179,9 +183,11 @@ FXDEFMAP(SciReplGui) SciReplGuiMap[]={
   FXMAPFUNC(  SEL_PICKED,   SciReplGui::ID_SRCH_HIST,   SciReplGui::onSrchHist),
   FXMAPFUNCS( SEL_COMMAND,  SciReplGui::ID_PREV,        SciReplGui::ID_CANCEL_SRCH, SciReplGui::onButton),
   FXMAPFUNC(  SEL_TIMEOUT,  SciReplGui::ID_FAKE_BTN_UP, SciReplGui::onFakeBtnUp),
+  FXMAPFUNC(  SEL_KEYPRESS,  0, SciReplGui::onKeyPress),
+  FXMAPFUNC(  SEL_CONFIGURE, 0, SciReplGui::onConfigure),
 };
 
-FXIMPLEMENT(SciReplGui,FXObject,SciReplGuiMap,ARRAYNUMBER(SciReplGuiMap))
+FXIMPLEMENT(SciReplGui,FXMatrix,SciReplGuiMap,ARRAYNUMBER(SciReplGuiMap))
 
 
 
@@ -199,24 +205,31 @@ static const char close_icon[] =
 ;
 
 
-
-SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only)
+SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only, bool floating):FXMatrix(p,2)
 {
   sciflags=0;
   target=tgt;
   message=sel;
+  setLayoutHints(floating?LAYOUT_FILL:LAYOUT_FILL_X);
+  setMatrixStyle(floating?MATRIX_BY_ROWS:MATRIX_BY_COLUMNS);
+  setFrameStyle(floating?FRAME_NONE:FRAME_GROOVE);
   FXuint textopts=TEXTFIELD_ENTER_ONLY|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X;
   const char*group=find_only?"Search":"Replace";
 
-  txt_fields=new FXVerticalFrame(p,FRAME_NONE|LAYOUT_FILL_X);
+  txt_fields=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN);
+  btn_ctrls=new  FXVerticalFrame(this,FRAME_NONE);
+
   SetPad(txt_fields,0);
 
   srch_lab=new FXLabel(txt_fields, _("Se&arch for:"));
   srch_hist=new HistoryTextField(txt_fields,48,group,"SM",this,ID_SRCH_HIST,textopts);
-  repl_lab=new FXLabel(txt_fields, _("Replace &with:"));
-  repl_hist=new HistoryTextField(txt_fields,48,group,"R",this,ID_REPL_HIST,textopts);
+  if (find_only) {
+    repl_hist=NULL;
+  } else {
+    repl_lab=new FXLabel(txt_fields, _("Replace &with:"));
+    repl_hist=new HistoryTextField(txt_fields,48,group,"R",this,ID_REPL_HIST,textopts);
+  }
 
-  btn_ctrls=new FXVerticalFrame(p,FRAME_NONE);
   SetPad(btn_ctrls,0);
 
   opts=new SciSearchOptions(btn_ctrls,this,ID_SCI_OPTS);
@@ -230,42 +243,40 @@ SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_on
   fwd_btn=new FXButton(nav_btns," &> ",NULL,this,ID_NEXT);
   if (find_only) {
     repl_once_btn=new FXButton(btns,_("F&ind"),NULL,this,ID_REPLACE);
+    repall_indoc_btn=NULL;
+    repall_insel_btn=NULL;
   } else {
     repl_once_btn=new FXButton(btns,_("&Replace"),NULL,this,ID_REPLACE);
+    repall_indoc_btn=new FXButton(btns,_("Re&place All"),NULL,this,ID_ALL_INDOC);
+    repall_insel_btn=new FXButton(btns,_("All in Sele&cted"),NULL,this,ID_ALL_INSEL);
   }
-  repall_indoc_btn=new FXButton(btns,_("Re&place All"),NULL,this,ID_ALL_INDOC);
-  repall_insel_btn=new FXButton(btns,_("All in Sele&cted"),NULL,this,ID_ALL_INSEL);
 
-  FXVerticalFrame*cncl_box=new FXVerticalFrame(btns,LAYOUT_RIGHT|LAYOUT_SIDE_BOTTOM|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_Y);
-  cncl_box->setVSpacing(0);
-  SetPad(cncl_box,0);
-  cncl_btn=new FXButton(cncl_box,FXString::null,NULL,this,ID_CANCEL_SRCH,BUTTON_NORMAL|LAYOUT_BOTTOM);
-  if (!find_only) {
-    new FXVerticalFrame(cncl_box,FRAME_NONE);
-    FXHorizontalFrame*cncl_frm=new FXHorizontalFrame(btn_ctrls,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_SIDE_BOTTOM);
-    SetPad(cncl_frm,0);
-    cncl_box->reparent(cncl_frm);
-  }
-  cncl_btn->setTipText(_("Close   {ESC}"));
-  SetPad(btns,0);
-
-  FXColor ico_buf[ICO_SIZE*ICO_SIZE];
-  FXColor bg=cncl_btn->getBackColor();
-  FXColor fg=cncl_btn->getTextColor();
-  for (FXint i=0; i<ICO_SIZE*ICO_SIZE; i++) { ico_buf[i]=close_icon[i]=='_'?bg:fg; }
-  FXIcon *ico=new FXIcon(cncl_btn->getApp(),ico_buf,0,IMAGE_OPAQUE,ICO_SIZE,ICO_SIZE);
-  ico->create();
-  cncl_btn->setIcon(ico);
-
-  if (find_only) {
-    repl_lab->hide();
-    repl_hist->hide();
-    repl_hist->disable();
-    repall_indoc_btn->hide();
-    repall_insel_btn->hide();
+  if (!floating) {
+    FXVerticalFrame*cncl_box=new FXVerticalFrame(btns,LAYOUT_RIGHT|LAYOUT_SIDE_BOTTOM|PACK_UNIFORM_HEIGHT|LAYOUT_FILL_Y);
+    cncl_box->setVSpacing(0);
+    SetPad(cncl_box,0);
+    cncl_btn=new FXButton(cncl_box,FXString::null,NULL,this,ID_CANCEL_SRCH,BUTTON_NORMAL|LAYOUT_BOTTOM);
+    if (!find_only) {
+      new FXVerticalFrame(cncl_box,FRAME_NONE);
+      FXHorizontalFrame*cncl_frm=new FXHorizontalFrame(btn_ctrls,LAYOUT_FILL_X|LAYOUT_FILL_Y|LAYOUT_SIDE_BOTTOM);
+      SetPad(cncl_frm,0);
+      cncl_box->reparent(cncl_frm);
+    }
+    cncl_btn->setTipText(_("Close   {ESC}"));
+    FXColor ico_buf[ICO_SIZE*ICO_SIZE];
+    FXColor bg=cncl_btn->getBackColor();
+    FXColor fg=cncl_btn->getTextColor();
+    for (FXint i=0; i<ICO_SIZE*ICO_SIZE; i++) { ico_buf[i]=close_icon[i]=='_'?bg:fg; }
+    FXIcon *ico=new FXIcon(cncl_btn->getApp(),ico_buf,0,IMAGE_OPAQUE,ICO_SIZE,ICO_SIZE);
+    ico->create();
+    cncl_btn->setIcon(ico);
   } else {
-    srch_hist->enslave(repl_hist);
+    btn_ctrls->setLayoutHints(LAYOUT_FILL_X);
+    new FXHorizontalFrame(btns,LAYOUT_FILL_X);
+    cncl_btn=new FXButton(btns,_("Close"),NULL,this,ID_CANCEL_SRCH,BUTTON_NORMAL|LAYOUT_BOTTOM);
   }
+  SetPad(btns,0);
+  if (repl_hist) { srch_hist->enslave(repl_hist); }
   setSearchText(FXString::null);
 }
 
@@ -285,7 +296,7 @@ void SciReplGui::AppendHist(const FXString& search,const FXString& replace,FXuin
   if (!replace.empty()) {
     tmp=getReplaceText();
     setReplaceText(replace);
-    repl_hist->append();
+    if (repl_hist) { repl_hist->append(); }
     setSearchText(tmp);
   }
   sciflags=oldmode;
@@ -296,7 +307,7 @@ void SciReplGui::AppendHist(const FXString& search,const FXString& replace,FXuin
 void SciReplGui::stop(FXuint stopval)
 {
   srch_hist->append();
-  repl_hist->append();
+  if (repl_hist) { repl_hist->append(); }
   if (target) { target->handle(this,FXSEL(SEL_COMMAND,message),(void*)(FXuval)stopval); }
 }
 
@@ -386,14 +397,14 @@ void SciReplGui::EnableSearch()
     bwd_btn->disable();
     fwd_btn->disable();
     repl_once_btn->disable();
-    repall_indoc_btn->disable();
-    repall_insel_btn->disable();
+    if (repall_indoc_btn) { repall_indoc_btn->disable(); }
+    if (repall_insel_btn) { repall_insel_btn->disable(); }
   } else {
     bwd_btn->enable();
     fwd_btn->enable();
     repl_once_btn->enable();
-    repall_indoc_btn->enable();
-    repall_insel_btn->enable();
+    if (repall_indoc_btn) { repall_indoc_btn->enable(); }
+    if (repall_insel_btn) { repall_insel_btn->enable(); }
   }
 }
 
@@ -415,7 +426,7 @@ long SciReplGui::onSrchHist(FXObject*o, FXSelector sel, void*p)
     }
     case SEL_COMMAND: {
       if (!getSearchText().empty()) {
-        if (repl_hist->isEnabled()) {
+        if (repl_hist && repl_hist->isEnabled()) {
            repl_hist->setFocus();
         } else {
           stop(SEARCH);
@@ -437,6 +448,22 @@ long SciReplGui::onSciOpts(FXObject*o, FXSelector sel, void*p)
 
 
 
+long SciReplGui::onConfigure(FXObject*o, FXSelector sel, void*p)
+{
+  setLayoutHints((getDefaultWidth()>getParent()->getWidth())?LAYOUT_FILL_X:0);
+  return FXMatrix::onConfigure(o,sel,p);
+}
+
+
+
+long SciReplGui::onKeyPress(FXObject*o, FXSelector sel, void*p)
+{
+  HandleKeyPress(((FXEvent*)p));
+  return FXMatrix::onKeyPress(o,sel,p);
+}
+
+
+
 void SciReplGui::setSearchText(const FXString& text)
 {
   srch_hist->setText(text);
@@ -454,21 +481,21 @@ FXString SciReplGui::getSearchText() const
 
 void SciReplGui::setReplaceText(const FXString& text)
 {
-  repl_hist->setText(text);
+  if (repl_hist) { repl_hist->setText(text); }
 }
 
 
 
 FXString SciReplGui::getReplaceText() const
 {
-  return repl_hist->getText();
+  return repl_hist?repl_hist->getText():FXString::null;
 }
 
 
 
 void SciReplGui::setHaveSelection(bool have_sel)
 {
-  if (have_sel) { repall_insel_btn->enable(); } else { repall_insel_btn->disable(); }
+  if (have_sel && repall_insel_btn) { repall_insel_btn->enable(); } else { repall_insel_btn->disable(); }
 }
 
 
@@ -483,6 +510,7 @@ void SciReplGui::setSearchMode(FXuint mode)
 
 void SciReplGui::create()
 {
+  FXMatrix::create();
   srch_hist->setFocus();
 }
 
@@ -491,72 +519,18 @@ void SciReplGui::create()
 void SciReplGui::destroy()
 {
   srch_hist->killSelection();
-  repl_hist->killSelection();
+  if (repl_hist) repl_hist->killSelection();
 }
 
 
 
-void SciReplGui::DoExecute(bool first_time)
+void SciReplGui::DoExecute()
 {
-  if (first_time) { setSearchText(""); }
   if ( (!bwd_btn->hasFocus())&&!fwd_btn->hasFocus() ) { srch_hist->setFocus(); }
   srch_hist->start();
-  repl_hist->start();
+  if (repl_hist) { repl_hist->start(); }
 }
 
-
-
-class SciReplPan: public FXHorizontalFrame {
-  FXDECLARE(SciReplPan);
-  SciReplPan(){}
-  SciReplGui*gui;
-public:
-  SciReplPan(FXComposite*p, FXObject*tgt=NULL, FXSelector sel=0, bool find_only=false);
-  ~SciReplPan() { delete gui; }
-  SciReplGui*Gui() { return gui; }
-  long onKeyPress(FXObject*o, FXSelector sel, void*p);
-  void FillX(bool fill_x);
-};
-
-
-
-FXDEFMAP(SciReplPan) SciReplPanMap[]={
-  FXMAPFUNC(SEL_KEYPRESS, 0, SciReplPan::onKeyPress),
-};
-
-FXIMPLEMENT(SciReplPan,FXHorizontalFrame,SciReplPanMap,ARRAYNUMBER(SciReplPanMap))
-
-
-
-SciReplPan::SciReplPan(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only):FXHorizontalFrame(p,FRAME_GROOVE|LAYOUT_FILL_X)
-{
-  gui=new SciReplGui(this,tgt,sel,find_only);
-}
-
-
-
-void SciReplPan::FillX(bool fill_x)
-{
-  gui->TextFrame()->setLayoutHints(fill_x?LAYOUT_FILL_X:0);
-  setLayoutHints(fill_x?LAYOUT_FILL_X:0);
-}
-
-
-
-long SciReplPan::onKeyPress(FXObject*o, FXSelector sel, void*p)
-{
-  gui->HandleKeyPress(((FXEvent*)p));
-  return FXHorizontalFrame::onKeyPress(o,sel,p);
-}
-
-
-
-FXDEFMAP(SearchDialogs) SearchDialogsMap[] = {
-  FXMAPFUNC(SEL_COMMAND, SearchDialogs::ID_SEARCH,    SearchDialogs::onSearch),
-  FXMAPFUNC(SEL_CHORE,   SearchDialogs::ID_REPL_DONE, SearchDialogs::onReplDone),
-};
-
-FXIMPLEMENT(SearchDialogs, FXObject, SearchDialogsMap, ARRAYNUMBER(SearchDialogsMap));
 
 
 
@@ -564,8 +538,11 @@ class MainPanel: public FXHorizontalFrame {
   FXDECLARE(MainPanel)
   MainPanel() {}
 public:
-  long onConfigure(FXObject*o, FXSelector sel, void*p);
-  MainPanel(FXComposite *p):FXHorizontalFrame(p,FRAME_NONE|LAYOUT_FILL_X) {}
+  long onConfigure(FXObject*o, FXSelector sel, void*p) {
+    for (FXWindow*w=getFirst(); w; w=w->getNext()) { w->handle(o,sel,p); }
+    return FXHorizontalFrame::onConfigure(o,sel,p);
+  }
+  MainPanel(FXComposite *p):FXHorizontalFrame(p,FRAME_NONE|LAYOUT_FILL_X) { setBaseColor(FXRGB(255,0,0)); }
 };
 
 
@@ -578,14 +555,46 @@ FXIMPLEMENT(MainPanel,FXHorizontalFrame,MainPanelMap,ARRAYNUMBER(MainPanelMap));
 
 
 
-long MainPanel::onConfigure(FXObject*o, FXSelector sel, void*p)
-{
-  for (FXWindow*w=getFirst(); w; w=w->getNext()) {
-    ((SciReplPan*)w)->FillX( w->getDefaultWidth() > getWidth() );
-  }
-  return FXHorizontalFrame::onConfigure(o,sel,p);
-}
+static FXint srch_dlg_box_prev_x=0;
+static FXint srch_dlg_box_prev_y=0;
+static bool srch_dlg_box_placed=false;
 
+
+class SrchDlgBox:public FXDialogBox {
+public:
+  SrchDlgBox(FXWindow*o):FXDialogBox(o,FXString::null) {}
+  virtual void show() {
+    if (srch_dlg_box_placed) {
+      position(srch_dlg_box_prev_x,srch_dlg_box_prev_y,getFirst()->getDefaultWidth(),getFirst()->getDefaultHeight());
+      FXDialogBox::show();
+    } else {
+      resize(getFirst()->getDefaultWidth(),getFirst()->getDefaultHeight());
+      FXDialogBox::show(PLACEMENT_OWNER);
+    }
+    srch_dlg_box_placed=true;
+    raise();
+  }
+  virtual void show(FXuint placement) { SrchDlgBox::show(); }
+  virtual void hide() {
+    srch_dlg_box_prev_x=getX();
+    srch_dlg_box_prev_y=getY();
+    FXDialogBox::hide();
+  }
+  virtual void destroy() {
+    srch_dlg_box_prev_x=getX();
+    srch_dlg_box_prev_y=getY();
+    FXDialogBox::destroy();
+  }
+};
+
+
+
+FXDEFMAP(SearchDialogs) SearchDialogsMap[] = {
+  FXMAPFUNC(SEL_COMMAND, SearchDialogs::ID_SEARCH,        SearchDialogs::onSearch),
+  FXMAPFUNC(SEL_CHORE,   SearchDialogs::ID_SEARCH_DONE,   SearchDialogs::onSearchDone),
+};
+
+FXIMPLEMENT(SearchDialogs, FXObject, SearchDialogsMap, ARRAYNUMBER(SearchDialogsMap));
 
 
 SearchDialogs::SearchDialogs(FXComposite*p, FXObject*trg, FXSelector sel) {
@@ -597,31 +606,61 @@ SearchDialogs::SearchDialogs(FXComposite*p, FXObject*trg, FXSelector sel) {
   parent=p;
   find_initial=true;
   repl_initial=true;
-  srchpan=new MainPanel(parent);
-  SetPad(srchpan,0);
-  find_dlg=new SciReplPan(srchpan, this, ID_SEARCH,true);
-  find_dlg->hide();
-  repl_dlg=NULL;
+  srchdlg=NULL;
+  srchpan=NULL;
+  repl_gui=NULL;
+  find_gui=NULL;
+}
+
+
+
+void SearchDialogs::SetGuiStyle(FXuint style)
+{
+  delete repl_gui;
+  repl_gui=NULL;
+  delete find_gui;
+  find_gui=NULL;
+  gui_style=(SearchDialogStyle)style;
+  if (style==SEARCH_GUI_FLOAT) {
+    if (!srchdlg) { srchdlg=new SrchDlgBox(parent->getShell()); }
+    SetPad(srchdlg,0); 
+    container=srchdlg;
+    delete srchpan;
+    srchpan=NULL;
+  } else {
+    if (!srchpan) { srchpan=new MainPanel(parent); }
+    SetPad(srchpan,0);
+    container=srchpan;
+    delete srchdlg;
+    srchdlg=NULL;  
+  }
 }
 
 
 
 SearchDialogs::~SearchDialogs()
 {
-  delete find_dlg;
-  find_dlg=NULL;
-  delete repl_dlg;
-  repl_dlg=NULL;
+  delete repl_gui;
+  repl_gui=NULL;
+  if (hist_queue.no()) {
+    if (!find_gui) {
+      find_gui=new SciReplGui(container, this, ID_SEARCH, true, container==srchdlg);
+    }
+    SaveHistoryQueue();
+  }
+  delete find_gui;
+  find_gui=NULL;
 }
 
 
 
-void SearchDialogs::SetPrefs(FXuint mode, FXuint wrap, bool verbose)
+void SearchDialogs::SetPrefs(FXuint mode, FXuint wrap, bool verbose, FXuint style)
 {
   searchmode=mode;
   defaultsearchmode=mode;
   searchwrap=(SearchWrapPolicy)wrap;
   searchverbose=verbose;
+  SetGuiStyle(style);
 }
 
 
@@ -632,9 +671,10 @@ void SearchDialogs::SearchFailed(FXWindow*w)
 }
 
 
+
 bool SearchDialogs::SearchFailed()
 {
-  if (searchverbose) { SearchFailed(parent); }
+  if (searchverbose) { SearchFailed(container); }
   return false;
 }
 
@@ -644,6 +684,65 @@ bool SearchDialogs::SearchWrapAsk(FXWindow*w)
   return (FXMessageBox::question(w->getShell(), MBOX_YES_NO, _("Wrap search?"), "%s:\n%s",
             _("Search term not found"),
             _("Wrap search and try again?"))==MBOX_CLICKED_YES);
+}
+
+
+
+void SearchDialogs::SaveHistoryQueue()
+{
+  for (FXint i=0; i<hist_queue.no(); i++) {
+    FXString*s=(FXString*)hist_queue[i];
+    find_gui->AppendHist(*s, FXString::null, defaultsearchmode);
+    delete s;
+    hist_queue[i]=NULL;
+  }
+  hist_queue.clear();
+}
+
+
+
+void SearchDialogs::ShowFindDialog()
+{
+  delete repl_gui;
+  repl_gui=NULL;
+  if (!find_gui) {
+    find_gui=new SciReplGui(container, this, ID_SEARCH, true, container==srchdlg);
+    SaveHistoryQueue();
+    container->create();
+    if (srchdlg) {
+      srchdlg->setTitle(_("Search"));
+      srchdlg->show();
+    } else {
+      srchpan->reparent(parent,(gui_style==SEARCH_GUI_ABOVE)?parent->getFirst():NULL);
+    }
+  }
+  parent->layout();
+  find_gui->setFocus();
+  find_gui->setSearchMode(searchmode);
+  find_gui->DoExecute();
+}
+
+
+
+void SearchDialogs::ShowReplaceDialog()
+{
+  delete find_gui;
+  find_gui=NULL;
+  if (!repl_gui) {
+    repl_gui=new SciReplGui(container, this, ID_SEARCH, false, container==srchdlg);
+    container->create();
+    if (srchdlg) {
+      srchdlg->setTitle(_("Replace"));
+      srchdlg->show();
+    } else {
+      srchpan->reparent(parent,(gui_style==SEARCH_GUI_ABOVE)?parent->getFirst():NULL);
+    }
+  }
+  repl_gui->setSearchMode(searchmode);
+  repl_ready=false;
+  repl_gui->setHaveSelection(TopWinPub::FocusedDoc()->GetSelLength()>0);
+  repl_gui->DoExecute();
+  repl_initial=false;
 }
 
 
@@ -680,7 +779,7 @@ bool SearchDialogs::DoFind(bool forward)
       } else {
         if (pos==sci->sendMessage(SCI_GETLENGTH,0,0)) { return SearchFailed(); }
       }
-      if (SearchWrapAsk(sci)) { return (FindText(forward,true))?true:SearchFailed(); }
+      if (SearchWrapAsk(container)) { return (FindText(forward,true))?true:SearchFailed(); }
     }
     default: { return false; }
   }
@@ -770,8 +869,12 @@ void SearchDialogs::FindSelected(bool forward)
     searchmode=defaultsearchmode;
     searchstring=srch;
     DoFind(forward);
-    find_dlg->Gui()->AppendHist(searchstring,"",defaultsearchmode);
-    if (find_dlg->shown()) { find_dlg->Gui()->setSearchText(srch); }
+    if (find_gui) {
+      find_gui->AppendHist(searchstring, FXString::null, defaultsearchmode);
+      find_gui->setSearchText(srch);
+    } else {
+      hist_queue.append((FXObject*)(new FXString(searchstring)));
+    }
   }
 }
 
@@ -803,29 +906,10 @@ bool SearchDialogs::ShowGoToDialog()
 
 
 
-void SearchDialogs::ShowFindDialog()
-{
-  if (repl_dlg) {
-    delete repl_dlg;
-    repl_dlg=NULL;
-  }
-  find_dlg->create();
-  if (!find_dlg->shown()) {
-    find_dlg->Gui()->setSearchText(FXString::null);
-    find_dlg->show();
-  }
-  parent->layout();
-  find_dlg->setFocus();
-  find_dlg->Gui()->setSearchMode(searchmode);
-  find_dlg->Gui()->DoExecute(find_initial);
-}
-
-
-
 FXuint SearchDialogs::NextSearch(FXuint code)
 {
-  searchstring=find_dlg->Gui()->getSearchText();
-  searchmode=find_dlg->Gui()->getSearchMode();
+  searchstring=find_gui->getSearchText();
+  searchmode=find_gui->getSearchMode();
   if (code!=SciReplGui::DONE) {
     find_initial=false;
     switch(code) {
@@ -834,29 +918,13 @@ FXuint SearchDialogs::NextSearch(FXuint code)
       }
       case SciReplGui::SEARCH:
       case SciReplGui::SEARCH_NEXT: {
-        DoFind(!find_dlg->Gui()->getSearchReverse());
+        DoFind(!find_gui->getSearchReverse());
         break;
       }
     }
   }
   TopWinPub::FocusedDoc()->update();
   return code;
-}
-
-
-
-void SearchDialogs::ShowReplaceDialog()
-{
-  if (!repl_dlg) {
-    repl_dlg=new SciReplPan(srchpan, this, ID_SEARCH, false);
-    repl_dlg->create();
-  }
-  find_dlg->hide();
-  repl_dlg->Gui()->setSearchMode(searchmode);
-  repl_ready=false;
-  repl_initial=false;
-  repl_dlg->Gui()->setHaveSelection(TopWinPub::FocusedDoc()->GetSelLength()>0);
-  repl_dlg->Gui()->DoExecute(repl_initial?PLACEMENT_OWNER:PLACEMENT_DEFAULT);
 }
 
 
@@ -898,10 +966,11 @@ FXuint SearchDialogs::NextReplace(FXuint code, bool forward)
 
 
 
-long SearchDialogs::onReplDone(FXObject*o, FXSelector sel, void *p)
+long SearchDialogs::onSearchDone(FXObject*o, FXSelector sel, void *p)
 {
-  delete repl_dlg;
-  repl_dlg=NULL;
+  SciReplGui**gui=(SciReplGui**)p;
+  delete *gui;
+  *gui=NULL;
   TopWinPub::FocusedDoc()->setFocus();
   return 1;
 }
@@ -911,14 +980,14 @@ long SearchDialogs::onReplDone(FXObject*o, FXSelector sel, void *p)
 long SearchDialogs::onSearch(FXObject*o, FXSelector sel, void *p)
 {
   FXuint code=(FXuint)(FXuval)p;
-  if (repl_dlg) {
+  if (repl_gui) {
     if (code==SciReplGui::DONE) {
-      find_dlg->getApp()->addChore(this,ID_REPL_DONE,NULL);
+      container->getApp()->addChore(this,ID_SEARCH_DONE,&repl_gui);
     } else {
-      searchmode=repl_dlg->Gui()->getSearchMode();
-      searchstring=repl_dlg->Gui()->getSearchText();
-      replacestring=repl_dlg->Gui()->getReplaceText();
-      NextReplace(code,!repl_dlg->Gui()->getSearchReverse());
+      searchmode=repl_gui->getSearchMode();
+      searchstring=repl_gui->getSearchText();
+      replacestring=repl_gui->getReplaceText();
+      NextReplace(code,!repl_gui->getSearchReverse());
     }
   } else {
     switch (code) {
@@ -928,13 +997,12 @@ long SearchDialogs::onSearch(FXObject*o, FXSelector sel, void *p)
         break;
       }
       case SciReplGui::DONE: {
-        find_dlg->hide();
-        parent->layout();
-        TopWinPub::FocusedDoc()->setFocus();
+        container->getApp()->addChore(this,ID_SEARCH_DONE,&find_gui);
         break;
       }
     }
   }
+  if (srchdlg&&(code==SciReplGui::DONE)) { srchdlg->hide(); }
   return 1;
 }
 
@@ -942,19 +1010,17 @@ long SearchDialogs::onSearch(FXObject*o, FXSelector sel, void *p)
 
 void SearchDialogs::setHaveSelection(bool have_sel)
 {
-  if (repl_dlg) { repl_dlg->Gui()->setHaveSelection(have_sel); }
+  if (repl_gui) { repl_gui->setHaveSelection(have_sel); }
 }
 
 
 
 void SearchDialogs::hide()
 {
-  if (repl_dlg) {
-    delete repl_dlg;
-    repl_dlg=NULL;
-  } else {
-    find_dlg->hide();
-    parent->layout();
-  }
+  delete repl_gui;
+  repl_gui=NULL;
+  delete find_gui;
+  find_gui=NULL;
+  if (srchdlg) { srchdlg->hide(); }
 }
 

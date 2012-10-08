@@ -614,7 +614,9 @@ void PrefsDialog::MakeEditorTab()
   chk=new FXCheckButton(column, _("Verbose search messages"), prefs, Settings::ID_TOGGLE_SEARCH_VERBOSE);
   chk->setCheck(prefs->SearchVerbose, FALSE);
   chk->setPadLeft(6);
+
   spinframe=new FXHorizontalFrame(column);
+
   new FXLabel(spinframe, _("Search wrap:"));
   list=new FXListBox(spinframe,prefs,Settings::ID_SET_SEARCH_WRAP,LIST_BOX_OPTS);
   list->appendItem(_("never"),NULL,NULL);
@@ -622,6 +624,15 @@ void PrefsDialog::MakeEditorTab()
   list->appendItem(_("prompt"),NULL,NULL);
   list->setNumVisible(list->getNumItems());
   list->setCurrentItem(prefs->SearchWrap);
+
+  new FXLabel(spinframe, _(" GUI:"));
+  list=new FXListBox(spinframe,prefs,Settings::ID_SET_SEARCH_GUI,LIST_BOX_OPTS);
+  list->appendItem(_("above"),NULL,NULL);
+  list->appendItem(_("below"),NULL,NULL);
+  list->appendItem(_("float"),NULL,NULL);
+  list->setNumVisible(list->getNumItems());
+  list->setCurrentItem(prefs->SearchGui); 
+
   new FXHorizontalSeparator(column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
   chk=new FXCheckButton(column, _("Open 7-bit ASCII files as UTF-8"), prefs, Settings::ID_TOGGLE_ASCII_DEFAULT);
   chk->setCheck(!prefs->DefaultToAscii, FALSE);

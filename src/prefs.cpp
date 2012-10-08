@@ -214,6 +214,11 @@ long Settings::onChangeSetting(FXObject*o, FXSelector sel, void*p)
       LIMIT_RANGE(SearchWrap,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
       break;
     }
+    case ID_SET_SEARCH_GUI: {
+      SearchGui=(FXival)p;
+      LIMIT_RANGE(SearchGui,SEARCH_GUI_ABOVE,SEARCH_GUI_FLOAT);
+      break;
+    }
 
     case ID_SET_AUTO_INDENT: {
       AutoIndent=(FXival)p;
@@ -677,6 +682,7 @@ static const char* edit_keys[] = {
   "SearchWrap",
   "SearchVerbose",
   "SearchOptions",
+  "SearchGui",
   "TabWidth",
   "IndentWidth",
   "CaretWidth",
@@ -866,6 +872,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
   ReadInt(SmoothScroll,true);
   ReadIntRng(WheelLines,3,1,32);
   ReadIntRng(SearchWrap,SEARCH_WRAP_ASK,SEARCH_WRAP_NEVER,SEARCH_WRAP_ASK);
+  ReadIntRng(SearchGui,SEARCH_GUI_BELOW,SEARCH_GUI_ABOVE,SEARCH_GUI_FLOAT);
   ReadIntRng(AutoIndent,AUTO_INDENT_NONE,AUTO_INDENT_NONE,AUTO_INDENT_SMART);
   ReadInt(SearchVerbose,true);
   ReadInt(SearchOptions,0);
@@ -1044,6 +1051,7 @@ Settings::~Settings()
   WriteInt(SmoothScroll);
   WriteInt(WheelLines);
   WriteInt(SearchWrap);
+  WriteInt(SearchGui);
   WriteInt(SearchVerbose);
   WriteInt(SearchOptions);
   WriteInt(ZoomFactor);

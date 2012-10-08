@@ -120,9 +120,10 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   outerbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
   innerbox=new FXVerticalFrame(outerbox,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
   toolbar=new ToolBarFrame(innerbox);
-  srchdlgs=new SearchDialogs(innerbox,this);
   hsplit=new FXSplitter(innerbox,this, 0, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
-  tabbook=new DocTabs(hsplit,this,0,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
+  innerbox=new FXVerticalFrame(hsplit,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0);
+  tabbook=new DocTabs(innerbox,this,0,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
+  srchdlgs=new SearchDialogs(innerbox, this, 0);
   tabbook->setTabStyleByChar(prefs->DocTabPosition);
   tabbook->setTabsCompact(prefs->DocTabsPacked);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
@@ -130,10 +131,11 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   statusbar=new StatusBar(outerbox,(void*)CommandUtils::DontFreezeMe());
   backups=new BackupMgr(this, ConfigDir());
   completions=new AutoCompleter();
-  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
+  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose,prefs->SearchGui);
   cmdutils=new CommandUtils(this);
   filedlgs=new FileDialogs(this,0);
 }
+
 
 
 TopWindowBase::~TopWindowBase()
@@ -415,10 +417,23 @@ long TopWindowBase::onCloseWait(FXObject*o, FXSelector sel, void*p)
 long TopWindowBase::onFocusIn(FXObject*o, FXSelector sel, void*p)
 {
   long rv=MainWinWithClipBrd::onFocusIn(o,sel,p);
-  if (active_widget==outlist) {
-    outlist->setFocus();
-  } else if (FocusedDoc()) {
-    FocusedDoc()->setFocus();
+  FXWindow*mw=getApp()->getModalWindow();
+  if (mw&&(mw->getOwner()!=this)) {
+    mw->hide();
+    mw->show();
+    mw->setFocus();
+#ifdef FOX_1_6
+    FXWindow*dw=FXWindow::findDefault(mw);
+#else
+    FXWindow*dw=mw->findDefault();
+#endif
+    if (dw) { dw->setFocus(); }
+  } else {
+    if (active_widget==outlist) {
+      outlist->setFocus();
+    } else if (FocusedDoc()) {
+      FocusedDoc()->setFocus();
+    }
   }
   return rv;
 }
@@ -1096,7 +1111,7 @@ void TopWindowBase::ShowPrefsDialog()
   prefdlg->execute(PLACEMENT_DEFAULT);
   delete prefdlg;
   ClosedDialog();
-  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose);
+  srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose,prefs->SearchGui);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
   tabbook->ForEachTab(TabCallbacks::PrefsCB, NULL);
   CheckStyle(NULL,0,ControlDoc());
@@ -1399,4 +1414,6 @@ FXString* TopWindowBase::NamedFiles() const
   tabbook->ForEachTab(TabCallbacks::NamedFilesCB,list);
   return list;
 }
+
+
 

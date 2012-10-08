@@ -42,7 +42,14 @@ typedef enum {
 } SearchWrapPolicy;
 
 
-class SciReplPan;
+typedef enum {
+  SEARCH_GUI_ABOVE,
+  SEARCH_GUI_BELOW,
+  SEARCH_GUI_FLOAT
+} SearchDialogStyle;
+
+
+class SciReplGui;
 
 
 class SearchDialogs: public FXObject {
@@ -52,28 +59,34 @@ private:
   bool FindText(bool forward, bool wrap);
   bool DoFind(bool forward);
   FXHorizontalFrame*srchpan;
-  SciReplPan*find_dlg;
-  SciReplPan*repl_dlg;
+  FXDialogBox*srchdlg;
+  FXComposite*container;
+  SciReplGui*find_gui;
+  SciReplGui*repl_gui;
   FXComposite*parent;
   FXSelector message;
   FXObject*target;
   bool find_initial;
   bool repl_initial;
   bool repl_ready;
+  SearchDialogStyle gui_style;
+  FXObjectList hist_queue;
   FXuint NextSearch(FXuint code);
   FXuint NextReplace(FXuint code, bool forward);
   FXString replacestring;
   bool SearchFailed();
+  void SetGuiStyle(FXuint style);
+  void SaveHistoryQueue();
 public:
-  static void SearchFailed(FXWindow*w);
-  static bool SearchWrapAsk(FXWindow*w);
+  void SearchFailed(FXWindow*w);
+  bool SearchWrapAsk(FXWindow*w);
   SearchWrapPolicy searchwrap;
   bool searchverbose;
   FXuint searchmode;
   FXuint searchdirn;
   FXuint defaultsearchmode;
   FXString searchstring;
-  void SetPrefs(FXuint mode, FXuint wrap, bool verbose);
+  void SetPrefs(FXuint mode, FXuint wrap, bool verbose, FXuint style);
   void ShowFindDialog();
   void ShowReplaceDialog();
   void FindNext();
@@ -86,17 +99,17 @@ public:
   void setHaveSelection(bool have_sel);
   bool GoToSelected();
   bool ShowGoToDialog();
-  FXDialogBox*FindDialog() { return (FXDialogBox*)find_dlg; }
+  FXWindow*FindDialog() { return (FXWindow*)find_gui; }
   SearchDialogs(FXComposite*p, FXObject*trg=NULL, FXSelector sel=0);
   void setSelector(FXSelector sel) { message=sel; }
   void setTarget(FXObject*trg) { target=trg; }
   virtual ~SearchDialogs();
   long onSearch(FXObject*o, FXSelector sel, void *p);
-  long onReplDone(FXObject*o, FXSelector sel, void *p);
+  long onSearchDone(FXObject*o, FXSelector sel, void *p);
   void hide();
   enum {
     ID_SEARCH=1,
-    ID_REPL_DONE,
+    ID_SEARCH_DONE,
     ID_LAST
   };
 };
