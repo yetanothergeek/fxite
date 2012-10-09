@@ -246,7 +246,7 @@ SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_on
     repall_indoc_btn=NULL;
     repall_insel_btn=NULL;
   } else {
-    repl_once_btn=new FXButton(btns,_("&Replace"),NULL,this,ID_REPLACE);
+    repl_once_btn=new FXButton(btns,_("Rep&lace"),NULL,this,ID_REPLACE);
     repall_indoc_btn=new FXButton(btns,_("Re&place All"),NULL,this,ID_ALL_INDOC);
     repall_insel_btn=new FXButton(btns,_("All in Sele&cted"),NULL,this,ID_ALL_INSEL);
   }
