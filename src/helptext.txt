@@ -139,6 +139,17 @@ menu, then type the string to search for and the string to substitute, and \
 press the %%%All in Selected%%% button in the dialog.  Note that selecting \
 text in the Replace dialog will ///unselect/// the text in the document.
 
+The settings under %%%Edit->Preferences->Editor->Default Search Options%%% provide a way to \
+control various behaviors of the dialogs: 
+ * The default matching mode (normal, regular expression, or whole word.)
+ * The default case sensitivity.
+ * The "wrapping" mode (e.g. whether to restart from the beginning when a search reaches the \
+end of the document.)
+ * The "verbose" mode (whether failed searches pop up a notification box.)
+ * The GUI "docking" style lets you choose between a panel anchored above or below the document, \
+or a more traditional "floating" dialog box.
+
+
 
 ###Cutting and Pasting###
 
