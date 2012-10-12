@@ -22,6 +22,9 @@
 #include <FXUTF16Codec.h>
 #include <FX88591Codec.h>
 
+#include "popmenu.h"
+#include "intl.h"
+
 #include "histbox.h"
 
 FXDEFMAP(MainWinWithClipBrd) MainWinWithClipBrdMap[]={
@@ -73,6 +76,33 @@ long MainWinWithClipBrd::onClipboardRequest(FXObject*o, FXSelector sel, void*p)
 }
 
 
+
+FXDEFMAP(ClipTextField) ClipTextFieldMap[] = {
+  FXMAPFUNC(SEL_RIGHTBUTTONPRESS,0,ClipTextField::onRightBtnPress),
+};
+
+FXIMPLEMENT(ClipTextField,FXTextField,ClipTextFieldMap,ARRAYNUMBER(ClipTextFieldMap));
+
+
+long ClipTextField::onRightBtnPress(FXObject*o, FXSelector sel, void*p)
+{
+  FXTextField::onRightBtnPress(o,sel,p);
+  FXEvent* ev=(FXEvent*)p;
+  if (!ev->moved) {
+    FXMenuPane *outpop=new FXMenuPane(this);
+    new PopUpMnuCmd(outpop,_("Cu&t"),NULL,this,ID_CUT_SEL);
+    new PopUpMnuCmd(outpop,_("&Copy"),NULL,this,ID_COPY_SEL);
+    new PopUpMnuCmd(outpop,_("&Paste"),NULL,this,ID_PASTE_SEL);
+    new FXMenuSeparator(outpop);
+    new PopUpMnuCmd(outpop,_("Select &All"),NULL,this,ID_SELECT_ALL);
+    outpop->create();
+    outpop->popup(NULL,ev->root_x-4,ev->root_y-2);
+    outpop->grabKeyboard();
+    getApp()->runModalWhileShown(outpop);
+    delete outpop;
+  }
+  return 1;
+}
 
 
 
@@ -278,7 +308,8 @@ FXDEFMAP(HistoryTextField) HistoryTextFieldMap[]={
 };
 
 
-FXIMPLEMENT(HistoryTextField,FXTextField,HistoryTextFieldMap,ARRAYNUMBER(HistoryTextFieldMap));
+FXIMPLEMENT(HistoryTextField,ClipTextField,HistoryTextFieldMap,ARRAYNUMBER(HistoryTextFieldMap));
+
 
 
 /*

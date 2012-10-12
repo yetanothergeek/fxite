@@ -43,10 +43,12 @@ public:
 */
 class ClipTextField: public FXTextField {
 private:
+  FXDECLARE(ClipTextField);
   void SurrenderClipboard();
 protected:
   ClipTextField(){}
 public:
+   long onRightBtnPress(FXObject*o, FXSelector sel, void*p);
    ClipTextField(FXComposite *p,
      FXint ncols, FXObject *tgt=NULL, FXSelector sel=0, FXuint opts=TEXTFIELD_NORMAL, FXint x=0, FXint y=0,
      FXint w=0, FXint h=0, FXint pl=DEFAULT_PAD, FXint pr=DEFAULT_PAD, FXint pt=DEFAULT_PAD, FXint pb=DEFAULT_PAD
