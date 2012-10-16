@@ -149,8 +149,6 @@ public:
   void HandleKeyPress(FXEvent*ev);
   virtual void create();
   virtual void destroy();
-  FXVerticalFrame *TextFrame() { return txt_fields; }
-  FXVerticalFrame *ButtonFrame() {return btn_ctrls; }
   enum {
     ID_SCI_OPTS=1,
     ID_SRCH_HIST,
