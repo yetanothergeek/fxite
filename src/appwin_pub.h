@@ -43,7 +43,7 @@ public:
   static FXString* NamedFiles();
   static SciDoc* ControlDoc();
   static SciDoc* FocusedDoc();
-  static void ActiveWidget(FXWindow*aw);
+  static void ActiveWidget(FXID aw);
   static void ShowOutputPane(bool showit);
   static FXSelector KillCmdID();
   static FXSelector LastID();

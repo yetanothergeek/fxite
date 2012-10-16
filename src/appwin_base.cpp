@@ -99,7 +99,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
 {
   FXASSERT(!global_top_window_instance);
   global_top_window_instance=this;
-  active_widget=NULL;
+  active_widget=0;
   recorder=NULL;
   recording=NULL;
   need_status=0;
@@ -429,8 +429,9 @@ long TopWindowBase::onFocusIn(FXObject*o, FXSelector sel, void*p)
 #endif
     if (dw) { dw->setFocus(); }
   } else {
-    if (active_widget==outlist) {
-      outlist->setFocus();
+    FXWindow*aw=getApp()->findWindowWithId(active_widget);
+    if (aw) {
+      aw->setFocus();
     } else if (FocusedDoc()) {
       FocusedDoc()->setFocus();
     }
@@ -458,7 +459,7 @@ long TopWindowBase::onFocusSci(FXObject*o,FXSelector s,void*p)
 {
   getApp()->addChore(this, ID_CHECK_STALE);
   if (((SciDoc*)o)->NeedStyled()) { getApp()->addChore(this, ID_CHECK_STYLE,o); }
-  active_widget=(SciDoc*)o;
+  active_widget=((SciDoc*)o)->id();
   return 1;
 }
 

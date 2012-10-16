@@ -54,7 +54,7 @@ SciDoc* TopWinPub::FocusedDoc()
 
 
 
-void TopWinPub::ActiveWidget(FXWindow*aw)
+void TopWinPub::ActiveWidget(FXID aw)
 {
   tw->ActiveWidget(aw);
 }

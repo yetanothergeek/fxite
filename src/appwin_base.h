@@ -66,7 +66,7 @@ protected:
   FXint stale_ticks;
   FXint save_ticks;
   FXString session_data;
-  FXWindow* active_widget;
+  FXID active_widget;
   bool destroying;
   bool close_all_confirmed;
   bool kill_commands_confirmed;
@@ -149,7 +149,7 @@ public:
   void AdjustIndent(SciDoc* sci,char ch);
   bool FoundBookmarkedTab(DocTab* tab);
   bool Destroying() { return destroying; }
-  void ActiveWidget(FXWindow* aw) { active_widget=aw; }
+  void ActiveWidget(FXID aw) { active_widget=aw; }
   void SetWordWrap(SciDoc* sci, bool wrapped);
   void ShowLineNumbers(bool showit);
   void ShowStatusBar(bool showit);

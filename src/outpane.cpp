@@ -83,7 +83,7 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
       }
     }
     case SEL_FOCUSIN: {
-      TopWinPub::ActiveWidget(this);
+      TopWinPub::ActiveWidget(id());
       return FXList::handle(o,sel,p);
     }
     default: { return FXList::handle(o,sel,p); }
