@@ -134,6 +134,7 @@ public:
 
   long onKeyPress(FXObject*o, FXSelector sel, void*p);
   long onConfigure(FXObject*o, FXSelector sel, void*p);
+  long onFocusIn(FXObject*o, FXSelector sel, void*p);
 
   void setSearchText(const FXString& text);
   FXString getSearchText() const;
@@ -183,6 +184,7 @@ FXDEFMAP(SciReplGui) SciReplGuiMap[]={
   FXMAPFUNC(  SEL_TIMEOUT,  SciReplGui::ID_FAKE_BTN_UP, SciReplGui::onFakeBtnUp),
   FXMAPFUNC(  SEL_KEYPRESS,  0, SciReplGui::onKeyPress),
   FXMAPFUNC(  SEL_CONFIGURE, 0, SciReplGui::onConfigure),
+  FXMAPFUNC(  SEL_FOCUSIN,   0, SciReplGui::onFocusIn),
 };
 
 FXIMPLEMENT(SciReplGui,FXMatrix,SciReplGuiMap,ARRAYNUMBER(SciReplGuiMap))
@@ -458,6 +460,15 @@ long SciReplGui::onKeyPress(FXObject*o, FXSelector sel, void*p)
 {
   HandleKeyPress(((FXEvent*)p));
   return FXMatrix::onKeyPress(o,sel,p);
+}
+
+
+
+long SciReplGui::onFocusIn(FXObject*o, FXSelector sel, void*p)
+{
+  FXMatrix::onFocusIn(o,sel,p);
+  TopWinPub::ActiveWidget(id());
+  return 1;
 }
 
 
