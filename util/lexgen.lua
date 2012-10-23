@@ -81,17 +81,18 @@ local casename=nil
 
 for line in iface:lines()
 do
-  if line:find("^%s*lex%s+[%w]+%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?%s*$") then
-    local tempname=line:match("^%s*lex%s+([%w]+)%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?%s*$")
+  if line:find("^%s*lex%s+[%w]+%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?.*$") then
+    local tempname=line:match("^%s*lex%s+([%w]+)%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?.*$")
     if tempname and (tempname:upper()==lexname_upper) then 
-      if line:find("^%s*lex%s+" .. tempname .. "%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?%s*$") then
-        lextag,lexpfx=line:match("^%s*lex%s+" .. tempname .. "%s*=%s*(SCLEX_[%u%d]+)%s+(SCE_[%u%d]+_?)%s*$")
+      if line:find("^%s*lex%s+" .. tempname .. "%s*=%s*SCLEX_[%u%d]+%s+SCE_[%u%d]+_?.*$") then
+        lextag,lexpfx=line:match("^%s*lex%s+" .. tempname .. "%s*=%s*(SCLEX_[%u%d]+)%s+(SCE_[%u%d]+_?).*$")
         casename=tempname
       end
     end
   end
 end
 
+if lexpfx=="SCE_H_" then lexpfx="SCE_H" end
 
 if not casename then
   local a,b=string.match(lexname, "(.)(.*)")

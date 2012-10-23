@@ -148,6 +148,7 @@ function print_words()
   keywordclass.macros.plain={}
   keywordclass.primitives.pdftex={}
   keywordclass.pseudoelement.other="selection"
+  keywordclass.oscript={}
   ]]
   )
 
@@ -206,6 +207,8 @@ function print_words()
         line=line:gsub( "%.%.keywordclass%.primitives.pdftex%.%.","..keywordclass.primitives.pdftex.something..");
         line=line:gsub( "^keywordclass%.context%.all=", "keywordclass.context.all.something=");
         line=line:gsub( "keywordclass%.python%) ","keywordclass.python .. \"")
+        line=line:gsub( "keywordclass%.function=","keywordclass.function_=")
+        line=line:gsub( "keywordclass%.function%.","keywordclass.function_.")
 
         line=line:gsub( "keywordclass%.lua4%) ","keywordclass.lua4 .. \"")
         line=line:gsub( "keywordclass2%.lua5%) ","keywordclass2.lua5 .. \"")
@@ -446,7 +449,7 @@ function create_headers()
     "inno", "nsis", "vbscript", "asp",
     "eiffel", "eiffelkw", "forth",
     "pov", "po", "asn1", "SML", "yaml",
-    "PL/M", "asy"
+    "PL/M", "asy", "oscript"
   }
 
   function skipit(name)
