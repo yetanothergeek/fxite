@@ -47,6 +47,7 @@ LexModula.cxx \
 LexOthers.cxx \
 LexPB.cxx \
 LexPLM.cxx \
+LexPO.cxx \
 LexPOV.cxx \
 LexPS.cxx \
 LexPascal.cxx \
