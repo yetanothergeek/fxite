@@ -720,10 +720,13 @@ void SearchDialogs::ShowFindDialog()
     container->create();
     if (srchdlg) {
       srchdlg->setTitle(_("Search"));
-      srchdlg->show();
     } else {
       srchpan->reparent(parent,(gui_style==SEARCH_GUI_ABOVE)?parent->getFirst():NULL);
     }
+  }
+  if (srchdlg) {
+    srchdlg->hide();
+    srchdlg->show();
   }
   parent->layout();
   find_gui->setFocus();
@@ -746,6 +749,10 @@ void SearchDialogs::ShowReplaceDialog()
     } else {
       srchpan->reparent(parent,(gui_style==SEARCH_GUI_ABOVE)?parent->getFirst():NULL);
     }
+  }
+  if (srchdlg) {
+    srchdlg->hide();
+    srchdlg->show();
   }
   repl_gui->setSearchMode(searchmode);
   repl_ready=false;
