@@ -723,6 +723,8 @@ void SearchDialogs::ShowFindDialog()
     } else {
       srchpan->reparent(parent,(gui_style==SEARCH_GUI_ABOVE)?parent->getFirst():NULL);
     }
+  } else {
+    find_gui->setSearchText(FXString::null);
   }
   if (srchdlg) {
     srchdlg->hide();
