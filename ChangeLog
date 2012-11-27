@@ -3,6 +3,43 @@
 #  For a more accurate and detailed listing of changes, check the git log.
 ################################################################################
 
+
+2012-10-23
+  * Fixed some autotools deprecation warnings.
+  * Update to Scintilla-3.2.3 from HG 4309:85ed8066ea9c.
+  * Use window ID instead of pointer to keep track of focused element.
+  * Added a pop-up menu for text fields.
+  * Added option for docking of search dialogs: above, below, or floating.
+
+
+2012-09-23
+  * Added "replace text" functions to macro recorder and scripting engine.
+  * Print command-line version info and help text to stdout, not stderr.
+  * Consider ancient CP/M EOF markers to be plain text.
+  * Don't disable GUI when running macros and (some) external commands.
+  * Be more agressive when trying to grab keyboard focus.
+  * Replaced modal find/replace dialogs with non-modal toolbar-style panel.
+  * Detect when open macro files are renamed in the tool manager dialog.
+  * Fixed a problem with GUI not being fully updated after changes to theme.
+  * Ignore attempts to save documents that are marked read-only.
+  * Reworked tab markers for modified and read-only documents.
+  * Added option to set notebook tab width automatically according to orientation.
+  * Solved a long-standing CPU usage problem in FXScintilla.
+
+
+2012-08-14
+  * Major source code refactoring and cleanup.
+  * Fixed some mouse-related problems with popup menu in output pane.
+  * Quiet some compiler warnings about signed/unsigned comparison.
+  * Explicitly delete main menu (ensures recent files list is saved on exit.)
+  * Fixed some problems with status bar layout.
+  * Reworked clipboard handling for text fields in transient dialogs.
+
+
+2012-07-09
+  * VERSION 0.9 RELEASE.
+
+
 2012-06-25
   * Fixed problem with unhandled keystrokes on MS-Windows (Fixes calltip keybinding.)
   * Exposed some calltip/ctags/autocomplete functions to the scripting engine.
