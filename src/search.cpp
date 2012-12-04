@@ -683,7 +683,7 @@ void SearchDialogs::SearchFailed(FXWindow*w)
 
 bool SearchDialogs::SearchFailed()
 {
-  if (searchverbose) { SearchFailed(container); }
+  if (searchverbose) { SearchFailed(parent); }
   return false;
 }
 
@@ -797,7 +797,7 @@ bool SearchDialogs::DoFind(bool forward)
       } else {
         if (pos==sci->sendMessage(SCI_GETLENGTH,0,0)) { return SearchFailed(); }
       }
-      if (SearchWrapAsk(container)) { return (FindText(forward,true))?true:SearchFailed(); }
+      if (SearchWrapAsk(parent)) { return (FindText(forward,true))?true:SearchFailed(); }
     }
     default: { return false; }
   }
