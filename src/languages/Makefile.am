@@ -33,6 +33,7 @@ metapost.h \
 modula.h \
 pascal.h \
 perl.h \
+po.h \
 properties.h \
 ps.h \
 python.h \

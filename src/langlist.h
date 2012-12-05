@@ -32,6 +32,7 @@
 #include "./languages/modula.h"
 #include "./languages/pascal.h"
 #include "./languages/perl.h"
+#include "./languages/po.h"
 #include "./languages/properties.h"
 #include "./languages/ps.h"
 #include "./languages/python.h"
@@ -81,6 +82,7 @@ LangStyle languages[]={
   LangModula,
   LangPascal,
   LangPerl,
+  LangPo,
   LangProperties,
   LangPS,
   LangPython,

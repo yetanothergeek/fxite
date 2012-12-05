@@ -178,6 +178,7 @@ void MainMenu::CreateLanguageMenu()
     case SCLEX_CONF:
     case SCLEX_CMAKE:
     case SCLEX_MAKEFILE:
+    case SCLEX_PO:
     case SCLEX_PROPERTIES:
     case SCLEX_XML: {
       mp=cfg_langmenu;

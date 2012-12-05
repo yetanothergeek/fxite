@@ -14,6 +14,7 @@ filetypes.javascript="*.js"
 filetypes.ruby="*.rb"
 filetypes.python="*.py"
 filetypes.css="*.css"
+filetypes.po="*.po|*.pot"
 
 local word_lists={
   c=[[
@@ -145,6 +146,16 @@ function defstyle(state)
     else
       return "_DEFLT_FG","Normal"
     end
+  end
+
+  if (lextag =="SCLEX_PO") then
+    if state:find("COMMENT")     then return "__GREEN__", "Italic" end
+    if state:find("MSGID_TEXT")  then return "__PURPLE_", "Normal" end
+    if state:find("MSGSTR_TEXT") then return "___BLUE__", "Normal" end
+    if state:find("MSG")         then return "_DEFLT_FG", "Bold"   end
+    if state:find("FLAGS")       then return "__ORANGE_", "Normal" end
+    if state:find("FUZZY")       then return "STREOL_FG", "Bold"   end
+    if state:find("REFERENCE")   then return "_DEFLT_FG", "Normal" end
   end
 
   if state:find("WORD2")        then return "_WORD2_FG", "Bold"   end

@@ -448,7 +448,7 @@ function create_headers()
     "spice", "specman", "rebol", "scriptol",
     "inno", "nsis", "vbscript", "asp",
     "eiffel", "eiffelkw", "forth",
-    "pov", "po", "asn1", "SML", "yaml",
+    "pov", "asn1", "SML", "yaml",
     "PL/M", "asy", "oscript"
   }
 
