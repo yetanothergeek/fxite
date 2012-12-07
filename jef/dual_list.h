@@ -28,11 +28,11 @@ two buttons between the lists to move items from one side to the other.
 The right-hand list also has two buttons below the list to arrange the order
 of an item up or down.
 
-Subclasses should implement their own version of the PopulateAvail() and 
+Subclasses should implement their own version of the PopulateAvail() and
 PopulateUsed() methods, these will be called by the base class's constructor.
 
 The control generates a SEL_CHANGED event whenever an item is moved from
-one list to the other or reordered in the right-hand list. Subclasses can 
+one list to the other or reordered in the right-hand list. Subclasses can
 assign whatever value they want to the "udata" variable and it will be passed
 to the message handler.
 
@@ -80,3 +80,4 @@ public:
 };
 
 #endif
+
