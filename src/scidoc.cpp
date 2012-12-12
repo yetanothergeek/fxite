@@ -608,7 +608,7 @@ bool SciDoc::setLanguageFromContent()
         while ((*p2)&&!isspace(*p2)) { p2++; }
         if (!*p2) { return false; }
         *p2='\0';
-        appname=FXPath::title(p1);
+        appname=FXPath::name(p1);
         if (strcmp(appname.text(), "env")==0) {
           p1=p2+1;
           while (isblank(*p1))  { p1++; }
@@ -616,7 +616,7 @@ bool SciDoc::setLanguageFromContent()
           while ((*p2)&&!isspace(*p2)) { p2++; }
           if (!*p2) { return false; }
           *p2='\0';
-          appname=FXPath::title(p1);
+          appname=FXPath::name(p1);
         }
         return setLanguage(GetLangFromAppName(appname.text()));
       } else {
