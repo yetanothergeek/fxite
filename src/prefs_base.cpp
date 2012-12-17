@@ -36,7 +36,3 @@ SettingsBase::~SettingsBase() {
   global_settings_instance=NULL;
 }
 
-
-
-
-  
