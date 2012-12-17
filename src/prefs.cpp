@@ -48,7 +48,7 @@ FXDEFMAP(Settings) SettingsMap[]={
 
 FXIMPLEMENT(Settings, FXObject, SettingsMap, ARRAYNUMBER(SettingsMap));
 
-#define LIMIT_RANGE(n,lo,hi) if (n<lo) { n=lo; } else { if (n>hi) { n=hi; } }
+#define LIMIT_RANGE(n,lo,hi) if (n<=lo) { n=lo; } else { if (n>=hi) { n=hi; } }
 
 #define SHELL_COMMAND "/bin/sh -c"
 
