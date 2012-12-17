@@ -418,9 +418,12 @@ long TopWindowBase::onFocusIn(FXObject*o, FXSelector sel, void*p)
 {
   long rv=MainWinWithClipBrd::onFocusIn(o,sel,p);
   FXWindow*mw=getApp()->getModalWindow();
-  if (mw&&(mw->getOwner()!=this)) {
-    mw->hide();
-    mw->show();
+  FXWindow*mwo=mw?mw->getOwner():NULL;
+  if (mw&&(mwo!=this)) {
+    if (mwo) {
+      mw->hide();
+      mw->show();
+    }
     mw->setFocus();
 #ifdef FOX_1_6
     FXWindow*dw=FXWindow::findDefault(mw);
