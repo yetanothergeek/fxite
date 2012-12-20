@@ -289,12 +289,35 @@ bool IsDesktopCurrent(FXMainWindow*tw)
   }
   return true;
 }
+
+
+
+static bool ClientMsg(FXTopWindow*w, const char *msg, ulong d0=0, ulong d1=0, ulong d2=0, ulong d3=0, ulong d4=0) {
+  Display*dpy=(Display*)w->getApp()->getDisplay();
+  Window root=w->getApp()->getRootWindow()->id();
+  XEvent event;
+  long mask = SubstructureRedirectMask | SubstructureNotifyMask;
+  event.type = ClientMessage;
+  event.xclient.type = ClientMessage;
+  event.xclient.serial = 0;
+  event.xclient.send_event = True;
+  event.xclient.message_type = XInternAtom(dpy, msg, False);
+  event.xclient.window = w->id();
+  event.xclient.format = 32;
+  event.xclient.data.l[0] = d0;
+  event.xclient.data.l[1] = d1;
+  event.xclient.data.l[2] = d2;
+  event.xclient.data.l[3] = d3;
+  event.xclient.data.l[4] = d4;
+  return XSendEvent(dpy, root, False, mask, &event)?true:false;
+}
+
 #endif
 
 
 
 // Try for "msecs" milliseconds to give window "w" (or any of its children) the keyboard focus.
-void WaitForWindowFocus(FXWindow*w, FXuint msecs)
+void WaitForWindowFocus(FXTopWindow*w, FXuint msecs)
 {
   FXApp*a=w->getApp();
 #ifdef FOX_1_6
@@ -302,6 +325,14 @@ void WaitForWindowFocus(FXWindow*w, FXuint msecs)
 #else
   FXTime timeout=FXThread::time()+1000000*msecs;
 #endif
+
+#ifndef WIN32
+  Display*dpy=(Display*)a->getDisplay();
+  ClientMsg(w,"_NET_ACTIVE_WINDOW", 2);
+  XSetInputFocus(dpy, w->id(), RevertToPointerRoot, CurrentTime);
+  XRaiseWindow(dpy,w->id());
+#endif
+
   while (FXThread::time()<timeout) {
     FXWindow*fw=a->getFocusWindow();
     if (fw) {

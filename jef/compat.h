@@ -72,5 +72,5 @@ bool IsDesktopCurrent(FXMainWindow*tw);
 
 FXID GetNetActiveWindow();
 
-void WaitForWindowFocus(FXWindow*w, FXuint msecs=1000);
+void WaitForWindowFocus(FXTopWindow*w, FXuint msecs=1000);
 
