@@ -197,7 +197,10 @@ int ini_sort(const char *filename)
       size_t len=0;
       ssize_t g=getline(&line, &len, f);
       if (g<0) {
-        if (line) { free(line); }
+        if (line) {
+          free(line);
+          line=NULL;
+        }
         break;
       }
       if (line) {
