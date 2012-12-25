@@ -213,7 +213,6 @@ bool CmdIO::cleanup(bool rv)
   if (stdinFD>0) { close(stdinFD); }
   if (stdoutFD>0) { close(stdoutFD); }
   if (stderrFD>0) { close(stderrFD); }
-  fflush(stdin);
   fflush(stdout);
   fflush(stderr);
   childPid=-1;
