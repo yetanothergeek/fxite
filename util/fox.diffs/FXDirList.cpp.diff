@@ -1,6 +1,6 @@
---- ../fox-1.7.31.orig/lib/FXDirList.cpp	2011-10-06 10:25:40.000000000 -0500
-+++ ./lib/FXDirList.cpp	2011-10-20 07:47:38.000000000 -0500
-@@ -916,6 +916,11 @@
+--- ../fox-1.7.37.orig/lib/FXDirList.cpp	2012-11-14 09:23:49.000000000 -0600
++++ ./lib/FXDirList.cpp	2012-12-17 12:50:40.912087439 -0600
+@@ -917,6 +917,11 @@
    // Path to parent node
    directory=getItemPathname(par);
  
