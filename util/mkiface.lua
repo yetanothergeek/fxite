@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/usr/bin/env lua5.1
 
 --[[
     Script to create the "luasci.h" file.
