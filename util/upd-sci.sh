@@ -133,7 +133,7 @@ echo >> "Makefile.am"
 cd ..
 for TAG in MAJOR_VERSION MINOR_VERSION PATCH_LEVEL
 do
-  export $TAG=`awk -F= '/^[ \t]*'${TAG}'=[0-9]*[ \t]*$/ {gsub(/[ \t]*/,""); print $2}' "${1}/configure.in"`
+  export $TAG=`awk -F= '/^[ \t]*'${TAG}'=[0-9]*[ \t]*$/ {gsub(/[ \t]*/,""); print $2}' "${1}/configure.ac"`
 done
 
 
