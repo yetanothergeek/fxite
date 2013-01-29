@@ -13,8 +13,8 @@ static StyleDef po_style[] = {
   { "programmercomment", SCE_PO_PROGRAMMER_COMMENT, __GREEN__, _DEFLT_BG, Italic },
   { "reference", SCE_PO_REFERENCE, _DEFLT_FG, _DEFLT_BG, Normal },
   { "flags", SCE_PO_FLAGS, __ORANGE_, _DEFLT_BG, Normal },
-  { "msgidtexteol", SCE_PO_MSGID_TEXT_EOL, _DEFLT_FG, _DEFLT_BG, Bold },
-  { "msgstrtexteol", SCE_PO_MSGSTR_TEXT_EOL, _DEFLT_FG, _DEFLT_BG, Bold },
+  { "msgidtexteol", SCE_PO_MSGID_TEXT_EOL, __PURPLE_, _DEFLT_BG, Normal },
+  { "msgstrtexteol", SCE_PO_MSGSTR_TEXT_EOL, ___BLUE__, _DEFLT_BG, Normal },
   { "msgctxttexteol", SCE_PO_MSGCTXT_TEXT_EOL, _DEFLT_FG, _DEFLT_BG, Bold },
   { "error", SCE_PO_ERROR, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }

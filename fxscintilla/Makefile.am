@@ -37,6 +37,7 @@ LexFlagship.cxx \
 LexFortran.cxx \
 LexHTML.cxx \
 LexHaskell.cxx \
+LexLaTeX.cxx \
 LexLisp.cxx \
 LexLua.cxx \
 LexMPT.cxx \
@@ -129,7 +130,9 @@ SparseState.h \
 SplitVector.h \
 Style.h \
 StyleContext.h \
+SubStyles.h \
 UniConversion.h \
 ViewStyle.h \
 WordList.h \
-XPM.h
+XPM.h \
+version.h
