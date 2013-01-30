@@ -807,7 +807,7 @@ void MenuMgr::ReadToolbarButtons(FXRegistry*reg, const char* tbar_sect)
       toolbar_buttons[i]=spec->sel;
     } else {
       toolbar_buttons[i]=TopWindow::ID_LAST;
-      if ((strncmp(keyval,"Custom_",7)==0)&&isdigit(keyval[7])) {
+      if ( keyval && (strncmp(keyval,"Custom_",7)==0) && isdigit(keyval[7]) ) {
         const FXchar *filename=reg->readStringEntry(tbar_sect,keyval,NULL);
         if (filename && FXStat::isFile(filename)) {
            RegTBarUsrCmd(i,keyval,filename);
