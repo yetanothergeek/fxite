@@ -1024,12 +1024,7 @@ bool TopWindowBase::CloseFile(bool close_last, bool hooked)
     SciDocUtils::DoneSci(sci,recording);
   } else {
     SciDocUtils::DoneSci(sci,recording);
-    FXWindow *w=tabbook->childAtIndex(i*2);
-    if (!w) {
-      i--;
-      w=tabbook->childAtIndex(i*2);
-    }
-    tabbook->ActivateTab(i);
+    tabbook->ActivateTab( tabbook->childAtIndex(i*2) ? i : i-1 );
   }
   need_status=1;
   return true;
