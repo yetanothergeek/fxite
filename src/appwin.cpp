@@ -686,19 +686,14 @@ long TopWindow::onQuit(FXObject*o, FXSelector sel, void*p)
 
 
 
-#define DOC_SEND(msg) \
-  SciDoc*sci=FocusedDoc(); \
-  if (sci) { \
-    sci->sendMessage(msg,0,0); \
-    sci->setFocus(); \
-  }
-
-
 long TopWindow::onUndo(FXObject*o, FXSelector sel, void*p)
 {
-  DOC_SEND(SCI_UNDO);
+  SciDoc*sci=FocusedDoc();
+  if (!sci) { return 1; }
+  sci->sendMessage(SCI_UNDO,0,0);
   sci->SetEolModeFromContent();
   MenuMgr::UpdateEolMenu(sci);
+  sci->setFocus();
   return 1;
 }
 
@@ -706,9 +701,12 @@ long TopWindow::onUndo(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onRedo(FXObject*o, FXSelector sel, void*p)
 {
-  DOC_SEND(SCI_REDO);
+  SciDoc*sci=FocusedDoc();
+  if (!sci) { return 1; }
+  sci->sendMessage(SCI_REDO,0,0);
   sci->SetEolModeFromContent();
   MenuMgr::UpdateEolMenu(sci);
+  sci->setFocus();
   return 1;
 }
 
@@ -740,7 +738,9 @@ long TopWindow::onPaste(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onDeleteChunk(FXObject*o, FXSelector sel, void*p)
 {
+  SciDoc*sci=FocusedDoc();
   FXint cmd=0;
+  if (!sci) { return 1; }
   switch (FXSELID(sel)) {
     case ID_DEL_WORD_LEFT:  { cmd=SCI_DELWORDLEFT;  break; }
     case ID_DEL_WORD_RIGHT: { cmd=SCI_DELWORDRIGHT; break; }
@@ -748,7 +748,8 @@ long TopWindow::onDeleteChunk(FXObject*o, FXSelector sel, void*p)
     case ID_DEL_LINE_RIGHT: { cmd=SCI_DELLINERIGHT; break; }
     default: return 1;
   }
-  DOC_SEND(cmd);
+  sci->sendMessage(cmd,0,0);
+  sci->setFocus();
   return 1;
 }
 
