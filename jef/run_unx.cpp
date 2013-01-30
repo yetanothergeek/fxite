@@ -246,7 +246,6 @@ bool CmdIO::run(const char *command, bool*canceler)
   int wpid=0;
   int wstatus=0;
   while (!(stdoutEOF&&stderrEOF)) {
-    wpid=0;
     wstatus=0;
     wpid = waitpid(childPid,&wstatus,WNOHANG);
     if (wpid>0) { status=wstatus; }
