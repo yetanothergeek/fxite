@@ -58,8 +58,6 @@ typedef struct _ErrorPattern {
 class Settings: public SettingsBase {
   FXDECLARE(Settings);
   static FXbool loaded;
-  bool packtabs;
-  FXuchar tabside;
   FXApp*app;
   FXRegistry*reg;
   FXSettings*style_reg;

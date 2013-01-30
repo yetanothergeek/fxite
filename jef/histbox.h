@@ -84,7 +84,6 @@ private:
   FXArrowButton* arUP;
   FXArrowButton* arDN;
   FXVerticalFrame* searcharrows;
-  FXTextField*input;
   RegHistory*hist;
   HistoryTextField*slave;
 public:
