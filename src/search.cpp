@@ -503,8 +503,10 @@ FXString SciReplGui::getReplaceText() const
 
 
 void SciReplGui::setHaveSelection(bool have_sel)
-{
-  if (have_sel && repall_insel_btn) { repall_insel_btn->enable(); } else { repall_insel_btn->disable(); }
+{ 
+  if (repall_insel_btn) {
+    if (have_sel) { repall_insel_btn->enable(); } else { repall_insel_btn->disable(); }
+  }
 }
 
 
