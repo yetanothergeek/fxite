@@ -51,7 +51,7 @@ typedef struct {
 
 static MytagEntry*CopyTag(tagEntry*te)
 {
-  MytagEntry*rv=(MytagEntry*)calloc(1,sizeof(tagEntry));
+  MytagEntry*rv=(MytagEntry*)calloc(1,sizeof(MytagEntry));
   rv->file=te->file?strdup(te->file):NULL;
   rv->pattern=te->address.pattern?strdup(te->address.pattern):NULL;
   rv->kind=te->kind?strdup(te->kind):NULL;
