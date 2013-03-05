@@ -900,6 +900,8 @@ long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
   bool ret = _scint->Idle();
   if (ret == false) {
     _scint->SetIdle(false);
+  } else {
+    FXApp::instance()->addChore(this, FXScintilla::ID_IDLE);
   }
   return 1;
 }
