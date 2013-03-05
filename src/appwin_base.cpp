@@ -989,6 +989,8 @@ bool TopWindowBase::OpenFile(const char*filename, const char*rowcol, bool readon
     }
   }
   sci->setFocus();
+  sci->NeedStyled(true);
+  getApp()->addChore(this, ID_CHECK_STYLE, sci);
   if (hooked) { RunHookScript("opened"); }
   return true;
 }
