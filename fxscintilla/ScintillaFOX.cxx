@@ -903,7 +903,7 @@ long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
   } else {
     FXApp::instance()->addChore(this, FXScintilla::ID_IDLE);
   }
-  return 1;
+  return 0;
 }
 
 long FXScintilla::onChoreStyleIdle(FXObject *, FXSelector, void *)
