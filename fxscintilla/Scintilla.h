@@ -148,6 +148,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_MARKERDEFINEPIXMAP 2049
 #define SCI_MARKERADDSET 2466
 #define SCI_MARKERSETALPHA 2476
+#define SC_MAX_MARGIN 4
 #define SC_MARGIN_SYMBOL 0
 #define SC_MARGIN_NUMBER 1
 #define SC_MARGIN_BACK 2
@@ -775,6 +776,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_ANNOTATIONGETVISIBLE 2549
 #define SCI_ANNOTATIONSETSTYLEOFFSET 2550
 #define SCI_ANNOTATIONGETSTYLEOFFSET 2551
+#define SCI_RELEASEALLEXTENDEDSTYLES 2552
+#define SCI_ALLOCATEEXTENDEDSTYLES 2553
 #define UNDO_MAY_COALESCE 1
 #define SCI_ADDUNDOACTION 2560
 #define SCI_CHARPOSITIONFROMPOINT 2561

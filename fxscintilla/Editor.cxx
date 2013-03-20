@@ -1775,7 +1775,7 @@ void Editor::PaintSelMargin(Surface *surfWindow, PRectangle &rc) {
 	PRectangle rcSelMargin = rcMargin;
 	rcSelMargin.right = rcMargin.left;
 
-	for (int margin = 0; margin < vs.margins; margin++) {
+	for (int margin = 0; margin <= SC_MAX_MARGIN; margin++) {
 		if (vs.ms[margin].width > 0) {
 
 			rcSelMargin.left = rcSelMargin.right;
@@ -1947,8 +1947,9 @@ void Editor::PaintSelMargin(Surface *surfWindow, PRectangle &rc) {
 				rcMarker.bottom = yposScreen + vs.lineHeight;
 				if (vs.ms[margin].style == SC_MARGIN_NUMBER) {
 					if (firstSubLine) {
-						char number[100];
-						sprintf(number, "%d", lineDoc + 1);
+						char number[100] = "";
+						if (lineDoc >= 0)
+							sprintf(number, "%d", lineDoc + 1);
 						if (foldFlags & SC_FOLDFLAG_LEVELNUMBERS) {
 							int lev = pdoc->GetLevel(lineDoc);
 							sprintf(number, "%c%c %03X %03X",
@@ -3726,7 +3727,7 @@ long Editor::FormatRange(bool draw, Sci_RangeToFormat *pfr) {
 	// Modify the view style for printing as do not normally want any of the transient features to be printed
 	// Printing supports only the line number margin.
 	int lineNumberIndex = -1;
-	for (int margin = 0; margin < ViewStyle::margins; margin++) {
+	for (int margin = 0; margin <= SC_MAX_MARGIN; margin++) {
 		if ((vsPrint.ms[margin].style == SC_MARGIN_NUMBER) && (vsPrint.ms[margin].width > 0)) {
 			lineNumberIndex = margin;
 		} else {
@@ -4454,7 +4455,7 @@ void Editor::NotifyIndicatorClick(bool click, int position, bool shift, bool ctr
 bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
 	int marginClicked = -1;
 	int x = 0;
-	for (int margin = 0; margin < ViewStyle::margins; margin++) {
+	for (int margin = 0; margin <= SC_MAX_MARGIN; margin++) {
 		if ((pt.x >= x) && (pt.x < x + vs.ms[margin].width))
 			marginClicked = margin;
 		x += vs.ms[margin].width;
@@ -6121,7 +6122,7 @@ bool Editor::PointInSelMargin(Point pt) {
 
 Window::Cursor Editor::GetMarginCursor(Point pt) {
 	int x = 0;
-	for (int margin = 0; margin < ViewStyle::margins; margin++) {
+	for (int margin = 0; margin <= SC_MAX_MARGIN; margin++) {
 		if ((pt.x >= x) && (pt.x < x + vs.ms[margin].width))
 			return static_cast<Window::Cursor>(vs.ms[margin].cursor);
 		x += vs.ms[margin].width;
@@ -6824,6 +6825,8 @@ void Editor::SetDocPointer(Document *document) {
 	braces[0] = invalidPosition;
 	braces[1] = invalidPosition;
 
+	vs.ReleaseAllExtendedStyles();
+
 	// Reset the contraction state to fully shown.
 	cs.Clear();
 	cs.InsertLines(0, pdoc->LinesTotal() - 1);
@@ -7053,7 +7056,7 @@ void Editor::AddStyledText(char *buffer, int appendLength) {
 }
 
 static bool ValidMargin(unsigned long wParam) {
-	return wParam < ViewStyle::margins;
+	return wParam <= SC_MAX_MARGIN;
 }
 
 static char *CharPtrFromSPtr(sptr_t lParam) {
@@ -8065,6 +8068,8 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			verticalScrollBarVisible = wParam != 0;
 			SetScrollBars();
 			ReconfigureScrollBars();
+			if (verticalScrollBarVisible)
+				SetVerticalScrollPos();
 		}
 		break;
 
@@ -9160,6 +9165,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_ANNOTATIONGETSTYLEOFFSET:
 		return vs.annotationStyleOffset;
+
+	case SCI_RELEASEALLEXTENDEDSTYLES:
+		vs.ReleaseAllExtendedStyles();
+		break;
+
+	case SCI_ALLOCATEEXTENDEDSTYLES:
+		return vs.AllocateExtendedStyles(wParam);
 
 	case SCI_ADDUNDOACTION:
 		pdoc->AddUndoAction(wParam, lParam & UNDO_MAY_COALESCE);

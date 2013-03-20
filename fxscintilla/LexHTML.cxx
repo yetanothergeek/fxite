@@ -445,11 +445,6 @@ static int StateForScript(script_type scriptLanguage) {
 	return Result;
 }
 
-static inline bool ishtmlwordchar(int ch) {
-	return !isascii(ch) ||
-		(isalnum(ch) || ch == '.' || ch == '-' || ch == '_' || ch == ':' || ch == '!' || ch == '#');
-}
-
 static inline bool issgmlwordchar(int ch) {
 	return !isascii(ch) ||
 		(isalnum(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
@@ -905,7 +900,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				 !IsScriptCommentState(state)) {
  			beforeLanguage = scriptLanguage;
 			scriptLanguage = segIsScriptingIndicator(styler, i + 2, i + 6, isXml ? eScriptXML : eScriptPHP);
-			if (scriptLanguage != eScriptPHP && isStringState(state)) continue;
+			if ((scriptLanguage != eScriptPHP) && (isStringState(state) || (state==SCE_H_COMMENT))) continue;
 			styler.ColourTo(i - 1, StateToPrint);
 			beforePreProc = state;
 			i++;

@@ -23,6 +23,7 @@ static StyleDef errorlist_style[] = {
   { "tidy", SCE_ERR_TIDY, _DEFLT_FG, _DEFLT_BG, Normal },
   { "javastack", SCE_ERR_JAVA_STACK, _DEFLT_FG, _DEFLT_BG, Normal },
   { "value", SCE_ERR_VALUE, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "gccincludedfrom", SCE_ERR_GCC_INCLUDED_FROM, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
