@@ -29,7 +29,85 @@
 #define SciMsg(im,wp,lp) sci->sendMessage(im,wp,lp)
 #define SciStr(im,wp,lp) sci->sendString(im,wp,lp)
 
+#if 1
 
+// The capitalization of text inserted by `&' or `\1', `\2', ... `\9' can be altered by
+// preceding them with `\U', `\u', `\L', or `\l'.  `\u' and `\l' change only the first 
+// character of the inserted entity, while `\U' and `\L' change the entire entity to 
+// upper or lower case, respectively. 
+
+
+void AppendResult(FXString &result, const FXchar* subject, FXint* beg, FXint* end, FXint index, FXuchar mode)
+{
+  if (mode) {
+    FXString copy(&subject[beg[index]],end[index]-beg[index]);
+    switch (mode) {
+      case 'L':
+      case 'U': { 
+        copy=(mode=='U')?copy.upper():copy.lower();
+        result.append(copy);
+        return;
+      }
+      case 'l':
+      case 'u': {
+        FXint utf8len=copy.inc(0);
+        FXString init(copy.text(),utf8len);
+        init=(mode=='u')?init.upper():init.lower();
+        result.append(init);
+        result.append(&copy[utf8len]);
+      }
+    }
+  } else {
+    result.append(&subject[beg[index]],end[index]-beg[index]);
+  }
+}
+
+
+#define IsDigit(c) (((c)>='0')&&(((c)<='9')))
+
+// Return substitution string
+FXString DoSubstitute(const FXchar* subject, FXint len, FXint* beg, FXint* end, const FXString& templat, FXint npar)
+{
+  FXint i=0;
+  FXString result;
+  while ( templat[i] != '\0' ) {
+    FXuchar casemode='\0';
+    FXint ch=templat[i];
+    i++;
+    if ( (ch=='\\') && (strchr("LUlu",templat[i])) && ((templat[i+1]=='&')||((templat[i+1]=='\\')&&IsDigit(templat[i+2]) )) ) {
+      casemode=templat[i];
+      ch=templat[i+1];
+      i+=2;
+    }
+    if (ch=='&') {
+      if ( (beg[0]>=0) && (end[0]<=len)) {
+        AppendResult(result,subject,beg,end,0,casemode);
+      }
+    } else if (ch=='\\' && IsDigit(templat[i])) {
+      FXint n=templat[i++]-'0';
+      if ( (n<npar) && (beg[n]>=0) && (end[n]<=len) ) {
+        AppendResult(result,subject,beg,end,n,casemode);
+      }
+    } else {
+      if(ch=='\\' && (templat[i]=='\\' || templat[i]=='&')) {
+        ch=templat[i++];
+      }
+      result.append(ch);
+    }
+  }
+  return result;
+}
+
+
+
+FXString DoSubstitute(const FXString& string,FXint* beg,FXint* end,const FXString& templat,FXint npar)
+{
+  return DoSubstitute(string.text(),string.length(),beg,end,templat,npar);
+}
+
+#else
+# define DoSubstitute FXRex::substitute
+#endif
 
 void SciSearch::SelectTarget(bool forward)
 {
@@ -270,7 +348,7 @@ void SciSearch::ReplaceSelection(const FXString &replacewith, FXuint opts)
   SciMsg(SCI_SETSEARCHFLAGS,0,0);
   SciMsg(SCI_TARGETFROMSELECTION,0,0);
   FXString repl_template=PrepareReplacement(replacewith,opts);
-  FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
+  FXString newstr=DoSubstitute(content,begs,ends,repl_template,MAX_CAPTURES);
   SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
   SelectTarget(start<end);
   NotifyRecorder(FXString::null,replacewith,opts,0);
@@ -309,7 +387,7 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
     if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
       SciMsg(SCI_SETTARGETSTART,begs[0],0);
       SciMsg(SCI_SETTARGETEND,ends[0],0);
-      FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
+      FXString newstr=DoSubstitute(content,begs,ends,repl_template,MAX_CAPTURES);
       SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
       content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
       count++;
@@ -363,7 +441,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
       if (rx.match(content,end,begs,ends,REX_FORWARD|REX_NOT_EMPTY,MAX_CAPTURES,start,end)) {
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
         SciMsg(SCI_SETTARGETEND,ends[0],0);
-        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
+        FXString newstr=DoSubstitute(content,begs,ends,repl_template,MAX_CAPTURES);
         SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
@@ -377,7 +455,7 @@ long SciSearch::ReplaceAllInSel(const FXString &searchfor, const FXString &repla
       if (rx.match(content,end,begs,ends,srchflags,MAX_CAPTURES,substart,end)) {
         SciMsg(SCI_SETTARGETSTART,begs[0],0);
         SciMsg(SCI_SETTARGETEND,ends[0],0);
-        FXString newstr=FXRex::substitute(content,begs,ends,repl_template,MAX_CAPTURES);
+        FXString newstr=DoSubstitute(content,begs,ends,repl_template,MAX_CAPTURES);
         SciStr(SCI_REPLACETARGET,newstr.length(),newstr.text());
         content=(const char*)SciMsg(SCI_GETCHARACTERPOINTER,0,0);
         count++;
