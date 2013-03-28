@@ -4,6 +4,24 @@
 ################################################################################
 
 
+2013-03-28
+  * VERSION 0.91 RELEASE.
+
+
+2013-03-25
+  * Added syntax to alter the case of text in find/replace operations.
+  * Update to Scintilla-3.2.5 release.
+  * Update document style / settings each time a new file is loaded.
+  * Reload Scintilla idle chore after each invocation (fixes word-wrap issue.)
+  * Removed some old focus-handling code, use _NET_ACTIVE_WINDOW instead.
+  * Fixed endless-loop focus problem with application-owned dialogs.
+  * Don't chop off shabang names at the dot.
+  * Fixed some "deprecated" warnings for autoconf/automake items.
+  * Use "parent" as dialog owner (fixes bizarre endless loop / focus bug.)
+  * Always clear the search field when the find dialog is invoked.
+  * Focus the search dialog if it is invoked when already open.
+
+
 2012-10-23
   * Fixed some autotools deprecation warnings.
   * Update to Scintilla-3.2.3 from HG 4309:85ed8066ea9c.
