@@ -147,7 +147,7 @@ private:
   virtual void NotifyParent(SCNotification scn);
   virtual void SetTicking(bool on);
   virtual bool SetIdle(bool on);
-  virtual void QueueStyling(int upTo);
+  virtual void QueueIdleWork(WorkNeeded::workItems items, int upTo);
   virtual void SetMouseCapture(bool on);
   virtual bool HaveMouseCapture();
   virtual bool PaintContains(PRectangle rc);
@@ -524,11 +524,11 @@ bool ScintillaFOX::SetIdle(bool on) {
   return true;
 }
 
-void ScintillaFOX::QueueStyling(int upTo) {
-  Editor::QueueStyling(upTo);
-  if (!styleNeeded.active) {
+void ScintillaFOX::QueueIdleWork(WorkNeeded::workItems items, int upTo) {
+  Editor::QueueIdleWork(items, upTo);
+  if (!workNeeded.active) {
     // Only allow one style needed to be queued
-    styleNeeded.active = true;
+    workNeeded.active = true;
     FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_STYLE_IDLE);
   }
 }
@@ -909,7 +909,7 @@ long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
 long FXScintilla::onChoreStyleIdle(FXObject *, FXSelector, void *)
 {
   // Idler will be automatically stopped
-  _scint->IdleStyling();
+  _scint->IdleWork();
   return 1;
 }
 

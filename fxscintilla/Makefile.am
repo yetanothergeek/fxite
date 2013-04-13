@@ -134,5 +134,4 @@ SubStyles.h \
 UniConversion.h \
 ViewStyle.h \
 WordList.h \
-XPM.h \
-version.h
+XPM.h

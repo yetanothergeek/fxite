@@ -924,6 +924,11 @@ fun void LineScroll=2168(int columns, int lines)
 # Ensure the caret is visible.
 fun void ScrollCaret=2169(,)
 
+# Scroll the argument positions and the range between them into view giving
+# priority to the primary position then the secondary position.
+# This may be used to make a search match visible.
+fun void ScrollRange=2569(position secondary, position primary)
+
 # Replace the selected text with the argument text.
 fun void ReplaceSel=2170(, string text)
 
@@ -1836,6 +1841,17 @@ set void AutoCSetCaseInsensitiveBehaviour=2634(int behaviour,)
 
 # Get auto-completion case insensitive behaviour.
 get int AutoCGetCaseInsensitiveBehaviour=2635(,)
+
+enu Ordering=SC_ORDER_
+val SC_ORDER_PRESORTED=0
+val SC_ORDER_PERFORMSORT=1
+val SC_ORDER_CUSTOM=2
+
+# Set the way autocompletion lists are ordered.
+set void AutoCSetOrder=2660(int order,)
+
+# Get the way autocompletion lists are ordered.
+get int AutoCGetOrder=2661(,)
 
 # Enlarge the document to a particular size of text bytes.
 fun void Allocate=2446(int bytes,)
@@ -3565,6 +3581,8 @@ val SCE_HA_COMMENTLINE=13
 val SCE_HA_COMMENTBLOCK=14
 val SCE_HA_COMMENTBLOCK2=15
 val SCE_HA_COMMENTBLOCK3=16
+val SCE_HA_PRAGMA=17
+val SCE_HA_PREPROCESSOR=18
 # Lexical states of SCLEX_TADS3
 lex TADS3=SCLEX_TADS3 SCE_T3_
 val SCE_T3_DEFAULT=0
