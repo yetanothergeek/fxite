@@ -33,7 +33,7 @@ private:
   void CreateConfigDir();
   InterProc *ipc;
 #ifdef WIN32
-  virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+  virtual FXival dispatchEvent(FXID hwnd, FXuint iMsg, FXuval wParam, FXival lParam);
 #endif
   FXString commands;
   FXString configdir;
