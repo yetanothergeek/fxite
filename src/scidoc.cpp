@@ -21,6 +21,8 @@
 #include <cerrno>
 #include <fxkeys.h>
 #include <fx.h>
+#include <FXTextCodec.h>
+#include <FXUTF16Codec.h>
 
 #include "lang.h"
 #include "prefs_base.h"
@@ -238,8 +240,6 @@ static bool ConfirmOpenBinary(SciDoc*sci, const char*filename)
 }
 
 
-#include <FXTextCodec.h>
-#include <FXUTF16Codec.h>
 
 bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
 {
@@ -364,13 +364,13 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
         _dirty=false;
         need_backup=false;
         if (codec) {
-          const char *content=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
-          FXString output;
-          output.length(codec->mb2utflen(content,sendMessage(SCI_GETLENGTH,0,0)));
-          codec->mb2utf((char*)output.text(),output.length(),content,sendMessage(SCI_GETLENGTH,0,0));
+          const char *orig=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
+          FXString recode;
+          recode.length(codec->mb2utflen(orig,sendMessage(SCI_GETLENGTH,0,0)));
+          codec->mb2utf((char*)recode.text(),recode.length(),orig,sendMessage(SCI_GETLENGTH,0,0));
           delete codec;
           SetUTF8(true);
-          sendString(SCI_SETTEXT,0,output.text());
+          sendString(SCI_SETTEXT,0,recode.text());
         }
         SetEolModeFromContent();
         sendMessage(SCI_EMPTYUNDOBUFFER,0,0);
