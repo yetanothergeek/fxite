@@ -24,8 +24,6 @@
 
 #include <fx.h>
 
-#include "compat.h"
-
 #include "listdlls.h"
 
 #include "intl.h"
@@ -137,29 +135,22 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
 
 
 
-// Set up a file handle for a child process:
-//   DuplicateHandle() for Win9x; SetHandleInformation() for WinNT
-static bool SetupHandle(HANDLE &FD)
-{
-  if (IsWin9x()) {
-    HANDLE CurrProc=GetCurrentProcess();
-    HANDLE tmpFD=NULL;
-    if (DuplicateHandle(CurrProc,FD,CurrProc,&tmpFD,DUPLICATE_SAME_ACCESS,FALSE,DUPLICATE_SAME_ACCESS)) {
-      CloseHandle(FD);
-      FD=tmpFD;
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return SetHandleInformation(FD, HANDLE_FLAG_INHERIT, 0);
-  }
+// Peek (without blocking) to see if we have anything to read
+// Returns number of bytes available
+// If the call fails, puts the error code in "status"
+// (Usually status will be ERROR_BROKEN_PIPE when the external process finishes.)
+static DWORD BytesAvail(HANDLE f, DWORD&status) {
+  char peek[1];
+  DWORD BytesRead=0;
+  DWORD TotalBytesAvail=0;
+  BOOL ok = PeekNamedPipe(f,&peek,1,&BytesRead,&TotalBytesAvail,NULL);
+  status=ok?0:GetLastError();
+  return ok?TotalBytesAvail:0;
 }
 
 
 
-// Launch an external command - note that this windows implementation
-// uses blocking I/O - the "canceler" is ignored!
+// Launch an external command
 bool CmdIO::run(const char *command, bool*canceler)
 {
   stdinFD = stdoutFD = stderrFD = StdIN_Rd = StdOUT_Wr = StdERR_Wr = NULL;
@@ -169,37 +160,48 @@ bool CmdIO::run(const char *command, bool*canceler)
   FXString cmd=command;
   static const ssize_t bufsize=1024;
   char buf[bufsize];
-  char TempDir[MAX_PATH];
-  char TempOut[MAX_PATH];
-  char TempErr[MAX_PATH];
   ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
   sa.bInheritHandle = TRUE;
   sa.lpSecurityDescriptor = NULL;
   DWORD exitcode=0;
-  ZeroMemory(TempDir,MAX_PATH);
-  ZeroMemory(TempOut,MAX_PATH);
-  ZeroMemory(TempErr,MAX_PATH);
+
   cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
   cmd.substitute("%f%", FXSystem::getEnvironment("f"), true);
   cmd.substitute("%L%", FXSystem::getEnvironment("l"), true);
   cmd.substitute("%l%", FXSystem::getEnvironment("l"), true);
-  if (SendString.empty()&&!IsWin9x()) {   // Output pipe only, no need for input...
-    if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
-    if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
-    if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
-    if (!SetHandleInformation(stderrFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stderr",false); }
-    StdIN_Rd=NULL;
 
-    if (CreateChildProcess(win, cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
-      SafeClose(StdOUT_Wr);
-      SafeClose(StdERR_Wr);
-      SafeClose(StdIN_Rd);
-      while (1) {
-        app->runWhileEvents();
-        FXuval rcvd=0;
+  if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
+  if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
+  if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
+  if (!SetHandleInformation(stderrFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stderr",false); }
+
+  if (!SendString.empty()) {
+    if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
+    if (!SetHandleInformation(stdinFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdin", false); }
+  }
+
+  if (CreateChildProcess(win, cmd, StdIN_Rd, StdOUT_Wr, StdERR_Wr, &pi)) {
+    SafeClose(StdOUT_Wr);
+    SafeClose(StdERR_Wr);
+    SafeClose(StdIN_Rd);
+    while (1) {
+      app->runWhileEvents();
+      if (*canceler) { break; }
+      if (remaining>0) {
+        FXuval sent=0;
+        BOOL ok=WriteFile(stdinFD,SendString.text()+(SendString.length()-remaining),FXMIN(remaining,256),&sent,NULL);
+        if (!ok) { /* Just ignore it? */ }
+        remaining -= sent;
+      } else {
+        SafeClose(stdinFD);
+      }
+      DWORD stderrStatus;
+      DWORD stderrBytesAvail=BytesAvail(stderrFD,stderrStatus);
+      if (stderrBytesAvail>0) {
         ZeroMemory(buf,bufsize);
-        BOOL ok = ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
+        FXuval rcvd=0;
+        BOOL ok = ReadFile(stderrFD,buf,FXMIN((FXuval)bufsize,stderrBytesAvail),&rcvd,NULL);
         if (rcvd>0) {
           ErrString.append(buf,rcvd);
           appendLine(ErrString,SEL_IO_EXCEPT);
@@ -212,11 +214,12 @@ bool CmdIO::run(const char *command, bool*canceler)
         }
         if (!ok) { break; }
       }
-      while (1) {
-        app->runWhileEvents();
-        FXuval rcvd=0;
+      DWORD stdoutStatus;
+      DWORD stdoutBytesAvail=BytesAvail(stdoutFD,stdoutStatus);
+      if (stdoutBytesAvail>0) {
         ZeroMemory(buf,bufsize);
-        BOOL ok = ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
+        FXuval rcvd=0;
+        BOOL ok = ReadFile(stdoutFD,buf,FXMIN((FXuval)bufsize,stdoutBytesAvail),&rcvd,NULL);
         if (rcvd>0) {
           RecvString.append(buf,rcvd);
           appendLine(RecvString,SEL_IO_WRITE);
@@ -229,38 +232,10 @@ bool CmdIO::run(const char *command, bool*canceler)
         }
         if (!ok) { break; }
       }
-    } else {
-      CleanupAndReturn("creating process", false);
+      if ((stdoutStatus!=0)&&(stderrStatus!=0)&&(remaining==0)) { break; }
     }
-  } else {   // Create only input pipe, use temp files for stdout and stderr...
-    if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
-    if (!SetupHandle(stdinFD)) { CleanupAndReturn("setting up stdin", false); }
-    DWORD dwRetVal = GetTempPath(MAX_PATH, TempDir);
-    if ((dwRetVal==0)||(dwRetVal>MAX_PATH)) {
-      CleanupAndReturn("retrieving name of temporary directory", false);
-    }
-    if (!GetTempFileName(TempDir,"OUT",0,TempOut)) { CleanupAndReturn("getting stdout temp file name", false); }
-    if (!GetTempFileName(TempDir,"ERR",0,TempErr)) { CleanupAndReturn("getting stderr temp file name", false); }
-    StdOUT_Wr=CreateFile(TempOut,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
-    if (StdOUT_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stdout temp file", false); }
-    StdERR_Wr=CreateFile(TempErr,GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
-    if (StdERR_Wr==INVALID_HANDLE_VALUE) { CleanupAndReturn("creating stderr temp file", false); }
-    if (CreateChildProcess(win, cmd, StdIN_Rd, StdOUT_Wr,StdERR_Wr, &pi)) {
-      SafeClose(StdIN_Rd);
-      SafeClose(StdOUT_Wr);
-      SafeClose(StdERR_Wr);
-      while (remaining>0) {
-        FXuval sent=0;
-        BOOL ok=WriteFile(stdinFD,SendString.text()+(SendString.length()-remaining),remaining,&sent,NULL);
-        remaining -= sent;
-        if ((sent==0)&&(!ok)) { break; }
-      }
-      SafeClose(stdinFD);
-      SafeClose(stdoutFD);
-      SafeClose(stderrFD);
-    } else {
-      CleanupAndReturn("creating process", false);
-    }
+  } else {
+    CleanupAndReturn("creating process", false);
   }
   do {
     app->runWhileEvents();
@@ -284,58 +259,6 @@ bool CmdIO::run(const char *command, bool*canceler)
   SafeClose(StdIN_Rd);
   SafeClose(StdOUT_Wr);
   SafeClose(StdERR_Wr);
-  if (TempOut[0]) {   // Read 'stdout' output text from temp file...
-    stdoutFD=CreateFile(TempOut,GENERIC_READ,0,&sa,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    if (stdoutFD!=INVALID_HANDLE_VALUE) {
-      FXuval rcvd;
-      do {
-        ZeroMemory(buf,bufsize);
-        BOOL ok=ReadFile(stdoutFD,buf,bufsize,&rcvd,NULL);
-        if (rcvd>0) {
-          RecvString.append(buf,rcvd);
-          appendLine(RecvString,SEL_IO_WRITE);
-        } else {
-          if (!RecvString.empty()) {
-            if (ensure_final_newline) { RecvString.append('\n'); }
-            appendLine(RecvString,SEL_IO_WRITE);
-          }
-          break;
-        }
-        if (!ok) { break; }
-      } while (1);
-      SafeClose(stdoutFD);
-      RecvString.substitute("\r", "", true);
-    } else {
-      WinErrMsg(ErrString, "opening output log", GetLastError());
-    }
-    DeleteFile(TempOut);
-  }
-  if (TempErr[0]) {   // Read 'stderr' error text from temp file...
-    stderrFD=CreateFile(TempErr,GENERIC_READ,0,&sa,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    if (stderrFD!=INVALID_HANDLE_VALUE) {
-      FXuval rcvd;
-      do {
-        ZeroMemory(buf,bufsize);
-        BOOL ok=ReadFile(stderrFD,buf,bufsize,&rcvd,NULL);
-        if (rcvd>0) {
-          ErrString.append(buf,rcvd);
-          appendLine(ErrString,SEL_IO_EXCEPT);
-        } else {
-          if (!ErrString.empty()) {
-            ErrString.append('\n');
-            appendLine(ErrString,SEL_IO_EXCEPT);
-          }
-          break;
-        }
-        if (!ok) { break; }
-      } while (1);
-      SafeClose(stderrFD);
-      ErrString.substitute('\r', ' ', true);
-    } else {
-      WinErrMsg(ErrString, "opening error log", GetLastError());
-    }
-    DeleteFile(TempErr);
-  }
   DWORD gle=GetLastError();
   if (gle && (gle!=ERROR_BROKEN_PIPE)) {
     WinErrMsg(ErrString,"running command",GetLastError());
