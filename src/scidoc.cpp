@@ -65,7 +65,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   search=new SciSearch(this,ID_RECORD_REPLACE);
   user_undo_level=0;
   recording=false;
-
+  memset(bom,0,sizeof(bom));
   sendMessage(SCI_SETMARGINTYPEN, 0, SC_MARGIN_NUMBER);
   sendMessage(SCI_SETMARGINWIDTHN, 1, 4);
   for (const char*c="CDLVXY"; *c; c++) {
@@ -238,13 +238,17 @@ static bool ConfirmOpenBinary(SciDoc*sci, const char*filename)
 }
 
 
+#include <FXTextCodec.h>
+#include <FXUTF16Codec.h>
 
 bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
 {
   _lasterror="";
   errno=0;
+  memset(bom,0,sizeof(bom));
   bool rv=true;
   bool ro=GetReadOnly();
+  FXTextCodec *codec=NULL;
   if (ro&&insert) {
     _lasterror=_("Document is marked read-only.");
     return false;
@@ -272,12 +276,35 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
       if (!insert) { SetUTF8(!DefaultToSbcs); }
       break;
     }
-    case 'U': { // UTF-8 encoded text file.
+    case 'U': { // UTF-8 encoded text file w/o BOM.
       if (!insert) { SetUTF8(true); }
+      break;
+    }
+    case 'M': { // UTF-8 BOM.
+      if (!insert) {
+        strcpy(bom,"\0357\0273\0277");
+        SetUTF8(true);
+      }
       break;
     }
     case 'Z': { // Zero-length (empty) file.
       if (!insert) { SetUTF8(!DefaultToAscii); }
+      break;
+    }
+    case 'e': { // UTF-16LE BOM.
+      if (!insert) {
+        codec=new FXUTF16LECodec();
+        strcpy(bom,"\377\376");
+        SetUTF8(false);
+      }
+      break;
+    }
+    case 'E': { // UTF-16BE BOM.
+      if (!insert) {
+        codec=new FXUTF16BECodec();
+        strcpy(bom,"\376\377");
+        SetUTF8(false);
+      }
       break;
     }
     case 'F': { // Failure, could not read the file.
@@ -294,7 +321,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
     }
     static const int BUFSIZE=1025;
     char buf[BUFSIZE];
-    fh.position(0,FXIO::Begin);
+    fh.position(strlen(bom),FXIO::Begin);
     long p=0;
     _loading=!insert;
     if (insert) {
@@ -336,6 +363,15 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
         _filetime=FXStat::modified(_filename);
         _dirty=false;
         need_backup=false;
+        if (codec) {
+          const char *content=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
+          FXString output;
+          output.length(codec->mb2utflen(content,sendMessage(SCI_GETLENGTH,0,0)));
+          codec->mb2utf(&output[0],output.length(),content,sendMessage(SCI_GETLENGTH,0,0));
+          delete codec;
+          SetUTF8(true);
+          sendString(SCI_SETTEXT,0,output.text());
+        }
         SetEolModeFromContent();
         sendMessage(SCI_EMPTYUNDOBUFFER,0,0);
       }
@@ -350,6 +386,14 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
   return rv;
 }
 
+const char*SciDoc::GetEncoding()
+{
+  switch ((FXuchar)bom[0]) {
+    case 0xFF: { return "UTF-16LE"; }
+    case 0xFE: { return "UTF-16BE"; }
+    default: { return _utf8?"UTF-8":"ASCII"; }
+  }
+}
 
 
 bool SciDoc::SaveToFile(const char*filename, bool as_itself)
@@ -363,9 +407,32 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
   if (fh.isOpen()) {
     FXbool en=isEnabled();
     FXbool hf=hasFocus();
+    FXTextCodec *codec=NULL;
+    FXString recode=FXString::null;
     if (en) { disable(); }
     FXint len=sendMessage(SCI_GETLENGTH,0,0);
     const char*buf=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
+    if (bom[0]) {
+      fh.writeBlock(bom,strlen(bom));
+      switch ((FXuchar)bom[0]) {
+        case 0xFF: {
+          codec=new FXUTF16LECodec();
+          break;
+        }
+        case 0xFE: {
+          codec=new FXUTF16BECodec();
+          break;
+        }
+      }
+    }
+    if (codec) {
+      FXint old_len=len;
+      len=codec->utf2mblen(buf,old_len);
+      recode.length(len);
+      codec->utf2mb(recode.text(),len,buf,old_len);
+      delete codec;
+      buf=recode.text();
+    }
     FXival wrote=fh.writeBlock(buf,len);
     if (en) { enable(); }
     if (hf) { setFocus(); }

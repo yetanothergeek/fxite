@@ -35,6 +35,7 @@ class SciDoc : public FXScintilla {
 private:
   LangStyle *_lang;
   FXString _filename;
+  FXchar bom[4];
   const char*_openers;
   const char*_closers;
   FXString _lasterror;
@@ -187,6 +188,7 @@ public:
   void SetEolModeFromContent();
   void SetUTF8(bool utf8);
   bool GetUTF8() { return _utf8; }
+  const char*GetEncoding();
   void SetUserUndoLevel(FXint action); // 1:push level; -1: pop level; 0:reset level
   void SetProperty(const char*key, const char*value);
   bool GetProperty(const FXString &key, FXString &value, bool expanded=false);

@@ -41,7 +41,7 @@ StatusBar::StatusBar(FXComposite *p, void* dont_freeze):
   docname=new FXTextField(hf, 1024, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY|LAYOUT_FILL_X);
   docname->setEditable(false);
 
-  encname=new FXTextField(this, 6, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
+  encname=new FXTextField(this, 8, NULL, FRAME_RAISED|FRAME_SUNKEN|TEXTFIELD_READONLY);
   encname->setEditable(false);
 
   mode=new FXLabel(this, FXString::null, NULL,JUSTIFY_LEFT|LAYOUT_FIX_Y);
@@ -71,10 +71,10 @@ void StatusBar::Coords(long line, long col)
 
 
 
-void StatusBar::FileInfo(const FXString &filename, bool utf8, long line, long column)
+void StatusBar::FileInfo(const FXString &filename, const char* enc, long line, long column)
 {
   docname->setText(filename);
-  encname->setText(utf8?"UTF-8":"ASCII");
+  encname->setText(enc);
   Coords(line,column);
 }
 

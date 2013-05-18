@@ -1282,7 +1282,7 @@ void TopWindowBase::UpdateTitle(long line, long col)
     menubar->SetLanguageCheckmark(sci->getLanguage());
     menubar->SetReadOnlyCheckmark(sci->sendMessage(SCI_GETREADONLY,0,0));
     menubar->SetWordWrapCheckmark(sci->GetWordWrap());
-    statusbar->FileInfo(sci->Filename(),sci->GetUTF8(),line,col);
+    statusbar->FileInfo(sci->Filename(),sci->GetEncoding(),line,col);
     MenuMgr::UpdateEolMenu(sci);
   } else {
     setTitle(EXE_NAME);
