@@ -367,7 +367,7 @@ bool SciDoc::DoLoadFromFile(const char*filename,bool insert)
           const char *content=(const char*)sendMessage(SCI_GETCHARACTERPOINTER,0,0);
           FXString output;
           output.length(codec->mb2utflen(content,sendMessage(SCI_GETLENGTH,0,0)));
-          codec->mb2utf(&output[0],output.length(),content,sendMessage(SCI_GETLENGTH,0,0));
+          codec->mb2utf((char*)output.text(),output.length(),content,sendMessage(SCI_GETLENGTH,0,0));
           delete codec;
           SetUTF8(true);
           sendString(SCI_SETTEXT,0,output.text());
@@ -429,7 +429,7 @@ bool SciDoc::SaveToFile(const char*filename, bool as_itself)
       FXint old_len=len;
       len=codec->utf2mblen(buf,old_len);
       recode.length(len);
-      codec->utf2mb(recode.text(),len,buf,old_len);
+      codec->utf2mb((char*)recode.text(),len,buf,old_len);
       delete codec;
       buf=recode.text();
     }
