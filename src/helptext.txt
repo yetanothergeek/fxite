@@ -478,6 +478,13 @@ files to be treated as UTF-8 by setting:
 (You will probably never want to enable this option, unless you encounter a corrupted UTF-8 \
 file, or you just want to test the compliance of the UTF-8 handler on a deliberately broken file.)
 
+If the file contains a BOM (Byte-Order-Marker) at the beginning of its content, it is handled like \
+this:
+  * For UTF-8 BOM, the file is opened as UTF-8. Saving the file will preserve the original BOM.
+  * For UTF-16 BOM, the file's contents are converted to UTF-8 in the editor, then converted \
+back to UTF-16 when the file is saved to disk. Saving the file will preserve the original BOM \
+and endianness.
+
 Note that __APP__ does not provide any sort of "on the fly" conversion between encodings, so if you want to \
 work with an extended ASCII file as if it were UTF-8 encoded, you will need to convert the file using an \
 external tool such as the "===iconv===" program before opening it in __APP__. 
