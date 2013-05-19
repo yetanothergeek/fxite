@@ -776,6 +776,12 @@ void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
 {
   for (MenuSpec*spec=menu_specs; spec->sel!=TopWindow::ID_LAST; spec++) {
     FXString acc=reg->readStringEntry(keys_sect,spec->pref,spec->accel);
+#ifdef WIN32
+    if (acc.contains("Shift")) {
+      acc.substitute(')','0');
+      acc.substitute('(','9');
+    }
+#endif
     if (strcmp(acc.text(),spec->accel)!=0) {
       memset(spec->accel,0,sizeof(spec->accel));
       strncpy(spec->accel,acc.text(),sizeof(spec->accel)-1);
