@@ -550,18 +550,18 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
   if (!cmdutils->IsCommandReady()) { return false; }
   cmdutils->CommandBusy(true);
   cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
-  bool rv=false;
+  bool success=false;
   if (!cmd.empty()) {
     MyCmdIO cmdio(this, prefs->ShellCommand.text());
-    FXString output="";
+    FXString output=FXString::null;
     command_timeout=false;
     getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
     cmdutils->DisableUI(true);
-    if (cmdio.filter(cmd.text(), input, output, &command_timeout)) {
+    success=cmdio.filter(cmd.text(), input, output, &command_timeout);
+    if (success) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
       sci->ScrollWrappedInsert();
-      rv=true;
     }
     cmdutils->DisableUI(false);
     statusbar->Normal();
@@ -570,7 +570,7 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
   sci->setFocus();
   need_status=1;
   cmdutils->CommandBusy(false);
-  return rv;
+  return success;
 }
 
 
