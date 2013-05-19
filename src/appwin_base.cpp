@@ -558,7 +558,7 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
     getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
     cmdutils->DisableUI(true);
-    success=cmdio.filter(cmd.text(), input, output, &command_timeout);
+    success=cmdio.filter(cmdutils->FixUpCmdLineEnv(cmd).text(), input, output, &command_timeout);
     if (success) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
       sci->ScrollWrappedInsert();
@@ -589,7 +589,7 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
     repaint();
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
     statusbar->Running(_("command"));
-    success=cmdio.lines(cmd.text(), outlist, outlist->ID_CMDIO, &command_timeout, true);
+    success=cmdio.lines(cmdutils->FixUpCmdLineEnv(cmd).text(), outlist, outlist->ID_CMDIO, &command_timeout, true);
     statusbar->Normal();
     if (success) {
       outlist->appendItem(_("Command succeeded."));

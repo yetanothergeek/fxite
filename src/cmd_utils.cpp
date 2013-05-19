@@ -137,6 +137,21 @@ void CommandUtils::SetShellEnv(const char*file, long line)
 
 
 
+const FXString CommandUtils::FixUpCmdLineEnv(const FXString&command)
+{
+#ifdef WIN32
+  FXString cmd=command;
+  cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%f%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%L%", FXSystem::getEnvironment("l"), true);
+  cmd.substitute("%l%", FXSystem::getEnvironment("l"), true);
+  return cmd;
+#else
+  return command;
+#endif
+}
+
+
 
 /*
   Usually, the application will catch the kill command key sequence by itself,

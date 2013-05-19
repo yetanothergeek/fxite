@@ -166,11 +166,6 @@ bool CmdIO::run(const char *command, bool*canceler)
   sa.lpSecurityDescriptor = NULL;
   DWORD exitcode=0;
 
-  cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
-  cmd.substitute("%f%", FXSystem::getEnvironment("f"), true);
-  cmd.substitute("%L%", FXSystem::getEnvironment("l"), true);
-  cmd.substitute("%l%", FXSystem::getEnvironment("l"), true);
-
   if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
   if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
   if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
