@@ -16,6 +16,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef INTERPROC_H
+#define INTERPROC_H
+
+#ifdef WIN32
+# include <windows.h>
+#endif
 
 class InterProc: public FXObject {
   FXDECLARE(InterProc);
@@ -64,3 +70,5 @@ public:
   void StopServer();
   InterProc(FXApp*a, const FXString &connection, const FXString &topic=FXString::null);
 };
+
+#endif
