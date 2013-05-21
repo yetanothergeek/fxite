@@ -168,13 +168,12 @@ bool CmdIO::run(const char *command, bool*canceler)
 
   if (!CreatePipe(&stdoutFD, &StdOUT_Wr, &sa, 0)) { CleanupAndReturn("creating stdout pipe", false); }
   if (!SetHandleInformation(stdoutFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdout",false); }
+
   if (!CreatePipe(&stderrFD, &StdERR_Wr, &sa, 0)) { CleanupAndReturn("creating stderr pipe", false); }
   if (!SetHandleInformation(stderrFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stderr",false); }
 
-  if (!SendString.empty()) {
-    if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
-    if (!SetHandleInformation(stdinFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdin", false); }
-  }
+  if (!CreatePipe(&StdIN_Rd, &stdinFD, &sa, 0)) { CleanupAndReturn("creating stdin pipe", false); }
+  if (!SetHandleInformation(stdinFD, HANDLE_FLAG_INHERIT, 0)) { CleanupAndReturn("setting up stdin", false); }
 
   if (CreateChildProcess(win, cmd, StdIN_Rd, StdOUT_Wr, StdERR_Wr, &pi)) {
     SafeClose(StdOUT_Wr);
