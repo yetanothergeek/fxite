@@ -181,7 +181,7 @@ bool CmdIO::run(const char *command, bool*canceler)
     SafeClose(StdIN_Rd);
     while (1) {
       app->runWhileEvents();
-      if (*canceler) { break; }
+      if (canceler && *canceler) { break; }
       if (remaining>0) {
         FXuval sent=0;
         BOOL ok=WriteFile(stdinFD,SendString.text()+(SendString.length()-remaining),FXMIN(remaining,256),&sent,NULL);
