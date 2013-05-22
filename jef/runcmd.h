@@ -34,13 +34,12 @@ private:
   bool ensure_final_newline;
   FXObject* target;
   FXSelector message;
-  bool* _canceler;
   void* userdata;
   bool cleanup(bool rv);
   FXint warning(const char*msg);
   FXint error(const char*msg);
   void appendLine(FXString&s, FXSelector selid);
-  bool run(const char *command, bool*command_timeout);
+  bool run(const char *command);
   bool checkCurrDir();
   virtual bool IsCancelled() { return false; }
 #ifdef WIN32
@@ -69,8 +68,8 @@ protected:
 public:
   CmdIO(FXMainWindow *window, const char*shellcmd="/bin/sh -c");
   virtual ~CmdIO();
-  bool filter(const char *command, const FXString &input, FXString &output, bool*canceler=NULL);
-  bool lines(const char *command, FXObject *trg, FXSelector sel, bool*canceler=NULL, bool multiline=false);
+  bool filter(const char *command, const FXString &input, FXString &output);
+  bool lines(const char *command, FXObject *trg, FXSelector sel, bool multiline=false);
   void setUserData(void* p) { userdata=p; }
   void *getUserData() { return userdata; }
 };

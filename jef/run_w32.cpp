@@ -151,7 +151,7 @@ static DWORD BytesAvail(HANDLE f, DWORD&status) {
 
 
 // Launch an external command
-bool CmdIO::run(const char *command, bool*canceler)
+bool CmdIO::run(const char *command)
 {
   stdinFD = stdoutFD = stderrFD = StdIN_Rd = StdOUT_Wr = StdERR_Wr = NULL;
   RecvString = ErrString = "";
