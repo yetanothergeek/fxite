@@ -54,7 +54,7 @@ void DualListForm::CheckCount()
   if (used_items->getNumItems()>0) {
     used_items->makeItemVisible(used_items->getCurrentItem());
     rem_btn->enable();
-  } else { 
+  } else {
     rem_btn->disable();
   }
   if (used_items->getNumItems()>0) {
@@ -140,13 +140,13 @@ void DualListForm::create()
 
 void DualListForm::PopulateAvail()
 {
-  
+
 }
 
 
 void DualListForm::PopulateUsed()
 {
-  
+
 }
 
 

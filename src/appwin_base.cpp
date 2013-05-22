@@ -681,7 +681,7 @@ void TopWindowBase::AskReload()
     if ( FXMessageBox::question(this, MBOX_YES_NO, _("Reload file"),
            _("Reload current document?") ) != MBOX_CLICKED_YES ) { return; }
   }
-  filedlgs->AskReload(sci);  
+  filedlgs->AskReload(sci);
 }
 
 
@@ -1138,7 +1138,7 @@ void TopWindowBase::ShowPrefsDialog()
   }
   tabbook->ActivateTab(tabbook->ActiveTab());
   toolbar->SetToolbarColors();
-  EnableUserFilters(FocusedDoc()->GetSelLength());  
+  EnableUserFilters(FocusedDoc()->GetSelLength());
 }
 
 
@@ -1385,7 +1385,7 @@ void TopWindowBase::InvertColors(bool inverted)
   toolbar->SetToolbarColors();
   tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());
-  menubar->SyncPrefsCheckmarks(); 
+  menubar->SyncPrefsCheckmarks();
 }
 
 

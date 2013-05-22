@@ -631,7 +631,7 @@ void PrefsDialog::MakeEditorTab()
   list->appendItem(_("below"),NULL,NULL);
   list->appendItem(_("float"),NULL,NULL);
   list->setNumVisible(list->getNumItems());
-  list->setCurrentItem(prefs->SearchGui); 
+  list->setCurrentItem(prefs->SearchGui);
 
   new FXHorizontalSeparator(column,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
   chk=new FXCheckButton(column, _("Open 7-bit ASCII files as UTF-8"), prefs, Settings::ID_TOGGLE_ASCII_DEFAULT);

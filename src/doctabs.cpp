@@ -426,7 +426,7 @@ void DocTabs::setTabsCompact(FXuchar compact)
   FXuint packing_hints = getPackingHints();
   FXuint ts=getTabStyle();
   tabs_compact=compact;
-  if (compact=='A') { 
+  if (compact=='A') {
     compact=(ts==TABBOOK_TOPTABS||ts==TABBOOK_BOTTOMTABS)?'P':'U';
   }
   if ( compact=='P' ) {

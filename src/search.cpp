@@ -503,7 +503,7 @@ FXString SciReplGui::getReplaceText() const
 
 
 void SciReplGui::setHaveSelection(bool have_sel)
-{ 
+{
   if (repall_insel_btn) {
     if (have_sel) { repall_insel_btn->enable(); } else { repall_insel_btn->disable(); }
   }
@@ -634,7 +634,7 @@ void SearchDialogs::SetGuiStyle(FXuint style)
   gui_style=(SearchDialogStyle)style;
   if (style==SEARCH_GUI_FLOAT) {
     if (!srchdlg) { srchdlg=new SrchDlgBox(parent->getShell()); }
-    SetPad(srchdlg,0); 
+    SetPad(srchdlg,0);
     container=srchdlg;
     delete srchpan;
     srchpan=NULL;
@@ -643,7 +643,7 @@ void SearchDialogs::SetGuiStyle(FXuint style)
     SetPad(srchpan,0);
     container=srchpan;
     delete srchdlg;
-    srchdlg=NULL;  
+    srchdlg=NULL;
   }
 }
 
@@ -689,7 +689,7 @@ bool SearchDialogs::SearchFailed()
   return false;
 }
 
- 
+
 bool SearchDialogs::SearchWrapAsk(FXWindow*w)
 {
   return (FXMessageBox::question(w->getShell(), MBOX_YES_NO, _("Wrap search?"), "%s:\n%s",

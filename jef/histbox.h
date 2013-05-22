@@ -38,7 +38,7 @@ public:
 /*
   When a ClipTextField object is destroyed and it "owns" the clipoard, it searches
   up through the chain of "owner" windows trying to find a window that inherits
-  from "MainWinWithClipBrd". If found, it tries to hand off the clipboard data  
+  from "MainWinWithClipBrd". If found, it tries to hand off the clipboard data
   by calling MainWinWithClipBrd::SaveClipboard().
 */
 class ClipTextField: public FXTextField {

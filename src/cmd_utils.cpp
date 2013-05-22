@@ -42,7 +42,7 @@ void CommandUtils::SetKillKey(FXHotKey k)
   killkey=k;
 #ifdef WIN32
   winkey=VkKeyScan(FXSELID(killkey));
-#endif  
+#endif
 }
 
 
@@ -62,9 +62,8 @@ void CommandUtils::InitKillKey()
       _("disabling support for macros and external commands.")
       );
     temp_accels=NULL;
-  }  
+  }
 }
-
 
 
 
@@ -95,6 +94,7 @@ void CommandUtils::SetKillCommandAccelKey(FXHotKey acckey)
   temp_accels=new FXAccelTable();
   temp_accels->addAccel(acckey,this,FXSEL(SEL_COMMAND,TopWindow::ID_KILL_COMMAND),0);
 }
+
 
 
 void CommandUtils::DisableUI(bool disabled)
@@ -165,6 +165,7 @@ const FXString CommandUtils::FixUpCmdLineEnv(const FXString&command)
   return command;
 #endif
 }
+
 
 
 #ifdef WIN32
