@@ -1,0 +1,43 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
+
+SET (PROJET_NAME    fxite)
+SET (PROJET_VERSION 0.91)
+
+PROJECT (${PROJET_NAME})
+
+SET (CMAKE_VERBOSE_MAKEFILE ON)
+
+ADD_DEFINITIONS (-DVERSION="${PROJET_VERSION}")
+
+# Locate pkg-config
+FIND_PACKAGE (PkgConfig REQUIRED)
+
+# Locate FOX
+PKG_SEARCH_MODULE (FOX REQUIRED fox18 fox17 fox)
+
+# Locate reswrap
+FIND_PROGRAM (
+    RESWRAP 
+    NAMES reswrap-1.7 reswrap 
+    PATHS /bin /usr/bin /usr/local/bin /opt/local/bin
+)
+IF (NOT RESWRAP)
+    MESSAGE (FATAL_ERROR "Could not locate reswrap")
+ENDIF ()
+
+# Locate X11
+FIND_PACKAGE (X11 REQUIRED)
+
+# Locate LUA
+OPTION (USE_SYSTEM_LUA "Use the installed Lua library" OFF)
+IF (USE_SYSTEM_LUA)
+    FIND_PACKAGE (Lua51 REQUIRED)
+ELSE ()
+    ADD_SUBDIRECTORY (${CMAKE_SOURCE_DIR}/lua)
+    SET (LUA_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/lua")
+    SET (LUA_LIBRARIES lua)
+ENDIF ()
+
+ADD_SUBDIRECTORY (fxscintilla)
+ADD_SUBDIRECTORY (jef)
+ADD_SUBDIRECTORY (src)
