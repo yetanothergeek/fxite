@@ -54,7 +54,7 @@ static const char*usersnipflags[]={
 
 
 MainMenu::MainMenu(FXComposite* p):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
-{ 
+{
   tw=(TopWindow*)p;
   prefs=SettingsBase::instance();
   CreateMenus();
@@ -609,7 +609,7 @@ void MainMenu::UnloadTagFile(FXMenuCommand*mc)
   delete mc;
   if (unloadtagsmenu->getMenu()->numChildren()==0) {
     EnableTagMenus(false);
-  } 
+  }
 }
 
 
@@ -680,7 +680,7 @@ void MainMenu::Recording(bool recording, bool recorded)
 
 void MainMenu::AppendDocList(const FXString &filename, FXTabItem*tab)
 {
-  FXMenuCommand* cmd = new FXMenuCommand(  doclistmenu, filename.empty()?tab->getText():filename, 
+  FXMenuCommand* cmd = new FXMenuCommand(  doclistmenu, filename.empty()?tab->getText():filename,
                                            NULL, tw, TW::ID_TAB_ACTIVATE, 0 );
   if (shown()) { cmd->create(); }
   RemoveRecentFile(filename);

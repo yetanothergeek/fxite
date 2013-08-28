@@ -34,7 +34,7 @@ public:
   void Colorize();
   void Running(const char*what);
   void Recording(bool recording);
-  void FileInfo(const FXString &filename, bool utf8, long line, long column);
+  void FileInfo(const FXString &filename, const char* enc, long line, long column);
   void Normal();
   void Clear();
   void Show(bool showit);

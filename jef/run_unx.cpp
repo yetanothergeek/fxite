@@ -221,10 +221,9 @@ bool CmdIO::cleanup(bool rv)
 
 
 
-bool CmdIO::run(const char *command, bool*canceler)
+bool CmdIO::run(const char *command)
 {
   stdinFD = stdoutFD = stderrFD = 0;
-  _canceler=canceler;
   stack_level=0;
   app=(win->getApp());
   stdoutEOF=false;
@@ -250,7 +249,7 @@ bool CmdIO::run(const char *command, bool*canceler)
     wpid = waitpid(childPid,&wstatus,WNOHANG);
     if (wpid>0) { status=wstatus; }
     app->runWhileEvents();
-    if (canceler&&*canceler) {
+    if (IsCancelled()) {
       app->removeInput(stdinFD,  INPUT_WRITE);
       app->removeInput(stdoutFD, INPUT_READ);
       app->removeInput(stderrFD, INPUT_READ);
@@ -269,7 +268,7 @@ bool CmdIO::run(const char *command, bool*canceler)
 
 bool CmdIO::excess()
 {
-  if (_canceler&&*_canceler) {
+  if (IsCancelled()) {
     stdoutEOF=true;
     stderrEOF=true;
     app->removeInput(stdoutFD, INPUT_READ);

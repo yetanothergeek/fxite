@@ -395,7 +395,7 @@ void MacroRecorder::translate(TranslateFunc callback, void* user_data)
           }
           text.format(_LUAMOD_".replace(\"%s\",\"%s\", {%s},\"%s\")",
                          what.text(), with.text(), flags.text(), how );
-          
+
         } else {
 
           text.format( _LUAMOD_".gofind(\"%s\", {%s}%s)",

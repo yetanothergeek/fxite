@@ -1,6 +1,10 @@
 #include <fx.h>
 #include <fxkeys.h>
 
+#ifdef WIN32
+# include <windows.h>
+#endif
+
 #include "appwin.h"
 #include "menuspec.h"
 #include "intl.h"
@@ -33,10 +37,20 @@ const char* CommandUtils::DontFreezeMe()
 
 
 
+void CommandUtils::SetKillKey(FXHotKey k)
+{
+  killkey=k;
+#ifdef WIN32
+  winkey=VkKeyScan(FXSELID(killkey));
+#endif
+}
+
+
+
 void CommandUtils::InitKillKey()
 {
   MenuSpec*killcmd=MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND);
-  killkey=parseAccel(killcmd->accel);
+  SetKillKey(parseAccel(killcmd->accel));
   if (killkey && FXSELID(killkey)) {
     temp_accels=new FXAccelTable();
     temp_accels->addAccel(killkey,this,FXSEL(SEL_COMMAND,TopWindow::ID_KILL_COMMAND),0);
@@ -48,9 +62,8 @@ void CommandUtils::InitKillKey()
       _("disabling support for macros and external commands.")
       );
     temp_accels=NULL;
-  }  
+  }
 }
-
 
 
 
@@ -60,6 +73,7 @@ CommandUtils::CommandUtils(TopWindowBase*win)
   temp_accels=NULL;
   command_busy=false;
   tw=(TopWindow*)win;
+  app=tw->getApp();
   InitKillKey();
 }
 
@@ -75,11 +89,12 @@ CommandUtils::~CommandUtils()
 
 void CommandUtils::SetKillCommandAccelKey(FXHotKey acckey)
 {
-  killkey=acckey;
+  SetKillKey(acckey);
   delete temp_accels;
   temp_accels=new FXAccelTable();
   temp_accels->addAccel(acckey,this,FXSEL(SEL_COMMAND,TopWindow::ID_KILL_COMMAND),0);
 }
+
 
 
 void CommandUtils::DisableUI(bool disabled)
@@ -137,6 +152,33 @@ void CommandUtils::SetShellEnv(const char*file, long line)
 
 
 
+const FXString CommandUtils::FixUpCmdLineEnv(const FXString&command)
+{
+#ifdef WIN32
+  FXString cmd=command;
+  cmd.substitute("%F%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%f%", FXSystem::getEnvironment("f"), true);
+  cmd.substitute("%L%", FXSystem::getEnvironment("l"), true);
+  cmd.substitute("%l%", FXSystem::getEnvironment("l"), true);
+  return cmd;
+#else
+  return command;
+#endif
+}
+
+
+
+#ifdef WIN32
+# define kill_key_down()  ( GetKeyState(winkey) & 0x8000 )
+# define ctrl_key_down()  ( GetKeyState(VK_CONTROL)   & 0x8000 )
+# define alt_key_down()   ( GetKeyState(VK_MENU)      & 0x8000 )
+# define shift_key_down() ( GetKeyState(VK_SHIFT)     & 0x8000 )
+#else
+# define kill_key_down()  ( app->getKeyState(FXSELID(killkey)) )
+# define ctrl_key_down()  ( app->getKeyState(KEY_Control_L) || app->getKeyState(KEY_Control_R) )
+# define alt_key_down()   ( app->getKeyState(KEY_Alt_L)     || app->getKeyState(KEY_Alt_R) )
+# define shift_key_down() ( app->getKeyState(KEY_Shift_L)   || app->getKeyState(KEY_Shift_R) )
+#endif
 
 /*
   Usually, the application will catch the kill command key sequence by itself,
@@ -148,18 +190,11 @@ void CommandUtils::SetShellEnv(const char*file, long line)
 bool CommandUtils::IsMacroCancelled(bool &command_timeout)
 {
   if (command_timeout) { return true; }
-  FXApp*a=tw->getApp();
-  if (a->getKeyState(FXSELID(killkey))) {
+  if (kill_key_down()) {
     FXushort mods=FXSELTYPE(killkey);
-    if (mods&CONTROLMASK) {
-      if (!(a->getKeyState(KEY_Control_L) || a->getKeyState(KEY_Control_R))) { return false; }
-    }
-    if (mods&SHIFTMASK) {
-      if (!(a->getKeyState(KEY_Shift_L) || a->getKeyState(KEY_Shift_R))) {  return false; }
-    }
-    if (mods&ALTMASK) {
-      if (!(a->getKeyState(KEY_Alt_L) || a->getKeyState(KEY_Alt_R))) { return false; }
-    }
+    if ( (mods&CONTROLMASK) && (!ctrl_key_down())  ) { return false; }
+    if ( (mods&SHIFTMASK)   && (!shift_key_down()) ) { return false; }
+    if ( (mods&ALTMASK)     && (!alt_key_down())   ) { return false; }
     command_timeout=true;
   }
   return command_timeout;

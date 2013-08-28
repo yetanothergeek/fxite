@@ -17,6 +17,17 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_HEADER_STDC
 
+
+case "${srcdir}" in
+  */*)
+    RELATIVE_SRC_DIR="${srcdir}"
+  ;;
+  *)
+    RELATIVE_SRC_DIR="${srcdir}/.."
+  ;;
+esac
+
+
 dnl #Let pkgconfig handle FOX flags unless they are set in the environment
 if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
 then
@@ -106,14 +117,7 @@ AC_ARG_WITH([system-lua],
   ,
   [
     dnl Use local copy of Lua
-    case "${srcdir}" in
-      */*)
-        LUA_CFLAGS="-I${srcdir}/lua"
-      ;;
-      *)
-        LUA_CFLAGS="-I${srcdir}/../lua"
-      ;;
-    esac
+    LUA_CFLAGS="-I${RELATIVE_SRC_DIR}/lua"
     LUA_LIBS="-Wl,-E -L`pwd`/lua -llua -lm"
     AM_CONDITIONAL(WITH_SYSTEM_LUA, false)
   ]
@@ -131,7 +135,7 @@ case $host_os in
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
-    FOX_LIBS="${srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid -mwindows"
+    FOX_LIBS="${RELATIVE_SRC_DIR}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid -mwindows"
   ;;
   *minix*)
     AC_DEFINE(_MINIX)
@@ -155,21 +159,11 @@ case "${LUA_LIBS}" in
 esac
 
 
-case "${srcdir}" in
-  */*)
-    FXSCINTILLA_CFLAGS="-I${srcdir}/fxscintilla"
-    JEFFX_CFLAGS="-I${srcdir}/jef"
-  ;;
-  *)
-    FXSCINTILLA_CFLAGS="-I${srcdir}/../fxscintilla"
-    JEFFX_CFLAGS="-I${srcdir}/../jef"
-  ;;
-esac
-
-
+FXSCINTILLA_CFLAGS="-I${RELATIVE_SRC_DIR}/fxscintilla"
 FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
 
 JEFFX_LIBS="-L`pwd`/jef -ljeffx"
+JEFFX_CFLAGS="-I${RELATIVE_SRC_DIR}/jef"
 
 
 AC_ARG_ENABLE([assert],AC_HELP_STRING([--enable-assert],[enable assertions]))

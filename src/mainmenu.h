@@ -45,11 +45,11 @@ private:
   FXMenuPane* recordermenu;
   FXMenuCommand* recorderstartmenu;
   FXMenuCommand* playbackmenu;
-  FXMenuCommand* showmacromenu;  
+  FXMenuCommand* showmacromenu;
   FXMenuCommand* filterselmenu;
   FXMenuCommand* openselmenu;
-  
-  
+
+
   FXMenuPane* editdeletemenu;
   FXMenuPane* editindentmenu;
   FXMenuPane* viewzoommenu;

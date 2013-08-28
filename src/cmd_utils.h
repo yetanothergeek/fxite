@@ -10,6 +10,11 @@ private:
   bool command_busy;
   FXHotKey killkey;
   TopWindow*tw;
+  FXApp*app;
+#ifdef WIN32
+  FXuint winkey;
+#endif
+  void SetKillKey(FXHotKey k);
   void InitKillKey();
 public:
   static void Freeze(FXWindow*win, bool frozen);
@@ -22,6 +27,7 @@ public:
   bool IsCommandReady();
   bool IsMacroCancelled(bool &command_timeout);
   static void SetShellEnv(const char*file, long line);
+  static const FXString FixUpCmdLineEnv(const FXString&command);
   CommandUtils(TopWindowBase*w);
   ~CommandUtils();
 };

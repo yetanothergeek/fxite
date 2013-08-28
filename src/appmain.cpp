@@ -177,7 +177,7 @@ static void usage(const char*prog)
 
 
 #ifdef WIN32
-long AppClass::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
+FXival AppClass::dispatchEvent(FXID hwnd, FXuint iMsg, FXuval wParam, FXival lParam)
 {
   switch (iMsg) {
       case WM_DDE_INITIATE:

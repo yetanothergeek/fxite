@@ -550,18 +550,18 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
   if (!cmdutils->IsCommandReady()) { return false; }
   cmdutils->CommandBusy(true);
   cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
-  bool rv=false;
+  bool success=false;
   if (!cmd.empty()) {
     MyCmdIO cmdio(this, prefs->ShellCommand.text());
-    FXString output="";
+    FXString output=FXString::null;
     command_timeout=false;
     getApp()->beginWaitCursor();
     statusbar->Running(_("command"));
     cmdutils->DisableUI(true);
-    if (cmdio.filter(cmd.text(), input, output, &command_timeout)) {
+    success=cmdio.filter(cmdutils->FixUpCmdLineEnv(cmd).text(), input, output);
+    if (success) {
       sci->sendString(SCI_REPLACESEL, 0, output.text());
       sci->ScrollWrappedInsert();
-      rv=true;
     }
     cmdutils->DisableUI(false);
     statusbar->Normal();
@@ -570,7 +570,7 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
   sci->setFocus();
   need_status=1;
   cmdutils->CommandBusy(false);
-  return rv;
+  return success;
 }
 
 
@@ -589,7 +589,7 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
     repaint();
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
     statusbar->Running(_("command"));
-    success=cmdio.lines(cmd.text(), outlist, outlist->ID_CMDIO, &command_timeout, true);
+    success=cmdio.lines(cmdutils->FixUpCmdLineEnv(cmd).text(), outlist, outlist->ID_CMDIO, true);
     statusbar->Normal();
     if (success) {
       outlist->appendItem(_("Command succeeded."));
@@ -681,7 +681,7 @@ void TopWindowBase::AskReload()
     if ( FXMessageBox::question(this, MBOX_YES_NO, _("Reload file"),
            _("Reload current document?") ) != MBOX_CLICKED_YES ) { return; }
   }
-  filedlgs->AskReload(sci);  
+  filedlgs->AskReload(sci);
 }
 
 
@@ -1138,7 +1138,7 @@ void TopWindowBase::ShowPrefsDialog()
   }
   tabbook->ActivateTab(tabbook->ActiveTab());
   toolbar->SetToolbarColors();
-  EnableUserFilters(FocusedDoc()->GetSelLength());  
+  EnableUserFilters(FocusedDoc()->GetSelLength());
 }
 
 
@@ -1282,7 +1282,7 @@ void TopWindowBase::UpdateTitle(long line, long col)
     menubar->SetLanguageCheckmark(sci->getLanguage());
     menubar->SetReadOnlyCheckmark(sci->sendMessage(SCI_GETREADONLY,0,0));
     menubar->SetWordWrapCheckmark(sci->GetWordWrap());
-    statusbar->FileInfo(sci->Filename(),sci->GetUTF8(),line,col);
+    statusbar->FileInfo(sci->Filename(),sci->GetEncoding(),line,col);
     MenuMgr::UpdateEolMenu(sci);
   } else {
     setTitle(EXE_NAME);
@@ -1385,7 +1385,7 @@ void TopWindowBase::InvertColors(bool inverted)
   toolbar->SetToolbarColors();
   tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());
-  menubar->SyncPrefsCheckmarks(); 
+  menubar->SyncPrefsCheckmarks();
 }
 
 

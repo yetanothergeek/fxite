@@ -32,9 +32,9 @@
 #if 1
 
 // The capitalization of text inserted by `&' or `\1', `\2', ... `\9' can be altered by
-// preceding them with `\U', `\u', `\L', or `\l'.  `\u' and `\l' change only the first 
-// character of the inserted entity, while `\U' and `\L' change the entire entity to 
-// upper or lower case, respectively. 
+// preceding them with `\U', `\u', `\L', or `\l'.  `\u' and `\l' change only the first
+// character of the inserted entity, while `\U' and `\L' change the entire entity to
+// upper or lower case, respectively.
 
 
 void AppendResult(FXString &result, const FXchar* subject, FXint* beg, FXint* end, FXint index, FXuchar mode)
@@ -43,7 +43,7 @@ void AppendResult(FXString &result, const FXchar* subject, FXint* beg, FXint* en
     FXString copy(&subject[beg[index]],end[index]-beg[index]);
     switch (mode) {
       case 'L':
-      case 'U': { 
+      case 'U': {
         copy=(mode=='U')?copy.upper():copy.lower();
         result.append(copy);
         return;
@@ -335,7 +335,7 @@ void SciSearch::NotifyRecorder(const FXString &searchfor, const FXString &replac
     scn.wParam=mode;
     scn.lParam=(sptr_t)(void*)replacewith.text();
     sci->handle((FXObject*)this,FXSEL(SEL_COMMAND,message),(void*)&scn);
-  }  
+  }
 }
 
 

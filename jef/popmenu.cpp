@@ -27,7 +27,7 @@ FXIMPLEMENT(PopUpMnuCmd,FXMenuCommand,PopUpMnuCmdMap,ARRAYNUMBER(PopUpMnuCmdMap)
 
 PopUpMnuCmd::PopUpMnuCmd(FXComposite* p,const FXString& text,FXIcon* ic,FXObject* tgt,FXSelector sel):
      FXMenuCommand(p,text,ic,tgt,sel), CreationTime(FXThread::time())
-{ 
+{
   CreationTime=FXThread::time();
 }
 

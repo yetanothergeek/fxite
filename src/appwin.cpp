@@ -809,7 +809,7 @@ long TopWindow::onFindNext(FXObject*o, FXSelector sel, void*p)
 
 
 long TopWindow::onFindPrev(FXObject*o, FXSelector sel, void*p)
-{ 
+{
   srchdlgs->FindPrev();
   return 1;
 }

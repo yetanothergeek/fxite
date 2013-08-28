@@ -142,6 +142,9 @@ static char get_stream_encoding(FILE *file) {
   unsigned long code;
   char result='T';
   fseek(file,0,SEEK_SET);
+  if ((getc(file)==0xFF)&&(getc(file)==0xFE)) { return 'e'; } else { fseek(file,0,SEEK_SET); }
+  if ((getc(file)==0xFE)&&(getc(file)==0xFF)) { return 'E'; } else { fseek(file,0,SEEK_SET); }
+  if ((getc(file)==0xEF)&&(getc(file)==0xBB)&&(getc(file)==0xBF)) { return 'M'; } else { fseek(file,0,SEEK_SET); }  
   for (;;) {
     c = getc(file);
     if (c != EOF) {
@@ -188,10 +191,12 @@ Test the contents of FILENAME and return one of the following values:
   B: Binary file ( contains null bytes or control codes not normally found in text. )
   T: Plain US-ASCII text file ( with no extended characters. )
   H: High (extended ASCII) text file.
-  U: UTF-8 encoded text file.
+  U: UTF-8 encoded text file w/o BOM (content validated).
+  M: UTF-8 BOM (content not validated)
   Z: Zero-length (empty) file.
   F: Failure, could not read the file.
-
+  e: UTF-16LE BOM
+  E: UTF-16BE BOM
 Notes:
   A return value of 'T' could also be treated as valid UTF-8
   Unknown encodings might be incorrectly returned as 'B' or 'H' !!!

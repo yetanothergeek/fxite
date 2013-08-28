@@ -331,6 +331,8 @@ void WaitForWindowFocus(FXTopWindow*w, FXuint msecs)
   ClientMsg(w,"_NET_ACTIVE_WINDOW", 2);
   XSetInputFocus(dpy, w->id(), RevertToPointerRoot, CurrentTime);
   XRaiseWindow(dpy,w->id());
+#else
+  if (w->isMinimized()) { w->restore(); }
 #endif
 
   while (FXThread::time()<timeout) {

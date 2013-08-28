@@ -73,7 +73,7 @@ void TabCallbacks::SetZoom(SciDoc*sci, FXSelector sel, void*p, DocTabs*tabbook, 
     z=(FXival)p;
    tabbook->ForEachTab(ZoomSpecCB, &z);
   }
-  prefs->ZoomFactor=sci->GetZoom();  
+  prefs->ZoomFactor=sci->GetZoom();
 }
 
 
@@ -158,7 +158,7 @@ bool TabCallbacks::StyleNextDocCB(FXint index, DocTab*tab, FXWindow*page, void*u
 
 /*
   ForEachTab callback that checks to see if a file is already open.
-  The user_data is an array of 3 pointers: 
+  The user_data is an array of 3 pointers:
      { FXString*filename, bool*activate, SciDoc*sci=NULL }
   If we find the document, we set the NULL SciDoc* to the
   found document and (optionally) activate that tab.

@@ -193,6 +193,13 @@ void ScintillaBase::AutoCompleteDoubleClick(void *p) {
 	sci->AutoCompleteCompleted();
 }
 
+void ScintillaBase::AutoCompleteInsert(Position startPos, int removeLen, const char *text, int textLen) {
+	UndoGroup ug(pdoc);
+	pdoc->DeleteChars(startPos, removeLen);
+	pdoc->InsertString(startPos, text, textLen);
+	SetEmptySelection(startPos + textLen);
+}
+
 void ScintillaBase::AutoCompleteStart(int lenEntered, const char *list) {
 	//Platform::DebugPrintf("AutoComplete %s\n", list);
 	ct.CallTipCancel();
@@ -202,17 +209,11 @@ void ScintillaBase::AutoCompleteStart(int lenEntered, const char *list) {
 			const char *typeSep = strchr(list, ac.GetTypesep());
 			int lenInsert = typeSep ? 
 				static_cast<int>(typeSep-list) : static_cast<int>(strlen(list));
-			UndoGroup ug(pdoc);
 			if (ac.ignoreCase) {
-				SetEmptySelection(sel.MainCaret() - lenEntered);
-				pdoc->DeleteChars(sel.MainCaret(), lenEntered);
-				SetEmptySelection(sel.MainCaret());
-				pdoc->InsertString(sel.MainCaret(), list, lenInsert);
-				SetEmptySelection(sel.MainCaret() + lenInsert);
+				// May need to convert the case before invocation, so remove lenEntered characters
+				AutoCompleteInsert(sel.MainCaret() - lenEntered, lenEntered, list, lenInsert);
 			} else {
-				SetEmptySelection(sel.MainCaret());
-				pdoc->InsertString(sel.MainCaret(), list + lenEntered, lenInsert - lenEntered);
-				SetEmptySelection(sel.MainCaret() + lenInsert - lenEntered);
+				AutoCompleteInsert(sel.MainCaret(), 0, list + lenEntered, lenInsert - lenEntered);
 			}
 			ac.Cancel();
 			return;
@@ -233,6 +234,11 @@ void ScintillaBase::AutoCompleteStart(int lenEntered, const char *list) {
 		HorizontalScrollTo(xOffset + pt.x - rcClient.right + widthLB);
 		Redraw();
 		pt = PointMainCaret();
+	}
+	if (wMargin.GetID()) {
+		Point ptOrigin = GetVisibleOriginInMain();
+		pt.x += ptOrigin.x;
+		pt.y += ptOrigin.y;
 	}
 	PRectangle rcac;
 	rcac.left = pt.x - ac.lb->CaretFromEdge();
@@ -357,15 +363,7 @@ void ScintillaBase::AutoCompleteCompleted() {
 		endPos = pdoc->ExtendWordSelect(endPos, 1, true);
 	if (endPos < firstPos)
 		return;
-	UndoGroup ug(pdoc);
-	if (endPos != firstPos) {
-		pdoc->DeleteChars(firstPos, endPos - firstPos);
-	}
-	SetEmptySelection(ac.posStart);
-	if (item != -1) {
-		pdoc->InsertCString(firstPos, selected.c_str());
-		SetEmptySelection(firstPos + static_cast<int>(selected.length()));
-	}
+	AutoCompleteInsert(firstPos, endPos - firstPos, selected.c_str(), static_cast<int>(selected.length()));
 	SetLastXChosen();
 }
 
@@ -398,6 +396,11 @@ void ScintillaBase::CallTipShow(Point pt, const char *defn) {
 	int ctStyle = ct.UseStyleCallTip() ? STYLE_CALLTIP : STYLE_DEFAULT;
 	if (ct.UseStyleCallTip()) {
 		ct.SetForeBack(vs.styles[STYLE_CALLTIP].fore, vs.styles[STYLE_CALLTIP].back);
+	}
+	if (wMargin.GetID()) {
+		Point ptOrigin = GetVisibleOriginInMain();
+		pt.x += ptOrigin.x;
+		pt.y += ptOrigin.y;
 	}
 	PRectangle rc = ct.CallTipStart(sel.MainCaret(), pt,
 		vs.lineHeight,
@@ -793,6 +796,13 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 
 	case SCI_AUTOCGETCASEINSENSITIVEBEHAVIOUR:
 		return ac.ignoreCaseBehaviour;
+
+	case SCI_AUTOCSETORDER:
+		ac.autoSort = wParam;
+		break;
+
+	case SCI_AUTOCGETORDER:
+		return ac.autoSort;
 
 	case SCI_USERLISTSHOW:
 		listType = wParam;
