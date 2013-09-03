@@ -6,9 +6,12 @@ version.h \
 Accessor.cxx \
 AutoComplete.cxx \
 CallTip.cxx \
+CaseConvert.cxx \
+CaseFolder.cxx \
 Catalogue.cxx \
 CellBuffer.cxx \
 CharClassify.cxx \
+CharacterCategory.cxx \
 CharacterSet.cxx \
 ContractionState.cxx \
 Decoration.cxx \
@@ -92,9 +95,12 @@ version.h \
 Accessor.h \
 AutoComplete.h \
 CallTip.h \
+CaseConvert.h \
+CaseFolder.h \
 Catalogue.h \
 CellBuffer.h \
 CharClassify.h \
+CharacterCategory.h \
 CharacterSet.h \
 ContractionState.h \
 Decoration.h \
@@ -120,7 +126,6 @@ PositionCache.h \
 PropSetSimple.h \
 RESearch.h \
 RunStyles.h \
-SVector.h \
 SciLexer.h \
 Scintilla.h \
 ScintillaBase.h \
@@ -132,6 +137,7 @@ Style.h \
 StyleContext.h \
 SubStyles.h \
 UniConversion.h \
+UnicodeFromUTF8.h \
 ViewStyle.h \
 WordList.h \
 XPM.h

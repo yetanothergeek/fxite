@@ -20,6 +20,10 @@ static StyleDef haskell_style[] = {
   { "commentblock3", SCE_HA_COMMENTBLOCK3, COMMNT_FG, _DEFLT_BG, Italic },
   { "pragma", SCE_HA_PRAGMA, _DEFLT_FG, _DEFLT_BG, Normal },
   { "preprocessor", SCE_HA_PREPROCESSOR, PREPRC_FG, _DEFLT_BG, Normal },
+  { "stringeol", SCE_HA_STRINGEOL, STREOL_FG, _DEFLT_BG, Normal },
+  { "reservedoperator", SCE_HA_RESERVED_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
+  { "literatecomment", SCE_HA_LITERATE_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
+  { "literatecodedelim", SCE_HA_LITERATE_CODEDELIM, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 

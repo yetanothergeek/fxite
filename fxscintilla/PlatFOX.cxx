@@ -455,6 +455,7 @@ static unsigned int GetBlue(unsigned int co) {
 
 void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
     ColourDesired outline, int alphaOutline, int flags) {
+  (void)flags;
   if (dc()) {
     int width = rc.Width();
     int height = rc.Height();
@@ -669,12 +670,16 @@ void SurfaceImpl::SetUnicodeMode(bool unicodeMode_) {
 }
 
 Surface *Surface::Allocate(int technology) {
+  (void)technology;
   return new SurfaceImpl;
 }
 
 void SurfaceImpl::DrawRGBAImage( PRectangle rc, int width, int height, 
                                const unsigned char *pixelsImage) {
-
+  (void)rc;
+  (void)width;
+  (void)height;
+  (void)pixelsImage;
 }
 
 Window::~Window() {}
@@ -802,6 +807,7 @@ void Window::SetTitle(const char *s) {
 
 /*** JKP: FIXME: Ugly and not tested !!! ***/
 PRectangle Window::GetMonitorRect(Point pt) {
+  (void)pt;
   FXRootWindow *rootwin=wid->getApp()->getRootWindow(); //(id->getApp(),id->getVisual());
   FXint xpos=wid->getX();
   FXint ypos=wid->getY();
@@ -926,6 +932,11 @@ FXIMPLEMENT(ListBoxList,FXList,ListBoxListMap,ARRAYNUMBER(ListBoxListMap))
 // ====================================================================
 
 void ListBoxFox::Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_) {
+  (void)ctrlID;
+  (void)location;
+  (void)lineHeight_;
+  (void)unicodeMode_;
+  (void)technology_;
   Parent=&parent;
   wid = new FXPacker(static_cast<FXComposite*>(parent.GetID()), FRAME_NONE|LAYOUT_EXPLICIT,0,0,0,0,1,1,1,1,0,0);
   list = new ListBoxList(static_cast<FXComposite*>(wid),this);

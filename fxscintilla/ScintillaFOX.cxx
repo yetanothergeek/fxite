@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if defined(__CYGWIN__)
@@ -71,7 +72,6 @@
 #include "Partitioning.h"
 #include "RunStyles.h"
 #include "ContractionState.h"
-#include "SVector.h"
 #include "CellBuffer.h"
 #include "CallTip.h"
 #include "KeyMap.h"
@@ -82,6 +82,7 @@
 #include "ViewStyle.h"
 #include "CharClassify.h"
 #include "Decoration.h"
+#include "CaseFolder.h"
 #include "Document.h"
 #include "Selection.h"
 #include "PositionCache.h"
@@ -195,12 +196,15 @@ ScintillaFOX::~ScintillaFOX()
 }
 
 int ScintillaFOX::TargetAsUTF8(char *text) {
+  (void)text;
   // TODO
   // Fail
   return 0;
 }
 
 int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
+  (void)utf8;
+  (void)encoded;
   // TODO
   // Fail
   return 0;
@@ -256,7 +260,7 @@ void ScintillaFOX::ClaimSelection()
   if (!sel.Empty()) { // <- JKP 2.00
     _fxsc.acquireSelection(&FXWindow::stringType,1);
     primarySelection = true;
-    primary.Free();
+    primary.Clear();
   }
   else {
 //  _fxsc.releaseSelection(); // JKP:  Does not work for 2.00 - Do we need somethong else?
@@ -267,7 +271,7 @@ void ScintillaFOX::UnclaimSelection()
 {
   //Platform::DebugPrintf("UnclaimPrimarySelection\n");
   if (!_fxsc.hasSelection()) {
-    primary.Free();
+    primary.Clear();
     primarySelection = false;
     FullPaint();
   }
@@ -325,8 +329,8 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
   isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
 #endif // WIN32
 
-  char*dest = Document::TransformLineEnds((int*)&len, (char*)data, len, pdoc->eolMode);
-  selText.Set(dest, len, CodePage(), 0, isRectangular, false);
+  std::string dest = Document::TransformLineEnds((char*)data, len, pdoc->eolMode);
+  selText.Copy(dest.c_str(), CodePage(), 0, isRectangular, false);
   pdoc->BeginUndoAction();
 
   if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
@@ -336,16 +340,16 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 	  sel.Range(sel.Main()).Start();
 
   if (selText.rectangular) {
-    PasteRectangular(selStart, selText.s, selText.len);
+    PasteRectangular(selStart, selText.Data(), selText.Length());
   } else {
     if (atPos<0) {
       selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
-      if (pdoc->InsertString(selStart.Position(),selText.s, selText.len)) {
-        SetEmptySelection( (selStart.Position()) + selText.len );
+      if (pdoc->InsertString(selStart.Position(),selText.Data(), selText.Length())) {
+        SetEmptySelection( (selStart.Position()) + selText.Length() );
       }
     } else {  
-      if (pdoc->InsertString(atPos,selText.s, selText.len)) {
-        SetEmptySelection(atPos+selText.len);
+      if (pdoc->InsertString(atPos,selText.Data(), selText.Length())) {
+        SetEmptySelection(atPos+selText.Length());
         FullPaint();
       }
     }
@@ -1146,7 +1150,7 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXScrollArea::onClipboardLost(sender,sel,ptr);
   //Platform::DebugPrintf("Clipboard lost\n");
-  _scint->copyText.Free();
+  _scint->copyText.Clear();
 
   return 1;
 }
@@ -1163,10 +1167,10 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   for (FXDragType *dt=InUTF8Mode(_scint)?types:types+1; *dt; dt++) {
     if(event->target==*dt){
       // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
-      size_t len=_scint->copyText.len;
+      size_t len=_scint->copyText.Length();
       if (!_scint->copyText.rectangular) {len--;}
       FXCALLOC(&cbdata,FXuchar,len+1);
-      memcpy(cbdata,_scint->copyText.s,len);
+      memcpy(cbdata,_scint->copyText.Data(),len);
   #ifndef WIN32
       setDNDData(FROM_CLIPBOARD,*dt,cbdata,len);
   #else
@@ -1341,12 +1345,12 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr) {
 
   // Return dragged text
   if(event->target==textType){
-    if (_scint->primary.s == NULL) {
+    if (_scint->primary.Empty()) {
       _scint->CopySelectionRange(&_scint->primary);
 
     }
-        if (_scint->primary.s) { /* JKP: This will crash if _scint->primary.s is NULL, so we test it first !!! */
-          setDNDData(FROM_DRAGNDROP,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+        if (!_scint->primary.Empty()) { /* JKP: This will crash if _scint->primary.s is NULL, so we test it first !!! */
+          setDNDData(FROM_DRAGNDROP,stringType,(FXuchar *)strdup(_scint->primary.Data()),_scint->primary.Length());
         } else { setDNDData(FROM_DRAGNDROP,stringType,NULL,0); }
     return 1;
     }
@@ -1398,11 +1402,11 @@ long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
   for (FXDragType *dt=InUTF8Mode(_scint)?types:types+1; *dt; dt++) {
     // Return text of the selection
     if (event->target==*dt) {
-      if (_scint->primary.s == NULL) {
+      if (_scint->primary.Empty()) {
         _scint->CopySelectionRange(&_scint->primary);
       }
-      if (_scint->primary.s) {
-        setDNDData(FROM_SELECTION,*dt,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+      if (!_scint->primary.Empty()) {
+        setDNDData(FROM_SELECTION,*dt,(FXuchar *)strdup(_scint->primary.Data()),strlen(_scint->primary.Data()));
         return 1;
       }
     }
