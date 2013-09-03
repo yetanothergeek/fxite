@@ -103,7 +103,9 @@ Octave \
 REBOL \
 VBScript \
 OScript \
-VisualProlog
+VisualProlog \
+KVIrc \
+STTXT
 do
   rm -f "Lex${UNUSED}.cxx"
   awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' Catalogue.cxx > Catalogue.tmp
@@ -120,6 +122,21 @@ printf '\nlibfxscintilla_a_SOURCES = \\\nversion.h'  >> "Makefile.am"
 /bin/ls -1 --color=never *.cxx | awk '/\.cxx$/ {printf(" \\\n%s", $1)}' >> "Makefile.am"
 
 echo  >> "Makefile.am"
+
+cat << EOF > CMakeLists.txt
+FILE (GLOB SOURCES RELATIVE "\${CMAKE_CURRENT_SOURCE_DIR}" *.cxx)
+
+INCLUDE_DIRECTORIES (\${FOX_INCLUDE_DIRS})
+ADD_DEFINITIONS (-DSCI_LEXER -DFOX)
+
+ADD_LIBRARY (
+    fxscintilla
+    STATIC
+    \${SOURCES}
+)
+
+EOF
+
 
 
 printf '\nnoinst_HEADERS =  \\\nversion.h'  >> "Makefile.am"

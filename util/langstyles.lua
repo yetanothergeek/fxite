@@ -102,6 +102,8 @@ function print_words()
   keywords2.docbook=docbook.elements42
   keywords.bash=bash_keywords1
   keywords2.bash=bash_keywords2
+  directives={}
+  directives.objective={}
   bash_keywords1=nil
   bash_keywords2=nil
   keywords1=keywords
