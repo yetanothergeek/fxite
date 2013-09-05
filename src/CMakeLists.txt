@@ -40,6 +40,7 @@ TARGET_LINK_LIBRARIES (
     jeffx
     ${LUA_LIBRARIES}
     ${FOX_LDFLAGS}
+    ${X11_X11_LIB}
 )
 
 INSTALL (TARGETS fxite         RUNTIME DESTINATION bin)
