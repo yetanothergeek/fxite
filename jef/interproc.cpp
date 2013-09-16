@@ -240,12 +240,12 @@ bool InterProc::ClientSend(FXTopWindow *client, const FXString &data)
          if (hCommand==NULL) { // got second DDE_ACK
            break;
          }
-         fxsleep(100000);
+         FXThread::sleep(100000);
          a->runWhileEvents();
        }
       break;
     }
-    fxsleep(100000);
+    FXThread::sleep(100000);
   }
   LocalClientID=0;
   if (hCommand) {
