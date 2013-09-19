@@ -4,6 +4,20 @@
 ################################################################################
 
 
+2013-09-19
+  * Replace calls to fxsleep with FXThread::sleep. (fixes compiling w/ fox-1.7.42+)
+  * Update to Scintilla-3.3.5 release.
+  * Added support building with CMake. (thanks gahr!)
+  * If window is minimized on Win32, restore it before trying to focus.
+  * Reworked code for cancelling an external command via keybinding.
+  * Always provide a valid stdin handle to child processes on win32.
+  * Fixed a problem with default indent/unindent keybindings on win32.
+  * Added support for UTF-16 files with BOM, and respect for UTF-8 BOM.
+  * Made external commands on Win32 less likely to block during I/O.
+  * Changed dispatchEvent to match FOX>=1.7.37; fixes DDE & DND regressions.
+  * Reworked path logic in configure, fixes building in-tree on win32.
+
+
 2013-03-28
   * VERSION 0.91 RELEASE.
 
