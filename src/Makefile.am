@@ -136,11 +136,6 @@ $(srcdir)/help_lua.h: $(srcdir)/help_lua.txt
 	$(RESWRAP) -o $@ $<.tmp
 	$(RM) $<.tmp
 
-# Inlining does not work for sl library!
-sl.o: $(srcdir)/sl.c $(srcdir)/sl.h
-	$(CC) $(CFLAGS) -c -fno-inline -o $@ $<
-
-
 $(srcdir)/icon32x32.ico: $(srcdir)/fxite.xpm
 	convert $< $@
 
