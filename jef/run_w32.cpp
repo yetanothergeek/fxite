@@ -112,7 +112,21 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
     }
     FXString ext = cmdline[0]=='"'?cmdline.section('"',1):cmdline.section(' ',0);
     ext=FXPath::extension(ext).lower();
-    if ((!ext.empty())&&(ext!="exe")&&(ext!="bat")&&(ext!="com")) {
+    bool ispathext=false;
+    if (ext.empty()) {
+      ispathext=true;
+    } else {
+      ext.prepend('.');
+      FXString pathext=FXSystem::getEnvironment("PATHEXT").lower();
+      if ( pathext.empty() ) { pathext=".com;.exe;.bat;.cmd"; }
+      for (FXint i=0; i<=pathext.contains(';'); i++) {
+        if (pathext.section(';',i)==ext) {
+          ispathext=true;
+          break;
+        }
+      }
+    }
+    if (ispathext) {
       // If the file is not executable, run the associated application instead.
       cmdline.prepend("\" ");
       cmdline.prepend(exename);
