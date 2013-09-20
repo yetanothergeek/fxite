@@ -12,4 +12,10 @@ fxscintilla/License.txt \
 fxscintilla/COPYRIGHTS \
 fxscintilla/ChangeLog \
 fxscintilla/COPYING \
-fxscintilla/Scintilla.iface
+fxscintilla/Scintilla.iface \
+CMakeLists.txt \
+fxscintilla/CMakeLists.txt \
+lua/CMakeLists.txt \
+jef/CMakeLists.txt \
+src/CMakeLists.txt
+
