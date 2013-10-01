@@ -448,22 +448,38 @@ void InterProc::StartServer(FXTopWindow *win, FXObject*trg, FXSelector sel)
 }
 
 
+#if (FOX_MINOR>6) 
+# if (FOX_MAJOR>1) || (FOX_MINOR>7) || (FOX_LEVEL>42)
+#  define FOX_1_7_43_OR_NEWER
+# endif
+#endif
+
+
+#ifdef FOX_1_7_43_OR_NEWER
+# define TotalSlotsInHash(h) (h)->no()
+# define UsedSlotsInHash(h) (h)->used()
+#else
+# define TotalSlotsInHash(h) (h)->size()
+# define UsedSlotsInHash(h) (h)->no()
+#endif
+
 
 void InterProc::StopServer()
 {
   app->removeInput(listen_fd,INPUT_READ);
   close(listen_fd);
   FXFile::remove(sock_name);
-  if (connlist) {
-    while (connlist->no()) {
-      FXString*s=(FXString*)connlist->value(0);
-      FXival fd=(FXival)connlist->key(0);
-      if (fd) {
-        app->removeInput(fd,INPUT_READ);
-        close(fd);
+  if ((connlist!=NULL) && (UsedSlotsInHash(connlist)>0)) {
+    for (FXint i=0; i<TotalSlotsInHash(connlist); i++) {
+      if  (!connlist->empty(i)) {
+        FXString*s=(FXString*)connlist->value(i);
+        FXival fd=(FXival)connlist->key(i);
+        if (fd) {
+          app->removeInput(fd,INPUT_READ);
+          close(fd);
+        }
+        if (s) { delete s; }
       }
-      if (s) { delete s; }
-      connlist->remove(connlist->key(0));
     }
     delete connlist;
     connlist=NULL;
