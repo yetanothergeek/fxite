@@ -4,6 +4,10 @@
 ################################################################################
 
 
+2013-10-03
+  * VERSION 0.92 RELEASE.
+
+
 2013-09-19
   * Replace calls to fxsleep with FXThread::sleep. (fixes compiling w/ fox-1.7.42+)
   * Update to Scintilla-3.3.5 release.
