@@ -135,7 +135,13 @@ case $host_os in
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
-    FOX_LIBS="${RELATIVE_SRC_DIR}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid -mwindows"
+    FOX_LIBS="${RELATIVE_SRC_DIR}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid"
+    AC_ARG_ENABLE([win32-console],AC_HELP_STRING([--enable-win32-console],[enable win32 debug console]))
+    AC_MSG_RESULT([$enable_win32_console])
+    if test "x$enable_win32_console" != "xyes"
+    then
+      FOX_LIBS="${FOX_LIBS} -mwindows"
+    fi
   ;;
   *minix*)
     AC_DEFINE(_MINIX)
