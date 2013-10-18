@@ -168,9 +168,9 @@ JEFFX_CFLAGS="-I${RELATIVE_SRC_DIR}/jef"
 
 AC_ARG_ENABLE([assert],AC_HELP_STRING([--enable-assert],[enable assertions]))
 
-AC_MSG_RESULT([$enable_assertions])
+AC_MSG_RESULT([$enable_assert])
 
-if test "x$enable_assertions" = "xyes"
+if test "x$enable_assert" = "xyes"
 then
   CFLAGS="${CFLAGS} -DDEBUG"
   CXXFLAGS="${CXXFLAGS} -DDEBUG"
