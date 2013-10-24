@@ -33,24 +33,12 @@ private:
   long ExecuteClientRequest(FXString*s);
 #ifdef WIN32
 private:
-  const FXString *commands;
-  WPARAM LocalServerID;
-  WPARAM RemoteClientID;
-  WPARAM LocalClientID;
-  WPARAM RemoteServerID;
-  FXString DdePrefix;
-  FXString DdeTopic;
-  ATOM atomApplication;
-  ATOM atomTopic;
-  LPARAM atoms;
-  HGLOBAL hCommand;
-  bool found_server;
-  void MakeAtoms();
-  void KillAtoms();
-  void DoDispatch(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
+  HANDLE listen_fd;
+  FXString sock_name;
+  void OpenThePipe();
 public:
-  static void dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam);
-  enum {ID_LAST};
+  long onCheckPipe(FXObject*o,FXSelector sel,void*p);
+  enum {ID_CHECK_PIPE,ID_LAST};
 #else
 private:
   FXString sock_name;

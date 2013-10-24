@@ -20,6 +20,7 @@
 
 #ifdef WIN32
 # include <windows.h>
+# include "compat.h"
 #else
 # include <cerrno>
 # include <unistd.h>
@@ -40,259 +41,77 @@
 #include "interproc.h"
 
 
-#ifdef WIN32 // For MS-Windows, we use the old-fashioned DDE for client/server communications...
+#ifdef WIN32  // For Win32, we use a named pipe for client/server communications...
 
-FXIMPLEMENT(InterProc,FXObject,NULL,0);
-
-
-static FXHash Conversations;
-static FXHash Servers;
-static FXHash Clients;
-
-void InterProc::MakeAtoms()
-{
-  FXString strTopic;
-  FXString strApplication;
-  if (DdeTopic.empty()) {
-    strTopic=DdePrefix+"_Topic";
-    strApplication=DdePrefix+"_Application";
-  } else {
-    strTopic=DdeTopic;
-    strApplication=DdePrefix;
-  }
-  atomApplication=GlobalAddAtom((LPSTR) strApplication.text());
-  atomTopic=GlobalAddAtom((LPSTR) strTopic.text());
-  atoms=MAKELONG(atomApplication, atomTopic);
-  Conversations.insert((void*)atoms, this);
-}
-
-
-
-void InterProc::KillAtoms()
-{
-  if (atomApplication) { GlobalDeleteAtom(atomApplication); }
-  if (atomTopic) { GlobalDeleteAtom(atomTopic); }
-  Conversations.remove((void*)atoms);
-}
-
-
-/*
-The InterProc object should never be a client and server at the same time, else we would be
-communicating with ourself, which is pointless. But problems arise when the same application
-has one object acting as a client and another as a server, how can dispatchEvent() know which
-object it is dealing with? The solution is to make dispatchEvent() into a static method, and
-use global lookup tables to dispatch the event to the correct object. Since each object should
-have a unique conversation atom within the same application, we can hash it to the object and
-use that as a starting point for keeping things straight...
-
-When iMsg is WM_DDE_INITIATE:
-  We can find the InterProc object in the Conversations table.
-  The wParam contains the remote client id, we must add it to the Clients table.
-When iMsg is WM_DDE_EXECUTE:
-  The wParam contains the remote client id, we can find the InterProc object via the
-  Clients table. After we find it, we must remove client id from the table.
-When iMsg is WM_DDE_ACK:
-  If we find the InterProc object in the Conversations table:
-    The wParam contains the remote server id, we must add it to the Servers table.
-  Else If we don't find the InterProc object in the Conversations table:
-    The wParam contains the remote server id, we can find the InterProc object via the
-    Servers table. After we find it, we must remove server id from the table.
-
-*/
-
-
-void InterProc::dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
-{
-  InterProc*ipc=NULL;
-
-  switch (iMsg) {
-    case WM_DDE_INITIATE: {
-      ipc=(InterProc*)(Conversations.find((void*)((FXival)lParam)));
-      break;
-    }
-    case WM_DDE_EXECUTE: {
-      ipc=(InterProc*)(Clients.remove((void*)((FXival)wParam)));
-      break;
-    }
-    case WM_DDE_ACK: {
-      ipc=(InterProc*)(Conversations.find((void*)((FXival)lParam)));
-      if (!ipc) {
-        ipc=(InterProc*)(Servers.remove((void*)((FXival)wParam)));
-      }
-      break;
-    }
-  }
-  if (ipc) { ipc->DoDispatch(hwnd,iMsg,wParam,lParam); }
-}
-
-
-
-#define AtomsMatch(lParam) ((LOWORD(lParam)==atomApplication)&&(HIWORD(lParam)==atomTopic))
-
-void InterProc::DoDispatch(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam)
-{
-  switch (iMsg) {
-    case  WM_DDE_INITIATE: {
-      if (LocalServerID && (wParam!=RemoteClientID) && AtomsMatch(lParam)) {
-        // We are the server, one of our clients wants to connect...
-        RemoteClientID=wParam;
-        Clients.insert((void*)RemoteClientID, (void*)this);
-        SendMessage((HWND)RemoteClientID, WM_DDE_ACK, LocalServerID, atoms);
-      }
-      break;
-    }
-    case WM_DDE_EXECUTE:{
-      if (LocalServerID&&RemoteClientID&&(wParam==RemoteClientID)) {
-        // We are the server, and the client sent us something to do...
-        UINT uiLo;
-        char* puiHi;
-        if (UnpackDDElParam(WM_DDE_EXECUTE,lParam,(PUINT)&uiLo,(PUINT)&puiHi)) {
-          FXString ReceivedFromClient=(char*)GlobalLock((void*)puiHi);
-          GlobalUnlock((void*)puiHi);
-          PostMessage((HWND)RemoteClientID, WM_DDE_ACK, LocalServerID, lParam);
-          RemoteClientID=0;
-          ExecuteClientRequest(&ReceivedFromClient);
-        }
-      }
-      break;
-    }
-    case WM_DDE_ACK: {
-      if (LocalClientID && (((WPARAM)hwnd)==LocalClientID) && !LocalServerID) {
-        if (AtomsMatch(lParam)) {
-          // We are the client, and the server acknowledged out initial request...
-          RemoteServerID=wParam;
-          hCommand = GlobalAlloc(GMEM_MOVEABLE, commands->length()+1);
-          if (!hCommand) { break; }
-          char* lpCommand = (char*)GlobalLock(hCommand);
-          if (!lpCommand) {
-            GlobalFree(hCommand);
-            hCommand=NULL;
-            break;
-          }
-          strncpy(lpCommand,commands->text(),commands->length());
-          lpCommand[commands->length()]='\0';
-          GlobalUnlock(hCommand);
-          LPARAM ddeParam=PackDDElParam(WM_DDE_EXECUTE,0,(UINT)hCommand);
-          Servers.insert((void*)RemoteServerID, (void*)this);
-          if (PostMessage((HWND)RemoteServerID,WM_DDE_EXECUTE,(WPARAM)hwnd,ddeParam)) {
-            found_server=true;
-          } else {
-            GlobalFree(hCommand);
-            FreeDDElParam(WM_DDE_EXECUTE, (LPARAM)hCommand);
-            hCommand=NULL;
-            Servers.remove((void*)RemoteServerID);
-          }
-        } else if (hCommand && RemoteServerID && (wParam==RemoteServerID)) {
-          // We are the client, and the server has completed processing our commands...
-          GlobalFree(hCommand);
-          FreeDDElParam(WM_DDE_EXECUTE, (LPARAM)hCommand);
-          hCommand=NULL;
-        }
-      }
-      break;
-    }
-  }
-}
-
-
-
-class ClientApp: public FXApp {
-  virtual long dispatchEvent(FXID hwnd,unsigned int iMsg,unsigned int wParam,long lParam){
-    ipc->dispatchEvent(hwnd,iMsg,wParam,lParam);
-    return FXApp::dispatchEvent(hwnd,iMsg,wParam,lParam);
-  }
-  InterProc*ipc;
-public:
-  ClientApp(InterProc*p):FXApp() { ipc=p; }
+FXDEFMAP(InterProc) InterProcMap[]={
+  FXMAPFUNC(SEL_TIMEOUT, InterProc::ID_CHECK_PIPE, InterProc::onCheckPipe),
 };
+
+FXIMPLEMENT(InterProc,FXObject,InterProcMap,ARRAYNUMBER(InterProcMap));
+
+
+
+void InterProc::OpenThePipe() {
+  listen_fd=CreateNamedPipe(sock_name.text(),PIPE_ACCESS_INBOUND,PIPE_TYPE_BYTE|PIPE_READMODE_BYTE,1,0,1024,50,NULL);
+}
+
+
+
+long InterProc::onCheckPipe(FXObject*o,FXSelector sel,void*p)
+{
+  char peek[1];
+  DWORD BytesRead=0;
+  DWORD TotalBytesAvail=0;
+  BOOL ok = PeekNamedPipe(listen_fd, &peek, 1, &BytesRead, &TotalBytesAvail, NULL);
+  if (TotalBytesAvail) {
+    FXString cmd=FXString::null;
+    char buf[512];
+    DWORD r=0;
+    ok=ReadFile(listen_fd, buf, sizeof(buf), &r,NULL);
+    if (ok) {
+      cmd.append(buf,r);
+    }
+    ExecuteClientRequest(&cmd);
+    CloseHandle(listen_fd);
+    OpenThePipe();
+  }
+  app->addTimeout(this, ID_CHECK_PIPE, ONE_SECOND);
+  return 1;
+}
 
 
 
 bool InterProc::ClientSend(FXTopWindow *client, const FXString &data)
 {
-  if (LocalServerID) {
+  if (listen_fd!=INVALID_HANDLE_VALUE) {
     fxerror(_("%s: object cannot act as both client and server"), getClassName());
   }
-  found_server=false;
-  hCommand=NULL;
-  RemoteServerID=0;
-  FXApp*a=app?app:new ClientApp(this);
-  if (!a->isInitialized()) {
-    static char argv0[MAX_PATH+1]="\0";
-    int argc=1;
-    if (!argv0[0]) { GetModuleFileName(NULL,argv0,MAX_PATH); }
-    char *argv[]={argv0,NULL};
-    a->init(argc,argv,true);
+  HANDLE h = CreateFile(sock_name.text(),GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  if ( h == INVALID_HANDLE_VALUE) { return false; }
+  DWORD written=0;
+  DWORD len=(DWORD)data.length();
+  while (written<len) {
+    DWORD w=0;
+    if (WriteFile(h,&data.text()[written],len-written,&w,NULL)) {written+=w; } else { break; }
   }
-  FXTopWindow *w=client?client:new FXMainWindow(a, DdePrefix+"_Client");
-  if (!w->id()) {
-    a->create();
-    w->create();
-  }
-  LocalClientID=(WPARAM)w->id();
-  commands=&data;
-  MakeAtoms();
-  SendMessage((HWND)HWND_BROADCAST,WM_DDE_INITIATE,(WPARAM)w->id(),atoms);
-  for (FXint i=0; i<5; i++) { // wait for first DDE_ACK
-    a->runWhileEvents();
-    if (found_server) { // got first DDE_ACK
-       for (FXint j=0; j<5; j++) { // wait for second DDE_ACK
-         if (hCommand==NULL) { // got second DDE_ACK
-           break;
-         }
-         FXThread::sleep(100000);
-         a->runWhileEvents();
-       }
-      break;
-    }
-    FXThread::sleep(100000);
-  }
-  LocalClientID=0;
-  if (hCommand) {
-    GlobalFree(hCommand);
-    FreeDDElParam(WM_DDE_EXECUTE, (LPARAM)hCommand);
-    hCommand=NULL;
-  }
-  KillAtoms();
-  if (w!=client) {
-    w->destroy();
-    delete w;
-  }
-  if (a!=app) {
-    a->destroy();
-    delete a;
-  }
-  if (RemoteServerID) {
-    Servers.remove((void*)RemoteServerID);
-    RemoteServerID=0;
-  }
-  return found_server;
+  CloseHandle(h);
+  return true;
 }
-
 
 
 void InterProc::StartServer(FXTopWindow *win, FXObject*trg, FXSelector sel)
 {
-  if (win) {
-    if (!win->id()) { win->create(); }
-    LocalServerID=(WPARAM)(win->id());
-  } else LocalServerID=0;
-  if (!LocalServerID) {
-    fxerror(_("%s: invalid window parameter.\n"), getClassName());
-  }
   target=trg;
   message=sel;
-  MakeAtoms();
+  OpenThePipe();
+  app->addTimeout(this, ID_CHECK_PIPE, ONE_SECOND);
 }
 
 
 
 void InterProc::StopServer()
 {
-  LocalServerID=0;
-  target=NULL;
-  message=0;
-  KillAtoms();
+  CloseHandle(listen_fd);
 }
 
 
@@ -506,11 +325,8 @@ InterProc::InterProc(FXApp*a, const FXString &connection, const FXString &topic)
 {
   app=a;
 #ifdef WIN32
-  LocalClientID=0;
-  RemoteClientID=0;
-  DdePrefix=connection;
-  DdeTopic=topic;
-  LocalServerID=0;
+  sock_name="\\\\.\\Pipe\\"+connection;
+  listen_fd=INVALID_HANDLE_VALUE;
 #else
   sock_name=connection;
   connlist=NULL;
