@@ -542,6 +542,9 @@ SelectionPosition Editor::SPositionFromLocation(Point pt, bool canReturnInvalid,
 	RefreshStyleData();
 	if (canReturnInvalid) {
 		PRectangle rcClient = GetTextRectangle();
+		// May be in scroll view coordinates so translate back to main view
+		Point ptOrigin = GetVisibleOriginInMain();
+		rcClient.Move(-ptOrigin.x, -ptOrigin.y);
 		if (!rcClient.Contains(pt))
 			return SelectionPosition(INVALID_POSITION);
 		if (pt.x < vs.textStart)
@@ -720,6 +723,8 @@ void Editor::RedrawSelMargin(int line, bool allAfter) {
 				rcSelMargin.top = rcLine.top;
 				if (!allAfter)
 					rcSelMargin.bottom = rcLine.bottom;
+				if (rcSelMargin.Empty())
+					return;
 			}
 			if (wMargin.GetID()) {
 				Point ptOrigin = GetVisibleOriginInMain();
@@ -2726,7 +2731,10 @@ void Editor::DrawIndicators(Surface *surface, ViewStyle &vsDraw, int line, int x
 					endPos = posLineEnd;
 				DrawIndicator(deco->indicator, startPos - posLineStart, endPos - posLineStart,
 					surface, vsDraw, xStart, rcLine, ll, subLine);
-				startPos = deco->rs.EndRun(endPos);
+				startPos = endPos;
+				if (!deco->rs.ValueAt(startPos)) {
+					startPos = deco->rs.EndRun(startPos);
+				}
 			}
 		}
 	}
@@ -2761,14 +2769,19 @@ void Editor::DrawAnnotation(Surface *surface, ViewStyle &vsDraw, int line, int x
 	const StyledText stAnnotation  = pdoc->AnnotationStyledText(line);
 	if (stAnnotation.text && ValidStyledText(vsDraw, vsDraw.annotationStyleOffset, stAnnotation)) {
 		surface->FillRectangle(rcSegment, vsDraw.styles[0].back);
-		if (vs.annotationVisible == ANNOTATION_BOXED) {
-			// Only care about calculating width if need to draw box
+		rcSegment.left = xStart;
+		if (trackLineWidth || (vs.annotationVisible == ANNOTATION_BOXED)) {
+			// Only care about calculating width if tracking or need to draw box
 			int widthAnnotation = WidestLineWidth(surface, vsDraw, vsDraw.annotationStyleOffset, stAnnotation);
-			widthAnnotation += vsDraw.spaceWidth * 2; // Margins
-			rcSegment.left = xStart + indent;
-			rcSegment.right = rcSegment.left + widthAnnotation;
-		} else {
-			rcSegment.left = xStart;
+			if (vs.annotationVisible == ANNOTATION_BOXED) {
+				widthAnnotation += vsDraw.spaceWidth * 2; // Margins
+			}
+			if (widthAnnotation > lineWidthMaxSeen)
+				lineWidthMaxSeen = widthAnnotation;
+			if (vs.annotationVisible == ANNOTATION_BOXED) {
+				rcSegment.left = xStart + indent;
+				rcSegment.right = rcSegment.left + widthAnnotation;
+			}
 		}
 		const int annotationLines = pdoc->AnnotationLines(line);
 		size_t start = 0;
@@ -4409,14 +4422,26 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 	ShowCaretAtCurrentPosition();
 }
 
-void Editor::NotifyFocus(bool) {}
+int Editor::ModifierFlags(bool shift, bool ctrl, bool alt, bool meta) {
+	return
+		(shift ? SCI_SHIFT : 0) |
+		(ctrl ? SCI_CTRL : 0) |
+		(alt ? SCI_ALT : 0) |
+		(meta ? SCI_META : 0);
+}
+
+void Editor::NotifyFocus(bool focus) {
+	SCNotification scn = {};
+	scn.nmhdr.code = focus ? SCN_FOCUSIN : SCN_FOCUSOUT;
+	NotifyParent(scn);
+}
 
 void Editor::SetCtrlID(int identifier) {
 	ctrlID = identifier;
 }
 
 void Editor::NotifyStyleToNeeded(int endStyleNeeded) {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_STYLENEEDED;
 	scn.position = endStyleNeeded;
 	NotifyParent(scn);
@@ -4434,14 +4459,14 @@ void Editor::NotifyErrorOccurred(Document *, void *, int status) {
 }
 
 void Editor::NotifyChar(int ch) {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CHARADDED;
 	scn.ch = ch;
 	NotifyParent(scn);
 }
 
 void Editor::NotifySavePoint(bool isSavePoint) {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	if (isSavePoint) {
 		scn.nmhdr.code = SCN_SAVEPOINTREACHED;
 	} else {
@@ -4451,51 +4476,63 @@ void Editor::NotifySavePoint(bool isSavePoint) {
 }
 
 void Editor::NotifyModifyAttempt() {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_MODIFYATTEMPTRO;
 	NotifyParent(scn);
 }
 
-void Editor::NotifyDoubleClick(Point pt, bool shift, bool ctrl, bool alt) {
-	SCNotification scn = {0};
+void Editor::NotifyDoubleClick(Point pt, int modifiers) {
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_DOUBLECLICK;
 	scn.line = LineFromLocation(pt);
 	scn.position = PositionFromLocation(pt, true);
-	scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-	        (alt ? SCI_ALT : 0);
+	scn.modifiers = modifiers;
+	NotifyParent(scn);
+}
+
+void Editor::NotifyDoubleClick(Point pt, bool shift, bool ctrl, bool alt) {
+	NotifyDoubleClick(pt, ModifierFlags(shift, ctrl, alt));
+}
+
+void Editor::NotifyHotSpotDoubleClicked(int position, int modifiers) {
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_HOTSPOTDOUBLECLICK;
+	scn.position = position;
+	scn.modifiers = modifiers;
 	NotifyParent(scn);
 }
 
 void Editor::NotifyHotSpotDoubleClicked(int position, bool shift, bool ctrl, bool alt) {
-	SCNotification scn = {0};
-	scn.nmhdr.code = SCN_HOTSPOTDOUBLECLICK;
+	NotifyHotSpotDoubleClicked(position, ModifierFlags(shift, ctrl, alt));
+}
+
+void Editor::NotifyHotSpotClicked(int position, int modifiers) {
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_HOTSPOTCLICK;
 	scn.position = position;
-	scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-	        (alt ? SCI_ALT : 0);
+	scn.modifiers = modifiers;
 	NotifyParent(scn);
 }
 
 void Editor::NotifyHotSpotClicked(int position, bool shift, bool ctrl, bool alt) {
-	SCNotification scn = {0};
-	scn.nmhdr.code = SCN_HOTSPOTCLICK;
+	NotifyHotSpotClicked(position, ModifierFlags(shift, ctrl, alt));
+}
+
+void Editor::NotifyHotSpotReleaseClick(int position, int modifiers) {
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_HOTSPOTRELEASECLICK;
 	scn.position = position;
-	scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-	        (alt ? SCI_ALT : 0);
+	scn.modifiers = modifiers;
 	NotifyParent(scn);
 }
 
 void Editor::NotifyHotSpotReleaseClick(int position, bool shift, bool ctrl, bool alt) {
-	SCNotification scn = {0};
-	scn.nmhdr.code = SCN_HOTSPOTRELEASECLICK;
-	scn.position = position;
-	scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-	        (alt ? SCI_ALT : 0);
-	NotifyParent(scn);
+	NotifyHotSpotReleaseClick(position, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::NotifyUpdateUI() {
 	if (needUpdateUI) {
-		SCNotification scn = {0};
+		SCNotification scn = {};
 		scn.nmhdr.code = SCN_UPDATEUI;
 		scn.updated = needUpdateUI;
 		NotifyParent(scn);
@@ -4506,24 +4543,28 @@ bool Editor::NotifyUpdateUI() {
 }
 
 void Editor::NotifyPainted() {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_PAINTED;
 	NotifyParent(scn);
 }
 
-void Editor::NotifyIndicatorClick(bool click, int position, bool shift, bool ctrl, bool alt) {
+void Editor::NotifyIndicatorClick(bool click, int position, int modifiers) {
 	int mask = pdoc->decorations.AllOnFor(position);
 	if ((click && mask) || pdoc->decorations.clickNotified) {
-		SCNotification scn = {0};
+		SCNotification scn = {};
 		pdoc->decorations.clickNotified = click;
 		scn.nmhdr.code = click ? SCN_INDICATORCLICK : SCN_INDICATORRELEASE;
-		scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) | (alt ? SCI_ALT : 0);
+		scn.modifiers = modifiers;
 		scn.position = position;
 		NotifyParent(scn);
 	}
 }
 
-bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
+void Editor::NotifyIndicatorClick(bool click, int position, bool shift, bool ctrl, bool alt) {
+	NotifyIndicatorClick(click, position, ModifierFlags(shift, ctrl, alt));
+}
+
+bool Editor::NotifyMarginClick(Point pt, int modifiers) {
 	int marginClicked = -1;
 	int x = vs.textStart - vs.fixedColumnWidth;
 	for (int margin = 0; margin <= SC_MAX_MARGIN; margin++) {
@@ -4534,6 +4575,8 @@ bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
 	if ((marginClicked >= 0) && vs.ms[marginClicked].sensitive) {
 		int position = pdoc->LineStart(LineFromLocation(pt));
 		if ((vs.ms[marginClicked].mask & SC_MASK_FOLDERS) && (foldAutomatic & SC_AUTOMATICFOLD_CLICK)) {
+			const bool ctrl = (modifiers & SCI_CTRL) != 0;
+			const bool shift = (modifiers & SCI_SHIFT) != 0;
 			int lineClick = pdoc->LineFromPosition(position);
 			if (shift && ctrl) {
 				FoldAll(SC_FOLDACTION_TOGGLE);
@@ -4553,10 +4596,9 @@ bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
 			}
 			return true;
 		}
-		SCNotification scn = {0};
+		SCNotification scn = {};
 		scn.nmhdr.code = SCN_MARGINCLICK;
-		scn.modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-		        (alt ? SCI_ALT : 0);
+		scn.modifiers = modifiers;
 		scn.position = position;
 		scn.margin = marginClicked;
 		NotifyParent(scn);
@@ -4566,8 +4608,12 @@ bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
 	}
 }
 
+bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
+	return NotifyMarginClick(pt, ModifierFlags(shift, ctrl, alt));
+}
+
 void Editor::NotifyNeedShown(int pos, int len) {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_NEEDSHOWN;
 	scn.position = pos;
 	scn.length = len;
@@ -4575,7 +4621,7 @@ void Editor::NotifyNeedShown(int pos, int len) {
 }
 
 void Editor::NotifyDwelling(Point pt, bool state) {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = state ? SCN_DWELLSTART : SCN_DWELLEND;
 	scn.position = PositionFromLocation(pt, true);
 	scn.x = pt.x + vs.ExternalMarginWidth();
@@ -4584,7 +4630,7 @@ void Editor::NotifyDwelling(Point pt, bool state) {
 }
 
 void Editor::NotifyZoom() {
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_ZOOM;
 	NotifyParent(scn);
 }
@@ -4776,7 +4822,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 			NotifyChange();	// Send EN_CHANGE
 		}
 
-		SCNotification scn = {0};
+		SCNotification scn = {};
 		scn.nmhdr.code = SCN_MODIFIED;
 		scn.position = mh.position;
 		scn.modificationType = mh.modificationType;
@@ -4918,7 +4964,7 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 	}
 
 	// Send notification
-	SCNotification scn = {0};
+	SCNotification scn = {};
 	scn.nmhdr.code = SCN_MACRORECORD;
 	scn.message = iMessage;
 	scn.wParam = wParam;
@@ -5738,9 +5784,7 @@ int Editor::KeyDownWithModifiers(int key, int modifiers, bool *consumed) {
 }
 
 int Editor::KeyDown(int key, bool shift, bool ctrl, bool alt, bool *consumed) {
-	int modifiers = (shift ? SCI_SHIFT : 0) | (ctrl ? SCI_CTRL : 0) |
-	        (alt ? SCI_ALT : 0);
-	return KeyDownWithModifiers(key, modifiers, consumed);
+	return KeyDownWithModifiers(key, ModifierFlags(shift, ctrl, alt), consumed);
 }
 
 void Editor::Indent(bool forwards) {
@@ -6277,18 +6321,21 @@ static bool AllowVirtualSpace(int virtualSpaceOptions, bool rectangular) {
 		|| (rectangular && ((virtualSpaceOptions & SCVS_RECTANGULARSELECTION) != 0));
 }
 
-void Editor::ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
+void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) {
 	//Platform::DebugPrintf("ButtonDown %d %d = %d alt=%d %d\n", curTime, lastClickTime, curTime - lastClickTime, alt, inDragDrop);
 	ptMouseLast = pt;
+	const bool ctrl = (modifiers & SCI_CTRL) != 0;
+	const bool shift = (modifiers & SCI_SHIFT) != 0;
+	const bool alt = (modifiers & SCI_ALT) != 0;
 	SelectionPosition newPos = SPositionFromLocation(pt, false, false, AllowVirtualSpace(virtualSpaceOptions, alt));
 	newPos = MovePositionOutsideChar(newPos, sel.MainCaret() - newPos.Position());
 	inDragDrop = ddNone;
 	sel.SetMoveExtends(false);
 
-	if (NotifyMarginClick(pt, shift, ctrl, alt))
+	if (NotifyMarginClick(pt, modifiers))
 		return;
 
-	NotifyIndicatorClick(true, newPos.Position(), shift, ctrl, alt);
+	NotifyIndicatorClick(true, newPos.Position(), modifiers);
 
 	bool inSelMargin = PointInSelMargin(pt);
 	// In margin ctrl+(double)click should always select everything
@@ -6371,9 +6418,9 @@ void Editor::ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, b
 		}
 		//Platform::DebugPrintf("Double click: %d - %d\n", anchor, currentPos);
 		if (doubleClick) {
-			NotifyDoubleClick(pt, shift, ctrl, alt);
+			NotifyDoubleClick(pt, modifiers);
 			if (PositionIsHotspot(newPos.Position()))
-				NotifyHotSpotDoubleClicked(newPos.Position(), shift, ctrl, alt);
+				NotifyHotSpotDoubleClicked(newPos.Position(), modifiers);
 		}
 	} else {	// Single click
 		if (inSelMargin) {
@@ -6402,7 +6449,7 @@ void Editor::ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, b
 			SetMouseCapture(true);
 		} else {
 			if (PointIsHotspot(pt)) {
-				NotifyHotSpotClicked(newPos.Position(), shift, ctrl, alt);
+				NotifyHotSpotClicked(newPos.Position(), modifiers);
 				hotSpotClickPos = PositionFromLocation(pt,true,false);
 			}
 			if (!shift) {
@@ -6445,6 +6492,10 @@ void Editor::ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, b
 	lastClick = pt;
 	lastXChosen = pt.x + xOffset;
 	ShowCaretAtCurrentPosition();
+}
+
+void Editor::ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
+	return ButtonDownWithModifiers(pt, curTime, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::PositionIsHotspot(int position) const {
@@ -6628,7 +6679,7 @@ void Editor::ButtonUp(Point pt, unsigned int curTime, bool ctrl) {
 	}
 	if (hotSpotClickPos != INVALID_POSITION && PointIsHotspot(pt)) {
 		hotSpotClickPos = INVALID_POSITION;
-		NotifyHotSpotReleaseClick(newPos.Position(), false, ctrl, false);
+		NotifyHotSpotReleaseClick(newPos.Position(), ctrl ? SCI_CTRL : 0);
 	}
 	if (HaveMouseCapture()) {
 		if (PointInSelMargin(pt)) {
@@ -6639,7 +6690,7 @@ void Editor::ButtonUp(Point pt, unsigned int curTime, bool ctrl) {
 		}
 		ptMouseLast = pt;
 		SetMouseCapture(false);
-		NotifyIndicatorClick(false, newPos.Position(), false, false, false);
+		NotifyIndicatorClick(false, newPos.Position(), 0);
 		if (inDragDrop == ddDragging) {
 			SelectionPosition selStart = SelectionStart();
 			SelectionPosition selEnd = SelectionEnd();

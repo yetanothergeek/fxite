@@ -57,7 +57,7 @@ protected:
 	ScintillaBase();
 	virtual ~ScintillaBase();
 	virtual void Initialise() = 0;
-	virtual void Finalise() = 0;
+	virtual void Finalise();
 
 	virtual void AddCharUTF(char *s, unsigned int len, bool treatAsDBCS=false);
 	void Command(int cmdId);
@@ -83,6 +83,7 @@ protected:
 	virtual void AddToPopUp(const char *label, int cmd=0, bool enabled=true) = 0;
 	void ContextMenu(Point pt);
 
+	virtual void ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers);
 	virtual void ButtonDown(Point pt, unsigned int curTime, bool shift, bool ctrl, bool alt);
 
 	void NotifyStyleToNeeded(int endStyleNeeded);
