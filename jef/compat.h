@@ -35,6 +35,9 @@ FXbool LocaleIsUTF8();
 # if (FOX_MAJOR>1)||(FOX_MINOR>7)||(FOX_LEVEL>26)
 #  define fxgetpid() (FXProcess::current())
 # endif
+# if (FOX_MAJOR>1) || (FOX_MINOR>7) || (FOX_LEVEL>44)
+#  define FOX_1_7_45_OR_NEWER
+# endif
 #endif
 
 
@@ -69,6 +72,19 @@ bool IsDesktopCurrent(FXMainWindow*tw);
 # endif
 #endif
 
+#ifdef FOX_1_7_45_OR_NEWER
+# define Dictionary FXDictionary
+# define DictKeyName(d,n)     ((d).key(n).text())
+# define TotalSlotsInDict(d)  ((d)->no())
+# define UsedSlotsInDict(d)   ((d)->used())
+# define ReplaceInDict(d,k,v) ((d)->at(k)=(v))
+#else
+# define Dictionary FXDict
+# define DictKeyName(d,n)     ((d).key(n))
+# define TotalSlotsInDict(d)  ((d)->size())
+# define UsedSlotsInDict(d)   ((d)->no())
+# define ReplaceInDict(d,k,v) ((d)->replace((k),(v)))
+#endif
 
 FXID GetNetActiveWindow();
 
