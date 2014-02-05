@@ -134,6 +134,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose,prefs->SearchGui);
   cmdutils=new CommandUtils(this);
   filedlgs=new FileDialogs(this,0);
+  macros=new MacroRunner();
 }
 
 
@@ -148,6 +149,7 @@ TopWindowBase::~TopWindowBase()
   delete getIcon();
   delete getMiniIcon();
   delete completions;
+  delete macros;
   global_top_window_instance=NULL;
 }
 
@@ -614,13 +616,12 @@ bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
 {
   if (!cmdutils->IsCommandReady()) { return false; }
   cmdutils->CommandBusy(true);
-  MacroRunner macros;
   command_timeout=false;
   statusbar->Running(_("macro"));
   update();
   statusbar->layout();
   getApp()->runWhileEvents();
-  bool rv=isfilename?macros.DoFile(script):macros.DoString(script);
+  bool rv=isfilename?macros->DoFile(script):macros->DoString(script);
   getApp()->runWhileEvents();
   if (!destroying) {
     tabbook->ForEachTab(TabCallbacks::ResetUndoLevelCB,NULL);
