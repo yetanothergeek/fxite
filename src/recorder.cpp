@@ -20,6 +20,7 @@
 #include <fx.h>
 #include <Scintilla.h>
 
+#include "compat.h"
 #include "macro.h"
 
 #include "intl.h"

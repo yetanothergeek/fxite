@@ -26,7 +26,7 @@ public:
 
 
 
-class AutoCompleter:public FXDict {
+class AutoCompleter:public Dictionary {
 private:
   void Show(SciDoc*sci);
   void Parse(char startchar, const char*filename);
