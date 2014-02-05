@@ -442,16 +442,19 @@ void MacroRunner::PopKeepers(lua_State *L)
               pr=new PersistRecord;
               pr->t=LUA_TBOOLEAN;
               pr->b=lua_toboolean(L,-1);
+              break;
             }
             case LUA_TNUMBER: {
               pr=new PersistRecord;
               pr->t=LUA_TNUMBER;
               pr->n=lua_tonumber(L,-1);
+              break;
             }
             case LUA_TSTRING: {
               pr=new PersistRecord;
               pr->t=LUA_TSTRING;
               pr->s=strdup(lua_tostring(L,-1));
+              break;
             }
           }
           if (pr) {
