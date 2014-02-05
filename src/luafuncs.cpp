@@ -25,8 +25,8 @@
 #include <FX88591Codec.h>
 #include <FXUTF16Codec.h>
 
-#include "macro.h"
 #include "compat.h"
+#include "macro.h"
 #include "appwin_pub.h"
 #include "scidoc.h"
 #include "doctabs.h"

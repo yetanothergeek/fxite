@@ -25,6 +25,7 @@
 #include "prefs.h"
 #include "lang.h"
 
+#include "compat.h"
 #include "scidoc.h"
 #include "filer.h"
 #include "toolmgr.h"
@@ -45,7 +46,6 @@
 #include "cmd_utils.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
-#include "compat.h"
 
 #include "intl.h"
 #include "appwin_base.h"
