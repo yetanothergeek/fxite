@@ -133,6 +133,7 @@ ScintillaWidget.h \
 Selection.h \
 SparseState.h \
 SplitVector.h \
+StringCopy.h \
 Style.h \
 StyleContext.h \
 SubStyles.h \
