@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2013 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -20,6 +20,7 @@
 #include <fx.h>
 #include <fxkeys.h>
 
+#include "compat.h"
 #include "scidoc.h"
 #include "doctabs.h"
 #include "search.h"
@@ -36,7 +37,6 @@
 #include "statusbar.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
-#include "compat.h"
 
 #include "intl.h"
 #include "appwin.h"

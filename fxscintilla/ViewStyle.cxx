@@ -55,8 +55,9 @@ const char *FontNames::Save(const char *name) {
 			return *it;
 		}
 	}
-	char *nameSave = new char[strlen(name) + 1];
-	strcpy(nameSave, name);
+	const size_t lenName = strlen(name) + 1;
+	char *nameSave = new char[lenName];
+	memcpy(nameSave, name, lenName);
 	names.push_back(nameSave);
 	return nameSave;
 }
@@ -324,7 +325,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	}
 	maxAscent = 1;
 	maxDescent = 1;
-	FindMaxAscentDescent(maxAscent, maxDescent);
+	FindMaxAscentDescent();
 	maxAscent += extraAscent;
 	maxDescent += extraDescent;
 	lineHeight = maxAscent + maxDescent;
@@ -514,7 +515,7 @@ FontRealised *ViewStyle::Find(const FontSpecification &fs) {
 	return 0;
 }
 
-void ViewStyle::FindMaxAscentDescent(unsigned int &maxAscent, unsigned int &maxDescent) {
+void ViewStyle::FindMaxAscentDescent() {
 	for (FontMap::const_iterator it = fonts.begin(); it != fonts.end(); ++it) {
 		if (maxAscent < it->second->ascent)
 			maxAscent = it->second->ascent;

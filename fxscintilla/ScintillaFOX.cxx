@@ -1168,6 +1168,7 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
     if(event->target==*dt){
       // <FIXME> Framework taken from FXTextField.cpp - Should have a look to FXText.cpp too!
       size_t len=_scint->copyText.Length();
+	  if (_scint->copyText.rectangular) {len++;}
       FXCALLOC(&cbdata,FXuchar,len+1);
       memcpy(cbdata,_scint->copyText.Data(),len);
   #ifndef WIN32

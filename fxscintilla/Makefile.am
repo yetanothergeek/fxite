@@ -133,6 +133,7 @@ ScintillaWidget.h \
 Selection.h \
 SparseState.h \
 SplitVector.h \
+StringCopy.h \
 Style.h \
 StyleContext.h \
 SubStyles.h \
@@ -140,4 +141,5 @@ UniConversion.h \
 UnicodeFromUTF8.h \
 ViewStyle.h \
 WordList.h \
-XPM.h
+XPM.h \
+version.h

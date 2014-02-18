@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2013 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -25,8 +25,8 @@
 #include <FX88591Codec.h>
 #include <FXUTF16Codec.h>
 
-#include "macro.h"
 #include "compat.h"
+#include "macro.h"
 #include "appwin_pub.h"
 #include "scidoc.h"
 #include "doctabs.h"

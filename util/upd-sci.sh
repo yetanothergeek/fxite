@@ -105,7 +105,9 @@ VBScript \
 OScript \
 VisualProlog \
 KVIrc \
-STTXT
+STTXT \
+DMAP \
+Rust
 do
   rm -f "Lex${UNUSED}.cxx"
   awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' Catalogue.cxx > Catalogue.tmp

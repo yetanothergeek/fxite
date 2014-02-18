@@ -133,7 +133,7 @@ int FxAsqWin::Run(FxAsqItem**results)
   dlg->create();
   dlg->setWidth(dlg->getDefaultWidth());
   dlg->setHeight(dlg->getDefaultHeight());
-  for (FXint i=keylist.first(); i<=keylist.last(); i=keylist.next(i))
+  if (UsedSlotsInDict(&keylist)>0) for (FXint i=0; i<TotalSlotsInDict(&keylist); ++i)
   {
     focused_btn=-1; // Focusing a button doesn't make much sense for interactive dialogs.
     FXWindow*obj=(FXWindow*)(keylist.data(i));
@@ -186,8 +186,8 @@ int FxAsqWin::Run(FxAsqItem**results)
 
 void FxAsqWin::PutResults()
 {
-  for (FXint i=keylist.first(); i<=keylist.last(); i=keylist.next(i)) {
-    const char*k=keylist.key(i);
+  for (FXint i=0; i<TotalSlotsInDict(&keylist); ++i) {
+    const char*k=DictKeyName(keylist,i);
     FXWindow*obj=(FXWindow*)keylist.data(i);
     if (k&&obj) {
       if (IsGroup(obj)) {
@@ -505,7 +505,7 @@ void FxAsqWin::Font(const char*key, const char*value, const char*label)
 FxAsqWin::~FxAsqWin()
 {
   void*p=NULL;
-  for (FXint i=keylist.first(); i<=keylist.last(); i=keylist.next(i)) {
+  for (FXint i=0; i<TotalSlotsInDict(&keylist); ++i) {
     FXWindow*obj=(FXWindow*)(keylist.data(i));
     if (IsList(obj)) {
       FXListBox*listbox=(FXListBox*)obj;

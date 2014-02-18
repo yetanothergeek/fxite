@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2013 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -1051,6 +1051,8 @@ void SciDoc::ScrollCaret(long pos)
   sendMessage(SCI_SETXOFFSET,0,0);
   if (pos<0) sendMessage(SCI_SCROLLCARET,0,0);
   if (GetWordWrap()) { return; }
+  for (FXWindow *w=this; w; w=w->getParent()) { w->layout(); }
+  if (pos>=0) { sendMessage(SCI_GOTOPOS,pos,0); }
   top=sendMessage(SCI_GETFIRSTVISIBLELINE,0,0);
   cur=sendMessage(SCI_LINEFROMPOSITION,pos>=0?pos:sendMessage(SCI_GETCURRENTPOS,0,0),0);
   btm=sendMessage(SCI_LINESONSCREEN,0,0)+top;

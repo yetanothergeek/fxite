@@ -28,7 +28,7 @@ class StyleContext {
 	IDocumentWithLineEnd *multiByteAccess;
 	unsigned int endPos;
 	unsigned int lengthDocument;
-	
+
 	// Used for optimizing GetRelativeCharacter
 	unsigned int posRelative;
 	unsigned int currentPosLastRelative;
@@ -43,7 +43,7 @@ class StyleContext {
 			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos+width, 0));
 			widthNext = 1;
 		}
-		// End of line determined from line end position, allowing CR, LF, 
+		// End of line determined from line end position, allowing CR, LF,
 		// CRLF and Unicode line ends as set by document.
 		if (currentLine < lineDocEnd)
 			atLineEnd = static_cast<int>(currentPos) >= (lineStartNext-1);
@@ -172,11 +172,11 @@ public:
 			}
 			int diffRelative = n - offsetRelative;
 			int posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
-			int ch = multiByteAccess->GetCharacterAndWidth(posNew, 0);
+			int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, 0);
 			posRelative = posNew;
 			currentPosLastRelative = currentPos;
 			offsetRelative = n;
-			return ch;
+			return chReturn;
 		} else {
 			// fast version for single byte encodings
 			return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n, 0));

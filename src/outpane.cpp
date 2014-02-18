@@ -52,7 +52,7 @@ long OutputList::onUserInput(FXObject*o, FXSelector sel, void*p)
   switch (FXSELTYPE(sel)) {
     case SEL_RIGHTBUTTONPRESS: {
       if(!ev->moved){
-        FXMenuPane *outpop=new FXMenuPane(this);
+        FXMenuPane *outpop=new FXMenuPane(getShell());
         new PopUpMnuCmd(outpop,_("Select &All"),NULL,this,ID_SELECT_ALL);
         new PopUpMnuCmd(outpop,_("&Copy"),NULL,this,ID_COPY_SELECTED);
         outpop->create();

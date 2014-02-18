@@ -61,6 +61,7 @@ protected:
   AutoCompleter* completions;
   SettingsBase* prefs;
   MacroRecorder* recorder;
+  MacroRunner* macros;
   BackupMgr* backups;
   CommandUtils* cmdutils;
   FXint stale_ticks;

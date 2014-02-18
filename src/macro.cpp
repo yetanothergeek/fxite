@@ -384,7 +384,7 @@ typedef struct {
 
 void MacroRunner::ClearKeepers()
 {
-  for (FXint i=keepers.first(); i<=keepers.last(); i=keepers.next(i)) {
+  if (UsedSlotsInDict(&keepers)>0) for (FXint i=0; i<TotalSlotsInDict(&keepers); ++i) {
     PersistRecord*pr=(PersistRecord*)keepers.data(i);
     if (pr) {
       if (pr->t==LUA_TSTRING) {
@@ -406,11 +406,12 @@ void MacroRunner::PushKeepers(lua_State *L)
     lua_pushstring(L,PERSIST_TABLE_NAME);
     lua_newtable(L);
     lua_settable(L, -3);
-    for (FXint i=keepers.first(); i<=keepers.last(); i=keepers.next(i)) {
+    if (UsedSlotsInDict(&keepers)>0) for (FXint i=0; i<TotalSlotsInDict(&keepers); ++i) {
       PersistRecord*pr=(PersistRecord*)keepers.data(i);
+      if (!pr) { continue; }
       lua_getglobal(L, LUA_MODULE_NAME);
       lua_getfield(L,-1,PERSIST_TABLE_NAME);
-      lua_pushstring(L,keepers.key(i));
+      lua_pushstring(L,DictKeyName(keepers,i));
       switch (pr->t) {
         case LUA_TNUMBER: { lua_pushnumber(L, pr->n);  break;}
         case LUA_TBOOLEAN:{ lua_pushboolean(L, pr->b); break;}
@@ -442,20 +443,23 @@ void MacroRunner::PopKeepers(lua_State *L)
               pr=new PersistRecord;
               pr->t=LUA_TBOOLEAN;
               pr->b=lua_toboolean(L,-1);
+              break;
             }
             case LUA_TNUMBER: {
               pr=new PersistRecord;
               pr->t=LUA_TNUMBER;
               pr->n=lua_tonumber(L,-1);
+              break;
             }
             case LUA_TSTRING: {
               pr=new PersistRecord;
               pr->t=LUA_TSTRING;
               pr->s=strdup(lua_tostring(L,-1));
+              break;
             }
           }
           if (pr) {
-            keepers.replace(lua_tostring(L,-2), pr);
+            ReplaceInDict(&keepers,lua_tostring(L,-2),pr);
           }
         }
         lua_pop(L, 1);

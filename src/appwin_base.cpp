@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2013 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -25,6 +25,7 @@
 #include "prefs.h"
 #include "lang.h"
 
+#include "compat.h"
 #include "scidoc.h"
 #include "filer.h"
 #include "toolmgr.h"
@@ -45,7 +46,6 @@
 #include "cmd_utils.h"
 #include "scidoc_util.h"
 #include "foreachtab.h"
-#include "compat.h"
 
 #include "intl.h"
 #include "appwin_base.h"
@@ -134,6 +134,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose,prefs->SearchGui);
   cmdutils=new CommandUtils(this);
   filedlgs=new FileDialogs(this,0);
+  macros=new MacroRunner();
 }
 
 
@@ -148,6 +149,7 @@ TopWindowBase::~TopWindowBase()
   delete getIcon();
   delete getMiniIcon();
   delete completions;
+  delete macros;
   global_top_window_instance=NULL;
 }
 
@@ -614,13 +616,12 @@ bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
 {
   if (!cmdutils->IsCommandReady()) { return false; }
   cmdutils->CommandBusy(true);
-  MacroRunner macros;
   command_timeout=false;
   statusbar->Running(_("macro"));
   update();
   statusbar->layout();
   getApp()->runWhileEvents();
-  bool rv=isfilename?macros.DoFile(script):macros.DoString(script);
+  bool rv=isfilename?macros->DoFile(script):macros->DoString(script);
   getApp()->runWhileEvents();
   if (!destroying) {
     tabbook->ForEachTab(TabCallbacks::ResetUndoLevelCB,NULL);

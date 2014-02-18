@@ -26,6 +26,7 @@ static StyleDef cpp_style[] = {
   { "hashquotedstring", SCE_C_HASHQUOTEDSTRING, STRING_FG, _DEFLT_BG, Normal },
   { "preprocessorcomment", SCE_C_PREPROCESSORCOMMENT, COMMNT_FG, _DEFLT_BG, Italic },
   { "preprocessorcommentdoc", SCE_C_PREPROCESSORCOMMENTDOC, COMMNT_FG, _DEFLT_BG, Italic },
+  { "userliteral", SCE_C_USERLITERAL, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 

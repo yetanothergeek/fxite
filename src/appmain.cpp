@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2011 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2013 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -180,12 +180,6 @@ static void usage(const char*prog)
 FXival AppClass::dispatchEvent(FXID hwnd, FXuint iMsg, FXuval wParam, FXival lParam)
 {
   switch (iMsg) {
-      case WM_DDE_INITIATE:
-      case WM_DDE_EXECUTE:
-      case WM_DDE_ACK: {
-        ipc->dispatchEvent(hwnd,iMsg,wParam,lParam);
-        break;
-      }
       case WM_DROPFILES: {
         HDROP hdrop = reinterpret_cast<HDROP>(wParam);
         int nFiles = ::DragQueryFile(hdrop, 0xffffffff, NULL, 0);
@@ -407,7 +401,8 @@ void AppClass::init(int& argc, char** argv, bool connect)
   sessionfile.append(sock_name);
   settingsfile=configdir+"settings";
 #ifdef WIN32
-  sock_name.prepend(APP_NAME"_");
+  sock_name.prepend(FXSystem::currentUserName()+"."APP_NAME".");
+  sock_name.lower();
   settingsfile.append(".ini");
 #else
   FXString serverdir=configdir+"servers"+PATHSEP;
