@@ -220,9 +220,10 @@ void ToolBarFrame::SetTBarBtnFontCB(FXButton*btn, void*user_data)
 
 void ToolBarFrame::SetTBarFont()
 {
-  delete toolbar_font;
+  FXFont *old_font=toolbar_font;
   toolbar_font=NULL;
   ForEachToolbarButton(SetTBarBtnFontCB,this);
+  delete old_font;
   getParent()->layout();
 }
 
