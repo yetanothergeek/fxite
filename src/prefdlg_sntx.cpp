@@ -152,6 +152,8 @@ long StyleEdit::onStyleBtn(FXObject*o,FXSelector sel,void*p)
   FXFont*tmpfont=new FXFont(caption->getApp(), fontdesc);
   tmpfont->create();
   caption->setFont(tmpfont);
+  delete labelfont;
+  labelfont=tmpfont;
   caption->update();
   return 1;
 }
