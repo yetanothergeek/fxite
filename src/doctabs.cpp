@@ -134,6 +134,7 @@ long DocTabs::onTabPopupMenu( FXObject* sender, FXSelector sel, void* p )
 DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   ShadyTabs(p,trg,sel,opts,0,0,0,0,0,0,0,0)
 {
+  tabs_compact='A';
   tab_width_max=0;
   tab_popup=new FXMenuPane(this);
   new FXMenuCommand(tab_popup,_("&Close"),NULL,this,ID_POPUP_CLICK);
