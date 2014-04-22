@@ -688,6 +688,11 @@ void PrefsDialog::create()
   acclist->setWidth((acclist->getParent()->getWidth()/3)*2);
   acclist->setHeaderSize(0,(acclist->getWidth()/2)-8);
   acclist->setHeaderSize(1,(acclist->getWidth()/2)-8);
+  
+  FXRootWindow*root=getApp()->getRootWindow();
+  setX(main_win->getX()+16+getWidth()<root->getWidth()?main_win->getX()+16:root->getWidth()-getWidth()-32);
+  setY(main_win->getY()+24+getHeight()<root->getHeight()?main_win->getY()+24:root->getHeight()-getDefaultHeight()-48);
+  
 #ifndef FOX_1_6
   acclist->hide();
   acclist->show();
@@ -700,8 +705,6 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getAp
 {
   prefs=aprefs;
   main_win=w;
-  setX(w->getX()+16);
-  setY(w->getY()+24);
   setWidth(620);
 
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
