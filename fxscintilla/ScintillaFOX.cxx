@@ -1257,7 +1257,7 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   FXDragAction action;
   FXint pos;
   // Scroll into view
-  if(startAutoScroll(ev, TRUE)) return 1;
+  if(startAutoScroll(ev, true)) return 1;
 
   // Handled elsewhere
   if(FXScrollArea::onDNDMotion(sender,sel,ptr)) return 1;

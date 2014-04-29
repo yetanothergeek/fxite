@@ -287,7 +287,7 @@ static int select(lua_State* L)
     sel_start=luaL_checkinteger(L,1);
     sel_end=(1==argc)?sel_start:luaL_checkinteger(L,2);
     sci->sendMessage(SCI_SETSELECTIONMODE, rectsel?SC_SEL_RECTANGLE:SC_SEL_STREAM, 0);
-    sci->sendMessage(SCI_SETCURRENTPOS, sel_end, FALSE);
+    sci->sendMessage(SCI_SETCURRENTPOS, sel_end, false);
     sci->sendMessage(SCI_SETANCHOR, sel_start, 0);
     sci->ScrollCaret();
     sci->sendMessage(SCI_SETSELECTIONMODE, rectsel?SC_SEL_RECTANGLE:SC_SEL_STREAM, 0);

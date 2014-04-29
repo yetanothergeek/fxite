@@ -84,7 +84,7 @@ long MyColorWell::onDoubleClicked(FXObject*o,FXSelector sel,void*p)
   colordialog.setSelector(ID_COLORDIALOG);
   colordialog.setRGBA(oldcolor);
   colordialog.setOpaqueOnly(isOpaqueOnly());
-  if(!colordialog.execute(PLACEMENT_SCREEN)) { setRGBA(oldcolor,TRUE); }
+  if(!colordialog.execute(PLACEMENT_SCREEN)) { setRGBA(oldcolor,true); }
   return 1;
 }
 

@@ -123,7 +123,7 @@ void GetAppDataDir(FXString &AppDataDir)
   }
   if (AppDataDir.empty()) {
     TCHAR strPath[MAX_PATH];
-    if (SHGetSpecialFolderPath(0,strPath,CSIDL_APPDATA,FALSE)) {
+    if (SHGetSpecialFolderPath(0,strPath,CSIDL_APPDATA,false)) {
       AppDataDir=(FXchar*)strPath;
     } else {
       AppDataDir="C:\\";
