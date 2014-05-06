@@ -22,6 +22,7 @@
 
 #include "prefs_base.h"
 #include "shmenu.h"
+#include "mru_menu.h"
 #include "lang.h"
 #include "menuspec.h"
 #include "appwin.h"

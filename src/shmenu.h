@@ -61,31 +61,3 @@ public:
   char Tag() { return _tag; }
 };
 
-
-
-
-class HistMenu: public FXMenuPane {
-  private:
-    FXDECLARE(HistMenu)
-    HistMenu(){}
-  protected:
-    FXString group;
-    FXMenuCascade*casc;
-    FXApp*app;
-    bool created;
-    void add_item(const FXString &txt, bool prepended);
-    void append(const FXString &txt);
-    FXMenuCommand*find(const FXString &txt);
-  public:
-    long onItemClick(FXObject*o,FXSelector sel,void*p);
-    enum {
-      ID_ITEM_CLICK=FXMenuPane::ID_LAST,
-      ID_LAST
-    };
-    HistMenu(FXWindow *p, const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel);
-    ~HistMenu();
-    virtual void create();
-    void prepend(const FXString &txt);
-    void remove(const FXString &txt);
-};
-

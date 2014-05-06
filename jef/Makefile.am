@@ -11,6 +11,7 @@ libjeffx_a_SOURCES=\
   ini_sort.c \
   interproc.cpp \
   listdlls.c \
+  mru_menu.cpp \
   popmenu.cpp \
   run_unx.cpp \
   run_w32.cpp \
@@ -27,6 +28,7 @@ noinst_HEADERS=\
   interproc.h \
   intl.h \
   listdlls.h \
+  mru_menu.h \
   popmenu.h \
   runcmd.h \
   shady_tabs.h \
