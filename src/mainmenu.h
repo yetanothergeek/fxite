@@ -22,7 +22,7 @@
 
 class TopWindow;
 class Settings;
-class HistMenu;
+class RecentFilesMenu;
 class UserMenu;
 
 class MainMenu: public FXMenuBar {
@@ -95,7 +95,7 @@ private:
   FXMenuCommand* showtipmenu;
 
   FXScrollPane* doclistmenu;
-  HistMenu* recent_files;
+  RecentFilesMenu* recent_files;
 
   UserMenu* usercmdmenu;
   UserMenu* userfiltermenu;

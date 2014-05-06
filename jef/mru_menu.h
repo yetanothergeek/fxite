@@ -20,10 +20,10 @@
 
 # define MRU_MENU_H
 
-class HistMenu: public FXMenuPane {
+class RecentFilesMenu: public FXMenuPane {
   private:
-    FXDECLARE(HistMenu)
-    HistMenu(){}
+    FXDECLARE(RecentFilesMenu)
+    RecentFilesMenu(){}
   protected:
     FXString group;
     FXMenuCascade*casc;
@@ -38,8 +38,8 @@ class HistMenu: public FXMenuPane {
       ID_ITEM_CLICK=FXMenuPane::ID_LAST,
       ID_LAST
     };
-    HistMenu(FXWindow *p, const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel);
-    ~HistMenu();
+    RecentFilesMenu(FXWindow *p, const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel);
+    ~RecentFilesMenu();
     virtual void create();
     void prepend(const FXString &txt);
     void remove(const FXString &txt);

@@ -21,33 +21,33 @@
 #include "mru_menu.h"
 
 
-class HistMnuCmd: public FXMenuCommand {
+class RecentFilesMnuCmd: public FXMenuCommand {
 public:
-  HistMnuCmd( FXComposite *p,
+  RecentFilesMnuCmd( FXComposite *p,
               const FXString &text, FXObject *tgt=NULL, FXSelector sel=0):FXMenuCommand(p,text,NULL,tgt,sel){}
-  ~HistMnuCmd() { free(getUserData()); }
+  ~RecentFilesMnuCmd() { free(getUserData()); }
 };
 
 
 
-FXDEFMAP(HistMenu) HistMenuMap[] = {
-  FXMAPFUNC(SEL_COMMAND,HistMenu::ID_ITEM_CLICK,HistMenu::onItemClick),
+FXDEFMAP(RecentFilesMenu) RecentFilesMenuMap[] = {
+  FXMAPFUNC(SEL_COMMAND,RecentFilesMenu::ID_ITEM_CLICK,RecentFilesMenu::onItemClick),
 };
 
-FXIMPLEMENT(HistMenu,FXMenuPane,HistMenuMap,ARRAYNUMBER(HistMenuMap))
+FXIMPLEMENT(RecentFilesMenu,FXMenuPane,RecentFilesMenuMap,ARRAYNUMBER(RecentFilesMenuMap))
 
 
 
-long HistMenu::onItemClick(FXObject*o,FXSelector sel,void*p)
+long RecentFilesMenu::onItemClick(FXObject*o,FXSelector sel,void*p)
 {
-  HistMnuCmd*mc = (HistMnuCmd*)o;
+  RecentFilesMnuCmd*mc = (RecentFilesMnuCmd*)o;
   if (target&&message) { target->handle(this,FXSEL(SEL_COMMAND, message), mc->getUserData()); }
   return 1;
 }
 
 
 
-void HistMenu::add_item(const FXString &txt, bool prepended)
+void RecentFilesMenu::add_item(const FXString &txt, bool prepended)
 {
   if ((!prepended) && (numChildren()>=26)) { return; }
   if (!txt.empty()) {
@@ -58,7 +58,7 @@ void HistMenu::add_item(const FXString &txt, bool prepended)
     }
     FXStat info;
     if ( FXStat::statFile(txt,info) && info.isFile() && info.isReadable() ) {
-      HistMnuCmd*mc=new HistMnuCmd(this,txt,this,ID_ITEM_CLICK);
+      RecentFilesMnuCmd*mc=new RecentFilesMnuCmd(this,txt,this,ID_ITEM_CLICK);
       mc->setUserData((void*)(strdup(  FXPath::simplify(FXPath::absolute(txt)).text()  )));
       if (created) { mc->create(); }
       if (prepended) {
@@ -71,21 +71,21 @@ void HistMenu::add_item(const FXString &txt, bool prepended)
 
 
 
-void HistMenu::prepend(const FXString &txt)
+void RecentFilesMenu::prepend(const FXString &txt)
 {
   add_item(txt, true);
 }
 
 
 
-void HistMenu::append(const FXString &txt)
+void RecentFilesMenu::append(const FXString &txt)
 {
   add_item(txt, false);
 }
 
 
 
-void HistMenu::remove(const FXString &txt)
+void RecentFilesMenu::remove(const FXString &txt)
 {
   if (!txt.empty()) {
     FXWindow*w;
@@ -93,7 +93,7 @@ void HistMenu::remove(const FXString &txt)
     for (w=getFirst(); w; ) {
       if (strcmp(s.text(), (char*)w->getUserData())==0) {
         FXWindow*w2=w->getNext();
-        delete (HistMnuCmd*) w;
+        delete (RecentFilesMnuCmd*) w;
         w=w2;
       } else {
         w=w->getNext();
@@ -104,7 +104,7 @@ void HistMenu::remove(const FXString &txt)
 
 
 
-FXMenuCommand*HistMenu::find(const FXString &txt)
+FXMenuCommand*RecentFilesMenu::find(const FXString &txt)
 {
   if (!txt.empty()) {
     FXWindow*w;
@@ -120,7 +120,7 @@ FXMenuCommand*HistMenu::find(const FXString &txt)
 
 
 
-HistMenu::HistMenu(FXWindow *p,
+RecentFilesMenu::RecentFilesMenu(FXWindow *p,
   const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel):FXMenuPane(p)
 {
   target=tgt;
@@ -135,7 +135,7 @@ HistMenu::HistMenu(FXWindow *p,
 
 
 
-HistMenu::~HistMenu()
+RecentFilesMenu::~RecentFilesMenu()
 {
   FXchar key[2]="\0";
   FXWindow*w;
@@ -148,7 +148,7 @@ HistMenu::~HistMenu()
 
 
 
-void HistMenu::create()
+void RecentFilesMenu::create()
 {
   if (created) return;
   created=true;
