@@ -144,7 +144,7 @@ bool CreateChildProcess(FXMainWindow*win, FXString &cmdline, HANDLE StdIN_Rd, HA
       si.dwFlags &= ~STARTF_USESHOWWINDOW;
     }
   }
-  return CreateProcess(NULL,cmdline.text(),NULL,NULL,TRUE,flags,NULL,NULL,&si,pi);
+  return CreateProcess(NULL,cmdline.text(),NULL,NULL,true,flags,NULL,NULL,&si,pi);
 }
 
 
@@ -176,7 +176,7 @@ bool CmdIO::run(const char *command)
   char buf[bufsize];
   ZeroMemory(&sa,sizeof(SECURITY_ATTRIBUTES));
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-  sa.bInheritHandle = TRUE;
+  sa.bInheritHandle = true;
   sa.lpSecurityDescriptor = NULL;
   DWORD exitcode=0;
 

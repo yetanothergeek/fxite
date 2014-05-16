@@ -424,10 +424,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
     TopWinPub::instantiate(this);
     if (getRootWindow() && getRootWindow()->id()) { TopWinPub::create(); } else { create(); }
     ipc->StartServer(TopWinPub::instance(),this,ID_IPC_EXEC);
-#if !(defined(WIN32) || defined(__minix))
-    fclose(stdin);
-    stdin=fopen(NULL_FILE, "r");
-#endif
+    freopen(NULL_FILE,"r",stdin);
   }
 }
 

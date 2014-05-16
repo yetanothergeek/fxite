@@ -78,6 +78,7 @@ int Scintilla_LinkLexers() {
 //**\(\tLINK_LEXER(\*);\n\)
 	LINK_LEXER(lmA68k);
 	LINK_LEXER(lmAda);
+	LINK_LEXER(lmAs);
 	LINK_LEXER(lmAsm);
 	LINK_LEXER(lmAsn1);
 	LINK_LEXER(lmASY);

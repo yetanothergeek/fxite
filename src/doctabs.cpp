@@ -56,7 +56,7 @@ long DocTabs::onDnd(FXObject* sender,FXSelector sel, void*p)
   switch (FXSELTYPE(sel)) {
     case SEL_DND_ENTER: {
       if (getApp()->getCursorWindow()==this) { return 0; }
-      setDragRectangle(0,0,width,height,FALSE);
+      setDragRectangle(0,0,width,height,false);
       if (offeredDNDType(FROM_DRAGNDROP,urilistType)) {
         acceptDrop();
         dnd_accept=true;
@@ -134,6 +134,7 @@ long DocTabs::onTabPopupMenu( FXObject* sender, FXSelector sel, void* p )
 DocTabs::DocTabs(FXComposite*p,FXObject*trg,FXSelector sel,FXuint opts):
   ShadyTabs(p,trg,sel,opts,0,0,0,0,0,0,0,0)
 {
+  tabs_compact='A';
   tab_width_max=0;
   tab_popup=new FXMenuPane(this);
   new FXMenuCommand(tab_popup,_("&Close"),NULL,this,ID_POPUP_CLICK);
@@ -504,7 +505,7 @@ long DocTab::onDnd(FXObject* sender,FXSelector sel, void*p)
   FXEvent* ev=(FXEvent*)p;
   switch(FXSELTYPE(sel)) {
     case SEL_DND_ENTER:  {
-      setDragRectangle(0,0,width,height,FALSE);
+      setDragRectangle(0,0,width,height,false);
       if (offeredDNDType(FROM_DRAGNDROP,FxteDnDTabType)) {
         acceptDrop();
         dnd_accept=true;

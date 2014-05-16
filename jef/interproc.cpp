@@ -300,9 +300,9 @@ void InterProc::StopServer()
         if (s) { delete s; }
       }
     }
-    delete connlist;
-    connlist=NULL;
   }
+  delete connlist;
+  connlist=NULL;
 }
 
 

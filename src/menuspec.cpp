@@ -803,13 +803,13 @@ void MenuMgr::WriteMenuSpecs(FXRegistry*reg, const char* keys_sect)
 
 void MenuMgr::ReadToolbarButtons(FXRegistry*reg, const char* tbar_sect)
 {
+  if (!reg->existingSection(tbar_sect)) { return; }
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
     char keyname[32];
     memset(keyname,0, sizeof(keyname));
     snprintf(keyname,sizeof(keyname)-1,"Button_%d", i+1);
-    MenuSpec*spec=MenuMgr::LookupMenu(toolbar_buttons[i]);
-    const FXchar *keyval=reg->readStringEntry(tbar_sect,keyname,spec?spec->pref:"");
-    spec=LookupMenuByPref(keyval);
+    const FXchar *keyval=reg->readStringEntry(tbar_sect,keyname,"");
+    MenuSpec*spec=LookupMenuByPref(keyval);
     if (spec) {
       toolbar_buttons[i]=spec->sel;
     } else {

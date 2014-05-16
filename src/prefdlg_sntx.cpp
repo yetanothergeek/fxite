@@ -46,7 +46,7 @@
 
 
 #define COLORWELL_OPTS ( COLORWELL_OPAQUEONLY|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y )
-#define STYLE_BTN_OPTS ( TOGGLEBUTTON_NORMAL | TOGGLEBUTTON_KEEPSTATE )
+#define STYLE_BTN_OPTS ( TOGGLEBUTTON_NORMAL | TOGGLEBUTTON_KEEPSTATE | LAYOUT_FILL_Y )
 
 
 static int whichlang=0;
@@ -84,7 +84,7 @@ long MyColorWell::onDoubleClicked(FXObject*o,FXSelector sel,void*p)
   colordialog.setSelector(ID_COLORDIALOG);
   colordialog.setRGBA(oldcolor);
   colordialog.setOpaqueOnly(isOpaqueOnly());
-  if(!colordialog.execute(PLACEMENT_SCREEN)) { setRGBA(oldcolor,TRUE); }
+  if(!colordialog.execute(PLACEMENT_SCREEN)) { setRGBA(oldcolor,true); }
   return 1;
 }
 
@@ -103,7 +103,6 @@ private:
   StyleDef*styledef;
   FXFontDesc fontdesc;
   FXFont* labelfont;
-  void SetButtonFont(FXToggleButton*btn,FXushort what);
   void conceal(FXFrame*w);
 public:
   long onStyleBtn(FXObject*o,FXSelector sel,void*p);
@@ -116,6 +115,18 @@ public:
     ID_COLOR_BTN,
     ID_LAST
   };
+};
+
+
+
+class StylePan: public FXMatrix {
+private:
+  FXFont*bold_btn_font;
+  FXFont*italic_btn_font;
+  friend class StyleEdit;
+public:
+  ~StylePan();
+  StylePan(FXComposite*o);
 };
 
 
@@ -152,6 +163,8 @@ long StyleEdit::onStyleBtn(FXObject*o,FXSelector sel,void*p)
   FXFont*tmpfont=new FXFont(caption->getApp(), fontdesc);
   tmpfont->create();
   caption->setFont(tmpfont);
+  delete labelfont;
+  labelfont=tmpfont;
   caption->update();
   return 1;
 }
@@ -202,22 +215,6 @@ void StyleEdit::create()
 
 
 
-void StyleEdit::SetButtonFont(FXToggleButton*btn,FXushort what)
-{
-  FXFont*tmpfont;
-  FXFontDesc fd;
-  GetFontDescription(fd,btn->getFont());
-  switch (what) {
-    case FXFont::Italic:fd.slant=FXFont::Italic;break;
-    case FXFont::Bold:fd.weight=FXFont::Bold;break;
-  }
-  strncpy(fd.face,"serif",sizeof(fd.face)-1);
-  tmpfont=new FXFont(btn->getApp(),fd);
-  btn->setFont(tmpfont);
-}
-
-
-
 StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXFont*scifont, bool bgonly)
 {
   Settings*prefs=Settings::instance();
@@ -226,6 +223,7 @@ StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXFont*scifont, bool bgonly)
   FXColor fg=HexToRGB(sd->fg[0]?sd->fg:prefs->globalStyle()->fg);
   FXHorizontalFrame*stylebtns=new FXHorizontalFrame(p,LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0,0,0,0,0,0,0);
   stylebtns->setBackColor(bg);
+  stylebtns->setUserData((void*)this);
 
   caption=new FXLabel(p,sd->key,NULL,LABEL_NORMAL|LAYOUT_FILL|LAYOUT_FILL_COLUMN);
   caption->setBackColor(bg);
@@ -239,11 +237,11 @@ StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXFont*scifont, bool bgonly)
 
 
   italic_btn=new FXToggleButton(stylebtns, "I", "I", NULL, NULL, this, ID_STYLE_BTN, STYLE_BTN_OPTS);
-  SetButtonFont(italic_btn,FXFont::Italic);
+  italic_btn->setFont((dynamic_cast<StylePan*>(p))->italic_btn_font);
   italic_btn->setState(sd->style&Italic?STATE_DOWN:STATE_UP);
 
   bold_btn = new FXToggleButton(stylebtns, "B", "B", NULL, NULL, this, ID_STYLE_BTN, STYLE_BTN_OPTS);
-  SetButtonFont(bold_btn,FXFont::Bold);
+  bold_btn->setFont((dynamic_cast<StylePan*>(p))->bold_btn_font);
   bold_btn->setState(sd->style&Bold?STATE_DOWN:STATE_UP);
 
   caption->setJustify(JUSTIFY_LEFT|JUSTIFY_CENTER_Y);
@@ -265,9 +263,25 @@ StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXFont*scifont, bool bgonly)
 
 
 
-static FXMatrix*MakeStylePan(FXWindow*o)
-{
-  return new FXMatrix((FXComposite*)o,3,MATRIX_BY_COLUMNS|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
+StylePan::~StylePan() {
+  for (FXWindow*w=getFirst(); w; w=w->getNext()) {
+    if (colOfChild(w)==0) { delete dynamic_cast<StyleEdit*>((FXObject*)(w->getUserData())); }
+  }
+  delete bold_btn_font;
+  delete italic_btn_font;
+}
+
+
+
+StylePan::StylePan(FXComposite*o):FXMatrix(o,3,MATRIX_BY_COLUMNS|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0) {
+  FXFontDesc fd;
+  GetFontDescription(fd,getApp()->getNormalFont());
+  strncpy(fd.face,"serif",sizeof(fd.face)-1);
+  fd.weight=FXFont::ExtraBold;
+  bold_btn_font  = new FXFont(getApp(),fd);
+  fd.weight=FXFont::Light;
+  fd.slant=FXFont::Italic;
+  italic_btn_font= new FXFont(getApp(),fd);
 }
 
 
@@ -363,7 +377,7 @@ long LangGUI::onLangSwitch(FXObject*o,FXSelector sel,void*p)
   scifont=new FXFont(langlist->getApp(), prefs->FontName, prefs->FontSize/10);
   FXWindow* w=style_pan->getParent();
   delete style_pan;
-  style_pan=MakeStylePan(w);
+  style_pan=new StylePan((FXComposite*)w);
   if (sel) { style_pan->create(); }
   StyleEdit*se;
   for (sdN=sd0; sdN->key; sdN++) {
@@ -511,7 +525,7 @@ void LangGUI::MakeStyleTab()
   new FXLabel(style_hdr, _("Style Name"), NULL, LAYOUT_FILL_X|FRAME_SUNKEN);
   new FXLabel(style_hdr, "  FG  /  BG  ",NULL,FRAME_SUNKEN);
   scroll=new FXScrollWindow(style_gui,LAYOUT_FILL|HSCROLLING_OFF|VSCROLLING_ON|VSCROLLER_ALWAYS);
-  style_pan=MakeStylePan(scroll);
+  style_pan=new StylePan(scroll);
   frame=new FXHorizontalFrame(style_gui,FRAME_RAISED|LAYOUT_FILL_X,0,0,0,0,0,0,0,0,0,0);
   SetPad(frame,4);
   frame=new FXHorizontalFrame(frame,FRAME_NONE|LAYOUT_CENTER_X,0,0,0,0,0,0,0,0,0,0);

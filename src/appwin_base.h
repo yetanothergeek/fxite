@@ -115,7 +115,7 @@ public:
   virtual ~TopWindowBase();
   static TopWindowBase* instance();
   virtual void create();
-  virtual FXbool close(FXbool notify=FALSE);
+  virtual FXbool close(FXbool notify=false);
   void ParseCommands(FXString &commands);
   bool Closing();
   bool IsMacroCancelled();

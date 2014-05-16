@@ -22,6 +22,7 @@
 
 #include "prefs_base.h"
 #include "shmenu.h"
+#include "mru_menu.h"
 #include "lang.h"
 #include "menuspec.h"
 #include "appwin.h"
@@ -280,7 +281,7 @@ void MainMenu::CreateMenus()
   MkMnuCmd(filemenu,ID_NEW);
   MkMnuCmd(filemenu,ID_OPEN_FILES);
   openselmenu=MkMnuCmd(filemenu,ID_OPEN_SELECTED);
-  recent_files=new HistMenu(filemenu, _("Open pre&vious"), "RecentFiles", tw, TW::ID_OPEN_PREVIOUS);
+  recent_files=new RecentFilesMenu(filemenu, _("Open pre&vious"), "RecentFiles", tw, TW::ID_OPEN_PREVIOUS);
 
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_SAVE);
