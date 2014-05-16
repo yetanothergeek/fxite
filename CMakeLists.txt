@@ -13,16 +13,30 @@ ADD_DEFINITIONS (-DVERSION="${PROJET_VERSION}")
 FIND_PACKAGE (PkgConfig REQUIRED)
 
 # Locate FOX
-PKG_SEARCH_MODULE (FOX REQUIRED fox18 fox17 fox)
+IF (NOT FOX_MODULE)
+    SET (FOX_MODULE "fox18;fox17;fox")
+ENDIF ()
+PKG_SEARCH_MODULE (FOX REQUIRED ${FOX_MODULE})
+LINK_DIRECTORIES(${FOX_LIBDIR})
+STRING (REGEX MATCH "^[0-9]+.[0-9]+" FOX_VER ${FOX_VERSION})
+IF (${FOX_VER} STREQUAL "1.6")
+    ADD_DEFINITIONS ("-DFOX_1_6")
+ELSEIF (${FOX_VER} STREQUAL "1.7")
+    ADD_DEFINITIONS ("-DFOX_1_7")
+ENDIF ()
 
 # Locate reswrap
-FIND_PROGRAM (
-    RESWRAP 
-    NAMES reswrap-1.7 reswrap 
-    PATHS /bin /usr/bin /usr/local/bin /opt/local/bin
-)
 IF (NOT RESWRAP)
-    MESSAGE (FATAL_ERROR "Could not locate reswrap")
+    IF (NOT RESWRAP)
+        FIND_PROGRAM (
+            RESWRAP
+            NAMES reswrap-1.7 reswrap
+            PATHS /bin /usr/bin /usr/local/bin /opt/local/bin
+        )
+    ENDIF (NOT RESWRAP)
+    IF (NOT RESWRAP)
+        MESSAGE (FATAL_ERROR "Could not locate reswrap")
+    ENDIF ()
 ENDIF ()
 
 # Locate X11
