@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef APPWIN_BASE_H
-#define APPWIN_BASE_H
+#ifndef FXITE_APPWIN_BASE_H
+#define FXITE_APPWIN_BASE_H
 
 
 #include "histbox.h"

@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_APPMAIN_H
+#define FXITE_APPMAIN_H
+
 
 class TopWindow;
 class Server;
@@ -60,4 +63,6 @@ public:
   FXString migration_errors;
 #endif
 };
+
+#endif
 
