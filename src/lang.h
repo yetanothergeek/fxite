@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef LANG_H
-#define LANG_H
+#ifndef FXITE_LANG_H
+#define FXITE_LANG_H
 
 #include "color_funcs.h"
 

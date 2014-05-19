@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_APPNAME_H
+#define FXITE_APPNAME_H
+
 
 #define EXE_NAME "fxite"
 #define APP_VENDOR EXE_NAME
@@ -28,4 +31,6 @@ public:
   static void VersionInfo();
   static void AboutBox();
 };
+
+#endif
 

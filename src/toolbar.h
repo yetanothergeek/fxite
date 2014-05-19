@@ -16,10 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_TOOLBAR_H
+#define FXITE_TOOLBAR_H
 
-
-#ifndef TOOLBAR_H
-#define TOOLBAR_H
 
 class TopWindow;
 

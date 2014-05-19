@@ -16,6 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_PREFDLG_EXT_H
+#define FXITE_PREFDLG_EXT_H
 
 
 // Dialog box to modify preferences for the file dialog's filter list.
@@ -51,4 +53,6 @@ public:
   virtual FXuint execute(FXuint placement=PLACEMENT_SCREEN);
   SysIncDlg(FXWindow* w);
 };
+
+#endif
 

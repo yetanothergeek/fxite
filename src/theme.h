@@ -16,6 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_THEME_H
+#define FXITE_THEME_H
 
 
 class Theme:public FXObject {
@@ -33,4 +35,6 @@ enum {
   ThemeChangedColors = 1<<0,
   ThemeChangedFont   = 1<<1
 };
+
+#endif
 

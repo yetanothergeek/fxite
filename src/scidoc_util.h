@@ -16,8 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef SCIDOC_UTIL_H
-#define SCIDOC_UTIL_H
+#ifndef FXITE_SCIDOC_UTIL_H
+#define FXITE_SCIDOC_UTIL_H
+
 
 class SciDoc;
 class Settings;

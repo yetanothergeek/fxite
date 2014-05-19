@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_LUAFUNCS_H
+#define FXITE_LUAFUNCS_H
+
 
 struct luaL_reg;
 class TopWindow;
@@ -23,4 +26,6 @@ class TopWindow;
 const luaL_reg* LuaFuncs();
 void LuaFuncsCleanup();
 const char *LuaQuitMessage();
+
+#endif
 

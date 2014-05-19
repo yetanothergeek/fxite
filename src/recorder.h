@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_RECORDER_H
+#define FXITE_RECORDER_H
+
 
 typedef void (*PlaybackFunc) (int message, uptr_t wParam, const sptr_t lParam, void* user_data);
 typedef void (*TranslateFunc) (const char* text, void* user_data);
@@ -35,4 +38,6 @@ public:
   MacroRecorder();
   ~MacroRecorder();
 };
+
+#endif
 

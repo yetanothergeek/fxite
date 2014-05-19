@@ -16,8 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef STATUSBAR_H
-#define STATUSBAR_H
+#ifndef FXITE_STATUSBAR_H
+#define FXITE_STATUSBAR_H
+
 
 class StatusBar: public FXHorizontalFrame {
   FXDECLARE(StatusBar)

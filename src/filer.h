@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_FILER_H
+#define FXITE_FILER_H
+
 
 class BackupMgr;
 
@@ -52,4 +55,6 @@ public:
   static bool ReadShortcut(FXWindow*w, FXString &filename);
 #endif
 };
+
+#endif
 

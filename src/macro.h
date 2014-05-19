@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_MACRO_H
+#define FXITE_MACRO_H
+
 
 class TopWindow;
 
@@ -36,4 +39,6 @@ public:
   bool DoFile(const FXString &filename);
   bool DoString(const FXString &sourcecode);
 };
+
+#endif
 

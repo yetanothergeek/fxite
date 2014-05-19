@@ -17,6 +17,10 @@
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#ifndef FXITE_FXASQ_C_H
+#define FXITE_FXASQ_C_H
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,5 +64,7 @@ void fxasq_hr(       FxAsqDlg *dlg);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 

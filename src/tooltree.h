@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_TOOLTREE_H
+#define FXITE_TOOLTREE_H
+
 
 class ToolsDialog;
 class UserMenu;
@@ -47,4 +50,6 @@ public:
   UserMenu*GetUserMenu(FXTreeItem*item);
   static bool SelectTool(FXWindow* owner, UserMenu** menus, FXMenuCommand*&mc);
 };
+
+#endif
 

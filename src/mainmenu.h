@@ -17,8 +17,8 @@
 */
 
 
-#ifndef MAINMENU_H
-#define MAINMENU_H
+#ifndef FXITE_MAINMENU_H
+#define FXITE_MAINMENU_H
 
 class TopWindow;
 class Settings;

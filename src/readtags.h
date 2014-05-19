@@ -18,8 +18,10 @@
 *   the tool needing to detect and resynchronize with changes to the tag file.
 *   Even for an unsorted 24MB tag file, tag searches take about one second.
 */
-#ifndef READTAGS_H
-#define READTAGS_H
+
+#ifndef FXITE_READTAGS_H
+#define FXITE_READTAGS_H
+
 
 #ifdef __cplusplus
 extern "C" {

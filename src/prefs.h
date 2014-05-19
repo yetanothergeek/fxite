@@ -31,8 +31,8 @@ Steps to adding a new preference:
 */
 
 
-#ifndef PREFS_H
-#define PREFS_H
+#ifndef FXITE_PREFS_H
+#define FXITE_PREFS_H
 
 #include "prefs_base.h"
 

@@ -16,6 +16,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_EXPORT_H
+#define FXITE_EXPORT_H
+
+
 void SaveToPDF(SciDoc*sci,  FILE *fp);
 void SaveToHTML(SciDoc*sci,  FILE *fp);
+
+#endif
 

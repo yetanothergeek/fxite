@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_SHMENU_H
+#define FXITE_SHMENU_H
+
 
 class UserMenuHelper;
 
@@ -60,4 +63,6 @@ public:
   static bool MakeLabelFromPath(const char*path, FXString &label);
   char Tag() { return _tag; }
 };
+
+#endif
 

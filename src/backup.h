@@ -15,6 +15,11 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+#ifndef FXITE_BACKUP_H
+#define FXITE_BACKUP_H
+
+
 class AppClass;
 
 class BackupMgr: public FXObject {
@@ -31,4 +36,6 @@ public:
   void RemoveBackup(SciDoc*sci);
   const FXString &LastError();
 };
+
+#endif
 

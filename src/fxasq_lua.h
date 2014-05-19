@@ -17,6 +17,10 @@
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#ifndef FXITE_FXASQ_LUA_H
+#define FXITE_FXASQ_LUA_H
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -25,5 +29,7 @@ extern int luaopen_dialog(lua_State *L);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 

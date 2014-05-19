@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_SEARCH_H
+#define FXITE_SEARCH_H
+
 
 class SciSearchOptions: public FXHorizontalFrame {
   FXDECLARE(SciSearchOptions)
@@ -116,4 +119,6 @@ public:
 
 
 bool GetPrimarySelection(FXString&target);
+
+#endif
 

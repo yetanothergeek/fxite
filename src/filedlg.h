@@ -16,6 +16,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_FILEDLG_H
+#define FXITE_FILEDLG_H
+
+
 class FileSel;
 
 class FileDlg: public FXFileDialog {
@@ -48,4 +52,6 @@ private:
       ID_LAST
     };
 };
+
+#endif
 

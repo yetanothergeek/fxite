@@ -16,6 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_HELP_H
+#define FXITE_HELP_H
+
 
 void show_help(FXMainWindow*win, FXint which, bool dark);
+
+#endif
 

@@ -16,6 +16,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_LUAFX_H
+#define FXITE_LUAFX_H
+
 
 const luaL_reg* LuaFxUtils(FXWindow*topwin, const char*exe_name);
+
+#endif
 

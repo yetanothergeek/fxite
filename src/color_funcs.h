@@ -16,9 +16,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_COLOR_FUNCS_H
+#define FXITE_COLOR_FUNCS_H
+
 
 typedef char ColorName[8];
 
 void RgbToHex(FXColor rgb, ColorName &clr);
 long HexToRGB(const char* rgb);
+
+#endif
 

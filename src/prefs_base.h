@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef FXITE_PREFS_BASE_H
+#define FXITE_PREFS_BASE_H
+
 
 typedef struct _StyleDef StyleDef;
 
@@ -118,4 +121,6 @@ typedef enum {
   BRACEMATCH_EITHER,
   BRACEMATCH_AFTER,
 } BraceMatchPolicy;
+
+#endif
 

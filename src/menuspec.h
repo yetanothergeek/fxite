@@ -16,7 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
+#ifndef FXITE_MENUSPEC_H
+#define FXITE_MENUSPEC_H
 
 
 typedef struct _MenuSpec {
@@ -73,4 +74,6 @@ public:
   static void SetFileFormat(SciDoc*sci, FXSelector sel);
   static char SetTabOrientation(FXSelector sel);
 };
+
+#endif
 
