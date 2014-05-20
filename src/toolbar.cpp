@@ -172,8 +172,8 @@ void ToolBarFrame::normalize()
 void ToolBarFrame::SetTBarBtnColorCB(FXButton*btn, void*user_data)
 {
   FXint*i=(FXint*)user_data;
-  btn->setBackColor(HexToRGB(MenuMgr::TBarColors(*i)));
-  btn->setTextColor(HexToRGB("#000000"));
+  btn->setBackColor(ColorFuncs::HexToRGB(MenuMgr::TBarColors(*i)));
+  btn->setTextColor(ColorFuncs::HexToRGB("#000000"));
   btn->setHiliteColor(makeHiliteColor(btn->getBackColor()));
   btn->setShadowColor(makeShadowColor(btn->getBackColor()));
   btn->setBorderColor(btn->getShadowColor());

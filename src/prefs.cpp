@@ -854,7 +854,9 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
   ReadInt(ShowToolbar,true);
   ReadInt(ShowWhiteSpace,false);
   ReadInt(ShowOutputPane,false);
+  bool InvertColors=false;
   ReadInt(InvertColors,false);
+  ColorFuncs::InvertColors(InvertColors);
   ReadIntRng(SplitView,0,SPLIT_NONE,SPLIT_BESIDE);
   ReadInt(OutputPaneHeight,64);
   ReadInt(SmartHome,false);
@@ -1030,6 +1032,7 @@ Settings::~Settings()
   WriteInt(ShowStatusBar);
   WriteInt(ShowWhiteSpace);
   WriteInt(ShowOutputPane);
+  bool InvertColors=ColorFuncs::ColorsInverted();
   WriteInt(InvertColors);
   WriteInt(SplitView);
   WriteInt(OutputPaneHeight);

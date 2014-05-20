@@ -35,7 +35,6 @@ public:
   FXulong ShowWhiteSpace:1;
 
   FXulong ShowOutputPane:1;
-  FXulong InvertColors:1;
   FXulong ShowRightEdge:1;
   FXulong ShowIndentGuides:1;
 

@@ -123,8 +123,8 @@ void StatusBar::Colorize()
   docname->setBackColor(clr);
   encname->setShadowColor(clr);
   encname->setBackColor(clr);
-  mode->setBackColor(HexToRGB("#FFFFCC"));
-  mode->setTextColor(HexToRGB("#FF0000"));
+  mode->setBackColor(ColorFuncs::HexToRGB("#FFFFCC"));
+  mode->setTextColor(ColorFuncs::HexToRGB("#FF0000"));
 }
 
 

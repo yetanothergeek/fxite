@@ -404,7 +404,7 @@ void MainMenu::CreateMenus()
   margin_chk =   MkMnuChk(viewmenu, ID_SHOW_MARGIN,     prefs->ShowRightEdge);
   guides_chk =   MkMnuChk(viewmenu, ID_SHOW_INDENT,     prefs->ShowIndentGuides);
   white_chk =    MkMnuChk(viewmenu, ID_SHOW_WHITESPACE, prefs->ShowWhiteSpace);
-  invert_chk =   MkMnuChk(viewmenu, ID_INVERT_COLORS,   prefs->InvertColors);
+  invert_chk =   MkMnuChk(viewmenu, ID_INVERT_COLORS,   ColorFuncs::ColorsInverted());
   caretline_chk = MkMnuChk(viewmenu, ID_SHOW_CARET_LINE, prefs->ShowCaretLine);
 
   new FXMenuSeparator(viewmenu, 0);
@@ -724,7 +724,7 @@ SyncCheck(toolbar_chk,   prefs->ShowToolbar);
 SyncCheck(margin_chk,    prefs->ShowRightEdge);
 SyncCheck(guides_chk,    prefs->ShowIndentGuides);
 SyncCheck(caretline_chk, prefs->ShowCaretLine);
-SyncCheck(invert_chk,    prefs->InvertColors);
+SyncCheck(invert_chk,    ColorFuncs::ColorsInverted());
 }
 
 

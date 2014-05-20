@@ -177,10 +177,10 @@ long StyleEdit::onColorBtn(FXObject*o,FXSelector sel,void*p)
   FXColor rgb=cw->getRGBA();
   if (cw==fg_btn) {
     caption->setTextColor(rgb);
-    RgbToHex(rgb,styledef->fg);
+    ColorFuncs::RgbToHex(rgb,styledef->fg);
   } else {
     caption->setBackColor(rgb);
-    RgbToHex(rgb,styledef->bg);
+    ColorFuncs::RgbToHex(rgb,styledef->bg);
     if (!fg_btn->isEnabled()) {
       caption->setTextColor(rgb>FXRGB(0x80,0x80,0x80)?FXRGB(0,0,0):FXRGB(0xFF,0xFF,0xFF));
     }
@@ -219,8 +219,8 @@ StyleEdit::StyleEdit(FXComposite *p, StyleDef*sd, FXFont*scifont, bool bgonly)
 {
   Settings*prefs=Settings::instance();
   styledef=sd;
-  FXColor bg=HexToRGB(sd->bg[0]?sd->bg:prefs->globalStyle()->bg);
-  FXColor fg=HexToRGB(sd->fg[0]?sd->fg:prefs->globalStyle()->fg);
+  FXColor bg=ColorFuncs::HexToRGB(sd->bg[0]?sd->bg:prefs->globalStyle()->bg);
+  FXColor fg=ColorFuncs::HexToRGB(sd->fg[0]?sd->fg:prefs->globalStyle()->fg);
   FXHorizontalFrame*stylebtns=new FXHorizontalFrame(p,LAYOUT_FILL_X|PACK_UNIFORM_WIDTH,0,0,0,0,0,0,0,0,0,0);
   stylebtns->setBackColor(bg);
   stylebtns->setUserData((void*)this);
@@ -531,7 +531,7 @@ void LangGUI::MakeStyleTab()
   frame=new FXHorizontalFrame(frame,FRAME_NONE|LAYOUT_CENTER_X,0,0,0,0,0,0,0,0,0,0);
   for (FXint i=0; rainbow[i][0]; i++) {
     new FXColorWell(frame,
-    HexToRGB(rainbow[i]),NULL,0,FRAME_NONE|COLORWELL_OPAQUEONLY|COLORWELL_SOURCEONLY|COLORWELL_NORMAL,0,0,0,0,0,0,0,0);
+    ColorFuncs::HexToRGB(rainbow[i]),NULL,0,FRAME_NONE|COLORWELL_OPAQUEONLY|COLORWELL_SOURCEONLY|COLORWELL_NORMAL,0,0,0,0,0,0,0,0);
   }
 }
 

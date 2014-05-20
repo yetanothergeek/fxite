@@ -22,8 +22,13 @@
 
 typedef char ColorName[8];
 
-void RgbToHex(FXColor rgb, ColorName &clr);
-long HexToRGB(const char* rgb);
+class ColorFuncs {
+public:
+  static void RgbToHex(FXColor rgb, ColorName &clr);
+  static long HexToRGB(const char* rgb);
+  static void InvertColors(bool inverted);
+  static bool ColorsInverted();
+};
 
 #endif
 

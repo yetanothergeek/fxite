@@ -84,7 +84,7 @@ SciDoc::SciDoc(FXComposite*p,FXObject*tgt,FXSelector sel):FXScintilla(p, tgt, se
   sendMessage(SCI_ASSIGNCMDKEY,SCK_BACK+(SCMOD_CTRL<<16)+(SCMOD_SHIFT<<16), 0);
   sendMessage(SCI_SETSCROLLWIDTHTRACKING,true,0);
   sendMessage(SCI_SETSCROLLWIDTH,4000,0);
-  sendMessage(SCI_SETEDGECOLOUR,HexToRGB("#FF0000"),0);
+  sendMessage(SCI_SETEDGECOLOUR,ColorFuncs::HexToRGB("#FF0000"),0);
   sendMessage(SCI_SETEOLMODE,SettingsBase::instance()->DefaultFileFormat,0);
   sendMessage(SCI_SETXCARETPOLICY,CARET_SLOP,8);
 }
@@ -711,8 +711,8 @@ void SciDoc::UpdateStyle()
 
   if (GlobalStyle) {
     for (sd=GlobalStyle; sd&&sd->key; sd++) {
-      sendMessage(SCI_STYLESETFORE, sd->id, HexToRGB(sd->fg));
-      sendMessage(SCI_STYLESETBACK, sd->id, HexToRGB(sd->bg));
+      sendMessage(SCI_STYLESETFORE, sd->id, ColorFuncs::HexToRGB(sd->fg));
+      sendMessage(SCI_STYLESETBACK, sd->id, ColorFuncs::HexToRGB(sd->bg));
       sendMessage(SCI_STYLESETITALIC, sd->id, sd->style & Italic);
       sendMessage(SCI_STYLESETBOLD, sd->id, sd->style & Bold);
     }
@@ -735,8 +735,8 @@ void SciDoc::UpdateStyle()
     }
     if (_lang->styles) {
       for (sd=_lang->styles; sd->key; sd++) {
-        sendMessage(SCI_STYLESETFORE, sd->id, HexToRGB(sd->fg[0]?sd->fg:DefaultFG));
-        sendMessage(SCI_STYLESETBACK, sd->id, HexToRGB(sd->bg[0]?sd->bg:DefaultBG));
+        sendMessage(SCI_STYLESETFORE, sd->id, ColorFuncs::HexToRGB(sd->fg[0]?sd->fg:DefaultFG));
+        sendMessage(SCI_STYLESETBACK, sd->id, ColorFuncs::HexToRGB(sd->bg[0]?sd->bg:DefaultBG));
         sendMessage(SCI_STYLESETITALIC, sd->id, sd->style & Italic);
         sendMessage(SCI_STYLESETBOLD, sd->id, sd->style & Bold);
 //        sendMessage(SCI_STYLESETUNDERLINE, sd->id, sd->style & Underline);
@@ -787,7 +787,7 @@ void SciDoc::CaretLineBG(const char*bgcolor)
 {
   memset(_caretlinebg,0,sizeof(_caretlinebg));
   if (bgcolor) { strncpy(_caretlinebg, bgcolor, sizeof(_caretlinebg)-1); }
-  sendMessage(SCI_SETCARETLINEBACK, HexToRGB(_caretlinebg), 0);
+  sendMessage(SCI_SETCARETLINEBACK, ColorFuncs::HexToRGB(_caretlinebg), 0);
   sendMessage(SCI_SETCARETLINEVISIBLE, _caretlinebg[0]?1:0, 0);
   slave(CaretLineBG,bgcolor);
 }
@@ -802,7 +802,7 @@ void SciDoc::RightMarginBG(const char*bgcolor)
   } else {
     _rightmarginbg[0]='\0';
   }
-  sendMessage(SCI_SETEDGECOLOUR, HexToRGB(_rightmarginbg), 0);
+  sendMessage(SCI_SETEDGECOLOUR, ColorFuncs::HexToRGB(_rightmarginbg), 0);
   slave(RightMarginBG,bgcolor);
 }
 
@@ -834,7 +834,7 @@ void SciDoc::WhiteSpaceBG(const char*bgcolor)
 {
   if (bgcolor) {
     strncpy(_whitespacebg, bgcolor, sizeof(_whitespacebg)-1);
-    sendMessage(SCI_SETWHITESPACEBACK, 1, HexToRGB(_whitespacebg));
+    sendMessage(SCI_SETWHITESPACEBACK, 1, ColorFuncs::HexToRGB(_whitespacebg));
   } else {
     sendMessage(SCI_SETWHITESPACEBACK, 0, 0);
     _whitespacebg[0]='\0';
@@ -848,7 +848,7 @@ void SciDoc::WhiteSpaceFG(const char*fgcolor)
 {
   if (fgcolor) {
     strncpy(_whitespacefg, fgcolor, sizeof(_whitespacefg)-1);
-    sendMessage(SCI_SETWHITESPACEFORE, 1, HexToRGB(_whitespacefg));
+    sendMessage(SCI_SETWHITESPACEFORE, 1, ColorFuncs::HexToRGB(_whitespacefg));
   } else {
     sendMessage(SCI_SETWHITESPACEFORE, 0, 0);
     _whitespacefg[0]='\0';
@@ -862,7 +862,7 @@ void SciDoc::CaretFG(const char*fgcolor)
 {
   if (fgcolor) {
     strncpy(_caretfg, fgcolor, sizeof(_caretfg)-1);
-    sendMessage(SCI_SETCARETFORE, HexToRGB(_caretfg), 0);
+    sendMessage(SCI_SETCARETFORE, ColorFuncs::HexToRGB(_caretfg), 0);
   } else {
     sendMessage(SCI_SETCARETFORE, 0, 0);
     _caretfg[0]='\0';
@@ -876,7 +876,7 @@ void SciDoc::SelectionBG(const char*bgcolor)
 {
   if (bgcolor) {
     strncpy(_selectionbg, bgcolor, sizeof(_selectionbg)-1);
-    sendMessage(SCI_SETSELBACK, 1, HexToRGB(_selectionbg));
+    sendMessage(SCI_SETSELBACK, 1, ColorFuncs::HexToRGB(_selectionbg));
   } else {
     sendMessage(SCI_SETCARETFORE, 0, 0);
     _caretfg[0]='\0';

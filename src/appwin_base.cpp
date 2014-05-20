@@ -112,8 +112,8 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   topwin_closing=false;
   StyleDef*sd=GetStyleFromId(Settings::globalStyle(), STYLE_CALLTIP);
   tips=new FXToolTip(getApp(),0);
-  RgbToHex(getApp()->getTipbackColor(), sd->bg);
-  RgbToHex(getApp()->getTipforeColor(), sd->fg);
+  ColorFuncs::RgbToHex(getApp()->getTipbackColor(), sd->bg);
+  ColorFuncs::RgbToHex(getApp()->getTipforeColor(), sd->fg);
   prefs=new Settings(this, ConfigDir());
   SciDoc::DefaultStyles(prefs->Styles());
   menubar=new MainMenu(this);
@@ -1382,7 +1382,7 @@ void TopWindowBase::SetWordWrap(SciDoc*sci, bool wrapped)
 
 void TopWindowBase::InvertColors(bool inverted)
 {
-  prefs->InvertColors=inverted;
+  ColorFuncs::InvertColors(inverted);
   toolbar->SetToolbarColors();
   tabbook->ForEachTab(TabCallbacks::PrefsCB,NULL);
   CheckStyle(NULL,0,ControlDoc());

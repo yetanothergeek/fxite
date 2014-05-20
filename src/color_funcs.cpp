@@ -19,7 +19,7 @@
 
 
 #include <fx.h>
-#include "prefs_base.h"
+
 #include "color_funcs.h"
 
 
@@ -42,10 +42,22 @@ static long InvertColor(long rgb)
 
 
 
-#define invert ( SettingsBase::instance()? SettingsBase::instance()->InvertColors : false )
+static bool invert=false;
+
+void ColorFuncs::InvertColors(bool inverted)
+{ 
+  invert=inverted;
+}
 
 
-void RgbToHex(FXColor rgb, ColorName &clr)
+
+bool ColorFuncs::ColorsInverted() {
+  return invert;
+}
+
+
+
+void ColorFuncs::RgbToHex(FXColor rgb, ColorName &clr)
 {
   if (invert) { rgb=InvertColor(rgb); }
   snprintf(clr, 8, "#%02x%02x%02x", FXREDVAL(rgb), FXGREENVAL(rgb), FXBLUEVAL(rgb));
@@ -53,7 +65,7 @@ void RgbToHex(FXColor rgb, ColorName &clr)
 
 
 
-long HexToRGB(const char* rgb)
+long ColorFuncs::HexToRGB(const char* rgb)
 {
   int r=0, g=0, b=0;
   sscanf(rgb+1,"%2x%2x%2x",&r,&g,&b);
