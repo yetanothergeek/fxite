@@ -150,10 +150,31 @@ void DualListForm::PopulateUsed()
 }
 
 
+#define LIST_OPTS LIST_BROWSESELECT|LAYOUT_FILL
+
 class MyList: public FXList {
+  FXDECLARE(MyList);
+  MyList(){}
 public:
+  MyList(FXComposite*p,FXObject*tgt,FXSelector sel):FXList(p,tgt,sel,LIST_OPTS) {}
   FXListItemList* getItems() { return &items; }
+  long onQueryTip(FXObject*o, FXSelector sel, void*p)
+  {
+    if (getParent()->getParent()->handle(o,sel,this)) {
+      return 1;
+    } else {
+      return FXList::onQueryTip(o,sel,p);
+    }
+  }
 };
+
+
+FXDEFMAP(MyList) MyListMap[]={
+  FXMAPFUNC(SEL_QUERY_TIP, 0, MyList::onQueryTip),
+};
+
+FXIMPLEMENT(MyList,FXList,MyListMap,ARRAYNUMBER(MyListMap));
+
 
 
 long DualListForm::onRemoveItem(FXObject*o,FXSelector sel,void*p)
@@ -202,8 +223,8 @@ DualListForm::DualListForm(FXComposite*p, FXObject* tgt, FXSelector sel, FXint m
   ins_btn=new FXButton(mid_column, _("&Insert>>"),NULL,this,ID_ITEM_INSERT,BUTTON_NORMAL|LAYOUT_CENTER_Y);
   rem_btn=new FXButton(mid_column, _("<<&Remove"),NULL,this,ID_ITEM_REMOVE,BUTTON_NORMAL|LAYOUT_CENTER_Y);
   new FXLabel(right_column, _("&Visible items:"));
-  avail_items=new FXList(left_column,this,ID_AVAIL_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
-  used_items=new FXList(right_column,this,ID_USED_ITEMS,LIST_BROWSESELECT|LAYOUT_FILL);
+  avail_items=new MyList(left_column,this,ID_AVAIL_ITEMS);
+  used_items=new MyList(right_column,this,ID_USED_ITEMS);
   FXHorizontalFrame* UpDnBtns=new FXHorizontalFrame( right_column,
                                                      FRAME_RAISED|LAYOUT_FILL_X|LAYOUT_CENTER_X|PACK_UNIFORM_WIDTH);
   raise_btn=new FXButton(UpDnBtns, _("Move &Up"),  NULL,this, ID_ITEM_RAISE,BUTTON_NORMAL|LAYOUT_CENTER_X);
