@@ -74,6 +74,9 @@ find . -name 'Makefile' \
   -or -name 'config.status' \
   -or -name 'libtool' \
   -or -name '*~' \
+  -or -name 'CMakeFiles' \
+  -or -name 'cmake_install.cmake' \
+  -or -name 'CMakeCache.txt' \
 | while read name
 do
   rm -rf "${name}"
