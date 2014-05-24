@@ -4,6 +4,11 @@ jef/histbox.cpp
 jef/run_unx.cpp
 jef/run_w32.cpp
 jef/runcmd.cpp
+mnumgr/menuspec.cpp
+mnumgr/prefdlg_kbnd.cpp
+mnumgr/prefdlg_tbar.cpp
+mnumgr/toolmgr.cpp
+mnumgr/tooltree.cpp
 src/appmain.cpp
 src/appname.cpp
 src/appwin.cpp
@@ -21,13 +26,12 @@ src/luafuncs.cpp
 src/luafx.cpp
 src/macro.cpp
 src/mainmenu.cpp
-src/menuspec.cpp
+src/menudefs.cpp
 src/migration.cpp
 src/outpane.cpp
 src/prefdlg.cpp
 src/prefdlg_ext.cpp
 src/prefdlg_sntx.cpp
-src/prefdlg_tbar.cpp
 src/prefs.cpp
 src/readtags.c
 src/recorder.cpp
@@ -38,6 +42,4 @@ src/search.cpp
 src/statusbar.cpp
 src/tagread.cpp
 src/theme.cpp
-src/toolmgr.cpp
-src/tooltree.cpp
 src/winshcut.c
