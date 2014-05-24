@@ -27,10 +27,10 @@
 #include "appwin_pub.h"
 #include "search.h"
 #include "histbox.h"
-#include "tooltree.h"
 #include "menuspec.h"
 #include "desclistdlg.h"
 #include "prefdlg_ext.h"
+#include "prefdlg_kbnd.h"
 #include "prefdlg_sntx.h"
 #include "prefdlg_tbar.h"
 #include "theme.h"
@@ -72,193 +72,13 @@ static FXival whichsyntab=0;
 
 FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
   FXMAPFUNC(SEL_COMMAND,PrefsDialog::ID_TAB_SWITCHED,PrefsDialog::onTabSwitch),
-  FXMAPFUNC(SEL_DOUBLECLICKED,PrefsDialog::ID_ACCEL_EDIT,PrefsDialog::onAccelEdit),
-  FXMAPFUNC(SEL_KEYPRESS,PrefsDialog::ID_ACCEL_EDIT,PrefsDialog::onAccelEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_FILTERS_EDIT,PrefsDialog::onFiltersEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_ERRPATS_EDIT,PrefsDialog::onErrPatsEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_SYSINCS_EDIT,PrefsDialog::onSysIncsEdit),
   FXMAPFUNC(SEL_COMMAND, PrefsDialog::ID_CHOOSE_FONT,PrefsDialog::onChooseFont),
-  FXMAPFUNC(SEL_CHANGED, PrefsDialog::ID_CHANGED_TOOLBAR,PrefsDialog::onChangedToolbar),
 };
 
 FXIMPLEMENT(PrefsDialog,FXDialogBox,PrefsDialogMap,ARRAYNUMBER(PrefsDialogMap));
-
-
-static bool AccelSanity(FXWindow*w, FXHotKey acckey)
-{
-  FXushort key=FXSELID(acckey);
-  FXushort mod=FXSELTYPE(acckey);
-  if (key==0) {
-    FXMessageBox::error(w, MBOX_OK, _("Invalid keybinding"), _("That keybinding does not end with a valid key name"));
-    return false;
-  }
-  if ((key>=KEY_F1)&&(key<=KEY_F12)) { return true; }
-  if ((mod&CONTROLMASK)||(mod&ALTMASK)||(mod&METAMASK)) { return true; }
-  return (FXMessageBox::question(w, MBOX_YES_NO, _("Weak keybinding"), "%s\n\n%s",
-    _("That key binding doesn't contain any [Ctrl] or [Alt]\n"
-      "modifiers, which might cause you some problems."),
-    _("Are you sure you want to continue?")
-   )==MBOX_CLICKED_YES);
-}
-
-
-
-static bool AccelUnique(FXWindow*w, FXAccelTable *table, FXHotKey acckey, MenuSpec*spec)
-{
-  MenuSpec*killcmd=MenuMgr::LookupMenu(TopWinPub::KillCmdID());
-
-  if ( (acckey==parseAccel(killcmd->accel)) && (spec!=killcmd)) {
-    FXMessageBox::error(w, MBOX_OK, _("Conflicting keybinding"),
-      _("Keybinding for \"%s\" must not conflict with \"%s\""),spec->pref,killcmd->pref);
-    return false;
-  }
-
-  if (!table->hasAccel(acckey)) { return true; }
-
-  if (FXMessageBox::question(w, MBOX_YES_NO, _("Conflicting keybinding"), "%s\n\n%s",
-    _("This keybinding appears to conflict with an existing one."),
-    _("Are you sure you want to continue?")
-  )==MBOX_CLICKED_YES) {
-    table->removeAccel(acckey);
-    return true;
-  } else {
-    return false;
-  }
-
-}
-
-
-
-static bool AccelDelete(FXWindow*w, FXAccelTable *table, const FXString &acctxt)
-{
-  FXHotKey acckey=parseAccel(acctxt);
-  if (!table->hasAccel(acckey)) {
-    return true;
-  } else {
-    if (FXMessageBox::question(w, MBOX_YES_NO, _("Confirm delete"),
-      _("Are you sure you want to remove this keybinding?")
-    )==MBOX_CLICKED_YES) {
-     table->removeAccel(acckey);
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-
-
-static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acckey)
-{
-  FXInputDialog dlg(w,"","");
-  FXint maxlen=sizeof(spec->accel)-1;
-  dlg.setNumColumns(maxlen);
-  FXString msg;
-  msg.format(
-    "%s:\n"
-    "   Ctrl+Shift+F12\n"
-    "   F3\n"
-    "   Alt+G\n\n"
-    "%s \"%s\"",
-    _("Examples"), _("Keybinding for"), spec->pref);
-  FXString orig=acctxt.text();
-  while (true) {
-    acckey=0;
-    if (dlg.getString(acctxt, w->getShell(), _("Edit keybinding"), msg )) {
-      if (acctxt.empty()) {
-        if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
-          FXMessageBox::error(w->getShell(), MBOX_OK, _("Empty keybinding"), "%s \"%s\"",
-            _("You cannot remove the keybinding for"), spec->pref);
-          acctxt=orig.text();
-          continue;
-        } else {
-          return true;
-        }
-      }
-      acckey=parseAccel(acctxt);
-      if (acckey) {
-        acctxt=unparseAccel(acckey);
-        if ((acctxt.length())<maxlen) {
-          if (AccelSanity(w,acckey)) { return strcmp(spec->accel, acctxt.text())!=0; }
-        } else {
-          FXMessageBox::error(w->getShell(), MBOX_OK,
-            _("Keybinding too long"), _("Text of keybinding specification must not exceed %d bytes\n"), maxlen);
-        }
-      } else {
-        FXMessageBox::error(w->getShell(), MBOX_OK,
-          _("Invalid keybinding"), "%s:\n%s", _("Failed to parse accelerator"), acctxt.text());
-        acctxt=orig.text();
-      }
-    } else {
-      return false;
-    }
-  }
-}
-
-
-
-long PrefsDialog::onAccelEdit(FXObject*o, FXSelector s, void*p)
-{
-  if (o!=acclist) { return 0; }
-    switch ( FXSELTYPE(s) ) {
-    case SEL_DOUBLECLICKED: {  break;  }
-    case SEL_KEYPRESS: {
-      FXint code=((FXEvent*)p)->code;
-      switch (code) {
-        case KEY_Return: { break; }
-        case KEY_KP_Enter: { break; }
-        case KEY_F2: { break; }
-        case KEY_space: { break; }
-        default: { return 0; }
-      }
-      break;
-    }
-    default: { return 0; }
-  }
-  MenuSpec*spec=(MenuSpec*)(acclist->getItemData(acclist->getCurrentItem()));
-  FXWindow*own=main_win;
-  FXAccelTable *table=own?own->getAccelTable():NULL;
-  if (spec && own && table) {
-    FXString acctxt=spec->accel;
-    FXHotKey acckey;
-    if ( EditAccel(acctxt,this,spec,acckey) ) {
-      if (acctxt.empty()) {
-        if (AccelDelete(this,table,spec->accel)) {
-          memset(spec->accel,0,sizeof(spec->accel));
-          if (spec->ms_mc) { spec->ms_mc->setAccelText(spec->accel); }
-          FXString txt;
-          txt.format("%s\t",spec->pref);
-          acclist->setItemText(acclist->getCurrentItem(),txt);
-        }
-      } else {
-        if (AccelUnique(this, table, acckey, spec)) {
-          FXHotKey oldkey=parseAccel(spec->accel);
-          memset(spec->accel,0,sizeof(spec->accel));
-          strncpy(spec->accel, acctxt.text(),sizeof(spec->accel)-1);
-          if (oldkey && table->hasAccel(oldkey)) { table->removeAccel(oldkey); }
-          if (spec->sel==(FXint)TopWinPub::KillCmdID()){
-            TopWinPub::SetKillCommandAccelKey(acckey);
-          } else  {
-            if (spec->ms_mc) {
-              spec->ms_mc->setSelector(0);
-              spec->ms_mc->setAccelText(spec->accel);
-              table->addAccel(acckey,spec->ms_mc->getTarget(),FXSEL(SEL_COMMAND,spec->sel));
-            } else {
-              table->addAccel(acckey,own,FXSEL(SEL_COMMAND,spec->sel));
-            }
-          }
-          FXString txt;
-          txt.format("%s\t%s",spec->pref,spec->accel);
-          acclist->setItemText(acclist->getCurrentItem(),txt);
-        }
-      }
-    }
-  } else {
-    FXMessageBox::error(getShell(), MBOX_OK, _("Internal error"), _("Failed to retrieve keybinding information"));
-  }
-  return 1;
-}
-
 
 
 #define SetPad(padwin, padsize) \
@@ -269,56 +89,10 @@ long PrefsDialog::onAccelEdit(FXObject*o, FXSelector s, void*p)
 
 
 
-// Subclass FXListItem to show custom tooltip...
-class TBarListItem: public FXListItem {
-public:
-  TBarListItem(const FXString &text, FXIcon *ic=NULL, void *ptr=NULL):FXListItem(text,ic,ptr){ }
-  virtual FXString getTipText() const {
-    FXString tip;
-    MenuSpec*spec=(MenuSpec*)getData();
-    if (spec) { MenuMgr::GetTBarBtnTip(spec,tip); } else { tip=label.text(); }
-    return tip;
-  }
-};
-
-
-
-// Subclass FXIconItem to show custom tooltip...
-class KBindListItem: public FXIconItem {
-public:
-  KBindListItem(const FXString &text, FXIcon*bi=NULL, FXIcon*mi=NULL, void*ptr=NULL):FXIconItem(text,bi,mi,ptr) {}
-  virtual FXString getTipText() const {
-    FXString tip;
-    MenuSpec*spec=(MenuSpec*)getData();
-    if (spec) { MenuMgr::GetTBarBtnTip(spec,tip); } else { tip=label.section('\t',0).text(); }
-    return tip;
-  }
-};
-
-
-
-static FXuint changed_toolbar = ToolbarUnchanged;
-
-FXuint PrefsDialog::ChangedToolbar()
-{
-  if (Theme::changed() & ThemeChangedFont) { changed_toolbar |= ToolbarChangedFont; }
-  return changed_toolbar;
-}
-
-
-long PrefsDialog::onChangedToolbar(FXObject*o,FXSelector sel,void*p)
-{
-  changed_toolbar|=(FXuint)((FXival)p);
-  return 1;
-}
-
-
-
 void PrefsDialog::MakeToolbarTab()
 {
   new FXTabItem(tabs,_("toolbar"));
-  new ToolbarPrefs(tabs, TopWinPub::UserMenus(), TopWinPub::LastID(), this, ID_CHANGED_TOOLBAR);
-  changed_toolbar=ToolbarUnchanged;
+  new ToolbarPrefs(tabs, TopWinPub::Toolbar(), TopWinPub::UserMenus(), mnumgr);
 }
 
 
@@ -326,8 +100,40 @@ void PrefsDialog::MakeToolbarTab()
 void PrefsDialog::MakePopupTab()
 {
   new FXTabItem(tabs,_("popup"));
-  new PopupPrefs(tabs, TopWinPub::UserMenus(), TopWinPub::LastID());
+  new PopupPrefs(tabs, TopWinPub::UserMenus(), mnumgr);
 }
+
+
+
+class MyKeyBindingList: public KeyBindingList {
+protected:
+  virtual bool AccelUnique(FXHotKey acckey, MenuSpec*spec) {
+    MenuSpec*killcmd=mnumgr->LookupMenu(TopWinPub::KillCmdID());
+    if ( (acckey==parseAccel(killcmd->accel)) && (spec!=killcmd)) {
+      FXMessageBox::error(getShell(), MBOX_OK, _("Conflicting keybinding"),
+        _("Keybinding for \"%s\" must not conflict with \"%s\""),spec->pref,killcmd->pref);
+      return false;
+    }
+    return KeyBindingList::AccelUnique(acckey,spec);
+  }
+  virtual bool AccelDelete(MenuSpec*spec) {
+    if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
+     FXMessageBox::error(getShell(), MBOX_OK, _("Empty keybinding"), "%s \"%s\"",
+        _("You cannot remove the keybinding for"), spec->pref);
+     return false;
+    }
+    return KeyBindingList::AccelDelete(spec);
+  }
+  virtual void AccelInsert(FXHotKey acckey, MenuSpec*spec) {
+    if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
+      TopWinPub::SetKillCommandAccelKey(acckey);
+    } else {
+      KeyBindingList::AccelInsert(acckey,spec);
+    }
+  }
+public:
+  MyKeyBindingList(FXComposite*o, MenuMgr*mmgr, FXWindow*w):KeyBindingList(o,mmgr,w){}
+};
 
 
 
@@ -335,18 +141,7 @@ void PrefsDialog::MakeKeybindingsTab()
 {
   new FXTabItem(tabs,_("keys"));
   FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
-  acclist=new FXIconList(frame,
-    this,ID_ACCEL_EDIT,FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|ICONLIST_BROWSESELECT);
-
-  acclist->appendHeader(_("action"));
-  acclist->appendHeader(_("keybinding"));
-  FXString spaces;
-  for (MenuSpec*spec=MenuMgr::MenuSpecs(); spec->sel!=(FXint)TopWinPub::LastID(); spec++) {
-    FXString txt;
-    txt.format("%s\t%s", spec->pref, spec->accel);
-    acclist->appendItem(new KBindListItem(txt, NULL, NULL, (void*)spec));
-  }
-  acclist->selectItem(0);
+  acclist=new MyKeyBindingList(frame, mnumgr, main_win);
 }
 
 
@@ -701,8 +496,9 @@ void PrefsDialog::create()
 
 
 
-PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs):FXDialogBox(w->getApp(), "Preferences")
+PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs, MenuMgr* mmgr):FXDialogBox(w->getApp(), "Preferences")
 {
+  mnumgr=mmgr;
   prefs=aprefs;
   main_win=w;
   setWidth(620);

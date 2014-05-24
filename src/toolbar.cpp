@@ -21,8 +21,6 @@
 
 #include "color_funcs.h"
 #include "menuspec.h"
-#include "prefs_base.h"
-#include "appwin.h"
 #include "compat.h"
 #include "toolbar.h"
 
@@ -32,7 +30,6 @@
 
 #define UsedWidthOf(f) ((f&&f->getLast())?(f->getLast()->getX()+f->getLast()->getWidth()):0)
 
-#define prefs SettingsBase::instance()
 
 /* Class that makes tool bar buttons restore document focus after they are clicked */
 class ToolBarBtn: public FXButton {
@@ -71,8 +68,9 @@ ToolBarBtn::ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSel
 
 long ToolBarBtn::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
   long rv=FXButton::onLeftBtnRelease(o,sel,p);
-  getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
+  getParent()->getParent()->handle(o,sel,p);
   return rv;
+
 }
 
 FXDEFMAP(ToolBarTogBtn) ToolBarTogBtnMap[] = {
@@ -94,7 +92,7 @@ ToolBarTogBtn::ToolBarTogBtn(FXComposite* p, const FXString& text, FXObject*tgt,
 long ToolBarTogBtn::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p )
 {
   long rv=FXToggleButton::onLeftBtnRelease(o,sel,p);
-  getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
+  getParent()->getParent()->handle(o,sel,p);
   return rv;
 }
 
@@ -105,7 +103,6 @@ FXDEFMAP(ToolBarFrame)ToolBarFrameMap[]={
 };
 
 FXIMPLEMENT(ToolBarFrame,FXVerticalFrame,ToolBarFrameMap,ARRAYNUMBER(ToolBarFrameMap));
-
 
 
 long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
@@ -119,23 +116,20 @@ long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
 // Wrap or unwrap buttons as needed.
 void ToolBarFrame::reconf()
 {
-  bool prefwrap=prefs->WrapToolbar;
-  if ((!prefwrap)&&(!wraptoolbar)) { return; }
   FXint kids1=rows[0]->numChildren();
   FXint kids2=rows[1]->numChildren();
-  if ((prefwrap)&&(kids1>0)&&(kids2==0)&&(width<UsedWidthOf(rows[0]))) {
+  if ((wraptoolbar)&&(kids1>0)&&(kids2==0)&&(width<UsedWidthOf(rows[0]))) {
     FXWindow *topright=rows[0]->childAtIndex((kids1/2));
     if (topright && (kids1%2==0)) { topright=topright->getPrev(); }
     while ( rows[0]->getLast() && (rows[0]->getLast() != topright) ) {
       rows[0]->getLast()->reparent(rows[1], rows[1]->getFirst());
     }
-  } else if ( (kids2>0) && ((!prefwrap)||(width>(UsedWidthOf(rows[0])+UsedWidthOf(rows[1])))) ) {
+  } else if ( (kids2>0) && ((!wraptoolbar)||(width>(UsedWidthOf(rows[0])+UsedWidthOf(rows[1])))) ) {
     while (rows[1]->getFirst()) {
       rows[1]->getFirst()->reparent(rows[0],NULL);
     }
   }
   if (rows[1]->numChildren()) { rows[1]->show(); } else { rows[1]->hide(); }
-  wraptoolbar=prefwrap;
   normalize();
 }
 
@@ -197,7 +191,7 @@ void ToolBarFrame::SetTBarBtnFontCB(FXButton*btn, void*user_data)
     FXFontDesc dsc;
     GetFontDescription(dsc, tbf->getApp()->getNormalFont());
     FXfloat scale=1.0;
-    switch (prefs->ToolbarButtonSize) {
+    switch (tbf->button_size) {
       case 0:{ scale=0.75; break; }
       case 1:{ scale=0.90; break; }
       case 2:{ scale=1.00; break; }
@@ -236,14 +230,15 @@ ToolBarFrame::~ToolBarFrame()
 
 
 
-ToolBarFrame::ToolBarFrame(FXComposite *o):FXVerticalFrame(o,TBarOpts,0,0,0,0,0,0,0,0,1,1)
+ToolBarFrame::ToolBarFrame(FXComposite *o, bool hideit):FXVerticalFrame(o,TBarOpts,0,0,0,0,0,0,0,0,1,1)
 {
   toolbar_font = NULL;
-  wraptoolbar=prefs->WrapToolbar;
+  hidden=hideit;
   rows[0]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
   rows[1]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
   rows[1]->hide();
 }
+
 
 
 void ToolBarFrame::ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data) {
@@ -279,28 +274,11 @@ void ToolBarFrame::NullifyButtonData(void*user_data)
 
 
 
-void ToolBarFrame::EnableFilterBtnCB(FXButton*btn, void*user_data)
-{
-  MenuSpec*spec=(MenuSpec*)btn->getUserData();
-  if (spec && (spec->type=='u') && spec->ms_mc && (spec->ms_mc->getSelector()==TopWindow::ID_USER_FILTER)) {
-    if ((bool)user_data) { btn->enable(); } else { btn->disable(); }
-  }
-}
-
-
-
-void ToolBarFrame::EnableFilterBtn(bool enabled)
-{
-  ForEachToolbarButton(EnableFilterBtnCB,(void*)enabled);
-}
-
-
-
 void ToolBarFrame::create()
 {
   FXVerticalFrame::create();
   normalize();
-  if (!prefs->ShowToolbar) { hide(); }
+  if (hidden) { hide(); }
 }
 
 
@@ -323,38 +301,30 @@ void ToolBarFrame::hide()
 
 #define EngageBtn(s,t) ((t*)btn)->setState(s?((t*)btn)->getState()|STATE_ENGAGED:((t*)btn)->getState()&~STATE_ENGAGED)
 
-void ToolBarFrame::CreateButtons(TopWindow*tw)
+void ToolBarFrame::CreateButtons(FXMainWindow*tw, FXuchar btn_size, bool wrapit, FXSelector custom_cmd_id, MenuMgr*mmgr)
 {
+  button_size=btn_size;
+  wraptoolbar=wrapit;
   ForEachToolbarButton(ClearTBarBtnDataCB,NULL);
   for (FXWindow*w=getFirst(); w; w=w->getNext()) {
     while (w->numChildren()) { delete w->getFirst(); }
   }
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
-    MenuSpec* spec=MenuMgr::LookupMenu(MenuMgr::TBarBtns()[i]);
-    if (spec && spec->sel<TopWindow::ID_LAST) {
+    MenuSpec* spec=mmgr->LookupMenu(mmgr->TBarBtns()[i]);
+    if (spec && spec->sel<mmgr->LastID()) {
       FXString txt=spec->btn_txt;
       txt.substitute(' ','\n',true);
       FXLabel*btn;
-      if ((spec->type=='k')||(spec->sel==TopWindow::ID_MACRO_RECORD)) {
+      if (spec->type=='k') {
         btn=new ToolBarTogBtn((FXComposite*)(getFirst()),txt,tw,spec->sel);
       } else {
-        btn=new ToolBarBtn((FXComposite*)(getFirst()),txt,tw,(spec->type=='u')?TopWindow::ID_TBAR_CUSTOM_CMD:spec->sel);
-        switch (spec->sel) { // These menus might be in a disabled state...
-          case TopWindow::ID_MACRO_PLAYBACK:
-          case TopWindow::ID_MACRO_TRANSLATE:
-          case TopWindow::ID_FILTER_SEL:
-          case TopWindow::ID_FIND_TAG:
-          case TopWindow::ID_SHOW_CALLTIP:
-          case TopWindow::ID_FMT_DOS:
-          case TopWindow::ID_FMT_MAC:
-          case TopWindow::ID_FMT_UNIX: {
-            if (!spec->ms_mc->isEnabled()) { btn->disable(); }
-            break;
-          }
-        }
+        btn=new ToolBarBtn((FXComposite*)(getFirst()),txt,tw,(spec->type=='u')?custom_cmd_id:spec->sel);
       }
       if (spec->ms_mc) {
-        if (spec->type!='u') { spec->ms_mc->setUserData((void*)btn); }
+        if (spec->type!='u') { 
+          spec->ms_mc->setUserData((void*)btn);
+          if (!spec->ms_mc->isEnabled()) { btn->disable(); }
+        }
         btn->setUserData(spec);
         switch(spec->type) {
           case 'k': { EngageBtn(((FXMenuCheck*)(spec->ms_mc))->getCheck(),FXToggleButton); break; }
@@ -362,7 +332,7 @@ void ToolBarFrame::CreateButtons(TopWindow*tw)
         }
       }
       FXString tip;
-      MenuMgr::GetTBarBtnTip(spec,tip);
+      mmgr->GetTBarBtnTip(spec,tip);
       btn->setTipText(tip);
     } else {
       break;

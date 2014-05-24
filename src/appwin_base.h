@@ -41,6 +41,7 @@ class StatusBar;
 class MainMenu;
 class AutoCompleter;
 class CommandUtils;
+class MyMenuMgr;
 
 class TopWindowBase: public MainWinWithClipBrd {
   FXDECLARE(TopWindowBase)
@@ -64,6 +65,7 @@ protected:
   MacroRunner* macros;
   BackupMgr* backups;
   CommandUtils* cmdutils;
+  MyMenuMgr* mnumgr;
   FXint stale_ticks;
   FXint save_ticks;
   FXString session_data;
@@ -143,6 +145,7 @@ public:
   void AddOutput(const FXString&line);
   void ClearOutput();
   UserMenu** UserMenus() const;
+  ToolBarFrame*Toolbar() const;
   void FindText(const char* searchstring, FXuint searchmode, bool forward);
   void FindAndReplace(const char*searchfor, const char*replacewith, FXuint searchmode, bool forward);
   void ReplaceAllInSelection(const char*searchfor, const char*replacewith, FXuint searchmode);
@@ -174,6 +177,8 @@ public:
     ID_CHECK_STYLE,
     ID_FOCUS_DOC,
     ID_SCINTILLA,
+    ID_TBAR_CUSTOM_CMD,
+    ID_KILL_COMMAND,
     ID_LAST
   };
 };

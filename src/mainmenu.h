@@ -16,14 +16,15 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #ifndef FXITE_MAINMENU_H
 #define FXITE_MAINMENU_H
+
 
 class TopWindow;
 class Settings;
 class RecentFilesMenu;
 class UserMenu;
+class MenuMgr;
 
 class MainMenu: public FXMenuBar {
 private:
@@ -43,7 +44,7 @@ private:
   FXMenuPane* helpmenu;
 
   FXMenuPane* recordermenu;
-  FXMenuCommand* recorderstartmenu;
+  FXMenuCheck* recorderstartmenu;
   FXMenuCommand* playbackmenu;
   FXMenuCommand* showmacromenu;
   FXMenuCommand* filterselmenu;
@@ -113,12 +114,12 @@ private:
   FXMenuCheck* white_chk;
   FXMenuCheck* wordwrap_chk;
   FXMenuCheck* invert_chk;
-
+  MenuMgr*mnumgr;
   static void SetMenuEnabled(FXMenuCommand*mnu, bool enabled);
   void EnableTagMenus(bool enabled);
 
 public:
-  MainMenu(FXComposite* p);
+  MainMenu(FXComposite* p, MenuMgr* mmgr);
   ~MainMenu();
   void Recording(bool recording, bool recorded);
   void RescanUserMenus();

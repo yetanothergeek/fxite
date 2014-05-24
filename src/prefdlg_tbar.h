@@ -22,6 +22,10 @@
 
 #include "dual_list.h"
 
+class UserMenu;
+class ToolBarFrame;
+class MenuMgr;
+
 class ToolbarPrefs: public DualListForm {
 private:
   FXDECLARE(ToolbarPrefs);
@@ -30,16 +34,17 @@ private:
   virtual void PopulateAvail();
   virtual void PopulateUsed();
   virtual void CheckCount();
-  void NotifyChanged(FXuint what);
-  Settings* prefs;
+  MenuMgr*mnumgr;
   UserMenu**user_menus;
+  ToolBarFrame*toolbar;
   FXint invalid;
 public:
   long onRemoveItem(FXObject*o, FXSelector sel, void*p);
   long onInsertCustomItem(FXObject*o, FXSelector sel, void*p);
   long onChangeBtnSize(FXObject*o,FXSelector sel,void*p);
   long onChangeBtnWrap(FXObject*o,FXSelector sel,void*p);
-  ToolbarPrefs(FXComposite*p, UserMenu**ums, FXSelector lastid, FXObject*tgt=NULL, FXSelector sel=0);
+  long onQueryTip(FXObject*o, FXSelector sel, void*p);
+  ToolbarPrefs(FXComposite*p, ToolBarFrame*tbar, UserMenu**ums, MenuMgr*mmgr);
   enum {
     ID_INSERT_CUSTOM=DualListForm::ID_LAST,
     ID_CHANGE_BTN_WRAP,
@@ -59,12 +64,14 @@ private:
   virtual void PopulateAvail();
   virtual void PopulateUsed();
   virtual void CheckCount();
+  MenuMgr*mnumgr;
   UserMenu**user_menus;
   FXint invalid;
 public:
-  PopupPrefs(FXComposite*p, UserMenu**ums, FXSelector lastid, FXObject*tgt=NULL, FXSelector sel=0);
+  PopupPrefs(FXComposite*p, UserMenu**ums, MenuMgr*mmgr);
   long onInsertCustomItem( FXObject*o, FXSelector sel, void*p);
   long onInsertSeparator(  FXObject*o, FXSelector sel, void*p);
+  long onQueryTip(FXObject*o, FXSelector sel, void*p);
   enum {
     ID_INSERT_CUSTOM=DualListForm::ID_LAST,
     ID_INSERT_SEPARATOR,

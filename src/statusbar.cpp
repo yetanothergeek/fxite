@@ -19,9 +19,8 @@
 #include <fx.h>
 
 #include "color_funcs.h"
-#include "menuspec.h"
-#include "intl.h"
 
+#include "intl.h"
 #include "statusbar.h"
 
 
@@ -80,10 +79,10 @@ void StatusBar::FileInfo(const FXString &filename, const char* enc, long line, l
 
 
 
-void StatusBar::Running(const char*what)
+void StatusBar::Running(const char*what, const char*howtokill)
 {
   FXString status;
-  status.format(_("Running %s (press %s to cancel)"), what, MenuMgr::LookupMenu(id_kill)->accel);
+  status.format(_("Running %s (press %s to cancel)"), what, howtokill);
   Mode(status.text());
 }
 

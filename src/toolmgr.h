@@ -19,16 +19,15 @@
 #ifndef FXITE_TOOLMGR_H
 #define FXITE_TOOLMGR_H
 
+#include "tooltree.h"
 
 class UserMenu;
-class ToolsTree;
 
 class ToolsDialog: public FXDialogBox {
 private:
   FXDECLARE(ToolsDialog)
   ToolsDialog(){}
 
-  ToolsTree* tree;
   FXVerticalFrame* left_box;
   FXVerticalFrame* right_box;
   FXVerticalFrame* name_panel;
@@ -72,7 +71,12 @@ private:
   bool SaveChanges();
   void SetMoveOptions(FXTreeItem *item);
   FXuint GetPermsForItem(FXTreeItem *item=NULL);
-  bool RenameItem(const FXString &oldpath, const FXString &newpath);
+protected:
+  ToolsTree* tree;
+  FXTreeItem*PrevItem() { return tree->PrevItem(); }
+  virtual bool CanRename(const FXString &oldpath, const FXString &newpath);
+  virtual bool RenameItem(const FXString &oldpath, const FXString &newpath);
+  virtual void EditFile() {}
 public:
   ToolsDialog(FXTopWindow*win, UserMenu**menus);
   virtual void create();

@@ -36,6 +36,7 @@ Steps to adding a new preference:
 
 #include "prefs_base.h"
 
+class MenuMgr;
 
 typedef enum {
   AUTO_INDENT_NONE=0,
@@ -62,9 +63,10 @@ class Settings: public SettingsBase {
   FXRegistry*reg;
   FXSettings*style_reg;
   FXString style_file;
+  MenuMgr*mnumgr;
   Settings() {}
 public:
-  Settings(FXMainWindow* w, const FXString& configdir);
+  Settings(FXMainWindow* w, const FXString& configdir, MenuMgr*mmgr);
   ~Settings();
 
   static const FXchar* CaretFG();
@@ -138,14 +140,6 @@ public:
   };
   static Settings*instance();
 };
-
-enum {
-  ToolbarUnchanged     = 0,
-  ToolbarChangedLayout = 1<<0,
-  ToolbarChangedFont   = 1<<1,
-  ToolbarChangedWrap   = 1<<2
-};
-
 
 #endif
 

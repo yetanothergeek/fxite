@@ -24,6 +24,7 @@ class Settings;
 class StyleEdit;
 class SciSearchOptions;
 class LangGUI;
+class MenuMgr;
 
 class PrefsDialog: public FXDialogBox {
 private:
@@ -36,6 +37,7 @@ private:
   SciSearchOptions*srchopts;
   FXTextField* filters_edit;
   LangGUI* langs;
+  MenuMgr*mnumgr;
 
   void MakeSyntaxTab();
   void MakeGeneralTab();
@@ -48,27 +50,22 @@ private:
   FXMainWindow* main_win;
 public:
   long onTabSwitch(FXObject*o,FXSelector sel,void*p);
-  long onAccelEdit(FXObject*o,FXSelector sel,void*p);
   long onFiltersEdit(FXObject*o,FXSelector sel,void*p);
   long onErrPatsEdit(FXObject*o,FXSelector sel,void*p);
   long onSysIncsEdit(FXObject*o,FXSelector sel,void*p);
   long onChooseFont(FXObject*o,FXSelector sel,void*p);
-  long onChangedToolbar(FXObject*o,FXSelector sel,void*p);
   enum {
     ID_SOMETHING=FXDialogBox::ID_LAST,
     ID_TAB_SWITCHED,
     ID_LANG_SWITCH,
-    ID_ACCEL_EDIT,
     ID_FILTERS_EDIT,
     ID_ERRPATS_EDIT,
     ID_SYSINCS_EDIT,
     ID_CHOOSE_FONT,
-    ID_CHANGED_TOOLBAR,
     ID_LAST
   };
-  PrefsDialog(FXMainWindow* w, Settings* aprefs);
+  PrefsDialog(FXMainWindow* w, Settings* aprefs, MenuMgr*mmgr);
   virtual void create();
-  static FXuint ChangedToolbar();
 };
 
 #endif

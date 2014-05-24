@@ -35,9 +35,9 @@
 #define TW TopWindow
 
 // Create a new menu command, menu check box, or menu radio item...
-#define MkMnuCmd(p,s) MenuMgr::MakeMenuCommand(p,tw,TW::s,'m')
-#define MkMnuChk(p,s,c) ((FXMenuCheck*)MenuMgr::MakeMenuCommand(p,tw,TW::s,'k',c))
-#define MkMnuRad(p,s) ((FXMenuRadio*)MenuMgr::MakeMenuCommand(p,tw,TW::s,'r'))
+#define MkMnuCmd(p,s) mnumgr->MakeMenuCommand(p,tw,TW::s,'m')
+#define MkMnuChk(p,s,c) ((FXMenuCheck*)mnumgr->MakeMenuCommand(p,tw,TW::s,'k',c))
+#define MkMnuRad(p,s) ((FXMenuRadio*)mnumgr->MakeMenuCommand(p,tw,TW::s,'r'))
 
 
 
@@ -54,9 +54,10 @@ static const char*usersnipflags[]={
 };
 
 
-MainMenu::MainMenu(FXComposite* p):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
+MainMenu::MainMenu(FXComposite* p, MenuMgr*mmgr):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
 {
   tw=(TopWindow*)p;
+  mnumgr=mmgr;
   prefs=SettingsBase::instance();
   CreateMenus();
   new FXHorizontalSeparator(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
@@ -422,7 +423,7 @@ void MainMenu::CreateMenus()
   recordermenu=new MyMenuPane(tw);
   NewCascade(toolsmenu,_("Macro &recorder"),NULL,recordermenu);
 
-  recorderstartmenu=MkMnuCmd(recordermenu,ID_MACRO_RECORD);
+  recorderstartmenu=MkMnuChk(recordermenu,ID_MACRO_RECORD,false);
   playbackmenu=MkMnuCmd(recordermenu,ID_MACRO_PLAYBACK);
   playbackmenu->disable();
   showmacromenu=MkMnuCmd(recordermenu,ID_MACRO_TRANSLATE);
@@ -672,6 +673,7 @@ void MainMenu::Recording(bool recording, bool recorded)
 {
   FXToggleButton*tbar_rec_btn=dynamic_cast<FXToggleButton*>((FXObject*)recorderstartmenu->getUserData());
   recorderstartmenu->setText(recording?_("Stop re&cording"):_("Re&cord macro"));
+  recorderstartmenu->setCheck(recording);
   SetMenuEnabled(playbackmenu,recorded && !recording);
   SetMenuEnabled(showmacromenu,recorded && !recording);
   if (tbar_rec_btn) { tbar_rec_btn->setState(recording); }
@@ -749,15 +751,15 @@ void MainMenu::SetWordWrapCheckmark(bool wrapped)
 void MainMenu::UpdateDocTabSettings()
 {
   switch (prefs->DocTabPosition) {
-    case 'T': MenuMgr::RadioUpdate(TW::ID_TABS_TOP,    TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
-    case 'B': MenuMgr::RadioUpdate(TW::ID_TABS_BOTTOM, TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
-    case 'L': MenuMgr::RadioUpdate(TW::ID_TABS_LEFT,   TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
-    case 'R': MenuMgr::RadioUpdate(TW::ID_TABS_RIGHT,  TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'T': mnumgr->RadioUpdate(TW::ID_TABS_TOP,    TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'B': mnumgr->RadioUpdate(TW::ID_TABS_BOTTOM, TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'L': mnumgr->RadioUpdate(TW::ID_TABS_LEFT,   TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
+    case 'R': mnumgr->RadioUpdate(TW::ID_TABS_RIGHT,  TW::ID_TABS_TOP, TW::ID_TABS_RIGHT); break;
   }
   switch (prefs->DocTabsPacked) {
-    case 'U':MenuMgr::RadioUpdate(TW::ID_TABS_UNIFORM,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
-    case 'P':MenuMgr::RadioUpdate(TW::ID_TABS_COMPACT,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
-    case 'A':MenuMgr::RadioUpdate(TW::ID_TABS_BY_POS,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+    case 'U':mnumgr->RadioUpdate(TW::ID_TABS_UNIFORM,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+    case 'P':mnumgr->RadioUpdate(TW::ID_TABS_COMPACT,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
+    case 'A':mnumgr->RadioUpdate(TW::ID_TABS_BY_POS,TW::ID_TABS_UNIFORM,TW::ID_TABS_BY_POS); break;
   }
 }
 

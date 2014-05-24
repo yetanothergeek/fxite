@@ -31,6 +31,7 @@
 #include "help.h"
 #include "backup.h"
 #include "menuspec.h"
+#include "menudefs.h"
 #include "appname.h"
 #include "outpane.h"
 #include "mainmenu.h"
@@ -159,7 +160,7 @@ long TopWindow::onInvertColors(FXObject*o, FXSelector sel, void*p)
 
 long TopWindow::onFileFormat(FXObject*o, FXSelector sel, void*p)
 {
-  MenuMgr::SetFileFormat(FocusedDoc(), FXSELID(sel));
+  mnumgr->SetFileFormat(FocusedDoc(), FXSELID(sel));
   return 1;
 }
 
@@ -531,7 +532,7 @@ long TopWindow::onScintillaCmd(FXObject*o,FXSelector s,void*p)
 
 long TopWindow::onScintillaPick(FXObject*o,FXSelector s,void*p)
 {
-  MenuMgr::ShowPopupMenu((FXPoint*)p);
+  mnumgr->ShowPopupMenu((FXPoint*)p);
   return 1;
 }
 
@@ -550,7 +551,7 @@ long TopWindow::onScintillaKey(FXObject* o, FXSelector sel, void*p)
 // Switch tab orientations
 long TopWindow::onTabOrient(FXObject*o,FXSelector sel,void*p)
 {
-  prefs->DocTabPosition=MenuMgr::SetTabOrientation(FXSELID(sel));
+  prefs->DocTabPosition=mnumgr->SetTabOrientation(FXSELID(sel));
   tabbook->setTabStyleByChar(prefs->DocTabPosition);
   FocusedDoc()->setFocus();
   return 1;
@@ -566,7 +567,7 @@ long TopWindow::onPackTabWidth(FXObject*o,FXSelector sel,void*p)
     case ID_TABS_BY_POS:  { prefs->DocTabsPacked='A'; break; }
   }
   tabbook->setTabsCompact(prefs->DocTabsPacked);
-  MenuMgr::RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_BY_POS);
+  mnumgr->RadioUpdate(FXSELID(sel),ID_TABS_UNIFORM,ID_TABS_BY_POS);
   return 1;
 }
 
@@ -692,7 +693,7 @@ long TopWindow::onUndo(FXObject*o, FXSelector sel, void*p)
   if (!sci) { return 1; }
   sci->sendMessage(SCI_UNDO,0,0);
   sci->SetEolModeFromContent();
-  MenuMgr::UpdateEolMenu(sci);
+  mnumgr->UpdateEolMenu(sci);
   sci->setFocus();
   return 1;
 }
@@ -705,7 +706,7 @@ long TopWindow::onRedo(FXObject*o, FXSelector sel, void*p)
   if (!sci) { return 1; }
   sci->sendMessage(SCI_REDO,0,0);
   sci->SetEolModeFromContent();
-  MenuMgr::UpdateEolMenu(sci);
+  mnumgr->UpdateEolMenu(sci);
   sci->setFocus();
   return 1;
 }

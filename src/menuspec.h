@@ -38,41 +38,47 @@ typedef struct _MenuSpec {
 #define TBAR_MAX_BTNS 24
 #define POPUP_MAX_CMDS 24
 
-class UsrMnuCmd;
-class SciDoc;
 
+class UsrMnuCmd;
+class ToolBarFrame;
 
 class MenuMgr {
 private:
   friend class UsrMnuCmd;
   static void ValidateUsrTBarCmd(FXMenuCommand*mc);
   static void InvalidateUsrTBarCmd(FXMenuCommand*mc);
+  void RemoveToolbarButton(FXint index);
+  MenuSpec* RegTBarUsrCmd(FXint index, const char*pref, const char*filename);
+  MenuSpec*menu_specs;
+  FXint* toolbar_buttons;
+  FXint last_id;
+  const char** DefaultPopupCommands;
+  char** PopupCommands;
+  FXString config_dir;
 public:
-  static FXMenuCommand*MakeMenuCommand(FXComposite*p, FXObject*tgt, FXSelector sel, char type, bool checked=false);
-  static void ShowPopupMenu(FXPoint*pt);
-  static MenuSpec*MenuSpecs();
-  static FXint*TBarBtns();
-  static MenuSpec*LookupMenu(FXint sel);
-  static MenuSpec*LookupMenuByPref(const char*pref);
+  MenuMgr(MenuSpec*specs, FXint* tbar_btns, FXint id_last, const char** def_pop_cmnds, char** pop_cmnds, const char*cfg_dir);
+  FXMenuCommand*MakeMenuCommand(FXComposite*p, FXObject*tgt, FXSelector sel, char type, bool checked=false);
+  MenuSpec*MenuSpecs();
+  FXint*TBarBtns();
+  MenuSpec*LookupMenu(FXint sel);
+  MenuSpec*LookupMenuByPref(const char*pref);
   static const char*TBarColors(FXint i);
   static const char*GetUsrCmdPath(MenuSpec*spec);
-  static void GetTBarBtnTip(MenuSpec*spec, FXString &tip);
-  static void GetTipFromFilename(const char*filename, FXString &tip);
+  void GetTBarBtnTip(MenuSpec*spec, FXString &tip);
+  void GetTipFromFilename(const char*filename, FXString &tip);
   static MenuSpec*AddTBarUsrCmd(FXMenuCommand*mc);
-  static void RemoveTBarUsrCmd(MenuSpec*spec);
-  static void PurgeTBarCmds();
-  static void WriteToolbarButtons(FXRegistry*reg, const char*tbar_section);
-  static void ReadToolbarButtons(FXRegistry*reg, const char*tbar_section);
-  static void ReadMenuSpecs(FXRegistry*reg, const char* keys_sect);
-  static void WriteMenuSpecs(FXRegistry*reg, const char* keys_sect);
-  static void ReadPopupMenu(FXRegistry*reg, const char* popup_sect);
-  static void WritePopupMenu(FXRegistry*reg, const char* popup_sect);
-  static char**GetPopupCommands();
-  static void FreePopupCommands();
-  static void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
-  static void UpdateEolMenu(SciDoc*sci);
-  static void SetFileFormat(SciDoc*sci, FXSelector sel);
-  static char SetTabOrientation(FXSelector sel);
+  static void RemoveTBarUsrCmd(ToolBarFrame*toolbar, MenuSpec*spec);
+  void PurgeTBarCmds(ToolBarFrame*toolbar);
+  void WriteToolbarButtons(FXRegistry*reg, const char*tbar_section);
+  void ReadToolbarButtons(FXRegistry*reg, const char*tbar_section);
+  void ReadMenuSpecs(FXRegistry*reg, const char* keys_sect);
+  void WriteMenuSpecs(FXRegistry*reg, const char* keys_sect);
+  void ReadPopupMenu(FXRegistry*reg, const char* popup_sect);
+  void WritePopupMenu(FXRegistry*reg, const char* popup_sect);
+  char**GetPopupCommands();
+  void FreePopupCommands();
+  void RadioUpdate(FXSelector curr, FXSelector min, FXSelector max);
+  FXint LastID();
 };
 
 #endif

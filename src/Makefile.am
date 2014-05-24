@@ -38,11 +38,13 @@ luafuncs.cpp \
 luafx.cpp \
 macro.cpp \
 mainmenu.cpp \
+menudefs.cpp \
 menuspec.cpp \
 migration.cpp \
 outpane.cpp \
 prefdlg.cpp \
 prefdlg_ext.cpp \
+prefdlg_kbnd.cpp \
 prefdlg_sntx.cpp \
 prefdlg_tbar.cpp \
 prefs.cpp \
@@ -91,10 +93,12 @@ luafx.h \
 luasci.h \
 macro.h \
 mainmenu.h \
+menudefs.h \
 menuspec.h \
 outpane.h \
 prefdlg.h \
 prefdlg_ext.h \
+prefdlg_kbnd.h \
 prefdlg_sntx.h \
 prefdlg_tbar.h \
 prefs.h \

@@ -25,6 +25,7 @@ class UserMenu;
 class DocTabs;
 class FileDialogs;
 class TopWindow;
+class ToolBarFrame;
 
 
 /*
@@ -49,6 +50,7 @@ public:
   static FXSelector LastID();
   static void SetKillCommandAccelKey(FXHotKey acckey);
   static UserMenu**UserMenus();
+  static ToolBarFrame*Toolbar();
   static void SaveClipboard();
   static const FXString &Connector();
   static const FXString &ConfigDir();
@@ -76,6 +78,7 @@ public:
   static FXMenuCaption* TagFiles();
   static void AddOutput(const FXString&line);
 };
+
 
 #endif
 

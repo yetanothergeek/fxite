@@ -28,6 +28,7 @@ private:
   FXAccelTable* temp_accels;
   bool command_busy;
   FXHotKey killkey;
+  MenuSpec*killcmd;
   TopWindow*tw;
   FXApp*app;
 #ifdef WIN32
@@ -47,7 +48,7 @@ public:
   bool IsMacroCancelled(bool &command_timeout);
   static void SetShellEnv(const char*file, long line);
   static const FXString FixUpCmdLineEnv(const FXString&command);
-  CommandUtils(TopWindowBase*w);
+  CommandUtils(TopWindowBase*w, MenuSpec*kill_spec);
   ~CommandUtils();
 };
 

@@ -33,7 +33,7 @@ protected:
   void Coords(long line, long col);
 public:
   void Colorize();
-  void Running(const char*what);
+  void Running(const char*what, const char*howtokill);
   void Recording(bool recording);
   void FileInfo(const FXString &filename, const char* enc, long line, long column);
   void Normal();

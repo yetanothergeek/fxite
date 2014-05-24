@@ -67,11 +67,10 @@ void CommandUtils::SetKillKey(FXHotKey k)
 
 void CommandUtils::InitKillKey()
 {
-  MenuSpec*killcmd=MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND);
   SetKillKey(parseAccel(killcmd->accel));
   if (killkey && FXSELID(killkey)) {
     temp_accels=new FXAccelTable();
-    temp_accels->addAccel(killkey,this,FXSEL(SEL_COMMAND,TopWindow::ID_KILL_COMMAND),0);
+    temp_accels->addAccel(killkey,this,FXSEL(SEL_COMMAND,killcmd->sel),0);
    } else {
     FXMessageBox::warning(tw->getApp(), MBOX_OK, _("Configuration error"),
       "%s \"%s\"\n%s",
@@ -85,8 +84,9 @@ void CommandUtils::InitKillKey()
 
 
 
-CommandUtils::CommandUtils(TopWindowBase*win)
+CommandUtils::CommandUtils(TopWindowBase*win, MenuSpec*kill_spec)
 {
+  killcmd=kill_spec;
   saved_accels=NULL;
   temp_accels=NULL;
   command_busy=false;
@@ -146,7 +146,7 @@ bool CommandUtils::IsCommandReady()
         "To fix this, go to:\n"
         "  Edit->Preferences->Keybindings\n"
         "and enter a valid setting for \"%s\""),
-      MenuMgr::LookupMenu(TopWindow::ID_KILL_COMMAND)->pref
+      killcmd->pref
     );
     return false;
   }

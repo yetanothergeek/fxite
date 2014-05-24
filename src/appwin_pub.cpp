@@ -304,3 +304,10 @@ FXString* TopWinPub::NamedFiles()
   return tw->NamedFiles();
 }
 
+
+
+ToolBarFrame*TopWinPub::Toolbar()
+{
+  return tw->Toolbar();
+}
+

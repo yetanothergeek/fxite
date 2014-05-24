@@ -20,35 +20,40 @@
 #define FXITE_TOOLBAR_H
 
 
-class TopWindow;
+class MenuMgr;
 
 // This thing behaves something like an FXHorizontalFrame that can "wrap" its contents across two rows.
 class ToolBarFrame: public FXVerticalFrame {
 private:
   FXDECLARE(ToolBarFrame);
-  ToolBarFrame(){}
   FXHorizontalFrame*rows[2];
   bool wraptoolbar;
+  bool hidden;
   FXFont*toolbar_font;
+  FXuchar button_size;
   static void SetTBarBtnColorCB(FXButton*btn, void*user_data);
   static void SetTBarBtnFontCB(FXButton*btn, void*user_data);
   static void NullifyButtonDataCB(FXButton*btn, void*user_data);
   static void ClearTBarBtnDataCB(FXButton*btn, void*user_data);
-  static void EnableFilterBtnCB(FXButton*btn, void*user_data);
-  void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   void reconf();
   void normalize();
+protected:
+  void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
+  ToolBarFrame(){}
 public:
   long onConfigure(FXObject*o,FXSelector sel,void*p);
   void NullifyButtonData(void*user_data);
   void SetToolbarColors();
   void SetTBarFont();
-  void EnableFilterBtn(bool enabled);
-  void CreateButtons(TopWindow*tw);
+  void CreateButtons(FXMainWindow*tw, FXuchar btn_size, bool wrapit, FXSelector custom_cmd_id, MenuMgr*mmgr);
+  bool Wrapped() { return wraptoolbar; }
+  void Wrapped(bool wrapit) { wraptoolbar=wrapit; }
+  FXuchar ButtonSize() { return button_size; }
+  void ButtonSize(FXuchar bs) { button_size = bs>=2 ? 2 : bs<=0 ? 0 : bs; }
   virtual void show();
   virtual void hide();
   virtual void create();
-  ToolBarFrame(FXComposite *o);
+  ToolBarFrame(FXComposite *o, bool hideit);
   ~ToolBarFrame();
 };
 

@@ -25,9 +25,7 @@
 
 #include "shmenu.h"
 #include "compat.h"
-#include "appwin_pub.h"
 #include "histbox.h"
-#include "tooltree.h"
 
 #include "intl.h"
 #include "toolmgr.h"
@@ -591,68 +589,6 @@ long ToolsDialog::onNewScanChore(FXObject*o, FXSelector sel, void*p)
 
 
 
-bool ToolsDialog::RenameItem(const FXString &oldpath, const FXString &newpath)
-{
-  bool isdir=FXStat::isDirectory(oldpath);
-  bool dirty=false;
-  FXString filelist=FXString::null;
-  if (isdir) {
-    FXString oldprefix=oldpath+PATHSEPSTRING;
-    FXString newprefix=newpath+PATHSEPSTRING;
-    FXString *openfiles=TopWinPub::NamedFiles();
-    for (FXString*p=openfiles; !p->empty(); p++) {
-      if (FX::compare(oldprefix,*p,oldpath.length())==0) {
-        if (TopWinPub::IsFileOpen(*p,false)==2) {
-          dirty=true;
-          break;
-        }
-        FXString filename=p->text()+oldprefix.length();
-        filelist.append(newprefix+filename);
-        filelist.append('\n');
-        TopWinPub::IsFileOpen(*p,true);
-        TopWinPub::CloseFile(false,false);
-      }
-    }
-    delete[] openfiles;
-  }
-  switch (TopWinPub::IsFileOpen(oldpath,false)) {
-    case 0: { break; }
-    case 1: {
-      TopWinPub::IsFileOpen(oldpath,true);
-      TopWinPub::CloseFile(false,false);
-      filelist.append(newpath);
-      filelist.append('\n');
-      break;
-    }
-    case 2: {
-      dirty=true;
-      break;
-    }
-  }
-
-  if (dirty) {
-    FXMessageBox::error(this, MBOX_OK, _("Active unsaved changes"), "%s\n%s",
-    _("Cannot proceed because a file to be renamed is currently"),
-    _("open in the editor, and has unsaved changes.")
-    );
-    return false;
-  }
-
-  bool result = isdir?FXDir::rename(oldpath,newpath):FXFile::rename(oldpath,newpath);
-  if (result) {
-    for (FXint i=0; i<filelist.contains('\n'); i++) { TopWinPub::OpenFile(filelist.section('\n',i).text(),NULL,false,false); }
-  } else {
-    FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
-      _("Failed to rename"),
-      tree->PrevItem()->hasItems()?_("folder"):_("file"),
-      _("from"), oldpath.text(),
-      _("to"), newpath.text(),
-      SystemErrorStr());
-  }
-
-  return result;
-}
-
 
 
 bool ToolsDialog::SaveChanges()
@@ -751,10 +687,7 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
       break;
     }
     case ID_EDIT_CLICK: {
-      TopWinPub::OpenFile(
-        (const char*)(((FXMenuCommand*)(tree->PrevItem()->getData()))->getUserData()),
-        NULL,false,false
-      );
+      EditFile();
       break;
     }
     case ID_NEW_MENU_CLICK: {
@@ -797,6 +730,33 @@ long ToolsDialog::onButtonClick(FXObject*o, FXSelector sel, void*p)
     }
   }
   return 1;
+}
+
+
+
+// A subclass can override this method if, for some application-specific reason,
+// a certain tool should not be renamed. But here, we just default to "true"
+bool ToolsDialog::CanRename(const FXString &oldpath, const FXString &newpath)
+{
+  return true;
+}
+
+
+
+bool ToolsDialog::RenameItem(const FXString &oldpath, const FXString &newpath)
+{
+  if (!CanRename(oldpath,newpath)) { return false; }
+  if (FXStat::isDirectory(oldpath)?FXDir::rename(oldpath,newpath):FXFile::rename(oldpath,newpath)) {
+    return true;
+  } else {
+    FXMessageBox::error(this, MBOX_OK, _("Rename error"), "%s %s:\n%s:\n %s\n%s:\n %s\n\n%s",
+      _("Failed to rename"),
+      PrevItem()->hasItems()?_("folder"):_("file"),
+      _("from"), oldpath.text(),
+      _("to"), newpath.text(),
+      SystemErrorStr());
+    return false;
+  }
 }
 
 

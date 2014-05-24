@@ -37,6 +37,7 @@
 #include "search.h"
 #include "backup.h"
 #include "menuspec.h"
+#include "menudefs.h"
 #include "mainmenu.h"
 #include "toolbar.h"
 #include "doctabs.h"
@@ -114,12 +115,13 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   tips=new FXToolTip(getApp(),0);
   ColorFuncs::RgbToHex(getApp()->getTipbackColor(), sd->bg);
   ColorFuncs::RgbToHex(getApp()->getTipforeColor(), sd->fg);
-  prefs=new Settings(this, ConfigDir());
+  mnumgr=new MyMenuMgr();
+  prefs=new Settings(this, ConfigDir(), mnumgr);
   SciDoc::DefaultStyles(prefs->Styles());
-  menubar=new MainMenu(this);
+  menubar=new MainMenu(this,mnumgr);
   outerbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
   innerbox=new FXVerticalFrame(outerbox,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
-  toolbar=new ToolBarFrame(innerbox);
+  toolbar=new MyToolBarFrame(innerbox, !prefs->ShowToolbar);
   hsplit=new FXSplitter(innerbox,this, 0, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   innerbox=new FXVerticalFrame(hsplit,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0);
   tabbook=new DocTabs(innerbox,this,0,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
@@ -132,7 +134,7 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   backups=new BackupMgr(this, ConfigDir());
   completions=new AutoCompleter();
   srchdlgs->SetPrefs(prefs->SearchOptions,prefs->SearchWrap,prefs->SearchVerbose,prefs->SearchGui);
-  cmdutils=new CommandUtils(this);
+  cmdutils=new CommandUtils(this, mnumgr->LookupMenu(ID_KILL_COMMAND));
   filedlgs=new FileDialogs(this,0);
   macros=new MacroRunner();
 }
@@ -150,6 +152,7 @@ TopWindowBase::~TopWindowBase()
   delete getMiniIcon();
   delete completions;
   delete macros;
+  delete mnumgr;
   global_top_window_instance=NULL;
 }
 
@@ -558,7 +561,7 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
     FXString output=FXString::null;
     command_timeout=false;
     getApp()->beginWaitCursor();
-    statusbar->Running(_("command"));
+    statusbar->Running(_("command"), mnumgr->LookupMenu(ID_KILL_COMMAND)->accel);
     cmdutils->DisableUI(true);
     success=cmdio.filter(cmdutils->FixUpCmdLineEnv(cmd).text(), input, output);
     if (success) {
@@ -590,7 +593,7 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
     update();
     repaint();
     if (!prefs->ShowOutputPane) { ShowOutputPane(true); }
-    statusbar->Running(_("command"));
+    statusbar->Running(_("command"), mnumgr->LookupMenu(ID_KILL_COMMAND)->accel);
     success=cmdio.lines(cmdutils->FixUpCmdLineEnv(cmd).text(), outlist, outlist->ID_CMDIO, true);
     statusbar->Normal();
     if (success) {
@@ -617,7 +620,7 @@ bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
   if (!cmdutils->IsCommandReady()) { return false; }
   cmdutils->CommandBusy(true);
   command_timeout=false;
-  statusbar->Running(_("macro"));
+  statusbar->Running(_("macro"), mnumgr->LookupMenu(ID_KILL_COMMAND)->accel);
   update();
   statusbar->layout();
   getApp()->runWhileEvents();
@@ -870,7 +873,7 @@ bool TopWindowBase::SetReadOnly(SciDoc*sci, bool rdonly)
 
 void TopWindowBase::EnableUserFilters(bool enabled)
 {
-  toolbar->EnableFilterBtn(enabled);
+  ((MyToolBarFrame*)toolbar)->EnableFilterBtn(enabled);
   menubar->EnableFilterMenu(enabled);
   srchdlgs->setHaveSelection(enabled);
 }
@@ -915,6 +918,13 @@ void TopWindowBase::ReplaceAllInDocument(const char*searchfor, const char*replac
 UserMenu**TopWindowBase::UserMenus() const
 {
   return menubar->UserMenus();
+}
+
+
+
+ToolBarFrame*TopWindowBase::Toolbar() const
+{
+  return toolbar;
 }
 
 
@@ -1099,17 +1109,17 @@ bool TopWindowBase::FoundBookmarkedTab(DocTab*tab)
 
 void TopWindowBase::UpdateToolbar()
 {
-  toolbar->CreateButtons((TopWindow*)this);
+  toolbar->CreateButtons(this,prefs->ToolbarButtonSize,prefs->WrapToolbar,ID_TBAR_CUSTOM_CMD,mnumgr);
   menubar->UpdateDocTabSettings();
   menubar->Recording(recording,recorder);
-  toolbar->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
+  ((MyToolBarFrame*)toolbar)->EnableFilterBtn(FocusedDoc()&&(FocusedDoc()->GetSelLength()>0));
 }
 
 
 
 void TopWindowBase::ShowPrefsDialog()
 {
-  PrefsDialog*prefdlg=new PrefsDialog(this, (Settings*)prefs);
+  PrefsDialog*prefdlg=new PrefsDialog(this, (Settings*)prefs, mnumgr);
   prefdlg->execute(PLACEMENT_DEFAULT);
   delete prefdlg;
   ClosedDialog();
@@ -1121,15 +1131,9 @@ void TopWindowBase::ShowPrefsDialog()
     getApp()->addTimeout(this,ID_TIMER, ONE_SECOND, NULL);
   }
   getApp()->setWheelLines(prefs->WheelLines);
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedLayout ) {
-    UpdateToolbar();
-  }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedWrap ) {
-    toolbar->handle(toolbar,FXSEL(SEL_CONFIGURE,0),NULL);
-  }
-  if ( PrefsDialog::ChangedToolbar() & ToolbarChangedFont ) {
-    toolbar->SetTBarFont();
-  }
+  prefs->ToolbarButtonSize=toolbar->ButtonSize();
+  prefs->WrapToolbar=toolbar->Wrapped();
+  UpdateToolbar();
   if (Theme::changed() & ThemeChangedColors) {
     Theme::apply(this);
     Theme::apply(srchdlgs->FindDialog());
@@ -1147,7 +1151,7 @@ void TopWindowBase::ShowPrefsDialog()
 
 void TopWindowBase::ShowToolManagerDialog()
 {
-  ToolsDialog tooldlg(this,UserMenus());
+  MyToolsDialog tooldlg(this,UserMenus());
   tooldlg.execute(PLACEMENT_SCREEN);
   RescanUserMenu();
   ClosedDialog();
@@ -1158,7 +1162,7 @@ void TopWindowBase::ShowToolManagerDialog()
 void TopWindowBase::RescanUserMenu()
 {
   menubar->RescanUserMenus();
-  MenuMgr::PurgeTBarCmds();
+  mnumgr->PurgeTBarCmds(toolbar);
   UpdateToolbar();
 }
 
@@ -1284,7 +1288,7 @@ void TopWindowBase::UpdateTitle(long line, long col)
     menubar->SetReadOnlyCheckmark(sci->sendMessage(SCI_GETREADONLY,0,0));
     menubar->SetWordWrapCheckmark(sci->GetWordWrap());
     statusbar->FileInfo(sci->Filename(),sci->GetEncoding(),line,col);
-    MenuMgr::UpdateEolMenu(sci);
+    mnumgr->UpdateEolMenu(sci);
   } else {
     setTitle(EXE_NAME);
     statusbar->Clear();

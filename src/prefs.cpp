@@ -803,8 +803,9 @@ static FXint ReadRegInt(FXRegistry *reg, const char*key, FXint def, FXint min=0,
 #endif
 
 
-Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
+Settings::Settings(FXMainWindow*w, const FXString &configdir, MenuMgr*mmgr):SettingsBase()
 {
+  mnumgr=mmgr;
   FXString tmp;
   reg=&(w->getApp()->reg());
   style_reg=new FXSettings();
@@ -985,9 +986,9 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir):SettingsBase()
     LIMIT_RANGE(ls->tabwidth,0,16);
   }
   styles=GlobalStyle;
-  MenuMgr::ReadMenuSpecs(reg,keys_sect);
-  MenuMgr::ReadToolbarButtons(reg,tbar_sect);
-  MenuMgr::ReadPopupMenu(reg,popup_sect);
+  mnumgr->ReadMenuSpecs(reg,keys_sect);
+  mnumgr->ReadToolbarButtons(reg,tbar_sect);
+  mnumgr->ReadPopupMenu(reg,popup_sect);
   ReadErrorPatterns(reg);
   ReadSysIncPaths(reg);
 }
@@ -1102,9 +1103,9 @@ Settings::~Settings()
 
   FreeAllKeywordLists();
 
-  MenuMgr::WriteMenuSpecs(reg,keys_sect);
-  MenuMgr::WriteToolbarButtons(reg,tbar_sect);
-  MenuMgr::WritePopupMenu(reg,popup_sect);
+  mnumgr->WriteMenuSpecs(reg,keys_sect);
+  mnumgr->WriteToolbarButtons(reg,tbar_sect);
+  mnumgr->WritePopupMenu(reg,popup_sect);
   SaveErrorPatterns(reg);
   SaveSysIncPaths(reg);
 
