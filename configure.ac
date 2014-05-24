@@ -171,6 +171,10 @@ FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
 JEFFX_LIBS="-L`pwd`/jef -ljeffx"
 JEFFX_CFLAGS="-I${RELATIVE_SRC_DIR}/jef"
 
+MNUMGR_LIBS="-L`pwd`/mnumgr -lmnumgr"
+MNUMGR_CFLAGS="-I${RELATIVE_SRC_DIR}/mnumgr"
+
+
 
 AC_ARG_ENABLE([assert],AC_HELP_STRING([--enable-assert],[enable assertions]))
 
@@ -207,6 +211,9 @@ AC_SUBST(X11_LIBS)
 AC_SUBST(JEFFX_CFLAGS)
 AC_SUBST(JEFFX_LIBS)
 
+AC_SUBST(MNUMGR_CFLAGS)
+AC_SUBST(MNUMGR_LIBS)
+
 
 AC_OUTPUT( 
  Makefile
@@ -215,6 +222,7 @@ AC_OUTPUT(
  src/Makefile
  src/languages/Makefile
  po/Makefile.in
+ mnumgr/Makefile
  jef/Makefile
 )
 

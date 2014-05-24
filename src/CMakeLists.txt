@@ -23,6 +23,7 @@ INCLUDE_DIRECTORIES (
     ${LUA_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/jef
+    ${CMAKE_SOURCE_DIR}/mnumgr
     ${CMAKE_SOURCE_DIR}/fxscintilla
     ${X11_X11_INCLUDE_PATH}
     ${FOX_INCLUDE_DIRS}
@@ -37,6 +38,7 @@ ADD_EXECUTABLE (
 TARGET_LINK_LIBRARIES (
     fxite
     fxscintilla
+    mnumgr
     jeffx
     ${LUA_LIBRARIES}
     ${FOX_LDFLAGS}

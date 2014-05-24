@@ -1,5 +1,5 @@
-AM_CPPFLAGS = $(JEFFX_CFLAGS) $(FXSCINTILLA_CFLAGS) $(FOX_CFLAGS) $(LUA_CFLAGS) $(X11_CFLAGS)
-LDADD = $(JEFFX_LIBS) $(FXSCINTILLA_LIBS) $(FOX_LIBS) $(LUA_LIBS) $(X11_LIBS) $(LIBINTL)
+AM_CPPFLAGS = $(JEFFX_CFLAGS) $(MNUMGR_CFLAGS) $(FXSCINTILLA_CFLAGS) $(FOX_CFLAGS) $(LUA_CFLAGS) $(X11_CFLAGS)
+LDADD =  $(MNUMGR_LIBS) $(JEFFX_LIBS) $(FXSCINTILLA_LIBS) $(FOX_LIBS) $(LUA_LIBS) $(X11_LIBS) $(LIBINTL)
 DEFS += -DLOCALEDIR=\"$(localedir)\"
 
 
@@ -21,7 +21,6 @@ appwin.cpp \
 appwin_pub.cpp \
 backup.cpp \
 cmd_utils.cpp \
-color_funcs.cpp \
 doctabs.cpp \
 export.cpp \
 filedlg.cpp \
@@ -39,14 +38,11 @@ luafx.cpp \
 macro.cpp \
 mainmenu.cpp \
 menudefs.cpp \
-menuspec.cpp \
 migration.cpp \
 outpane.cpp \
 prefdlg.cpp \
 prefdlg_ext.cpp \
-prefdlg_kbnd.cpp \
 prefdlg_sntx.cpp \
-prefdlg_tbar.cpp \
 prefs.cpp \
 prefs_base.cpp \
 readtags.c \
@@ -55,13 +51,9 @@ scidoc.cpp \
 scidoc_util.cpp \
 scisrch.cpp \
 search.cpp \
-shmenu.cpp \
 statusbar.cpp \
 tagread.cpp \
 theme.cpp \
-toolbar.cpp \
-toolmgr.cpp \
-tooltree.cpp \
 winshcut.c
 
 
@@ -73,7 +65,6 @@ appwin_base.h \
 appwin_pub.h \
 backup.h \
 cmd_utils.h \
-color_funcs.h \
 doctabs.h \
 export.h \
 filedlg.h \
@@ -94,13 +85,10 @@ luasci.h \
 macro.h \
 mainmenu.h \
 menudefs.h \
-menuspec.h \
 outpane.h \
 prefdlg.h \
 prefdlg_ext.h \
-prefdlg_kbnd.h \
 prefdlg_sntx.h \
-prefdlg_tbar.h \
 prefs.h \
 prefs_base.h \
 readtags.h \
@@ -109,13 +97,9 @@ scidoc.h \
 scidoc_util.h \
 scisrch.h \
 search.h \
-shmenu.h \
 statusbar.h \
 tagread.h \
-theme.h \
-toolbar.h \
-toolmgr.h \
-tooltree.h
+theme.h
 
 
 EXTRA_DIST=\
