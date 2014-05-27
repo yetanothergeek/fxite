@@ -52,7 +52,6 @@ protected:
   MyToolBarFrame(){};
 public:
   MyToolBarFrame(FXComposite *o, bool hideit):ToolBarFrame(o,hideit){}
-  long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p );
   void EnableFilterBtn(bool enabled);
 };
 

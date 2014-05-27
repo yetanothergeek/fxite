@@ -429,14 +429,6 @@ FXDEFMAP(MyToolBarFrame) MyToolBarFrameMap[] = {
 FXIMPLEMENT(MyToolBarFrame,ToolBarFrame,MyToolBarFrameMap,ARRAYNUMBER(MyToolBarFrameMap))
 
 
-long MyToolBarFrame::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p)
-{
-  long rv=ToolBarFrame::onLeftBtnRelease(o,sel,p);
-  getApp()->addChore(TopWindow::instance(),TopWindow::ID_FOCUS_DOC,NULL);
-  return rv;
-}
-
-
 
 void MyToolBarFrame::EnableFilterBtnCB(FXButton*btn, void*user_data)
 {

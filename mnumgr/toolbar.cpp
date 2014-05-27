@@ -31,70 +31,22 @@
 #define UsedWidthOf(f) ((f&&f->getLast())?(f->getLast()->getX()+f->getLast()->getWidth()):0)
 
 
-/* Class that makes tool bar buttons restore document focus after they are clicked */
+//  Override (ignore) setFocus method: toolbar buttons are for mice,
+//  and should never gain keyboard focus.
 class ToolBarBtn: public FXButton {
-  FXDECLARE(ToolBarBtn)
-  ToolBarBtn(){}
 public:
-  ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel);
-  long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p );
+  virtual void setFocus() {}
+  ToolBarBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
+    FXButton(p,txt,ico,trg,sel) {}
 };
 
 
-/* Class that makes tool bar toggle buttons restore document focus after they are clicked */
 class ToolBarTogBtn: public FXToggleButton {
-  FXDECLARE(ToolBarTogBtn)
-  ToolBarTogBtn(){}
 public:
-  ToolBarTogBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel);
-  long onLeftBtnRelease(FXObject*o, FXSelector sel, void*p );
+  virtual void setFocus() {}
+  ToolBarTogBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
+    FXToggleButton(p,txt,txt,ico,ico,trg,sel,TogBtnOpts) {}
 };
-
-
-
-FXDEFMAP(ToolBarBtn) ToolBarBtnMap[] = {
-  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,ToolBarBtn::onLeftBtnRelease),
-};
-
-FXIMPLEMENT(ToolBarBtn,FXButton,ToolBarBtnMap,ARRAYNUMBER(ToolBarBtnMap))
-
-
-ToolBarBtn::ToolBarBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
-    FXButton(p,text,NULL,tgt,sel,FRAME_NONE|JUSTIFY_NORMAL,0,0,24,24,2,2,0,0)
-{
-
-}
-
-
-long ToolBarBtn::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p ) {
-  long rv=FXButton::onLeftBtnRelease(o,sel,p);
-  getParent()->getParent()->handle(o,sel,p);
-  return rv;
-
-}
-
-FXDEFMAP(ToolBarTogBtn) ToolBarTogBtnMap[] = {
-  FXMAPFUNC(SEL_LEFTBUTTONRELEASE,0,ToolBarTogBtn::onLeftBtnRelease),
-};
-
-FXIMPLEMENT(ToolBarTogBtn,FXToggleButton,ToolBarTogBtnMap,ARRAYNUMBER(ToolBarTogBtnMap))
-
-
-
-ToolBarTogBtn::ToolBarTogBtn(FXComposite* p, const FXString& text, FXObject*tgt, FXSelector sel):
-    FXToggleButton(p,text,text,NULL,NULL,tgt,sel,TogBtnOpts,0,0,24,24,2,2,0,0)
-{
-
-}
-
-
-
-long ToolBarTogBtn::onLeftBtnRelease(FXObject*o, FXSelector sel, void*p )
-{
-  long rv=FXToggleButton::onLeftBtnRelease(o,sel,p);
-  getParent()->getParent()->handle(o,sel,p);
-  return rv;
-}
 
 
 
