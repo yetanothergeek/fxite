@@ -37,7 +37,7 @@ class ToolBarBtn: public FXButton {
 public:
   virtual void setFocus() {}
   ToolBarBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
-    FXButton(p,txt,ico,trg,sel) {}
+    FXButton(p,txt,NULL,trg,sel) {}
 };
 
 
@@ -45,7 +45,7 @@ class ToolBarTogBtn: public FXToggleButton {
 public:
   virtual void setFocus() {}
   ToolBarTogBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
-    FXToggleButton(p,txt,txt,ico,ico,trg,sel,TogBtnOpts) {}
+    FXToggleButton(p,txt,txt,NULL,NULL,trg,sel,TogBtnOpts) {}
 };
 
 
