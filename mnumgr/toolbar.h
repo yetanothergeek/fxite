@@ -23,10 +23,9 @@
 class MenuMgr;
 
 // This thing behaves something like an FXHorizontalFrame that can "wrap" its contents across two rows.
-class ToolBarFrame: public FXVerticalFrame {
+class ToolBarFrame: public FXMatrix {
 private:
   FXDECLARE(ToolBarFrame);
-  FXHorizontalFrame*rows[2];
   bool wraptoolbar;
   bool hidden;
   FXFont*toolbar_font;
@@ -36,7 +35,6 @@ private:
   static void NullifyButtonDataCB(FXButton*btn, void*user_data);
   static void ClearTBarBtnDataCB(FXButton*btn, void*user_data);
   void reconf();
-  void normalize();
 protected:
   void ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data);
   ToolBarFrame(){}

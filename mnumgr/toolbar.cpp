@@ -25,7 +25,7 @@
 #include "toolbar.h"
 
 
-#define TBarOpts (FRAME_NONE|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT)
+#define TBarOpts (FRAME_NONE|LAYOUT_FILL_X|PACK_UNIFORM_HEIGHT|PACK_UNIFORM_WIDTH|MATRIX_BY_COLUMNS)
 #define TogBtnOpts  (FRAME_RAISED|FRAME_THICK|JUSTIFY_NORMAL|TOGGLEBUTTON_KEEPSTATE)
 
 #define UsedWidthOf(f) ((f&&f->getLast())?(f->getLast()->getX()+f->getLast()->getWidth()):0)
@@ -54,12 +54,12 @@ FXDEFMAP(ToolBarFrame)ToolBarFrameMap[]={
   FXMAPFUNC(SEL_CONFIGURE, 0, ToolBarFrame::onConfigure)
 };
 
-FXIMPLEMENT(ToolBarFrame,FXVerticalFrame,ToolBarFrameMap,ARRAYNUMBER(ToolBarFrameMap));
+FXIMPLEMENT(ToolBarFrame,FXMatrix,ToolBarFrameMap,ARRAYNUMBER(ToolBarFrameMap));
 
 
 long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
 {
-  FXVerticalFrame::onConfigure(o,sel,p);
+  FXMatrix::onConfigure(o,sel,p);
   reconf();
   return 1;
 }
@@ -67,50 +67,13 @@ long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
 
 // Wrap or unwrap buttons as needed.
 void ToolBarFrame::reconf()
-{
-  FXint kids1=rows[0]->numChildren();
-  FXint kids2=rows[1]->numChildren();
-  if ((wraptoolbar)&&(kids1>0)&&(kids2==0)&&(width<UsedWidthOf(rows[0]))) {
-    FXWindow *topright=rows[0]->childAtIndex((kids1/2));
-    if (topright && (kids1%2==0)) { topright=topright->getPrev(); }
-    while ( rows[0]->getLast() && (rows[0]->getLast() != topright) ) {
-      rows[0]->getLast()->reparent(rows[1], rows[1]->getFirst());
-    }
-  } else if ( (kids2>0) && ((!wraptoolbar)||(width>(UsedWidthOf(rows[0])+UsedWidthOf(rows[1])))) ) {
-    while (rows[1]->getFirst()) {
-      rows[1]->getFirst()->reparent(rows[0],NULL);
-    }
+{  
+  setNumColumns(numChildren());
+  setNumRows(1);
+  if (wraptoolbar && (getParent()->getWidth()<getDefaultWidth())) {
+    setNumColumns((numChildren()/2)+(numChildren()%2));
+    setNumRows(2);
   }
-  if (rows[1]->numChildren()) { rows[1]->show(); } else { rows[1]->hide(); }
-  normalize();
-}
-
-
-
-// Make all buttons the same width
-void ToolBarFrame::normalize()
-{
-  if (rows[0]->numChildren()==0) { return; }
-  FXint wdt=0;
-  for (FXWindow*row=getFirst(); row; row=row->getNext()) {
-    for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
-      btn->setLayoutHints(btn->getLayoutHints()&~LAYOUT_FIX_WIDTH);
-    }
-  }
-  layout();
-  for (FXWindow*row=getFirst(); row; row=row->getNext()) {
-    for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
-      FXint w=btn->getWidth();
-      if (w>wdt) { wdt=w; }
-    }
-  }
-  for (FXWindow*row=getFirst(); row; row=row->getNext()) {
-    for (FXWindow*btn=row->getFirst(); btn; btn=btn->getNext()) {
-      btn->setLayoutHints(btn->getLayoutHints()|LAYOUT_FIX_WIDTH);
-      btn->setWidth(wdt);
-    }
-  }
-  layout();
 }
 
 
@@ -156,10 +119,6 @@ void ToolBarFrame::SetTBarBtnFontCB(FXButton*btn, void*user_data)
   if (tbf->getShell()->shown()) {
     btn->create();
   }
-  if (btn->getNext()==NULL) {
-    tbf->normalize();
-    tbf->reconf();
-  }
 }
 
 
@@ -170,6 +129,7 @@ void ToolBarFrame::SetTBarFont()
   toolbar_font=NULL;
   ForEachToolbarButton(SetTBarBtnFontCB,this);
   delete old_font;
+  reconf();
   getParent()->layout();
 }
 
@@ -182,23 +142,16 @@ ToolBarFrame::~ToolBarFrame()
 
 
 
-ToolBarFrame::ToolBarFrame(FXComposite *o, bool hideit):FXVerticalFrame(o,TBarOpts,0,0,0,0,0,0,0,0,1,1)
+ToolBarFrame::ToolBarFrame(FXComposite *o, bool hideit):FXMatrix(o,1,TBarOpts,0,0,0,0,0,0,0,0,1,1)
 {
   toolbar_font = NULL;
   hidden=hideit;
-  rows[0]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
-  rows[1]=new FXHorizontalFrame(this,TBarOpts,0,0,0,0,0,0,0,0,1,1);
-  rows[1]->hide();
 }
 
 
 
 void ToolBarFrame::ForEachToolbarButton(void (*cb)(FXButton*btn, void*user_data), void*user_data) {
-  for (FXWindow*hfrm=getFirst(); hfrm; hfrm=hfrm->getNext()) {
-    for (FXWindow*btn=hfrm->getFirst(); btn; btn=btn->getNext()) {
-      cb((FXButton*)btn, user_data);
-    }
-  }
+  for (FXWindow*btn=getFirst(); btn; btn=btn->getNext()) { cb((FXButton*)btn, user_data); }
 }
 
 
@@ -228,8 +181,7 @@ void ToolBarFrame::NullifyButtonData(void*user_data)
 
 void ToolBarFrame::create()
 {
-  FXVerticalFrame::create();
-  normalize();
+  FXMatrix::create();
   if (hidden) { hide(); }
 }
 
@@ -237,7 +189,7 @@ void ToolBarFrame::create()
 
 void ToolBarFrame::show()
 {
-  FXVerticalFrame::show();
+  FXMatrix::show();
   getParent()->layout();
 }
 
@@ -245,7 +197,7 @@ void ToolBarFrame::show()
 
 void ToolBarFrame::hide()
 {
-  FXVerticalFrame::hide();
+  FXMatrix::hide();
   getParent()->layout();
 }
 
@@ -258,9 +210,7 @@ void ToolBarFrame::CreateButtons(FXMainWindow*tw, FXuchar btn_size, bool wrapit,
   button_size=btn_size;
   wraptoolbar=wrapit;
   ForEachToolbarButton(ClearTBarBtnDataCB,NULL);
-  for (FXWindow*w=getFirst(); w; w=w->getNext()) {
-    while (w->numChildren()) { delete w->getFirst(); }
-  }
+  while (numChildren()) { delete getFirst(); }
   for (FXint i=0; i<TBAR_MAX_BTNS; i++) {
     MenuSpec* spec=mmgr->LookupMenu(mmgr->TBarBtns()[i]);
     if (spec && spec->sel<mmgr->LastID()) {
@@ -268,9 +218,9 @@ void ToolBarFrame::CreateButtons(FXMainWindow*tw, FXuchar btn_size, bool wrapit,
       txt.substitute(' ','\n',true);
       FXLabel*btn;
       if (spec->type=='k') {
-        btn=new ToolBarTogBtn((FXComposite*)(getFirst()),txt,tw,spec->sel);
+        btn=new ToolBarTogBtn(this,txt,tw,spec->sel);
       } else {
-        btn=new ToolBarBtn((FXComposite*)(getFirst()),txt,tw,(spec->type=='u')?custom_cmd_id:spec->sel);
+        btn=new ToolBarBtn(this,txt,tw,(spec->type=='u')?custom_cmd_id:spec->sel);
       }
       if (spec->ms_mc) {
         if (spec->type!='u') { 
