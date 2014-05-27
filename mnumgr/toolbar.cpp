@@ -35,7 +35,7 @@
 //  and should never gain keyboard focus.
 class ToolBarBtn: public FXButton {
 public:
-  virtual void setFocus() {}
+  virtual void setFocus() { update(); }
   ToolBarBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
     FXButton(p,txt,NULL,trg,sel) {}
 };
@@ -43,7 +43,7 @@ public:
 
 class ToolBarTogBtn: public FXToggleButton {
 public:
-  virtual void setFocus() {}
+  virtual void setFocus() { update(); }
   ToolBarTogBtn(FXComposite*p, const FXString&txt, FXObject*trg, FXSelector sel):
     FXToggleButton(p,txt,txt,NULL,NULL,trg,sel,TogBtnOpts) {}
 };
