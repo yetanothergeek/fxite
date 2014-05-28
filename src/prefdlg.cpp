@@ -32,6 +32,7 @@
 #include "prefdlg_ext.h"
 #include "prefdlg_sntx.h"
 #include "cfg_keybind.h"
+#include "cfg_popmenu.h"
 #include "cfg_toolbar.h"
 #include "theme.h"
 #include "shady_tabs.h"

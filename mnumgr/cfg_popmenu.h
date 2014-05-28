@@ -1,6 +1,6 @@
 /*
   FXiTe - The Free eXtensIble Text Editor
-  Copyright (c) 2009-2012 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
+  Copyright (c) 2009-2014 Jeffrey Pohlmeyer <yetanothergeek@gmail.com>
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License version 3 as
@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef MNUMGR_CFG_TOOLBAR_H
-#define MNUMGR_CFG_TOOLBAR_H
+#ifndef MNUMGR_CFG_POPMENU_H
+#define MNUMGR_CFG_POPMENU_H
 
 
 #include "dual_list.h"
@@ -26,32 +26,29 @@ class UserMenu;
 class ToolBarFrame;
 class MenuMgr;
 
-class ToolbarPrefs: public DualListForm {
+class PopupPrefs: public DualListForm {
 private:
-  FXDECLARE(ToolbarPrefs);
-  ToolbarPrefs(){}
+  FXDECLARE(PopupPrefs);
+  PopupPrefs(){}
   FXButton* custom_btn;
+  FXButton* separator_btn;
   virtual void PopulateAvail();
   virtual void PopulateUsed();
   virtual void CheckCount();
   MenuMgr*mnumgr;
   UserMenu**user_menus;
-  ToolBarFrame*toolbar;
   FXint invalid;
 public:
-  long onRemoveItem(FXObject*o, FXSelector sel, void*p);
-  long onInsertCustomItem(FXObject*o, FXSelector sel, void*p);
-  long onChangeBtnSize(FXObject*o,FXSelector sel,void*p);
-  long onChangeBtnWrap(FXObject*o,FXSelector sel,void*p);
+  PopupPrefs(FXComposite*p, UserMenu**ums, MenuMgr*mmgr);
+  long onInsertCustomItem( FXObject*o, FXSelector sel, void*p);
+  long onInsertSeparator(  FXObject*o, FXSelector sel, void*p);
   long onQueryTip(FXObject*o, FXSelector sel, void*p);
-  ToolbarPrefs(FXComposite*p, ToolBarFrame*tbar, UserMenu**ums, MenuMgr*mmgr);
   enum {
     ID_INSERT_CUSTOM=DualListForm::ID_LAST,
-    ID_CHANGE_BTN_WRAP,
-    ID_CHANGE_BTN_SIZE,
+    ID_INSERT_SEPARATOR,
     ID_LAST
   };
 };
 
-#endif
 
+#endif
