@@ -4,6 +4,7 @@ AM_CPPFLAGS = $(JEFFX_CFLAGS) $(FOX_CFLAGS)
 noinst_LIBRARIES=libjeffx.a
 
 libjeffx_a_SOURCES=\
+  color_funcs.cpp \
   compat.cpp \
   desclistdlg.cpp \
   dual_list.cpp \
@@ -21,6 +22,7 @@ libjeffx_a_SOURCES=\
 
 
 noinst_HEADERS=\
+  color_funcs.h \
   compat.h \
   desclistdlg.h \
   dual_list.h \

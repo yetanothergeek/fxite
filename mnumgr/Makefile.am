@@ -4,7 +4,6 @@ AM_CPPFLAGS = $(JEFFX_CFLAGS) $(FOX_CFLAGS)
 noinst_LIBRARIES=libmnumgr.a
 
 libmnumgr_a_SOURCES=\
-color_funcs.cpp \
 menuspec.cpp \
 prefdlg_kbnd.cpp \
 prefdlg_tbar.cpp \
@@ -14,7 +13,6 @@ toolmgr.cpp \
 tooltree.cpp
 
 noinst_HEADERS=\
-color_funcs.h \
 menuspec.h \
 prefdlg_kbnd.h \
 prefdlg_tbar.h \
