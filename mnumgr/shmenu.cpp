@@ -214,7 +214,6 @@ bool UserMenu::MakeLabelFromPath(const char*path, FXString &label)
     accel.erase(0,at+1);
     label.trunc(at);
   }
-  if (isdigit(label[0])&&isdigit(label[1]&&(label[2]=='.'))) { label.erase(0,3); }
   label.lower();
   label.substitute('_', '&', false);
   label.substitute('-', ' ', true);
