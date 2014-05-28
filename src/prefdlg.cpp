@@ -30,9 +30,9 @@
 #include "menuspec.h"
 #include "desclistdlg.h"
 #include "prefdlg_ext.h"
-#include "prefdlg_kbnd.h"
 #include "prefdlg_sntx.h"
-#include "prefdlg_tbar.h"
+#include "cfg_keybind.h"
+#include "cfg_toolbar.h"
 #include "theme.h"
 #include "shady_tabs.h"
 

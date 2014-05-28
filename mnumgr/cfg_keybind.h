@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef FXITE_PREFDLG_KBND
-#define FXITE_PREFDLG_KBND
+#ifndef MNUMGR_CFG_KEYBIND_H
+#define MNUMGR_CFG_KEYBIND_H
 
 #include "menuspec.h"
 

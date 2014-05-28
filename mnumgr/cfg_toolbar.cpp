@@ -23,7 +23,7 @@
 #include "shmenu.h"
 
 #include "intl.h"
-#include "prefdlg_tbar.h"
+#include "cfg_toolbar.h"
 
 
 

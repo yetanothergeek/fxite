@@ -20,7 +20,7 @@
 #include <fxkeys.h>
 
 #include "intl.h"
-#include "prefdlg_kbnd.h"
+#include "cfg_keybind.h"
 
 FXDEFMAP(KeyBindingList) KeyBindingListMap[] = {
   FXMAPFUNC(SEL_QUERY_TIP,0,KeyBindingList::onQueryTip),
