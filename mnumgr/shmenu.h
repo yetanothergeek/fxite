@@ -16,14 +16,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef FXITE_SHMENU_H
-#define FXITE_SHMENU_H
+#ifndef MNUMGR_SHMENU_H
+#define MNUMGR_SHMENU_H
 
 
 class UserMenuHelper;
 
 class UserMenu: public FXObject {
-FXDECLARE(UserMenu)
+  FXDECLARE(UserMenu)
   UserMenu(){}
   friend class UserMenuHelper;
 private:
@@ -38,7 +38,6 @@ private:
   FXSelector selector;
   const char**_flags;
   char _tag;
-protected:
   int count;
   void ScanDir(FXMenuPane*parent, const char *directory);
   void create();
@@ -53,7 +52,7 @@ public:
   void rescan();
   void enable();
   void disable();
-  FXString getText();
+  const FXString getText();
   void setText(const FXString &s);
   const char** getFlags() const { return _flags; };
   const FXMenuPane*menu() const { return (panes.no()>0)?panes[0]:NULL; }

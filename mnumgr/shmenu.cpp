@@ -72,12 +72,12 @@ public:
 
 
 
-FXDEFMAP(UsrMnuCmd) MyCmdMap[] = {
+FXDEFMAP(UsrMnuCmd) UsrMnuCmdMap[] = {
   FXMAPFUNC(SEL_KEYRELEASE,0,UsrMnuCmd::onKeyRelease),
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,0,UsrMnuCmd::onButtonRelease)
 };
 
-FXIMPLEMENT(UsrMnuCmd,FXMenuCommand,MyCmdMap,ARRAYNUMBER(MyCmdMap))
+FXIMPLEMENT(UsrMnuCmd,FXMenuCommand,UsrMnuCmdMap,ARRAYNUMBER(UsrMnuCmdMap))
 
 
 
@@ -147,12 +147,8 @@ void UserMenu::rescan()
   if (topcasc) {
     if (hasitems) {
       if (panes[0]->numChildren()==1) {
-        FXMenuCascade*mc=(FXMenuCascade*)panes[0]->getFirst();
-        if (mc && (strcmp(mc->getClassName(),"FXMenuCascade")==0)) {
-          if (mc->getText()=="Hidden") {
-            topcasc->hide();
-          }
-        }
+        FXMenuCascade*mc=dynamic_cast<FXMenuCascade*>(panes[0]->getFirst());
+        if (mc && (mc->getText()=="Hidden")) { topcasc->hide();  }
       }
     } else { topcasc->hide(); }
   }
@@ -174,13 +170,12 @@ void UserMenu::disable()
 
 
 
-FXString UserMenu::getText()
+const FXString UserMenu::getText()
 {
-  if (topcasc) {return topcasc->getText(); } else {
-    FXString rv=FXPath::name(topdir);
-    rv[0]=toupper(rv[0]);
-    return rv;
-  }
+  if (topcasc) { return topcasc->getText(); }
+  FXString rv=FXPath::name(topdir);
+  rv[0]=toupper(rv[0]);
+  return rv;
 }
 
 
@@ -195,19 +190,14 @@ void UserMenu::setText(const FXString &s)
 bool UserMenu::MakeLabelFromPath(const char*path, FXString &label)
 {
   label=FXPath::name(path);
-
+  FXString accel=FXString::null;
   if ( (label.length()>=3) && isdigit(label[0]) && isdigit(label[1]) && (label[2]=='.')) {
     label.erase(0,3);
   } else {
     return false;
   }
-
   label=FXPath::stripExtension(label);
-
-  if (!(FXPath::extension(label)).empty()) {
-    label=FXPath::stripExtension(label);
-  }
-  FXString accel="";
+  if (!(FXPath::extension(label)).empty()) { label=FXPath::stripExtension(label); }
   FXint at=label.find('@');
   if (at>=0) {
     accel=label.text();
@@ -234,6 +224,8 @@ bool UserMenu::MakeLabelFromPath(const char*path, FXString &label)
 
 
 
+typedef int (*SlFunc)(void*,void*);
+
 typedef struct _StrNode {
   struct _StrNode*next;
   char* data;
@@ -247,7 +239,6 @@ static int NodeCmp(StrNode*n1, StrNode*n2)
 }
 
 
-typedef int (*SlFunc)(void*,void*);
 
 static void NodeFree(void*p)
 {
