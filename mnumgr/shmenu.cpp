@@ -196,7 +196,7 @@ bool UserMenu::MakeLabelFromPath(const char*path, FXString &label)
 {
   label=FXPath::name(path);
 
-  if ( (label.length()>=3) && isdigit(label[0]) && isdigit(label[0]) && (label[2]=='.')) {
+  if ( (label.length()>=3) && isdigit(label[0]) && isdigit(label[1]) && (label[2]=='.')) {
     label.erase(0,3);
   } else {
     return false;
