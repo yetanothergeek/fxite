@@ -127,16 +127,20 @@ static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acck
   }
 }
 
+
+
 void KeyBindingList::AccelInsert(FXHotKey acckey, MenuSpec*spec)
 {
-   FXAccelTable*table=win->getAccelTable();
-   if (spec->ms_mc) {
-     spec->ms_mc->setAccelText(spec->accel);
-     table->addAccel(acckey,spec->ms_mc->getTarget(),FXSEL(SEL_COMMAND,spec->sel));
-   } else {
-     table->addAccel(acckey,win,FXSEL(SEL_COMMAND,spec->sel));
-   }
+  FXAccelTable*table=win->getAccelTable();
+  if (spec->ms_mc) {
+    spec->ms_mc->setAccelText(spec->accel);
+    table->addAccel(acckey,spec->ms_mc->getTarget(),FXSEL(SEL_COMMAND,spec->sel));
+  } else {
+    table->addAccel(acckey,win,FXSEL(SEL_COMMAND,spec->sel));
+  }
 }
+
+
 
 long KeyBindingList::onAccelEdit(FXObject*o, FXSelector s, void*p)
 {
