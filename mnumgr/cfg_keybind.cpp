@@ -131,7 +131,6 @@ void KeyBindingList::AccelInsert(FXHotKey acckey, MenuSpec*spec)
 {
    FXAccelTable*table=win->getAccelTable();
    if (spec->ms_mc) {
-     spec->ms_mc->setSelector(0);
      spec->ms_mc->setAccelText(spec->accel);
      table->addAccel(acckey,spec->ms_mc->getTarget(),FXSEL(SEL_COMMAND,spec->sel));
    } else {
