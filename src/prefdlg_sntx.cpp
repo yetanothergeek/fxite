@@ -38,13 +38,6 @@
 #define SPIN_OPTS      ( SPIN_NORMAL | FRAME_SUNKEN | FRAME_THICK )
 #define PACK_UNIFORM   ( PACK_UNIFORM_WIDTH | PACK_UNIFORM_HEIGHT )
 
-#define SetPad(padwin, padsize) \
-(padwin)->setPadLeft(padsize); \
-(padwin)->setPadTop(padsize); \
-(padwin)->setPadRight(padsize); \
-(padwin)->setPadBottom(padsize);
-
-
 #define COLORWELL_OPTS ( COLORWELL_OPAQUEONLY|LAYOUT_FIX_WIDTH|FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y )
 #define STYLE_BTN_OPTS ( TOGGLEBUTTON_NORMAL | TOGGLEBUTTON_KEEPSTATE | LAYOUT_FILL_Y )
 

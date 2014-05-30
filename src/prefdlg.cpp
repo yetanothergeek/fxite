@@ -82,13 +82,6 @@ FXDEFMAP(PrefsDialog) PrefsDialogMap[]={
 FXIMPLEMENT(PrefsDialog,FXDialogBox,PrefsDialogMap,ARRAYNUMBER(PrefsDialogMap));
 
 
-#define SetPad(padwin, padsize) \
-(padwin)->setPadLeft(padsize); \
-(padwin)->setPadTop(padsize); \
-(padwin)->setPadRight(padsize); \
-(padwin)->setPadBottom(padsize);
-
-
 
 void PrefsDialog::MakeToolbarTab()
 {

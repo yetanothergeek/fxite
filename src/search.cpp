@@ -32,16 +32,6 @@
 
 
 
-#define SetPadLRTB(o,l,r,t,b) \
-  o->setPadLeft(l); \
-  o->setPadRight(r); \
-  o->setPadTop(t); \
-  o->setPadBottom(b);
-
-#define SetPad(o,p) SetPadLRTB(o,p,p,p,p)
-
-
-
 FXDEFMAP(SciSearchOptions) SciSearchOptionsMap[]={
   FXMAPFUNC(SEL_COMMAND,SciSearchOptions::ID_TOGGLE_CHK,SciSearchOptions::onToggleChk),
 };

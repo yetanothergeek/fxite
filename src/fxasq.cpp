@@ -22,13 +22,6 @@
 #include "intl.h"
 #include "fxasq.h"
 
-#define SetPad(w,p) \
-  w->setPadTop(0); \
-  w->setPadBottom(p); \
-  w->setPadLeft(p); \
-  w->setPadRight(p); \
-  w->setVSpacing(p);
-
 #define LISTBOX_OPTS FRAME_SUNKEN|FRAME_THICK|LISTBOX_NORMAL|LAYOUT_FILL_X
 
 #define IsThis(o,t) ( dynamic_cast<t*>(o)!=NULL )
