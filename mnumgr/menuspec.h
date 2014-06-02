@@ -64,6 +64,7 @@ public:
   MenuSpec*LookupMenuByPref(const char*pref);
   static const char*TBarColors(FXint i);
   static const char*GetUsrCmdPath(MenuSpec*spec);
+  static void SetAccelerator(MenuSpec*spec, const FXString &accel);
   void GetTBarBtnTip(MenuSpec*spec, FXString &tip);
   void GetTipFromFilename(const char*filename, FXString &tip);
   static MenuSpec*AddTBarUsrCmd(FXMenuCommand*mc);

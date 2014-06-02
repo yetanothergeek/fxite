@@ -539,6 +539,16 @@ FXMenuCommand*MenuMgr::MakeMenuCommand(FXComposite*p, FXObject*tgt, FXSelector s
 
 
 
+void MenuMgr::SetAccelerator(MenuSpec*spec, const FXString &accel)
+{
+  memset(spec->accel,0,sizeof(spec->accel));
+  strncpy(spec->accel,accel.text(),sizeof(spec->accel)-1);
+  char*plus=strrchr(spec->accel,'+');
+  if (plus && (strlen(plus)==2)) { plus[1]=Ascii::toUpper(plus[1]); }
+}
+
+
+
 void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
 {
   for (MenuSpec*spec=menu_specs; spec->sel!=last_id; spec++) {
@@ -550,10 +560,7 @@ void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
       acc.substitute('(','9');
     }
 #endif
-    if (strcmp(acc.text(),spec->accel)!=0) {
-      memset(spec->accel,0,sizeof(spec->accel));
-      strncpy(spec->accel,acc.text(),sizeof(spec->accel)-1);
-    }
+    SetAccelerator(spec,acc);
   }
 }
 
