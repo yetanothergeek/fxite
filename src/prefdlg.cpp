@@ -496,6 +496,7 @@ PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs, MenuMgr* mmgr):FXDia
   prefs=aprefs;
   main_win=w;
   setWidth(620);
+  SetPad(this,2);
 
   FXHorizontalFrame* buttons=new FXHorizontalFrame(this,LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X);
   new FXButton(buttons,_("  &Close  "), NULL,this,ID_ACCEPT,FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_Y);
