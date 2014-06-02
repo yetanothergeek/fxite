@@ -542,7 +542,8 @@ FXMenuCommand*MenuMgr::MakeMenuCommand(FXComposite*p, FXObject*tgt, FXSelector s
 void MenuMgr::ReadMenuSpecs(FXRegistry*reg, const char* keys_sect)
 {
   for (MenuSpec*spec=menu_specs; spec->sel!=last_id; spec++) {
-    FXString acc=reg->readStringEntry(keys_sect,spec->pref,spec->accel);
+   const char*fallback=reg->existingEntry(keys_sect,spec->pref) ? "" : spec->accel;
+    FXString acc=reg->readStringEntry(keys_sect,spec->pref,fallback);
 #ifdef WIN32
     if (acc.contains("Shift")) {
       acc.substitute(')','0');
