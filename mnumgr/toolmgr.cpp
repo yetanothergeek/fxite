@@ -34,12 +34,6 @@
 
 #define IsTop(ti) ( (!ti->getParent()) || (!ti->getParent()->getParent()) )
 
-#define SetPad(w,p) \
-  (w)->setPadTop(p); \
-  (w)->setPadBottom(p); \
-  (w)->setPadLeft(p); \
-  (w)->setPadRight(p);
-
 static const char*default_help_text = _("Configure user-defined commands for the \"Tools\" menu.");
 
 static const char*intro_text = _(
