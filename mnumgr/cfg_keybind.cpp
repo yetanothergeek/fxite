@@ -19,57 +19,75 @@
 #include <fx.h>
 #include <fxkeys.h>
 
+#include "cfg_shortcut.h"
+
 #include "intl.h"
 #include "cfg_keybind.h"
 
-FXDEFMAP(KeyBindingList) KeyBindingListMap[] = {
-  FXMAPFUNC(SEL_QUERY_TIP,0,KeyBindingList::onQueryTip),
-  FXMAPFUNC(SEL_DOUBLECLICKED,KeyBindingList::ID_ACCEL_EDIT,KeyBindingList::onAccelEdit),
-  FXMAPFUNC(SEL_KEYPRESS,KeyBindingList::ID_ACCEL_EDIT,KeyBindingList::onAccelEdit),
+
+class MyIconList: public FXIconList {
+protected:
+  FXDECLARE(MyIconList);
+  MyIconList(){}
+public:
+  MyIconList(ShortcutList*o,FXSelector sel,FXuint opts):FXIconList(o,o,sel,opts) {}
+  long onQueryTip(FXObject*o,FXSelector sel,void*p) {
+    if (getParent()->handle(o,sel,this)) {
+      return 1;
+    } else {
+      return FXIconList::onQueryTip(o,sel,p);
+    }
+  }
 };
 
-FXIMPLEMENT(KeyBindingList,FXIconList,KeyBindingListMap,ARRAYNUMBER(KeyBindingListMap))
+FXDEFMAP(MyIconList) MyIconListMap[] = {
+  FXMAPFUNC(SEL_QUERY_TIP,0,MyIconList::onQueryTip),
+};
+
+FXIMPLEMENT(MyIconList,FXIconList,MyIconListMap,ARRAYNUMBER(MyIconListMap))
 
 
-static bool AccelSanity(FXWindow*w, FXHotKey acckey)
+
+FXDEFMAP(ShortcutList) ShortcutListMap[]={
+  FXMAPFUNC(SEL_CHANGED, ShortcutList::ID_SEL_KEYBIND, ShortcutList::onSelectKeybinding),
+  FXMAPFUNC(SEL_CHANGED, ShortcutList::ID_EDIT_KEYBIND, ShortcutList::onEditKeybinding),
+  FXMAPFUNC(SEL_COMMAND, ShortcutList::ID_APPLY_CHANGES, ShortcutList::onApplyChanges),
+  FXMAPFUNC(SEL_COMMAND, ShortcutList::ID_REMOVE_KEYBIND, ShortcutList::onRemoveKeybinding),
+  FXMAPFUNC(SEL_QUERY_TIP, 0, ShortcutList::onQueryTip),
+};
+FXIMPLEMENT(ShortcutList,FXHorizontalFrame,ShortcutListMap,ARRAYNUMBER(ShortcutListMap));
+
+
+
+bool ShortcutList::ConfirmOverwrite(FXHotKey acckey, MenuSpec*spec)
 {
-  FXushort key=FXSELID(acckey);
-  FXushort mod=FXSELTYPE(acckey);
-  if (key==0) {
-    FXMessageBox::error(w, MBOX_OK, _("Invalid keybinding"), _("That keybinding does not end with a valid key name"));
-    return false;
-  }
-  if ((key>=KEY_F1)&&(key<=KEY_F12)) { return true; }
-  if ((mod&CONTROLMASK)||(mod&ALTMASK)||(mod&METAMASK)) { return true; }
-  return (FXMessageBox::question(w, MBOX_YES_NO, _("Weak keybinding"), "%s\n\n%s",
-    _("That key binding doesn't contain any [Ctrl] or [Alt]\n"
-      "modifiers, which might cause you some problems."),
-    _("Are you sure you want to continue?")
-   )==MBOX_CLICKED_YES);
+  return sce->ConfirmOverwrite(win->getAccelTable());
 }
 
 
 
-bool KeyBindingList::AccelUnique(FXHotKey acckey, MenuSpec*spec)
+long ShortcutList::onQueryTip(FXObject*o,FXSelector sel,void*p)
 {
-  FXAccelTable*table=win->getAccelTable();
-  if (!table->hasAccel(acckey)) { return true; }
-
-  if (FXMessageBox::question(getShell(), MBOX_YES_NO, _("Conflicting keybinding"), "%s\n\n%s",
-    _("This keybinding appears to conflict with an existing one."),
-    _("Are you sure you want to continue?")
-  )==MBOX_CLICKED_YES) {
-    table->removeAccel(acckey);
-    return true;
-  } else {
-    return false;
+  MyIconList*w=dynamic_cast<MyIconList*>((FXObject*)p);
+  if (w) {
+    FXint index,cx,cy;
+    FXuint btns;
+    if (w->getCursorPosition(cx,cy,btns) && (index=w->getItemAt(cx,cy))>=0) {
+      MenuSpec*spec=(MenuSpec*)(w->getItem(index)->getData());
+      if (spec) {
+        FXString tip=FXString::null;
+        mnumgr->GetTBarBtnTip(spec,tip);
+        o->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
+        return 1;
+      }
+    }
   }
-
+  return 0;
 }
 
 
 
-bool KeyBindingList::AccelDelete(MenuSpec*spec)
+bool ShortcutList::DeleteShortcut(MenuSpec*spec)
 {
   FXHotKey acckey=parseAccel(spec->accel);
   FXAccelTable*table=win->getAccelTable();
@@ -79,7 +97,9 @@ bool KeyBindingList::AccelDelete(MenuSpec*spec)
     if (FXMessageBox::question(getShell(), MBOX_YES_NO, _("Confirm delete"),
       _("Are you sure you want to remove this keybinding?")
     )==MBOX_CLICKED_YES) {
-     table->removeAccel(acckey);
+      table->removeAccel(acckey);
+      memset(spec->accel,0,sizeof(spec->accel));
+      UpdateListItem(spec);
       return true;
     } else {
       return false;
@@ -89,145 +109,224 @@ bool KeyBindingList::AccelDelete(MenuSpec*spec)
 
 
 
-static bool EditAccel(FXString&acctxt, FXWindow*w, MenuSpec*spec, FXHotKey &acckey)
+void ShortcutList::UpdateListItem(MenuSpec*spec)
 {
-  FXInputDialog dlg(w,"","");
-  FXint maxlen=sizeof(spec->accel)-1;
-  dlg.setNumColumns(maxlen);
-  FXString msg;
-  msg.format(
-    "%s:\n"
-    "   Ctrl+Shift+F12\n"
-    "   F3\n"
-    "   Alt+G\n\n"
-    "%s \"%s\"",
-    _("Examples"), _("Keybinding for"), spec->pref);
-  FXString orig=acctxt.text();
-  while (true) {
-    acckey=0;
-    if (dlg.getString(acctxt, w->getShell(), _("Edit keybinding"), msg )) {
-      if (acctxt.empty()) { return true; }
-      acckey=parseAccel(acctxt);
-      if (acckey) {
-        acctxt=unparseAccel(acckey);
-        if ((acctxt.length())<maxlen) {
-          if (AccelSanity(w,acckey)) { return strcmp(spec->accel, acctxt.text())!=0; }
-        } else {
-          FXMessageBox::error(w->getShell(), MBOX_OK,
-            _("Keybinding too long"), _("Text of keybinding specification must not exceed %d bytes\n"), maxlen);
-        }
-      } else {
-        FXMessageBox::error(w->getShell(), MBOX_OK,
-          _("Invalid keybinding"), "%s:\n%s", _("Failed to parse accelerator"), acctxt.text());
-        acctxt=orig.text();
-      }
-    } else {
-      return false;
-    }
-  }
+  FXint n=acclist->findItemByData(spec);
+  if (n>=0) {
+    FXString txt;
+    txt.format("%s\t%s", spec->pref, spec->accel);
+    acclist->setItemText(n, txt);
+    handle(acclist,FXSEL(SEL_CHANGED,ID_SEL_KEYBIND),(void*)(FXival)n);
+  } 
 }
 
 
 
-void KeyBindingList::AccelInsert(FXHotKey acckey, MenuSpec*spec)
+void ShortcutList::ApplyShortcut(FXHotKey acckey, MenuSpec*spec)
 {
   FXAccelTable*table=win->getAccelTable();
+  FXString accel=unparseAccel(acckey);
+  if (spec->accel[0]) {
+    FXHotKey old=parseAccel(spec->accel);
+    if (table->hasAccel(old)) table->removeAccel(old);
+  }
+  mnumgr->SetAccelerator(spec,accel);
   if (spec->ms_mc) {
     spec->ms_mc->setAccelText(spec->accel);
     table->addAccel(acckey,spec->ms_mc->getTarget(),FXSEL(SEL_COMMAND,spec->sel));
   } else {
     table->addAccel(acckey,win,FXSEL(SEL_COMMAND,spec->sel));
   }
+  UpdateListItem(spec);
 }
 
 
 
-long KeyBindingList::onAccelEdit(FXObject*o, FXSelector s, void*p)
+long ShortcutList::onRemoveKeybinding(FXObject*o,FXSelector sel,void*p)
 {
-  if (o!=this) { return 0; }
-    switch ( FXSELTYPE(s) ) {
-    case SEL_DOUBLECLICKED: {  break;  }
-    case SEL_KEYPRESS: {
-      FXint code=((FXEvent*)p)->code;
-      switch (code) {
-        case KEY_Return: { break; }
-        case KEY_KP_Enter: { break; }
-        case KEY_F2: { break; }
-        case KEY_space: { break; }
-        default: { return 0; }
-      }
-      break;
-    }
-    default: { return 0; }
-  }
-  MenuSpec*spec=(MenuSpec*)(getItemData(getCurrentItem()));
-  FXAccelTable*table=win->getAccelTable();
-  if (spec) {
-    FXString acctxt=spec->accel;
-    FXHotKey acckey;
-    if ( EditAccel(acctxt,this,spec,acckey) ) {
-      if (acctxt.empty()) {
-        if (AccelDelete(spec)) {
-          memset(spec->accel,0,sizeof(spec->accel));
-          if (spec->ms_mc) { spec->ms_mc->setAccelText(spec->accel); }
-          FXString txt;
-          txt.format("%s\t",spec->pref);
-          setItemText(getCurrentItem(),txt);
-        }
-      } else {
-        if (AccelUnique(acckey, spec)) {
-          FXHotKey oldkey=parseAccel(spec->accel);
-          memset(spec->accel,0,sizeof(spec->accel));
-          strncpy(spec->accel, acctxt.text(),sizeof(spec->accel)-1);
-          if (oldkey && table->hasAccel(oldkey)) { table->removeAccel(oldkey); }
-          AccelInsert(acckey,spec);
-          FXString txt;
-          txt.format("%s\t%s",spec->pref,spec->accel);
-          setItemText(getCurrentItem(),txt);
-        }
-      }
+  FXIconItem*item=acclist->getItem(acclist->getCurrentItem());
+  MenuSpec*spec=(MenuSpec*)item->getData();
+  if (spec->accel[0] && DeleteShortcut(spec)) { apply_btn->disable(); }
+  return 1;
+}
+
+
+
+bool ShortcutList::Verify(FXHotKey acckey, MenuSpec*spec)
+{
+  return sce->verify();
+}
+
+
+
+long ShortcutList::onApplyChanges(FXObject*o,FXSelector sel,void*p)
+{
+  FXHotKey hk=sce->getChord();
+  FXIconItem*item=acclist->getItem(acclist->getCurrentItem());
+  MenuSpec*spec=(MenuSpec*)item->getData();
+  if (hk) {
+    if (Verify(hk,spec) && ConfirmOverwrite(hk,spec)) {
+      ApplyShortcut(hk,spec);
     }
   } else {
-    FXMessageBox::error(getShell(), MBOX_OK, _("Internal error"), _("Failed to retrieve keybinding information"));
+    if (DeleteShortcut(spec)) { apply_btn->disable(); }
   }
   return 1;
 }
 
 
 
-#define LIST_OPTS FRAME_SUNKEN|FRAME_THICK|LAYOUT_SIDE_TOP|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|ICONLIST_BROWSESELECT
+#define GetCaption(p) ((FXMenuCaption*)((p)->getParent()->getUserData()))
 
-KeyBindingList::KeyBindingList(FXComposite*o, MenuMgr*mmgr, FXWindow*w):FXIconList(o,this,ID_ACCEL_EDIT,LIST_OPTS)
+long ShortcutList::onSelectKeybinding(FXObject*o, FXSelector sel, void*p)
 {
-  mnumgr=mmgr;
-  win=w;
-  appendHeader(_("action"));
-  appendHeader(_("keybinding"));
-  FXString spaces;
-  for (MenuSpec*spec=mnumgr->MenuSpecs(); spec->sel!=mnumgr->LastID(); spec++) {
-    FXString txt;
-    txt.format("%s\t%s", spec->pref, spec->accel);
-    appendItem(new FXIconItem(txt, NULL, NULL, (void*)spec));
-  }
-  selectItem(0);
-}
-
-
-
-long KeyBindingList::onQueryTip(FXObject* sender,FXSelector sel,void* ptr)
-{
-  FXint index,cx,cy;
-  FXuint btns;
-  if (flags&FLAG_TIP) {
-    if (getCursorPosition(cx,cy,btns) && (index=getItemAt(cx,cy))>=0) {
-      FXString tip;
-      MenuSpec*spec=(MenuSpec*)(getItem(index)->getData());
-      mnumgr->GetTBarBtnTip(spec,tip);
-      sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&tip);
-      return 1;
+  apply_btn->disable();
+  FXIconItem*item=acclist->getItem((FXint)(FXival)p);
+  if (item) {
+    MenuSpec*spec=(MenuSpec*)item->getData();
+    sce->setShortcut(spec->accel[0]?spec->accel:FXString::null);
+    if (spec->accel[0]) { remove_btn->enable(); } else { remove_btn->disable(); }
+    FXWindow*w;
+    for (w=menupath->getFirst(); w; w=w->getNext()) {
+      ((FXLabel*)w)->setText(" ");
+      ((FXLabel*)w)->setBackColor(getApp()->getBackColor());
+    }
+    FXMenuCaption*cpn=NULL;
+    FXint i=-1;
+    for (cpn=spec->ms_mc; cpn!=NULL; cpn=GetCaption(cpn)) { i++; }
+    for (cpn=spec->ms_mc; cpn!=NULL; cpn=GetCaption(cpn)) {
+      w=menupath->childAtIndex(i--);
+      ((FXLabel*)w)->setText(cpn->getText());
+      ((FXLabel*)w)->setBackColor(getApp()->getBaseColor());
+      ((FXLabel*)w)->setIcon((cpn==spec->ms_mc)?NULL:arrow);
+      
     }
   }
   return 0;
 }
 
+
+
+long ShortcutList::onEditKeybinding(FXObject*o, FXSelector sel, void*p)
+{
+  apply_btn->enable();
+  return 1;
+}
+
+
+
+class MyLabel: public FXLabel {
+  FXDECLARE(MyLabel)
+  MyLabel() {}
+protected:
+public:
+  MyLabel(FXComposite*p):FXLabel(p," ",NULL,LABEL_NORMAL|LAYOUT_FIX_X) {
+    setIconPosition(ICON_AFTER_TEXT);
+  }
+  long onPaint(FXObject*o, FXSelector sel, void*p) {
+    FXLabel::onPaint(o,sel,p);
+    if (icon) {
+      FXDCWindow dc(icon);
+      dc.setForeground(getTextColor());
+      FXPoint points[3]={FXPoint(1,1),FXPoint(11,6),FXPoint(1,11)};
+      icon->fill(getBaseColor());
+      dc.fillPolygon(points,3);
+    }
+    return 1;
+  }
+};
+FXDEFMAP(MyLabel) MyLabelMap[]={
+  FXMAPFUNC(SEL_PAINT, 0, MyLabel::onPaint)
+};
+FXIMPLEMENT(MyLabel,FXLabel,MyLabelMap,ARRAYNUMBER(MyLabelMap));
+
+
+
+static const char * arrow_xpm[] = {
+"16 16 2 1",
+" 	c #FFFFFF",
+".	c #000000",
+"                ",
+"                ",
+"                ",
+"                ",
+"   ...          ",
+"    ....        ",
+"     .....      ",
+"............    ",
+"............    ",
+"     .....      ",
+"    ....        ",
+"   ...          ",
+"                ",
+"                ",
+"                ",
+"                "};
+
+
+
+void ShortcutList::create()
+{
+  FXHorizontalFrame::create();
+  arrow=new FXXPMIcon(getApp(),arrow_xpm,0,IMAGE_OWNED|IMAGE_KEEP);
+  FXLabel*label=(FXLabel*)(menupath->getFirst());
+  FXColor bg=label->getBaseColor();
+  FXColor fg=label->getTextColor();
+  for (FXint x=0; x<arrow->getWidth(); x++) {
+    for (FXint y=0; y<arrow->getHeight(); y++) {
+      if (arrow->getPixel(x,y)==FXRGB(0,0,0)) { 
+        arrow->setPixel(x,y,fg);
+      } else {
+        arrow->setPixel(x,y,bg);
+      }
+    }
+  }
+  arrow->create();
+  arrow->render();
+  
+#ifdef FOX_1_6
+  acclist->handle(acclist,FXSEL(SEL_CLICKED,acclist->ID_HEADER_CHANGE),0);
+#else
+  acclist->handle(acclist,FXSEL(SEL_CLICKED,acclist->ID_HEADER),0);
+#endif
+  acclist->setHeaderSize(0,acclist->getHeaderSize(0)+4);
+  acclist->setHeaderSize(1,acclist->getFont()->getTextWidth("Ctrl+Alt+Shift+Return")+2);
+  acclist->setWidth(acclist->getHeaderSize(0)+acclist->getHeaderSize(1)+16);
+  handle(acclist,FXSEL(SEL_CHANGED,ID_SEL_KEYBIND),NULL);
+}
+
+ShortcutList::~ShortcutList()
+{
+  delete arrow;
+}
+
+ShortcutList::ShortcutList(FXComposite*o, MenuMgr*mmgr, FXWindow*w, FXuint opts):FXHorizontalFrame(o,opts)
+{
+  mnumgr=mmgr;
+  win=w;
+  acclist=new MyIconList(this,ID_SEL_KEYBIND,LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH|ICONLIST_BROWSESELECT);
+  acclist->appendHeader(_("Action"));
+  acclist->appendHeader(_("Keybinding"));
+  for (MenuSpec*spec=mnumgr->MenuSpecs(); spec->sel!=mnumgr->LastID(); spec++) {
+    FXString txt;
+    txt.format("%s\t%s", spec->pref, spec->accel);
+    acclist->appendItem(new FXIconItem(txt, NULL, NULL, (void*)spec));
+  }
+  acclist->selectItem(0);
+  FXVerticalFrame *vframe=new FXVerticalFrame(this,FRAME_NONE);
+  FXGroupBox*grp=new FXGroupBox(vframe,_("Menu Path:"),GROUPBOX_NORMAL|FRAME_RIDGE|LAYOUT_FILL_X);
+  menupath=new FXVerticalFrame(grp,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X);
+  menupath->setBackColor(getApp()->getBackColor());
+  menupath->setVSpacing(0);
+  for (FXuint i=0; i<8; i++) {
+    FXLabel*label=new FXLabel(menupath," ",NULL,LABEL_NORMAL|LAYOUT_FIX_X);
+    label->setIconPosition(ICON_AFTER_TEXT);
+    label->setX((i+1)*4);
+  }
+  sce=new ShortcutEditor(vframe,this,ID_EDIT_KEYBIND);
+  sce->setText(_("Shortcut:"));
+  FXHorizontalFrame*btns=new FXHorizontalFrame(vframe,PACK_UNIFORM_WIDTH);
+  apply_btn=new FXButton(btns,_("Apply"),NULL,this,ID_APPLY_CHANGES, BUTTON_NORMAL|LAYOUT_CENTER_X);
+  remove_btn=new FXButton(btns,_("Remove"),NULL,this,ID_REMOVE_KEYBIND, BUTTON_NORMAL|LAYOUT_CENTER_X);
+}
 

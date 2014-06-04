@@ -33,7 +33,6 @@ private:
   friend class StyleEdit;
   FXTabBook*tabs;
   Settings*prefs;
-  FXIconList*acclist;
   SciSearchOptions*srchopts;
   FXTextField* filters_edit;
   LangGUI* langs;

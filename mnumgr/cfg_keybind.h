@@ -21,22 +21,39 @@
 
 #include "menuspec.h"
 
-class KeyBindingList: public FXIconList {
+class ShortcutEditor;
+
+class ShortcutList: public FXHorizontalFrame {
+  FXDECLARE(ShortcutList)
+  ShortcutList() {}
+  void UpdateListItem(MenuSpec*spec);
+  FXIcon*arrow;
 protected:
-  FXDECLARE(KeyBindingList);
-  KeyBindingList(){}
-protected:
+  FXIconList*acclist;
+  ShortcutEditor*sce;
+  FXVerticalFrame*menupath;
+  FXButton*apply_btn;
+  FXButton*remove_btn;
   MenuMgr*mnumgr;
   FXWindow*win;
-  virtual bool AccelUnique(FXHotKey acckey, MenuSpec*spec);
-  virtual bool AccelDelete(MenuSpec*spec);
-  virtual void AccelInsert(FXHotKey acckey, MenuSpec*spec);
+  virtual bool ConfirmOverwrite(FXHotKey acckey, MenuSpec*spec);
+  virtual bool DeleteShortcut(MenuSpec*spec);
+  virtual void ApplyShortcut(FXHotKey acckey, MenuSpec*spec);
+  virtual bool Verify(FXHotKey acckey, MenuSpec*spec);
 public:
-  KeyBindingList(FXComposite*o, MenuMgr*mmgr, FXWindow*w);
-  long onQueryTip(FXObject* sender,FXSelector,void*);
-  long onAccelEdit(FXObject* sender,FXSelector,void*);
+  ShortcutList(FXComposite*o, MenuMgr*mmgr, FXWindow*w, FXuint opts=0);
+  ~ShortcutList();
+  long onQueryTip(FXObject*o,FXSelector sel,void*p);
+  long onSelectKeybinding(FXObject*o,FXSelector sel,void*p);
+  long onEditKeybinding(FXObject*o,FXSelector sel,void*p);
+  long onApplyChanges(FXObject*o,FXSelector sel,void*p);
+  long onRemoveKeybinding(FXObject*o,FXSelector sel,void*p);
+  virtual void create();
   enum {
-    ID_ACCEL_EDIT=FXIconList::ID_LAST,
+    ID_SEL_KEYBIND=FXHorizontalFrame::ID_LAST,
+    ID_EDIT_KEYBIND,
+    ID_APPLY_CHANGES,
+    ID_REMOVE_KEYBIND,
     ID_LAST
   };
 };

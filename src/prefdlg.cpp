@@ -31,6 +31,7 @@
 #include "desclistdlg.h"
 #include "prefdlg_ext.h"
 #include "prefdlg_sntx.h"
+#include "cfg_shortcut.h"
 #include "cfg_keybind.h"
 #include "cfg_popmenu.h"
 #include "cfg_toolbar.h"
@@ -52,7 +53,7 @@ static const char* hint_list[] = {
   _("General application settings"),
   _("Editor specific settings"),
   color_hint,
-  _("Double-click an item to edit"),
+  _("Configure keyboard shortcuts"),
   _("Edit toolbar buttons"),
   _("Edit popup menu items"),
   _("User interface colors and font"),
@@ -99,34 +100,34 @@ void PrefsDialog::MakePopupTab()
 
 
 
-class MyKeyBindingList: public KeyBindingList {
+class MyShortcutList: public ShortcutList {
 protected:
-  virtual bool AccelUnique(FXHotKey acckey, MenuSpec*spec) {
+  virtual bool ConfirmOverwrite(FXHotKey acckey, MenuSpec*spec) { 
     MenuSpec*killcmd=mnumgr->LookupMenu(TopWinPub::KillCmdID());
     if ( (acckey==parseAccel(killcmd->accel)) && (spec!=killcmd)) {
       FXMessageBox::error(getShell(), MBOX_OK, _("Conflicting keybinding"),
         _("Keybinding for \"%s\" must not conflict with \"%s\""),spec->pref,killcmd->pref);
       return false;
     }
-    return KeyBindingList::AccelUnique(acckey,spec);
+    return ShortcutList::ConfirmOverwrite(acckey,spec);
   }
-  virtual bool AccelDelete(MenuSpec*spec) {
-    if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
+  virtual bool DeleteShortcut(MenuSpec*spec) {
+        if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
      FXMessageBox::error(getShell(), MBOX_OK, _("Empty keybinding"), "%s \"%s\"",
         _("You cannot remove the keybinding for"), spec->pref);
      return false;
     }
-    return KeyBindingList::AccelDelete(spec);
+    return ShortcutList::DeleteShortcut(spec);
   }
-  virtual void AccelInsert(FXHotKey acckey, MenuSpec*spec) {
+  virtual void ApplyShortcut(FXHotKey acckey, MenuSpec*spec){
     if (spec->sel==(FXint)TopWinPub::KillCmdID()) {
       TopWinPub::SetKillCommandAccelKey(acckey);
     } else {
-      KeyBindingList::AccelInsert(acckey,spec);
+      ShortcutList::ApplyShortcut(acckey,spec);
     }
   }
 public:
-  MyKeyBindingList(FXComposite*o, MenuMgr*mmgr, FXWindow*w):KeyBindingList(o,mmgr,w){}
+  MyShortcutList(FXComposite*o, MenuMgr*mmgr, FXWindow*w, FXuint opts=0):ShortcutList(o,mmgr,w,opts){}
 };
 
 
@@ -134,8 +135,7 @@ public:
 void PrefsDialog::MakeKeybindingsTab()
 {
   new FXTabItem(tabs,_("keys"));
-  FXHorizontalFrame *frame=new FXHorizontalFrame(tabs,FRAME_RAISED|LAYOUT_FILL);
-  acclist=new MyKeyBindingList(frame, mnumgr, main_win);
+  new MyShortcutList(tabs,mnumgr,main_win,FRAME_RAISED|LAYOUT_FILL);
 }
 
 
@@ -474,18 +474,11 @@ void PrefsDialog::create()
   FXDialogBox::create();
   SetupXAtoms(this, "prefs", APP_NAME);
   show(PLACEMENT_DEFAULT);
-  acclist->setWidth((acclist->getParent()->getWidth()/3)*2);
-  acclist->setHeaderSize(0,(acclist->getWidth()/2)-8);
-  acclist->setHeaderSize(1,(acclist->getWidth()/2)-8);
   
   FXRootWindow*root=getApp()->getRootWindow();
   setX(main_win->getX()+16+getWidth()<root->getWidth()?main_win->getX()+16:root->getWidth()-getWidth()-32);
   setY(main_win->getY()+24+getHeight()<root->getHeight()?main_win->getY()+24:root->getHeight()-getDefaultHeight()-48);
-  
-#ifndef FOX_1_6
-  acclist->hide();
-  acclist->show();
-#endif
+
 }
 
 
