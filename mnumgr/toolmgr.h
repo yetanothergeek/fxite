@@ -22,6 +22,7 @@
 #include "tooltree.h"
 
 class UserMenu;
+class ShortcutEditor;
 
 class ToolsDialog: public FXDialogBox {
 private:
@@ -31,7 +32,7 @@ private:
   FXVerticalFrame* left_box;
   FXVerticalFrame* right_box;
   FXVerticalFrame* name_panel;
-  FXGroupBox* accel_panel;
+  ShortcutEditor*accel_panel;
   FXGroupBox* opts_panel;
   FXVerticalFrame* new_panel;
   FXHorizontalFrame* change_panel;
@@ -41,12 +42,8 @@ private:
   FXTextField* name_field;
   FXTextField* extn_field;
   FXListBox* menukey_list;
-  FXTextField* accel_field;
   FXCheckButton* opt_chk;
   FXRadioButton* opt_rad;
-  FXCheckButton* ctrl_chk;
-  FXCheckButton* alt_chk;
-  FXCheckButton* shift_chk;
   FXLabel* props_lab;
   FXLabel* intro_lab;
   FXButton* reset_btn;

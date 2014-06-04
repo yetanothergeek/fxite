@@ -26,6 +26,7 @@
 #include "shmenu.h"
 #include "compat.h"
 #include "histbox.h"
+#include "cfg_shortcut.h"
 
 #include "intl.h"
 #include "toolmgr.h"
@@ -50,12 +51,11 @@ static const char*intro_text = _(
 FXDEFMAP(ToolsDialog) ToolsDialogMap[] = {
   FXMAPFUNC(SEL_CHANGED,  ToolsDialog::ID_TREELIST_CHANGED, ToolsDialog::onTreeListChanged),
   FXMAPFUNC(SEL_CHORE,    ToolsDialog::ID_TREELIST_CHORE, ToolsDialog::onTreeListAfterChanged),
-  FXMAPFUNC(SEL_KEYPRESS, ToolsDialog::ID_ACCELFIELD,  ToolsDialog::onAccelField),
+  FXMAPFUNC(SEL_CHANGED,  ToolsDialog::ID_ACCELFIELD,  ToolsDialog::onAccelField),
   FXMAPFUNC(SEL_CHANGED,  ToolsDialog::ID_NAMEFIELD,   ToolsDialog::onNameField),
   FXMAPFUNC(SEL_COMMAND,  ToolsDialog::ID_OPTCHOOSE,   ToolsDialog::onChooseOpt),
   FXMAPFUNC(SEL_COMMAND,  ToolsDialog::ID_MODIFIED,    ToolsDialog::onModified),
   FXMAPFUNCS(SEL_COMMAND, ToolsDialog::ID_APPLY_CLICK, ToolsDialog::ID_NEW_TOOL_CLICK, ToolsDialog::onButtonClick),
-  FXMAPFUNC(SEL_MIDDLEBUTTONRELEASE, ToolsDialog::ID_ACCELFIELD, ToolsDialog::onAccelField),
   FXMAPFUNC(SEL_CHORE, ToolsDialog::ID_NEW_SCAN_CHORE,ToolsDialog::onNewScanChore),
   FXMAPFUNC(SEL_TIMEOUT, ToolsDialog::ID_NEW_SCAN_CHORE,ToolsDialog::onNewScanChore),
   FXMAPFUNC(SEL_COMMAND, FXDialogBox::ID_ACCEPT, ToolsDialog::onClose),
@@ -151,10 +151,7 @@ void ToolsDialog::clear()
   extn_field->hide();
   intro_lab->hide();
   extn_field->getPrev()->hide();
-  accel_field->setText("");
-  ctrl_chk->setCheck(false);
-  alt_chk->setCheck(false);
-  shift_chk->setCheck(false);
+  accel_panel->setShortcut(FXString::null);
   index_field->setText("");
   name_field->setText("");
   extn_field->setText("");
@@ -374,17 +371,7 @@ long ToolsDialog::onTreeListAfterChanged(FXObject*o, FXSelector sel, void*p)
     menukey_list->setCurrentItem(
       menukey_list->findItemByData((void*)(FXival)info.name.find_first_of('_'))
     );
-    FXHotKey hk=parseAccel(info.accel);
-    FXuint mask=FXSELTYPE(hk);
-    FXuint key=FXSELID(hk);
-    ctrl_chk->setCheck(mask&CONTROLMASK);
-    alt_chk->setCheck(mask&ALTMASK);
-    shift_chk->setCheck(mask&SHIFTMASK);
-    if (key) {
-      accel_field->setText(unparseAccel(key).upper());
-    } else {
-      accel_field->setText("");
-    }
+    accel_panel->setShortcut(info.accel);
   }
   return 0;
 }
@@ -416,39 +403,7 @@ long ToolsDialog::onChooseOpt(FXObject*o, FXSelector sel, void*p)
 
 long ToolsDialog::onAccelField(FXObject*o, FXSelector sel, void*p)
 {
-  if (FXSELTYPE(sel)==SEL_MIDDLEBUTTONRELEASE) { return 1; }
-  FXEvent*ev=(FXEvent*)p;
-  if (
-    (ev->code>=KEY_F1 && ev->code<=KEY_F12) ||
-    (ev->code>=KEY_0 && ev->code<=KEY_9) ||
-    (ev->code>=KEY_A && ev->code<=KEY_Z) ||
-    (ev->code>=KEY_a && ev->code<=KEY_z)
-  ) {
-    accel_field->setText(unparseAccel(ev->code).upper());
-    if (ev->state) {
-      ctrl_chk->setCheck(ev->state&CONTROLMASK);
-      alt_chk->setCheck(ev->state&ALTMASK);
-      shift_chk->setCheck(ev->state&SHIFTMASK);
-    }
-    setModified(true);
-  } else {
-    switch (ev->code) {
-      case KEY_Tab:
-      case KEY_Up:
-      case KEY_Down:
-      case KEY_Escape: {
-        return 0;
-      }
-      case KEY_Delete:
-      case KEY_BackSpace: {
-        accel_field->setText("");
-        ctrl_chk->setCheck(false);
-        alt_chk->setCheck(false);
-        shift_chk->setCheck(false);
-        setModified(true);
-      }
-    }
-  }
+  setModified(true);
   return 1;
 }
 
@@ -525,24 +480,15 @@ bool ToolsDialog::BuildName(FXString &path, bool isdir)
     tmp.insert((FXival)(menukey_list->getItemData(menukey_list->getCurrentItem())),"_");
   }
   path.append(tmp);
-  if (!accel_field->getText().empty()) {
-    FXuint accel_state=0;
-    accel_state|=ctrl_chk->getCheck()?CONTROLMASK:0;
-    accel_state|=alt_chk->getCheck()?ALTMASK:0;
-    accel_state|=shift_chk->getCheck()?SHIFTMASK:0;
-    if ( ((accel_state==0)||(accel_state==SHIFTMASK)) && (accel_field->getText().length()<2) ) {
-      FXMessageBox::error(this,MBOX_OK, _("Invalid accelerator"), "%s\n\n%s",
-        _("Alphanumeric accelerators must have a [Ctrl] or [Alt] modifier."),
-        _("Only function keys [F1] - [F12] can be used without a modifier.")
-      );
-    accel_field->setFocus();
-    accel_field->selectAll();
-    path="";
-    return false;
+  if (accel_panel->verify()) { 
+    FXHotKey accel_key=accel_panel->getChord();
+    if (accel_key) {
+      path.append("@");
+      path.append(unparseAccel(accel_key));
     }
-    FXuint accel_key=parseAccel(accel_field->getText());
-    path.append("@");
-    path.append(unparseAccel(FXSEL(accel_state,accel_key)));
+  } else {
+    accel_panel->setFocus();
+    return false;
   }
   if (opt_chk && opt_chk->getCheck()) {
     path.append(".");
@@ -800,19 +746,7 @@ ToolsDialog::ToolsDialog(FXTopWindow*win, UserMenu**menus):
   index_field=new ClipTextField(strip,2,this,ID_MODIFIED,TEXTFIELD_LIMITED|TEXTFIELD_INTEGER|FRAME_SUNKEN|FRAME_THICK);
   new FXLabel(strip,_("  E&xt'n"));
   extn_field=new ClipTextField(strip,4,this,TEXTFIELD_LIMITED|FRAME_SUNKEN|FRAME_THICK);
-
-  accel_panel=new FXGroupBox(right_box,"Shortcut",FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK|LAYOUT_CENTER_X);
-
-  strip=new FXHorizontalFrame(accel_panel,LAYOUT_FILL_X);
-  new FXLabel(strip,_("&Hot key:"));
-  accel_field=new ClipTextField(strip,3,this,ID_ACCELFIELD,TEXTFIELD_LIMITED|FRAME_SUNKEN|FRAME_THICK);
-
-
-  ctrl_chk  = new FXCheckButton(strip,_("C&trl"),this,ID_MODIFIED);
-  ctrl_chk->setPadLeft(22);
-  alt_chk   = new FXCheckButton(strip,_("A&lt"),this,ID_MODIFIED);
-  shift_chk = new FXCheckButton(strip,_("Shi&ft"),this,ID_MODIFIED);
-
+  accel_panel=new ShortcutEditor(right_box,this,ID_ACCELFIELD);
   change_panel=new FXHorizontalFrame(right_box,LAYOUT_RIGHT|PACK_UNIFORM_WIDTH);
   apply_btn=new FXButton(change_panel,_(" &Save changes "), NULL, this, ID_APPLY_CLICK);
   reset_btn=new FXButton(change_panel,_(" &Undo changes "), NULL, this, ID_RESET_CLICK);
