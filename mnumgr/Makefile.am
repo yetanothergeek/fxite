@@ -6,6 +6,7 @@ noinst_LIBRARIES=libmnumgr.a
 libmnumgr_a_SOURCES=\
 cfg_keybind.cpp \
 cfg_popmenu.cpp \
+cfg_shortcut.cpp \
 cfg_toolbar.cpp \
 menuspec.cpp \
 shmenu.cpp \
@@ -16,6 +17,7 @@ tooltree.cpp
 noinst_HEADERS=\
 cfg_keybind.h \
 cfg_popmenu.h \
+cfg_shortcut.h \
 cfg_toolbar.h \
 menuspec.h \
 shmenu.h \
