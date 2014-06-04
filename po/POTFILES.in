@@ -4,9 +4,11 @@ jef/histbox.cpp
 jef/run_unx.cpp
 jef/run_w32.cpp
 jef/runcmd.cpp
+mnumgr/cfg_keybind.cpp
+mnumgr/cfg_popmenu.cpp
+mnumgr/cfg_shortcut.cpp
+mnumgr/cfg_toolbar.cpp
 mnumgr/menuspec.cpp
-mnumgr/prefdlg_kbnd.cpp
-mnumgr/prefdlg_tbar.cpp
 mnumgr/toolmgr.cpp
 mnumgr/tooltree.cpp
 src/appmain.cpp
