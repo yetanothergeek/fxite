@@ -28,7 +28,7 @@
 
 static const char *Scintilla_Copyright =" \
 The Scintilla editing control and the PDF/HTML export code are\n\
-copyright 1998-2013 by Neil Hodgson <neilh@scintilla.org>\n\
+copyright 1998-2014 by Neil Hodgson <neilh@scintilla.org>\n\
 and are released under the following license:\n\
 \n\
 All Rights Reserved\n\
@@ -111,7 +111,7 @@ For more details, visit http://www.fox-toolkit.org\
 
 #define App_About "\
 Free eXtensIble Text Editor (FXiTe) %s %s\n\n\
-Copyright (c) 2009-2013 Jeffrey Pohlmeyer\n\
+Copyright (c) 2009-2014 Jeffrey Pohlmeyer\n\
 <%s>\n\n\
 %s\
 GNU GENERAL PUBLIC LICENSE Version 3\n\n\
