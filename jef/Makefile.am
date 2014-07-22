@@ -18,7 +18,8 @@ libjeffx_a_SOURCES=\
   run_w32.cpp \
   runcmd.cpp \
   shady_tabs.cpp \
-  sl.c
+  sl.c \
+  theme.cpp
 
 
 noinst_HEADERS=\
@@ -34,5 +35,5 @@ noinst_HEADERS=\
   popmenu.h \
   runcmd.h \
   shady_tabs.h \
-  sl.h
-
+  sl.h \
+  theme.h

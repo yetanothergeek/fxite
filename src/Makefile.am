@@ -53,7 +53,6 @@ scisrch.cpp \
 search.cpp \
 statusbar.cpp \
 tagread.cpp \
-theme.cpp \
 winshcut.c
 
 
@@ -98,8 +97,8 @@ scidoc_util.h \
 scisrch.h \
 search.h \
 statusbar.h \
-tagread.h \
-theme.h
+tagread.h
+
 
 
 EXTRA_DIST=\
