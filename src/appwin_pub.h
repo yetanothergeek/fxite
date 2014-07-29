@@ -47,6 +47,7 @@ public:
   static void ActiveWidget(FXID aw);
   static void ShowOutputPane(bool showit);
   static FXSelector KillCmdID();
+  static FXSelector ThemeID();
   static FXSelector LastID();
   static void SetKillCommandAccelKey(FXHotKey acckey);
   static UserMenu**UserMenus();

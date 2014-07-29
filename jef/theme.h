@@ -16,24 +16,51 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+
 #ifndef FXITE_THEME_H
 #define FXITE_THEME_H
 
+typedef struct _AppColors {
+  const FXchar* name;
+  FXColor BaseColor;
+  FXColor BorderColor;
+  FXColor BackColor;
+  FXColor ForeColor;
+  FXColor SelbackColor;
+  FXColor SelforeColor;
+  FXColor TipbackColor;
+  FXColor TipforeColor;
+  FXColor SelMenuBackColor;
+  FXColor SelMenuTextColor;
+} AppColors;
+
+class ThemeControl;
 
 class Theme:public FXObject {
+private:
+  friend class ThemeControl;
+  static AppColors*CurrentColors();
+  static AppColors*SystemColors();
+  static const AppColors*PresetThemes();
+  static FXint NumPresets();
+  static const FXString GetCurrentFontName();
+  static void SetCurrentFontName(const FXString&name);
+  static bool SameColors(AppColors*a,AppColors*b);
+  static void CopyColors(AppColors*dst,AppColors*src);
+  static bool GetUseSystemColors();
+  static FXuint SetUseSystemColors(bool use);
+  static void Backup();
+  static FXuint Restore();
+  static FXuint Modified();
 public:
   static void init();
   static void done();
   static void apply(FXWindow*win);
-  static FXuint changed();
-  static FXHorizontalFrame* MakeThemeGUI(FXComposite*o);
-};
-
-
-enum {
-  ThemeUnchanged=0,
-  ThemeChangedColors = 1<<0,
-  ThemeChangedFont   = 1<<1
+  enum {
+    Unchanged     = 0,
+    ChangedColors = 1<<0,
+    ChangedFont   = 1<<1
+  };
 };
 
 #endif

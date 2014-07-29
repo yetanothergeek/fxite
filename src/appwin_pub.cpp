@@ -82,6 +82,13 @@ FXSelector TopWinPub::LastID()
 
 
 
+FXSelector TopWinPub::ThemeID()
+{
+  return TW::ID_THEME_CHANGE;
+}
+
+
+
 void TopWinPub::SetKillCommandAccelKey(FXHotKey acckey)
 {
   tw->SetKillCommandAccelKey(acckey);

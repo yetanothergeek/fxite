@@ -35,7 +35,7 @@
 #include "cfg_keybind.h"
 #include "cfg_popmenu.h"
 #include "cfg_toolbar.h"
-#include "theme.h"
+#include "cfg_theme.h"
 #include "shady_tabs.h"
 
 #include "intl.h"
@@ -449,7 +449,7 @@ void PrefsDialog::MakeEditorTab()
 void PrefsDialog::MakeThemeTab()
 {
   new FXTabItem(tabs,_("theme"));
-  Theme::MakeThemeGUI(tabs);
+  new ThemeGUI(tabs,main_win,TopWinPub::ThemeID());
 }
 
 

@@ -170,6 +170,7 @@ public:
   long onFocusIn(   FXObject* o, FXSelector sel, void* p );
   long onFocusDoc(  FXObject* o, FXSelector sel, void* p );
   long onFocusSci(  FXObject* o, FXSelector sel, void* p );
+  long onThemeChange( FXObject* o, FXSelector sel, void* p );
   enum {
     ID_TIMER = MainWinWithClipBrd::ID_LAST,
     ID_CLOSEWAIT,
@@ -179,6 +180,7 @@ public:
     ID_SCINTILLA,
     ID_TBAR_CUSTOM_CMD,
     ID_KILL_COMMAND,
+    ID_THEME_CHANGE,
     ID_LAST
   };
 };

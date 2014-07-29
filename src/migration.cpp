@@ -167,3 +167,37 @@ void MigrateConfigDir(FXApp*a, const FXString &src, const FXString &dst, FXStrin
 
 #endif
 
+
+static void MovePref(FXRegistry*old_reg, const char*old_sect, const char*old_name, FXRegistry*new_reg, const char*new_sect, const char*new_name)
+{
+  if (old_reg->existingEntry(old_sect,old_name)) {
+    const char*value=old_reg->readStringEntry(old_sect,old_name);
+    new_reg->writeStringEntry(new_sect,new_name,value);
+    old_reg->deleteEntry(old_sect,old_name);
+  }
+}
+
+
+
+void MigrateTheme(FXRegistry*r)
+{
+  static const char*old_sect="CustomColors";
+  static const char*new_sect="SETTINGS";
+  MovePref(r, old_sect, "Font",    r, new_sect, "Font");
+  MovePref(r, old_sect, "Back",    r, new_sect, "backcolor");
+  MovePref(r, old_sect, "Base",    r, new_sect, "basecolor");
+  MovePref(r, old_sect, "Border",  r, new_sect, "bordercolor");
+  MovePref(r, old_sect, "Fore",    r, new_sect, "forecolor");
+  MovePref(r, old_sect, "Hilite",  r, new_sect, "hilitecolor");
+  MovePref(r, old_sect, "Selback", r, new_sect, "selbackcolor");
+  MovePref(r, old_sect, "Selfore", r, new_sect, "selforecolor");
+  MovePref(r, old_sect, "Shadow",  r, new_sect, "shadowcolor");
+  MovePref(r, old_sect, "Tipback", r, new_sect, "tipbackcolor");
+  MovePref(r, old_sect, "Tipfore", r, new_sect, "tipforecolor");
+  MovePref(r, old_sect, "SelMenuBack",  r, new_sect, "selmenubackcolor");
+  MovePref(r, old_sect, "SelMenuText",  r, new_sect, "selmenutextcolor");
+  MovePref(r, old_sect, "UseSystemColors", r, new_sect, "UseSystemColors");
+  r->deleteEntry(old_sect, "CurrentTheme");
+  r->deleteSection(old_sect);
+}
+
