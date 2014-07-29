@@ -1,3 +1,4 @@
+jef/cfg_theme.cpp
 jef/desclistdlg.cpp
 jef/dual_list.cpp
 jef/histbox.cpp
@@ -43,5 +44,4 @@ src/scisrch.cpp
 src/search.cpp
 src/statusbar.cpp
 src/tagread.cpp
-src/theme.cpp
 src/winshcut.c
