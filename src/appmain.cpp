@@ -318,6 +318,7 @@ void AppClass::CreateConfigDir()
 #endif // FOX Version
 
 
+extern void MigrateTheme(FXRegistry*r);
 
 void AppClass::init(int& argc, char** argv, bool connect)
 {
@@ -335,6 +336,7 @@ void AppClass::init(int& argc, char** argv, bool connect)
   }
   FXApp::init(argc,argv,connect);
 #endif
+  MigrateTheme(&reg());
   Theme::init();
   CreateConfigDir();
   for (FXint i=1; i<getArgc(); i++) {

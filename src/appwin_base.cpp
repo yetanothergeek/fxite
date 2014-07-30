@@ -64,6 +64,7 @@ FXDEFMAP(TopWindowBase) TopWindowBaseMap[]={
   FXMAPFUNC(SEL_CHORE,    TopWindowBase::ID_FOCUS_DOC,    TopWindowBase::onFocusDoc),
   FXMAPFUNC(SEL_FOCUSIN,  TopWindowBase::ID_SCINTILLA,    TopWindowBase::onFocusSci),
   FXMAPFUNC(SEL_FOCUSIN,  0,                              TopWindowBase::onFocusIn),
+  FXMAPFUNC(SEL_CHANGED,  TopWindowBase::ID_THEME_CHANGE, TopWindowBase::onThemeChange),
 };
 FXIMPLEMENT(TopWindowBase,MainWinWithClipBrd,TopWindowBaseMap,ARRAYNUMBER(TopWindowBaseMap))
 
@@ -1117,6 +1118,21 @@ void TopWindowBase::UpdateToolbar()
 
 
 
+long TopWindowBase::onThemeChange(FXObject* o, FXSelector sel, void* p )
+{ 
+  if ((FXuint)((FXival)p) == Theme::ChangedColors) {
+    Theme::apply(this);
+    Theme::apply(srchdlgs->FindDialog());
+    tips->setBackColor(getApp()->getTipbackColor());
+    tips->setTextColor(getApp()->getTipforeColor());
+    statusbar->Colorize();
+  }
+  UpdateToolbar();
+  return 1;
+}
+
+
+
 void TopWindowBase::ShowPrefsDialog()
 {
   PrefsDialog*prefdlg=new PrefsDialog(this, (Settings*)prefs, mnumgr);
@@ -1134,13 +1150,6 @@ void TopWindowBase::ShowPrefsDialog()
   prefs->ToolbarButtonSize=toolbar->ButtonSize();
   prefs->WrapToolbar=toolbar->Wrapped();
   UpdateToolbar();
-  if (Theme::changed() & ThemeChangedColors) {
-    Theme::apply(this);
-    Theme::apply(srchdlgs->FindDialog());
-    tips->setBackColor(getApp()->getTipbackColor());
-    tips->setTextColor(getApp()->getTipforeColor());
-    statusbar->Colorize();
-  }
   tabbook->ActivateTab(tabbook->ActiveTab());
   toolbar->SetToolbarColors();
   EnableUserFilters(FocusedDoc()->GetSelLength());
