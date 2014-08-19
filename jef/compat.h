@@ -96,12 +96,14 @@ bool IsDesktopCurrent(FXMainWindow*tw);
 # define TotalSlotsInDict(d)  ((d)->no())
 # define UsedSlotsInDict(d)   ((d)->used())
 # define ReplaceInDict(d,k,v) ((d)->at(k)=(v))
+# define LookupInDict(d,k)    ((d)->at(k))
 #else
 # define Dictionary FXDict
 # define DictKeyName(d,n)     ((d).key(n))
 # define TotalSlotsInDict(d)  ((d)->size())
 # define UsedSlotsInDict(d)   ((d)->no())
 # define ReplaceInDict(d,k,v) ((d)->replace((k),(v)))
+# define LookupInDict(d,k)    ((d)->find(k))
 #endif
 
 FXID GetNetActiveWindow();
