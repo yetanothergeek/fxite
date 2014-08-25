@@ -16,6 +16,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#if (FOX_MAJOR==1) && (FOX_MINOR==6) && !defined(FOX_1_6)
+# define FOX_1_6
+#endif
+
 #ifdef FOX_1_6
 # define ONE_SECOND ((FXuint)1000)
 # define PathMatch(pattern,file,flags) FXPath::match(pattern,file,flags)
