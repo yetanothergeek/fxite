@@ -336,5 +336,5 @@ int luaopen_dialog(lua_State *L)
 
   luaL_register(L, NULL, &asq_funcs[1]);
   luaL_register(L, DLG_MODULE_NAME, asq_funcs);
-  return 0;
+  return 1;
 }
