@@ -20,10 +20,10 @@
 #define FXITE_LUAFUNCS_H
 
 
-struct luaL_reg;
+struct luaL_Reg;
 class TopWindow;
 
-const luaL_reg* LuaFuncs();
+const luaL_Reg* LuaFuncs();
 void LuaFuncsCleanup();
 const char *LuaQuitMessage();
 

@@ -599,7 +599,7 @@ static int pid(lua_State* L)
 
 
 
-static const struct luaL_reg fx_util_funcs[] = {
+static const struct luaL_Reg fx_util_funcs[] = {
   {"message", message},
   {"confirm", confirm},
   {"input", input},
@@ -620,7 +620,7 @@ static const struct luaL_reg fx_util_funcs[] = {
 
 
 
-const luaL_reg* LuaFxUtils(FXWindow*topwin, const char*exe_name)
+const luaL_Reg* LuaFxUtils(FXWindow*topwin, const char*exe_name)
 {
   default_title=exe_name;
   if (!main_window) { main_window=topwin; }

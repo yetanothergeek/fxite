@@ -1354,7 +1354,7 @@ static int tagfiles(lua_State* L)
 
 
 
-static const struct luaL_reg fxte_funcs[] = {
+static const struct luaL_Reg fxte_funcs[] = {
   {"seltext", seltext},
   {"text", text},
   {"documents", documents},
@@ -1403,7 +1403,7 @@ static const struct luaL_reg fxte_funcs[] = {
 
 
 
-const luaL_reg* LuaFuncs()
+const luaL_Reg* LuaFuncs()
 {
   return fxte_funcs;
 }

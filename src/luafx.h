@@ -20,7 +20,7 @@
 #define FXITE_LUAFX_H
 
 
-const luaL_reg* LuaFxUtils(FXWindow*topwin, const char*exe_name);
+const luaL_Reg* LuaFxUtils(FXWindow*topwin, const char*exe_name);
 
 #endif
 

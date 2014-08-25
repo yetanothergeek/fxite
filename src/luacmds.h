@@ -20,7 +20,7 @@
 #define FXITE_LUACMDS_H
 
 
-const luaL_reg* LuaCommands(FXMainWindow*topwin);
+const luaL_Reg* LuaCommands(FXMainWindow*topwin);
 
 #endif
 
