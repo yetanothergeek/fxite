@@ -301,7 +301,7 @@ static int asq_done(lua_State *L)
 
 
 
-static const struct luaL_reg asq_funcs[] = {
+static const struct luaL_Reg asq_funcs[] = {
   {"new",      asq_new},
   {"run",      asq_run},
   {"label",    asq_label},
@@ -330,7 +330,6 @@ int luaopen_dialog(lua_State *L)
   lua_pushvalue(L, -2);
   lua_settable(L, -3);
 
-  luaL_getmetatable(L, MetaName);
   lua_pushstring(L,"__gc");
   lua_pushcfunction(L,asq_done);
   lua_rawset(L,-3);
