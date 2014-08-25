@@ -47,7 +47,7 @@ MacroRunner::~MacroRunner()
 /* Catch and report script errors */
 static FXint traceback(lua_State *L)
 {
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  lua_getglobal(L, "debug");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return 1;
@@ -324,7 +324,7 @@ static void debug_hook(lua_State *L, lua_Debug *ar)
 /* Override a builtin Lua function, or add a new one if it doesn't exist */
 static void override(lua_State *L, const char*module, const char* funcname, lua_CFunction newfunc)
 {
-  lua_getfield(L,LUA_GLOBALSINDEX,module);
+  lua_getglobal(L,module);
   if (lua_istable(L,-1)) {
     lua_pushstring(L,funcname);
     if (newfunc) {
@@ -342,7 +342,7 @@ static void override(lua_State *L, const char*module, const char* funcname, lua_
 /* Don't let scripts try to read from stdin, as this would block indefinitely */
 static void close_stdin(lua_State *L)
 {
-  lua_getfield(L, LUA_GLOBALSINDEX, "io");
+  lua_getglobal(L, "io");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return;
