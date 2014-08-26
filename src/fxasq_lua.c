@@ -31,6 +31,9 @@
 #include "intl.h"
 #include "fxasq_lua.h"
 
+#if LUA_VERSION_NUM<502
+# define lua_rawlen lua_objlen
+#endif
 
 #define DLG_MODULE_NAME "dialog"
 #define MetaName "_fxasq_metatable"
@@ -234,7 +237,7 @@ static int asq_new(lua_State *L) {
   if (argc>=2) {
     luaL_argcheck(L,lua_istable(L,2),2,_("expected table"));
   }
-  n=lua_objlen(L,2);
+  n=lua_rawlen(L,2);
   for (i=1;i<=n; i++) {
     lua_rawgeti(L,2,i);
     char msg[64];

@@ -36,6 +36,10 @@
 #include "intl.h"
 #include "luafx.h"
 
+#if LUA_VERSION_NUM<502
+# define lua_rawlen lua_objlen
+#endif
+
 static FXWindow*main_window=NULL;
 
 static const char*default_title;
@@ -248,7 +252,7 @@ static int choose(lua_State*L) {
   FXString fmsg;
   int i,n;
   luaL_argcheck(L, lua_istable(L,argtbl), argtbl, _("table expected") );
-  n=lua_objlen(L,argtbl);
+  n=lua_rawlen(L,argtbl);
   luaL_argcheck(L, n>0, argtbl, _("table can't be empty"));
   for (i=1;i<=n; i++) {
     lua_rawgeti(L,argtbl,i);

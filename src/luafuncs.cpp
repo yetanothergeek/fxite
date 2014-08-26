@@ -38,6 +38,9 @@
 #include "intl.h"
 #include "luafuncs.h"
 
+#if LUA_VERSION_NUM<502
+# define lua_rawlen lua_objlen
+#endif
 
 
 /*
@@ -86,7 +89,7 @@ static bool check_find_flags(lua_State* L, int pos, int &flags)
 {
   flags=0;
   luaL_argcheck(L, lua_istable(L,pos), pos, _("expected table"));
-  int n=lua_objlen(L, pos);
+  int n=lua_rawlen(L, pos);
   for (int i=1; i<=n; i++) {
     lua_rawgeti(L, pos, i);
     if (lua_isstring(L,-1)) {
