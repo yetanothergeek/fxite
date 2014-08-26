@@ -337,7 +337,11 @@ int luaopen_dialog(lua_State *L)
   lua_pushcfunction(L,asq_done);
   lua_rawset(L,-3);
 
+#if LUA_VERSION_NUM < 502
   luaL_register(L, NULL, &asq_funcs[1]);
   luaL_register(L, DLG_MODULE_NAME, asq_funcs);
+#else
+  luaL_setfuncs(L,asq_funcs,0);
+#endif
   return 1;
 }
