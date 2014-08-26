@@ -493,9 +493,9 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   lua_sethook(L,debug_hook,LUA_MASKLINE,1);
   luaL_register(L, LUA_MODULE_NAME, LuaFuncs());
   luaL_register(L, LUA_MODULE_NAME, LuaFxUtils(TopWinPub::instance(), EXE_NAME));
+  luaL_register(L, LUA_MODULE_NAME, LuaCommands(TopWinPub::instance()));
   override(L,LUA_MODULE_NAME,"script", scriptname);
   override(L,LUA_MODULE_NAME,"optimize", optimize);
-  luaL_openlib(L, LUA_MODULE_NAME, LuaCommands(TopWinPub::instance()), 0);
   set_string_token(L, "_VERSION", VERSION);
   PushKeepers(L);
   if (isfilename) {
