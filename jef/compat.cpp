@@ -361,6 +361,7 @@ void WaitForWindowFocus(FXTopWindow*w, FXuint msecs)
     w->raise();
     w->setFocus();
     a->runWhileEvents();
+    FXThread::sleep(10000000);
   }
 }
 
