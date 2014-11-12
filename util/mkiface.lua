@@ -73,6 +73,7 @@ io.input(scintilla_iface)
 
 for line in io.lines()
 do
+  line=line:gsub('%s+$','')
   if line:match("^fun%s")
     or line:match("^get%s")
       or line:match("^set%s")
