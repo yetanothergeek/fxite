@@ -1,20 +1,21 @@
 /* lexname=vhdl lexpfx=SCE_VHDL_ lextag=SCLEX_VHDL */
 
 static StyleDef vhdl_style[] = {
-  { "default", SCE_VHDL_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "attribute", SCE_VHDL_ATTRIBUTE, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "blockcomment", SCE_VHDL_BLOCK_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
   { "comment", SCE_VHDL_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
   { "commentlinebang", SCE_VHDL_COMMENTLINEBANG, COMMNT_FG, _DEFLT_BG, Italic },
-  { "number", SCE_VHDL_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
-  { "string", SCE_VHDL_STRING, STRING_FG, _DEFLT_BG, Normal },
-  { "operator", SCE_VHDL_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
+  { "default", SCE_VHDL_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
   { "identifier", SCE_VHDL_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "stringeol", SCE_VHDL_STRINGEOL, STREOL_FG, _DEFLT_BG, Normal },
   { "keyword", SCE_VHDL_KEYWORD, _WORD1_FG, _DEFLT_BG, Bold },
-  { "stdoperator", SCE_VHDL_STDOPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
-  { "attribute", SCE_VHDL_ATTRIBUTE, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "number", SCE_VHDL_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
+  { "operator", SCE_VHDL_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
   { "stdfunction", SCE_VHDL_STDFUNCTION, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "stdoperator", SCE_VHDL_STDOPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
   { "stdpackage", SCE_VHDL_STDPACKAGE, _DEFLT_FG, _DEFLT_BG, Normal },
   { "stdtype", SCE_VHDL_STDTYPE, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "string", SCE_VHDL_STRING, STRING_FG, _DEFLT_BG, Normal },
+  { "stringeol", SCE_VHDL_STRINGEOL, STREOL_FG, _DEFLT_BG, Normal },
   { "userword", SCE_VHDL_USERWORD, _WORD1_FG, _DEFLT_BG, Bold },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };

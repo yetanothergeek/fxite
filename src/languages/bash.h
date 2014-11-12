@@ -1,20 +1,20 @@
 /* lexname=bash lexpfx=SCE_SH_ lextag=SCLEX_BASH */
 
 static StyleDef bash_style[] = {
+  { "backticks", SCE_SH_BACKTICKS, __ORANGE_, _DEFLT_BG, Normal },
+  { "character", SCE_SH_CHARACTER, STRING_FG, _DEFLT_BG, Normal },
+  { "commentline", SCE_SH_COMMENTLINE, COMMNT_FG, _DEFLT_BG, Italic },
   { "default", SCE_SH_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
   { "error", SCE_SH_ERROR, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "commentline", SCE_SH_COMMENTLINE, COMMNT_FG, _DEFLT_BG, Italic },
-  { "number", SCE_SH_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
-  { "word", SCE_SH_WORD, _WORD1_FG, _DEFLT_BG, Bold },
-  { "string", SCE_SH_STRING, STRING_FG, _DEFLT_BG, Normal },
-  { "character", SCE_SH_CHARACTER, STRING_FG, _DEFLT_BG, Normal },
-  { "operator", SCE_SH_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
-  { "identifier", SCE_SH_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "scalar", SCE_SH_SCALAR, SCALAR_FG, _DEFLT_BG, Normal },
-  { "param", SCE_SH_PARAM, SCALAR_FG, _DEFLT_BG, Normal },
-  { "backticks", SCE_SH_BACKTICKS, __ORANGE_, _DEFLT_BG, Normal },
   { "heredelim", SCE_SH_HERE_DELIM, _DEFLT_FG, _HERE_BG_, Normal },
   { "hereq", SCE_SH_HERE_Q, _DEFLT_FG, _HERE_BG_, Normal },
+  { "identifier", SCE_SH_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "number", SCE_SH_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
+  { "operator", SCE_SH_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
+  { "param", SCE_SH_PARAM, SCALAR_FG, _DEFLT_BG, Normal },
+  { "scalar", SCE_SH_SCALAR, SCALAR_FG, _DEFLT_BG, Normal },
+  { "string", SCE_SH_STRING, STRING_FG, _DEFLT_BG, Normal },
+  { "word", SCE_SH_WORD, _WORD1_FG, _DEFLT_BG, Bold },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 

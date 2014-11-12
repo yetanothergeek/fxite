@@ -1,4 +1,4 @@
-/* lexname=xml lexpfx=SCE_H lextag=SCLEX_XML */
+/* lexname=xml lexpfx=SCE_H_ lextag=SCLEX_XML */
 
 #define xml_style html_style
 

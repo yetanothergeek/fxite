@@ -9,6 +9,7 @@ static const char* java_words[]= {
   "",
   "",
   "",
+  "",
   NULL
 };
 

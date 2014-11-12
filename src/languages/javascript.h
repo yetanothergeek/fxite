@@ -9,6 +9,7 @@ static const char* javascript_words[]= {
   "",
   "",
   "",
+  "",
   NULL
 };
 

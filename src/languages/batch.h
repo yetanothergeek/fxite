@@ -1,14 +1,14 @@
 /* lexname=batch lexpfx=SCE_BAT_ lextag=SCLEX_BATCH */
 
 static StyleDef batch_style[] = {
-  { "default", SCE_BAT_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "comment", SCE_BAT_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
-  { "word", SCE_BAT_WORD, _WORD1_FG, _DEFLT_BG, Bold },
-  { "label", SCE_BAT_LABEL, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "hide", SCE_BAT_HIDE, _DEFLT_FG, _DEFLT_BG, Normal },
   { "command", SCE_BAT_COMMAND, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "comment", SCE_BAT_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
+  { "default", SCE_BAT_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "hide", SCE_BAT_HIDE, _DEFLT_FG, _DEFLT_BG, Normal },
   { "identifier", SCE_BAT_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "label", SCE_BAT_LABEL, _DEFLT_FG, _DEFLT_BG, Normal },
   { "operator", SCE_BAT_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
+  { "word", SCE_BAT_WORD, _WORD1_FG, _DEFLT_BG, Bold },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 

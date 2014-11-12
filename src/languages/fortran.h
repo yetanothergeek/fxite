@@ -1,21 +1,21 @@
 /* lexname=fortran lexpfx=SCE_F_ lextag=SCLEX_FORTRAN */
 
 static StyleDef fortran_style[] = {
-  { "default", SCE_F_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
   { "comment", SCE_F_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
+  { "continuation", SCE_F_CONTINUATION, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "default", SCE_F_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "identifier", SCE_F_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "label", SCE_F_LABEL, _DEFLT_FG, _DEFLT_BG, Normal },
   { "number", SCE_F_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
+  { "operator", SCE_F_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
+  { "operator2", SCE_F_OPERATOR2, OPERTR_FG, _DEFLT_BG, Bold },
+  { "preprocessor", SCE_F_PREPROCESSOR, PREPRC_FG, _DEFLT_BG, Normal },
   { "string1", SCE_F_STRING1, STRING_FG, _DEFLT_BG, Normal },
   { "string2", SCE_F_STRING2, STRING_FG, _DEFLT_BG, Normal },
   { "stringeol", SCE_F_STRINGEOL, STREOL_FG, _DEFLT_BG, Normal },
-  { "operator", SCE_F_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
-  { "identifier", SCE_F_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
   { "word", SCE_F_WORD, _WORD1_FG, _DEFLT_BG, Bold },
   { "word2", SCE_F_WORD2, _WORD2_FG, _DEFLT_BG, Bold },
   { "word3", SCE_F_WORD3, _WORD1_FG, _DEFLT_BG, Bold },
-  { "preprocessor", SCE_F_PREPROCESSOR, PREPRC_FG, _DEFLT_BG, Normal },
-  { "operator2", SCE_F_OPERATOR2, OPERTR_FG, _DEFLT_BG, Bold },
-  { "label", SCE_F_LABEL, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "continuation", SCE_F_CONTINUATION, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 

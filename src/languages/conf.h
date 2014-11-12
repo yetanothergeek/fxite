@@ -1,16 +1,16 @@
 /* lexname=conf lexpfx=SCE_CONF_ lextag=SCLEX_CONF */
 
 static StyleDef conf_style[] = {
-  { "default", SCE_CONF_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
   { "comment", SCE_CONF_COMMENT, COMMNT_FG, _DEFLT_BG, Italic },
-  { "number", SCE_CONF_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
-  { "identifier", SCE_CONF_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "default", SCE_CONF_DEFAULT, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "directive", SCE_CONF_DIRECTIVE, _DEFLT_FG, _DEFLT_BG, Normal },
   { "extension", SCE_CONF_EXTENSION, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "identifier", SCE_CONF_IDENTIFIER, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "ip", SCE_CONF_IP, _DEFLT_FG, _DEFLT_BG, Normal },
+  { "number", SCE_CONF_NUMBER, NUMBER_FG, _DEFLT_BG, Normal },
+  { "operator", SCE_CONF_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
   { "parameter", SCE_CONF_PARAMETER, _DEFLT_FG, _DEFLT_BG, Normal },
   { "string", SCE_CONF_STRING, STRING_FG, _DEFLT_BG, Normal },
-  { "operator", SCE_CONF_OPERATOR, OPERTR_FG, _DEFLT_BG, Bold },
-  { "ip", SCE_CONF_IP, _DEFLT_FG, _DEFLT_BG, Normal },
-  { "directive", SCE_CONF_DIRECTIVE, _DEFLT_FG, _DEFLT_BG, Normal },
   { NULL, 0, _DEFLT_FG, _DEFLT_BG, Normal }
 };
 
