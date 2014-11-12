@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <ctype.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <ctype.h>
 
 #include <vector>
 
@@ -84,6 +84,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmASY);
 	LINK_LEXER(lmBash);
 	LINK_LEXER(lmBatch);
+	LINK_LEXER(lmBibTeX);
 	LINK_LEXER(lmBlitzBasic);
 	LINK_LEXER(lmCaml);
 	LINK_LEXER(lmClw);
@@ -127,6 +128,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmPureBasic);
 	LINK_LEXER(lmPython);
 	LINK_LEXER(lmR);
+	LINK_LEXER(lmRegistry);
 	LINK_LEXER(lmRuby);
 	LINK_LEXER(lmSmalltalk);
 	LINK_LEXER(lmSML);

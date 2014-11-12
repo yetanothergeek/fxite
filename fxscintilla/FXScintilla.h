@@ -41,7 +41,11 @@ protected:
 public:
   enum {
     idLast = SCID(100),
-    ID_TICK,
+    ID_TICK_CARET,
+    ID_TICK_SCROLL,
+    ID_TICK_WIDEN,
+    ID_TICK_DWELL,
+    ID_TICK_PLATFORM,
     ID_IDLE,
     ID_STYLE_IDLE,
     ID_LAST

@@ -86,6 +86,9 @@
 #include "Document.h"
 #include "Selection.h"
 #include "PositionCache.h"
+#include "EditModel.h"
+#include "MarginView.h"
+#include "EditView.h"
 #include "Editor.h"
 #include "ScintillaBase.h"
 
@@ -146,7 +149,12 @@ private:
   virtual void ClaimSelection();
   virtual void NotifyChange();
   virtual void NotifyParent(SCNotification scn);
-  virtual void SetTicking(bool on);
+  FXSelector TickReasonToSel(TickReason reason);
+  TickReason SelToTickReason(FXSelector sel);
+  virtual bool FineTickerAvailable();
+  virtual bool FineTickerRunning(TickReason reason);
+  virtual void FineTickerStart(TickReason reason, int millis, int tolerance);
+  virtual void FineTickerCancel(TickReason reason);
   virtual bool SetIdle(bool on);
   virtual void QueueIdleWork(WorkNeeded::workItems items, int upTo);
   virtual void SetMouseCapture(bool on);
@@ -396,12 +404,13 @@ int ScintillaFOX::KeyDefault(int key, int modifiers) {
 
 void ScintillaFOX::Initialise()
 {
-  SetTicking(true);
 }
 
 void ScintillaFOX::Finalise()
 {
-  SetTicking(false);
+  for (TickReason tr = tickCaret; tr <= tickDwell; tr = static_cast<TickReason>(tr + 1)) {
+    FineTickerCancel(tr);
+  }
   ScintillaBase::Finalise();
 }
 
@@ -498,17 +507,54 @@ void ScintillaFOX::NotifyParent(SCNotification scn)
   _fxsc.handle(&_fxsc, MKUINT(0, SEL_COMMAND), &scn);
 }
 
-void ScintillaFOX::SetTicking(bool on)
+FXSelector ScintillaFOX::TickReasonToSel(TickReason reason)
 {
-  if (timer.ticking != on) {
-    timer.ticking = on;
-    if (timer.ticking) {
-      FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
-    } else {
-      FXApp::instance()->removeTimeout(&_fxsc, _fxsc.ID_TICK);
-    }
+  switch (reason) {
+    case tickCaret:    return FXScintilla::ID_TICK_CARET;
+    case tickScroll:   return FXScintilla::ID_TICK_SCROLL;
+    case tickWiden:    return FXScintilla::ID_TICK_WIDEN;
+    case tickDwell:    return FXScintilla::ID_TICK_DWELL;
+    case tickPlatform: return FXScintilla::ID_TICK_PLATFORM;
+    default: return 0;
   }
-  timer.ticksToWait = caret.period;
+}
+
+ScintillaFOX::TickReason ScintillaFOX::SelToTickReason(FXSelector sel)
+{
+  switch (sel) {
+    case FXScintilla::ID_TICK_CARET:    return tickCaret;
+    case FXScintilla::ID_TICK_SCROLL:   return tickScroll;
+    case FXScintilla::ID_TICK_WIDEN:    return tickWiden;
+    case FXScintilla::ID_TICK_DWELL:    return tickDwell;
+    case FXScintilla::ID_TICK_PLATFORM: return tickPlatform;
+    default: return tickCaret;
+  }
+}
+
+bool ScintillaFOX::FineTickerAvailable()
+{
+  return true;
+}
+
+bool ScintillaFOX::FineTickerRunning(TickReason reason)
+{
+  return FXApp::instance()->hasTimeout(&_fxsc, TickReasonToSel(reason));
+}
+
+void ScintillaFOX::FineTickerStart(TickReason reason, int millis, int tolerance)
+{
+  (void)tolerance;
+  FineTickerCancel(reason);
+#ifdef FOX_1_6
+  FXApp::instance()->addTimeout(&_fxsc, TickReasonToSel(reason), millis, (void*)(FXival)millis);
+#else
+  FXApp::instance()->addTimeout(&_fxsc, TickReasonToSel(reason), millis*1000000, (void*)(FXival)millis);
+#endif
+}
+
+void ScintillaFOX::FineTickerCancel(TickReason reason)
+{
+  FXApp::instance()->removeTimeout(&_fxsc, TickReasonToSel(reason));
 }
 
 bool ScintillaFOX::SetIdle(bool on) {
@@ -788,7 +834,11 @@ FXDEFMAP(FXScintilla) FXScintillaMap[]={
   FXMAPFUNC(SEL_CHANGED, 0, FXScintilla::onChanged),
   FXMAPFUNC(SEL_PAINT, 0, FXScintilla::onPaint),
   FXMAPFUNC(SEL_CONFIGURE,0,FXScintilla::onConfigure),
-  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK,FXScintilla::onTimeoutTicking),
+  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK_CARET,FXScintilla::onTimeoutTicking),
+  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK_SCROLL,FXScintilla::onTimeoutTicking),
+  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK_WIDEN,FXScintilla::onTimeoutTicking),
+  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK_DWELL,FXScintilla::onTimeoutTicking),
+  FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK_PLATFORM,FXScintilla::onTimeoutTicking),
   FXMAPFUNC(SEL_FOCUSIN,0,FXScintilla::onFocusIn),
   FXMAPFUNC(SEL_FOCUSOUT,0,FXScintilla::onFocusOut),
   FXMAPFUNC(SEL_MOTION,0,FXScintilla::onMotion),
@@ -886,14 +936,15 @@ long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
   return 1;
 }
 
-long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
+long FXScintilla::onTimeoutTicking(FXObject *o, FXSelector sel, void *p)
 {
+  (void)o;
 #ifdef FOX_1_6
-  FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
+  FXApp::instance()->addTimeout(this, FXSELID(sel), (FXint)(FXival)p, p);
 #else
-  FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize*1000000);
+  FXApp::instance()->addTimeout(this, FXSELID(sel), ((FXint)(FXival)p)*1000000, p);
 #endif
-  _scint->Tick();
+  _scint->TickFor(_scint->SelToTickReason(FXSELID(sel)));
   return 0;
 }
 
@@ -1100,8 +1151,9 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
   FXint len = event->text.length();
   // Check for multi-byte UTF-8 character
   if ((_scint->pdoc->dbcsCodePage==SC_CP_UTF8)&&(len>1)&&(len<5) && !(ctrl||alt)) {
-    if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
-      _scint->MovePositionTo(_scint->CurrentPosition() + len);
+   const int lengthInserted = _scint->pdoc->InsertString(_scint->CurrentPosition(), (const char*)event->text.text(), event->text.length());
+    if (lengthInserted > 0) {
+      _scint->MovePositionTo(_scint->CurrentPosition() + lengthInserted);
     }
     return 1;
   }
@@ -1134,8 +1186,9 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
   //Platform::DebugPrintf("SK-key: %d %x %x\n",event->code, event->state, consumed);
   if (event->code == 0xffffff && event->text.length() > 0) {
     _scint->ClearSelection();
-    if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
-      _scint->MovePositionTo(_scint->CurrentPosition() + event->text.length());
+    const int lengthInserted = _scint->pdoc->InsertString(_scint->CurrentPosition(), (const char*)event->text.text(), event->text.length());
+    if (lengthInserted > 0) {
+      _scint->MovePositionTo(_scint->CurrentPosition() + lengthInserted);
     }
     consumed = true;
   }

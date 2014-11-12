@@ -68,6 +68,7 @@ Bullant \
 CoffeeScript \
 Crontab \
 Csound \
+DMIS \
 ECL \
 EScript \
 Eiffel \

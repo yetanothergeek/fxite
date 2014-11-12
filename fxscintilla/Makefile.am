@@ -16,6 +16,8 @@ CharacterSet.cxx \
 ContractionState.cxx \
 Decoration.cxx \
 Document.cxx \
+EditModel.cxx \
+EditView.cxx \
 Editor.cxx \
 ExternalLexer.cxx \
 Indicator.cxx \
@@ -27,6 +29,7 @@ LexAsm.cxx \
 LexAsn1.cxx \
 LexBash.cxx \
 LexBasic.cxx \
+LexBibTeX.cxx \
 LexCLW.cxx \
 LexCOBOL.cxx \
 LexCPP.cxx \
@@ -58,6 +61,7 @@ LexPascal.cxx \
 LexPerl.cxx \
 LexPython.cxx \
 LexR.cxx \
+LexRegistry.cxx \
 LexRuby.cxx \
 LexSML.cxx \
 LexSQL.cxx \
@@ -74,6 +78,7 @@ LexerModule.cxx \
 LexerNoExceptions.cxx \
 LexerSimple.cxx \
 LineMarker.cxx \
+MarginView.cxx \
 PerLine.cxx \
 PlatFOX.cxx \
 PositionCache.cxx \
@@ -105,6 +110,8 @@ CharacterSet.h \
 ContractionState.h \
 Decoration.h \
 Document.h \
+EditModel.h \
+EditView.h \
 Editor.h \
 ExternalLexer.h \
 FXScintilla.h \
@@ -118,6 +125,7 @@ LexerModule.h \
 LexerNoExceptions.h \
 LexerSimple.h \
 LineMarker.h \
+MarginView.h \
 OptionSet.h \
 Partitioning.h \
 PerLine.h \
