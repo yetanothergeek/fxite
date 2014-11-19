@@ -30,9 +30,9 @@
 #define SciStr(im,wp,lp) sci->sendString(im,wp,lp)
 
 #ifdef FOX_1_7_50_OR_NEWER
-# define RxMatch(rx, str, len, beg, end, mode, npar, fm, to) ( ((rx)->search((str), (len), (fm), (to), (mode), (beg), (end), (npar))) !=0 )
+# define RxMatch(rx, str, len, beg, end, mode, npar, fm, to) ( ((rx)->search((str), (len), (fm), (to), (mode), (beg), (end), (npar))) >=0 )
 #else
-# define RxMatch(rx, str, len, beg, end, mode, npar, fm, to) ( ((rx)->match ((str), (len), (beg), (end), (mode), (npar), (fm), (to))) >=0 )
+# define RxMatch(rx, str, len, beg, end, mode, npar, fm, to) ( ((rx)->match ((str), (len), (beg), (end), (mode), (npar), (fm), (to))) !=0 )
 #endif
 
 #if 1
