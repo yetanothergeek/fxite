@@ -1260,7 +1260,12 @@ void TopWindowBase::ParseCommands(FXString &commands)
             FXString filename=sect.text();
             if (rowcol.empty()) {
               FXint beg,end;
-              if (rx_rowcol.match(filename,&beg,&end)) {
+#ifdef FOX_1_7_50_OR_NEWER
+              if (rx_rowcol.search(filename,0,filename.length(),Normal,&beg,&end,1)>=0)
+#else
+              if (rx_rowcol.match(filename,&beg,&end))
+#endif
+              {
                 if (!FXStat::isFile(filename)) {
                   rowcol=filename.mid(beg,end-beg).text();
                   filename=filename.left(beg).text();

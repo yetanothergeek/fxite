@@ -42,8 +42,16 @@ FXbool LocaleIsUTF8();
 # define FILEMATCH_NOESCAPE FXPath::NoEscape
 # define FILEMATCH_FILE_NAME FXPath::PathName
 # define FILEMATCH_CASEFOLD FXPath::CaseFold
-# define REX_FORWARD    FXRex::Forward
-# define REX_BACKWARD   FXRex::Backward
+# if (FOX_MAJOR>1) || (FOX_MINOR>7) || (FOX_LEVEL>49)
+#  define FOX_1_7_50_OR_NEWER
+# endif
+# ifdef FOX_1_7_50_OR_NEWER
+#  define REX_FORWARD    0
+#  define REX_BACKWARD   0
+# else
+#  define REX_FORWARD    FXRex::Forward
+#  define REX_BACKWARD   FXRex::Backward
+# endif
 # define REX_CAPTURE    FXRex::Capture
 # define REX_NEWLINE    FXRex::Newline
 # define REX_NORMAL     FXRex::Normal
