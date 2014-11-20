@@ -179,7 +179,7 @@ private:
   // From ScintillaBase
   virtual bool ModifyScrollBars(int nMax, int nPage);
   virtual void ReconfigureScrollBars();
-  virtual PRectangle GetClientRectangle();
+  virtual PRectangle GetClientRectangle() const;
   virtual int KeyDefault(int key, int modifiers);
 
   // Popup flag
@@ -708,7 +708,7 @@ sptr_t ScintillaFOX::DirectFunction(
   return sciThis->WndProc(iMessage, wParam, lParam);
 }
 
-PRectangle ScintillaFOX::GetClientRectangle() {
+PRectangle ScintillaFOX::GetClientRectangle() const {
   // Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
   // to prevent infinite loop
 #ifdef FOX_1_6
