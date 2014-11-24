@@ -139,6 +139,30 @@ static const FXString GetActualFont(FXFont*fnt)
 
 
 
+#define AppColorToReg(c) a->reg().writeColorEntry(colors_sect, Reg##c, a->get##c());
+
+// Store current application colors to in-memory registry
+static void AppToReg()
+{
+  FXApp*a=FXApp::instance();
+  AppColorToReg(BackColor);
+  AppColorToReg(BackColor);
+  AppColorToReg(BaseColor);
+  AppColorToReg(BorderColor);
+  AppColorToReg(ForeColor);
+  AppColorToReg(HiliteColor);
+  AppColorToReg(SelMenuBackColor);
+  AppColorToReg(SelMenuTextColor);
+  AppColorToReg(SelbackColor);
+  AppColorToReg(SelforeColor);
+  AppColorToReg(ShadowColor);
+  AppColorToReg(TipbackColor);
+  AppColorToReg(TipforeColor);
+  a->reg().writeStringEntry(colors_sect,"Font", GetActualFont(a->getNormalFont()).text());
+}
+
+
+
 #define RegColorToApp(c) a->set##c(r->readColorEntry(colors_sect, Reg##c));
 
 // Apply registry color and font settings to application object
@@ -168,30 +192,6 @@ static void RegToApp()
     a->getNormalFont()->create();
     current_font=GetActualFont(a->getNormalFont());
   }
-}
-
-
-
-#define AppColorToReg(c) a->reg().writeColorEntry(colors_sect, Reg##c, a->get##c());
-
-// Store current application colors to in-memory registry
-static void AppToReg()
-{
-  FXApp*a=FXApp::instance();
-  AppColorToReg(BackColor);
-  AppColorToReg(BackColor);
-  AppColorToReg(BaseColor);
-  AppColorToReg(BorderColor);
-  AppColorToReg(ForeColor);
-  AppColorToReg(HiliteColor);
-  AppColorToReg(SelMenuBackColor);
-  AppColorToReg(SelMenuTextColor);
-  AppColorToReg(SelbackColor);
-  AppColorToReg(SelforeColor);
-  AppColorToReg(ShadowColor);
-  AppColorToReg(TipbackColor);
-  AppColorToReg(TipforeColor);
-  a->reg().writeStringEntry(colors_sect,"Font", GetActualFont(a->getNormalFont()).text());
 }
 
 
