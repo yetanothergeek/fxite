@@ -210,10 +210,18 @@ static void RegToApp()
 
 
 
+static bool BadTheme(AppColors*ac)
+{
+  AppColors AllBlack={"",0,0,0,0,0,0,0,0,0,0};
+  return SameColors(ac,&AllBlack);
+}
+
+
+
 #define GetSystemColor(f) system_colors.f=r.readColorEntry(colors_sect,Reg##f);
 
 // Populate system_colors struct with system-wide FOX color settings
-static void GetSystemColors()
+static bool GetSystemColors()
 {
   FXRegistry r(FXString::null,FXString::null);
   r.read();
@@ -227,6 +235,7 @@ static void GetSystemColors()
   GetSystemColor(TipbackColor);
   GetSystemColor(SelMenuBackColor);
   GetSystemColor(SelMenuTextColor);
+  return !BadTheme(&system_colors);
 }
 
 
@@ -267,7 +276,7 @@ FXuint Theme::SetUseSystemColors(bool use)
   if (use) {
     RemoveAppSettings();
     RegToApp();
-    GetSystemColors();
+    if (!GetSystemColors()) { CopyColors(&system_colors, (AppColors*)&ColorThemes[0]); }
     use_system_colors=true;
     if (!SameColors(&current_colors,&system_colors)) { what_changed|=ChangedColors; }
     if (current_font!=system_font) {
@@ -284,7 +293,10 @@ FXuint Theme::SetUseSystemColors(bool use)
 // but before any windows are created
 void Theme::init()
 {
-  GetSystemColors();
+  if (!GetSystemColors()) {
+    use_system_colors=false;
+    FXApp::instance()->reg().writeBoolEntry(colors_sect, "UseSystemColors",use_system_colors);
+  }
   FXFont *fnt=FXApp::instance()->getNormalFont();
   fnt->create();
   system_font=GetActualFont(fnt);
