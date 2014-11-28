@@ -289,10 +289,52 @@ FXuint Theme::SetUseSystemColors(bool use)
 
 
 
+#define ThemeColorToReg(f) a->reg().writeColorEntry(colors_sect,Reg##f,ac->f);
+
+static void ThemeColorsToReg(AppColors*ac) {
+  FXApp*a=FXApp::instance();
+  ThemeColorToReg(BaseColor);
+  ThemeColorToReg(BorderColor);
+  ThemeColorToReg(BackColor);
+  ThemeColorToReg(ForeColor);
+  ThemeColorToReg(SelbackColor);
+  ThemeColorToReg(SelforeColor);
+  ThemeColorToReg(TipbackColor);
+  ThemeColorToReg(TipforeColor);
+  ThemeColorToReg(SelMenuBackColor);
+  ThemeColorToReg(SelMenuTextColor);
+  a->reg().writeColorEntry(colors_sect, "shadowcolor", makeShadowColor(ac->BaseColor));
+  a->reg().writeColorEntry(colors_sect, "hilitecolor", makeHiliteColor(ac->BaseColor));
+  a->reg().write();
+  a->reg().read();
+}
+
+
+
+#define AppColorIsBlack(f) ((FXApp::instance()->get##f())==0)
+
+bool AppIsBlack()
+{
+  return (
+    AppColorIsBlack(BaseColor) &&
+    AppColorIsBlack(BorderColor) &&
+    AppColorIsBlack(BackColor) &&
+    AppColorIsBlack(ForeColor) &&
+    AppColorIsBlack(SelbackColor) &&
+    AppColorIsBlack(SelforeColor) &&
+    AppColorIsBlack(TipbackColor) &&
+    AppColorIsBlack(TipforeColor) &&
+    AppColorIsBlack(SelMenuBackColor) &&
+    AppColorIsBlack(SelMenuTextColor)
+  );
+}
+
+
 // Initialize the theme manager, this should be called after FXApp::init(), 
 // but before any windows are created
 void Theme::init()
 {
+  if (AppIsBlack()) { ThemeColorsToReg((AppColors*)&ColorThemes[0]); }
   if (!GetSystemColors()) {
     use_system_colors=false;
     FXApp::instance()->reg().writeBoolEntry(colors_sect, "UseSystemColors",use_system_colors);
@@ -303,6 +345,10 @@ void Theme::init()
   current_font=system_font;
   CopyColors(&current_colors,&system_colors);
   RegToApp();
+  if (AppIsBlack()) {
+    ThemeColorsToReg((AppColors*)&ColorThemes[0]);
+    RegToApp();
+  }
 }
 
 
