@@ -72,9 +72,16 @@ bool Theme::GetUseSystemColors() { return use_system_colors; }
 #define SizeOfColors (sizeof(AppColors)-sizeof(char*))
 
 
+static void CopyColors(AppColors*dst,AppColors*src)
+{
+  memcpy(&(dst->BaseColor),&(src->BaseColor),SizeOfColors);
+}
+
+
+
 // Copy color fields only, preserve existing name field of destination.
 void Theme::CopyColors(AppColors*dst,AppColors*src) {
-  memcpy(&(dst->BaseColor),&(src->BaseColor),SizeOfColors);
+  ::CopyColors(dst,src);
 }
 
 
@@ -106,10 +113,17 @@ void Theme::Backup()
 
 
 
+static bool SameColors(AppColors*a,AppColors*b)
+{
+  return memcmp(&(a->BaseColor),&(b->BaseColor),SizeOfColors)==0;
+}
+
+
+
 // Return true if both structs have the same color scheme
 bool Theme::SameColors(AppColors*a,AppColors*b)
 {
-  return memcmp(&(a->BaseColor),&(b->BaseColor),SizeOfColors)==0;
+  return ::SameColors(a,b);
 }
 
 
