@@ -411,7 +411,14 @@ long TopWindowBase::onTimer(FXObject*o, FXSelector sel, void*p)
 long TopWindowBase::onCloseWait(FXObject*o, FXSelector sel, void*p)
 {
   if (FXSELTYPE(sel)==SEL_CHORE) {
-    getApp()->addTimeout(this,ID_CLOSEWAIT, ONE_SECOND/10, NULL);
+    static FXint CloseWaitChoreCount=10;
+    if (CloseWaitChoreCount>0) {
+      CloseWaitChoreCount--;
+      getApp()->addChore(this,ID_CLOSEWAIT, NULL);
+    } else {
+      CloseWaitChoreCount=10;
+      getApp()->addTimeout(this,ID_CLOSEWAIT, ONE_SECOND/10, NULL);
+    }
   } else {
     close();
   }
