@@ -149,5 +149,4 @@ UniConversion.h \
 UnicodeFromUTF8.h \
 ViewStyle.h \
 WordList.h \
-XPM.h \
-version.h
+XPM.h
