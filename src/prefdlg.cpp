@@ -483,7 +483,7 @@ void PrefsDialog::create()
 
 
 
-PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs, MenuMgr* mmgr):FXDialogBox(w->getApp(), "Preferences")
+PrefsDialog::PrefsDialog(FXMainWindow* w, Settings* aprefs, MenuMgr* mmgr):FXDialogBox(w, "Preferences")
 {
   mnumgr=mmgr;
   prefs=aprefs;
