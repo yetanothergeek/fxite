@@ -20,13 +20,20 @@
 #define FXITE_RUNCMD_H
 
 
+enum {
+  CMD_NONE=0,
+  CMD_SHELL=1,
+  CMD_MACRO=2,
+  CMD_FILTER=4,
+};
+
 class TopWindowBase;
 
 class CommandUtils: public FXObject {
 private:
   FXAccelTable* saved_accels;
   FXAccelTable* temp_accels;
-  bool command_busy;
+  FXuint commands;
   FXHotKey killkey;
   MenuSpec*killcmd;
   TopWindow*tw;
@@ -42,9 +49,9 @@ public:
   FXHotKey KillKey() { return killkey; }
   void SetKillCommandAccelKey(FXHotKey acckey);
   void DisableUI(bool disabled);
-  void CommandBusy(bool bsy) { command_busy=bsy; }
-  bool CommandBusy() { return command_busy; }
-  bool IsCommandReady();
+  void CommandBusy(FXuint cmd);
+  void CommandDone(FXuint cmd);
+  bool IsCommandReady(FXuint cmd);
   bool IsMacroCancelled(bool &command_timeout);
   static void SetShellEnv(const char*file, long line);
   static const FXString FixUpCmdLineEnv(const FXString&command);

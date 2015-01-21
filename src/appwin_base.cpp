@@ -560,8 +560,8 @@ public:
 
 bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXString &input)
 {
-  if (!cmdutils->IsCommandReady()) { return false; }
-  cmdutils->CommandBusy(true);
+  if (!cmdutils->IsCommandReady(CMD_FILTER)) { return false; }
+  cmdutils->CommandBusy(CMD_FILTER);
   cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool success=false;
   if (!cmd.empty()) {
@@ -582,7 +582,7 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
   }
   sci->setFocus();
   need_status=1;
-  cmdutils->CommandBusy(false);
+  cmdutils->CommandDone(CMD_FILTER);
   return success;
 }
 
@@ -590,8 +590,8 @@ bool TopWindowBase::FilterSelection(SciDoc *sci, const FXString &cmd, const FXSt
 
 bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
 {
-  if (!cmdutils->IsCommandReady()) { return false; }
-  cmdutils->CommandBusy(true);
+  if (!cmdutils->IsCommandReady(CMD_SHELL)) { return false; }
+  cmdutils->CommandBusy(CMD_SHELL);
   cmdutils->SetShellEnv(sci->Filename().text(),sci->GetLineNumber());
   bool success=false;
   if (!cmd.empty()) {
@@ -617,7 +617,7 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
   }
   if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
   need_status=1;
-  cmdutils->CommandBusy(false);
+  cmdutils->CommandDone(CMD_SHELL);
   return success;
 }
 
@@ -625,8 +625,8 @@ bool TopWindowBase::RunCommand(SciDoc *sci, const FXString &cmd)
 
 bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
 {
-  if (!cmdutils->IsCommandReady()) { return false; }
-  cmdutils->CommandBusy(true);
+  if (!cmdutils->IsCommandReady(CMD_MACRO)) { return false; }
+  cmdutils->CommandBusy(CMD_MACRO);
   command_timeout=false;
   statusbar->Running(_("macro"), mnumgr->LookupMenu(ID_KILL_COMMAND)->accel);
   update();
@@ -640,7 +640,7 @@ bool TopWindowBase::RunMacro(const FXString &script, bool isfilename)
     if (FocusedDoc() && (GetNetActiveWindow()==id())) { FocusedDoc()->setFocus(); }
     need_status=1;
   }
-  cmdutils->CommandBusy(false);
+  cmdutils->CommandDone(CMD_MACRO);
   return rv;
 }
 

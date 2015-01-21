@@ -89,7 +89,7 @@ CommandUtils::CommandUtils(TopWindowBase*win, MenuSpec*kill_spec)
   killcmd=kill_spec;
   saved_accels=NULL;
   temp_accels=NULL;
-  command_busy=false;
+  commands=CMD_NONE;
   tw=(TopWindow*)win;
   app=tw->getApp();
   InitKillKey();
@@ -132,9 +132,23 @@ void CommandUtils::DisableUI(bool disabled)
 
 
 
-bool CommandUtils::IsCommandReady()
+void CommandUtils::CommandBusy(FXuint cmd)
 {
-  if (command_busy) {
+  commands|=cmd;
+}
+
+
+
+void CommandUtils::CommandDone(FXuint cmd)
+{
+  commands&=~cmd;
+}
+
+
+
+bool CommandUtils::IsCommandReady(FXuint cmd)
+{
+  if (commands) {
     FXMessageBox::error(tw, MBOX_OK, _("Command error"),
       _("Multiple commands cannot be executed at the same time."));
     return false;
