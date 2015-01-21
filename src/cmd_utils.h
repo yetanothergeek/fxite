@@ -34,6 +34,11 @@ private:
   FXAccelTable* saved_accels;
   FXAccelTable* temp_accels;
   FXuint commands;
+#ifdef FOX_1_6
+  FXlong macro_timer;
+#else
+  FXTime macro_timer;
+#endif
   FXHotKey killkey;
   MenuSpec*killcmd;
   TopWindow*tw;

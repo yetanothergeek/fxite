@@ -90,6 +90,7 @@ CommandUtils::CommandUtils(TopWindowBase*win, MenuSpec*kill_spec)
   saved_accels=NULL;
   temp_accels=NULL;
   commands=CMD_NONE;
+  macro_timer=0;
   tw=(TopWindow*)win;
   app=tw->getApp();
   InitKillKey();
@@ -135,6 +136,7 @@ void CommandUtils::DisableUI(bool disabled)
 void CommandUtils::CommandBusy(FXuint cmd)
 {
   commands|=cmd;
+  if (cmd==CMD_MACRO) { macro_timer=FXThread::time(); }
 }
 
 
@@ -142,12 +144,16 @@ void CommandUtils::CommandBusy(FXuint cmd)
 void CommandUtils::CommandDone(FXuint cmd)
 {
   commands&=~cmd;
+  if (cmd==CMD_MACRO) { macro_timer=0; }
 }
 
 
 
 bool CommandUtils::IsCommandReady(FXuint cmd)
 {
+  if ((commands&cmd)&&(cmd==CMD_MACRO)&&((FXThread::time()-macro_timer)<500000000)) {
+    return false; // Likely due to excessive keyboard events (user holding down hotkey), ignore it.
+  }
   if (commands) {
     FXMessageBox::error(tw, MBOX_OK, _("Command error"),
       _("Multiple commands cannot be executed at the same time."));
