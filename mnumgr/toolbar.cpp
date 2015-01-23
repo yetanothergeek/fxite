@@ -68,6 +68,7 @@ long ToolBarFrame::onConfigure(FXObject*o,FXSelector sel,void*p)
 // Wrap or unwrap buttons as needed.
 void ToolBarFrame::reconf()
 {  
+  if (numChildren()<1) { return; }
   setNumColumns(numChildren());
   setNumRows(1);
   if (wraptoolbar && (getParent()->getWidth()<getDefaultWidth())) {
