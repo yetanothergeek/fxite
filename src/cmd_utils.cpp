@@ -151,14 +151,6 @@ void CommandUtils::CommandDone(FXuint cmd)
 
 bool CommandUtils::IsCommandReady(FXuint cmd)
 {
-  if ((commands&cmd)&&(cmd==CMD_MACRO)&&((FXThread::time()-macro_timer)<500000000)) {
-    return false; // Likely due to excessive keyboard events (user holding down hotkey), ignore it.
-  }
-  if (commands) {
-    FXMessageBox::error(tw, MBOX_OK, _("Command error"),
-      _("Multiple commands cannot be executed at the same time."));
-    return false;
-  }
   if (!temp_accels) {
     FXMessageBox::error(tw, MBOX_OK, _("Command support disabled"),
       _("Support for running macros and external commands has been\n"
@@ -168,6 +160,14 @@ bool CommandUtils::IsCommandReady(FXuint cmd)
         "and enter a valid setting for \"%s\""),
       killcmd->pref
     );
+    return false;
+  }
+  if ((commands&cmd)&&(cmd==CMD_MACRO)&&((FXThread::time()-macro_timer)<500000000)) {
+    return false; // Likely due to excessive keyboard events (user holding down hotkey), ignore it.
+  }
+  if (commands) {
+    FXMessageBox::error(tw, MBOX_OK, _("Command error"),
+      _("Multiple commands cannot be executed at the same time."));
     return false;
   }
   return true;
