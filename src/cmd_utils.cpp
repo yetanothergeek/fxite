@@ -149,6 +149,15 @@ void CommandUtils::CommandDone(FXuint cmd)
 
 
 
+static bool MultiCmdError(FXTopWindow *tw)
+{
+  FXMessageBox::error(tw, MBOX_OK, _("Command error"),
+    _("Multiple commands cannot be executed at the same time."));
+  return false;
+}
+
+
+
 bool CommandUtils::IsCommandReady(FXuint cmd)
 {
   if (!temp_accels) {
@@ -162,13 +171,20 @@ bool CommandUtils::IsCommandReady(FXuint cmd)
     );
     return false;
   }
-  if ((commands&cmd)&&(cmd==CMD_MACRO)&&((FXThread::time()-macro_timer)<500000000)) {
-    return false; // Likely due to excessive keyboard events (user holding down hotkey), ignore it.
+  if (commands&CMD_FILTER) {
+    return MultiCmdError(tw); // Disallow everything while a filter is already running.
   }
-  if (commands) {
-    FXMessageBox::error(tw, MBOX_OK, _("Command error"),
-      _("Multiple commands cannot be executed at the same time."));
-    return false;
+  if (commands&CMD_SHELL) {
+    if (cmd==CMD_SHELL) {
+      return MultiCmdError(tw); // Disallow two shells running at the same time.
+    }
+  }
+  if (commands&CMD_MACRO) {
+    if ((cmd==CMD_MACRO)&&((FXThread::time()-macro_timer)<500000000)) {
+      return false; // Likely due to excessive keyboard events (user holding down hotkey), ignore it.
+    } else {
+      return MultiCmdError(tw); // Disallow anything else while a macro is already running.
+    }
   }
   return true;
 }
