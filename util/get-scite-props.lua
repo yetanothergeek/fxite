@@ -295,7 +295,7 @@ local skip_langs={ -- Languages we don't care about
   'eiffel', 'eiffelkw', 'forth',
   'pov', 'asn1', 'SML', 'yaml',
   'PL/M', 'asy', 'oscript', 
-  'ecl','asl','avs','tacl','tal'
+  'ecl','asl','avs','tacl','tal','hex'
 }
 
 function skip_lang(lang)

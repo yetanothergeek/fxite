@@ -108,7 +108,11 @@ VisualProlog \
 KVIrc \
 STTXT \
 DMAP \
-Rust
+Rust \
+Hex \
+IHex \
+Srec \
+TEHex
 do
   rm -f "Lex${UNUSED}.cxx"
   awk '!/^\tLINK_LEXER\(lm'${UNUSED}'\);$/' Catalogue.cxx > Catalogue.tmp
