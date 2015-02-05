@@ -17,17 +17,6 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_HEADER_STDC
 
-
-case "${srcdir}" in
-  */*)
-    RELATIVE_SRC_DIR="${srcdir}"
-  ;;
-  *)
-    RELATIVE_SRC_DIR="${srcdir}/.."
-  ;;
-esac
-
-
 dnl #Let pkgconfig handle FOX flags unless they are set in the environment
 if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
 then
@@ -117,11 +106,12 @@ AC_ARG_WITH([system-lua],
   ,
   [
     dnl Use local copy of Lua
-    LUA_CFLAGS="-I${RELATIVE_SRC_DIR}/lua"
-    LUA_LIBS="-Wl,-E -L`pwd`/lua -llua -lm"
+    LUA_CFLAGS="-I\${abs_top_srcdir}/lua"
+    LUA_LIBS="-Wl,-E -L\${abs_top_builddir}/lua -llua -lm"
     AM_CONDITIONAL(WITH_SYSTEM_LUA, false)
   ]
 )
+
 
 
 AC_CANONICAL_HOST
@@ -135,7 +125,7 @@ case $host_os in
   ;;
   *mingw*)
     dnl #tell mingw where to find stuff
-    FOX_LIBS="${RELATIVE_SRC_DIR}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid"
+    FOX_LIBS="\${abs_top_srcdir}/src/icon32x32.coff ${FOX_LIBS} -lgdi32 -limm32 -lws2_32 -lole32 -luuid"
     AC_ARG_ENABLE([win32-console],AC_HELP_STRING([--enable-win32-console],[enable win32 debug console]))
     AC_MSG_RESULT([$enable_win32_console])
     if test "x$enable_win32_console" != "xyes"
@@ -165,14 +155,14 @@ case "${LUA_LIBS}" in
 esac
 
 
-FXSCINTILLA_CFLAGS="-I${RELATIVE_SRC_DIR}/fxscintilla"
-FXSCINTILLA_LIBS="-L`pwd`/fxscintilla -lfxscintilla"
+FXSCINTILLA_CFLAGS="-I\${abs_top_srcdir}/fxscintilla"
+FXSCINTILLA_LIBS="-L\${abs_top_builddir}/fxscintilla -lfxscintilla"
 
-JEFFX_LIBS="-L`pwd`/jef -ljeffx"
-JEFFX_CFLAGS="-I${RELATIVE_SRC_DIR}/jef"
+JEFFX_LIBS="-L\${abs_top_builddir}/jef -ljeffx"
+JEFFX_CFLAGS="-I\${abs_top_srcdir}/jef"
 
-MNUMGR_LIBS="-L`pwd`/mnumgr -lmnumgr"
-MNUMGR_CFLAGS="-I${RELATIVE_SRC_DIR}/mnumgr"
+MNUMGR_LIBS="-L\${abs_top_builddir}/mnumgr -lmnumgr"
+MNUMGR_CFLAGS="-I\${abs_top_srcdir}/mnumgr"
 
 
 
