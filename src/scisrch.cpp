@@ -389,7 +389,7 @@ long SciSearch::ReplaceAllInDoc(const FXString &searchfor, const FXString &repla
   SciMsg(SCI_SETSEARCHFLAGS,0,0);
   SciMsg(SCI_BEGINUNDOACTION,0,0);
   while (1) {
-    if (end==start) { break; }
+    if (end<=start) { break; }
     if (RxMatch(&rx,content,end,begs,ends,srchflags,MAX_CAPTURES,start,end)) {
       SciMsg(SCI_SETTARGETSTART,begs[0],0);
       SciMsg(SCI_SETTARGETEND,ends[0],0);
