@@ -32,6 +32,9 @@ static void SetBackColor(FXWindow*w)
   BackColor(FXListBox);
   BackColor(FXList);
   BackColor(FXTextField);
+  BackColor(FXIconList);
+  BackColor(FXTreeList);
+  BackColor(FXText);
   c=w->getApp()->getBaseColor();
   BackColor(FXWindow);
 }
