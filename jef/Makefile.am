@@ -7,6 +7,7 @@ libjeffx_a_SOURCES=\
   cfg_theme.cpp \
   color_funcs.cpp \
   compat.cpp \
+  ctokens.c \
   desclistdlg.cpp \
   dual_list.cpp \
   histbox.cpp \
@@ -28,6 +29,7 @@ noinst_HEADERS=\
   cfg_theme.h \
   color_funcs.h \
   compat.h \
+  ctokens.h \
   desclistdlg.h \
   dual_list.h \
   histbox.h \

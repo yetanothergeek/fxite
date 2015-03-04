@@ -32,6 +32,7 @@ fxasq_lua.c \
 help.cpp \
 isutf8.c \
 lang.cpp \
+lua_ctokens.c \
 luacmds.cpp \
 luafuncs.cpp \
 luafx.cpp \
@@ -77,6 +78,7 @@ help_lua.h \
 helptext.h \
 lang.h \
 langlist.h \
+lua_ctokens.h \
 luacmds.h \
 luafuncs.h \
 luafx.h \

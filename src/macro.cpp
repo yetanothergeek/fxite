@@ -27,6 +27,7 @@
 #include "luafuncs.h"
 #include "luafx.h"
 #include "fxasq_lua.h"
+#include "lua_ctokens.h"
 
 #include "intl.h"
 #include "macro.h"
@@ -483,8 +484,14 @@ bool MacroRunner::RunMacro(const FXString &source, bool isfilename)
   lua_State *L=luaL_newstate();
   luaL_openlibs(L);
   luaopen_dialog(L);
-#if LUA_VERSION_NUM>=502
+#if LUA_VERSION_NUM<502
+  luaopen_dialog(L);
+  luaopen_ctokens(L);
+#else
+  luaopen_dialog(L);
   lua_setglobal(L, "dialog");
+  luaopen_ctokens(L);
+  lua_setglobal(L, "ctokens");
 #endif
   override(L,"os","exit", osexit);
   override(L,"io","stdin", NULL);
