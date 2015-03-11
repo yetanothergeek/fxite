@@ -90,7 +90,7 @@ int ctokens_callback(const TokenInfo*info)
     lua_rawgeti(L, LUA_REGISTRYINDEX, c->data_idx);
     lua_rawset(L,-3);
   }
-  lua_pcall(c->L, 1, 1, 0);
+  lua_call(c->L, 1, 1);
   return lua_toboolean(c->L,-1);
 }
 
