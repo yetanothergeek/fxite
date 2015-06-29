@@ -121,16 +121,16 @@ FXMenuCommand*RecentFilesMenu::find(const FXString &txt)
 
 
 RecentFilesMenu::RecentFilesMenu(FXWindow *p,
-  const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel):FXMenuPane(p)
+  const FXString &caption, const FXString &groupname, FXRegistry*r, FXObject *tgt, FXSelector sel):FXMenuPane(p)
 {
   target=tgt;
   message=sel;
+  reg=r;
   created=false;
   FXchar key[2]="\0";
   casc=new FXMenuCascade((FXComposite*)p,caption, NULL, this);
   group=groupname.text();
-  app=p->getApp();
-  for (key[0]='a'; key[0]<='z'; key[0]++) { prepend(app->reg().readStringEntry(group.text(),key, "")); }
+  for (key[0]='a'; key[0]<='z'; key[0]++) { prepend(reg->readStringEntry(group.text(),key, "")); }
 }
 
 
@@ -139,10 +139,10 @@ RecentFilesMenu::~RecentFilesMenu()
 {
   FXchar key[2]="\0";
   FXWindow*w;
-  for (key[0]='a'; key[0]<='z'; key[0]++) { append(app->reg().readStringEntry(group.text(),key, "")); }
-  app->reg().deleteSection(group.text());
+  for (key[0]='a'; key[0]<='z'; key[0]++) { append(reg->readStringEntry(group.text(),key, "")); }
+  reg->deleteSection(group.text());
   for (w=getFirst(), key[0]='z' ; w && (key[0]>='a'); w=w->getNext(), key[0]--) {
-    app->reg().writeStringEntry(group.text(),key,(char*)w->getUserData());
+    reg->writeStringEntry(group.text(),key,(char*)w->getUserData());
   }
 }
 

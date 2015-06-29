@@ -84,6 +84,7 @@ const FXString& TopWindowBase::Connector() { return ((AppClass*)(FXApp::instance
 
 const FXString& TopWindowBase::SessionFile() { return ((AppClass*)getApp())->SessionFile(); }
 
+const FXString& TopWindowBase::HistoryFile() { return ((AppClass*)getApp())->HistoryFile(); }
 
 void TopWindowBase::Cut()   { SciDocUtils::Cut(FocusedDoc()); }
 
@@ -96,6 +97,8 @@ void TopWindowBase::Paste() { SciDocUtils::Paste(FocusedDoc()); }
 
 
 #define PACK_UNIFORM ( PACK_UNIFORM_WIDTH | PACK_UNIFORM_HEIGHT )
+
+extern void MigrateHistory(FXRegistry*from, FXRegistry*to);
 
 TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,DECOR_ALL,0,0,600,400)
 {
@@ -118,15 +121,18 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
   ColorFuncs::RgbToHex(getApp()->getTipforeColor(), sd->fg);
   mnumgr=new MyMenuMgr();
   prefs=new Settings(this, ConfigDir(), mnumgr);
+  history.setAsciiMode(true);
+  history.parseFile(HistoryFile(),true);
+  MigrateHistory(&getApp()->reg(), &history);
   SciDoc::DefaultStyles(prefs->Styles());
-  menubar=new MainMenu(this,mnumgr);
+  menubar=new MainMenu(this,mnumgr,&history);
   outerbox=new FXVerticalFrame(this,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0,0,0);
   innerbox=new FXVerticalFrame(outerbox,FRAME_NONE|LAYOUT_FILL,0,0,0,0,4,4,4,4);
   toolbar=new MyToolBarFrame(innerbox, !prefs->ShowToolbar);
   hsplit=new FXSplitter(innerbox,this, 0, SPLITTER_VERTICAL|SPLITTER_REVERSED|LAYOUT_FILL|SPLITTER_TRACKING);
   innerbox=new FXVerticalFrame(hsplit,FRAME_NONE|LAYOUT_FILL,0,0,0,0,0,0,0,0);
   tabbook=new DocTabs(innerbox,this,0,FRAME_NONE|PACK_UNIFORM|LAYOUT_FILL);
-  srchdlgs=new SearchDialogs(innerbox, this, 0);
+  srchdlgs=new SearchDialogs(innerbox, &history, this, 0);
   tabbook->setTabStyleByChar(prefs->DocTabPosition);
   tabbook->setTabsCompact(prefs->DocTabsPacked);
   tabbook->MaxTabWidth(prefs->TabTitleMaxWidth);
@@ -141,9 +147,12 @@ TopWindowBase::TopWindowBase(FXApp* a):MainWinWithClipBrd(a,EXE_NAME,NULL,NULL,D
 }
 
 
+extern "C" { int ini_sort(const char *filename); }
 
 TopWindowBase::~TopWindowBase()
 {
+  history.unparseFile(HistoryFile());
+  ini_sort(HistoryFile().text());
   destroying=true;
   delete filedlgs;
   delete backups;
@@ -256,10 +265,9 @@ FXbool TopWindowBase::close(FXbool notify)
 
   session_data="";
   if (!RunHookScript("shutdown")) { return false; }
-  prefs->LastFocused=FocusedDoc()->Filename();
+  FXString LastFocused=FocusedDoc()->Filename();
   if (!CloseAll(true)) {
     not_confirmed();
-    prefs->LastFocused="";
     FocusedDoc()->setFocus();
     return false;
   }
@@ -268,6 +276,7 @@ FXbool TopWindowBase::close(FXbool notify)
      FXFile fh(SessionFile(), FXIO::Writing);
      if (fh.isOpen()) {
        FXival wrote=0;
+       session_data+=LastFocused+"\n";
        wrote=fh.writeBlock(session_data.text(),session_data.length());
        if (!(fh.close() && (wrote==session_data.length()))) {
          fxwarning(_(EXE_NAME": Could not save %s (%s)"), SessionFile().text(), SystemErrorStr());
@@ -809,10 +818,10 @@ void TopWindowBase::ShowFilterDialog(bool is_filter)
   HistBox *dlg;
   bool save_first;
   if(is_filter) {
-    dlg=new HistBox(this, _("Filter selection"), _("Command:"), "Filters");
+    dlg=new HistBox(this, _("Filter selection"), _("Command:"), "Filters", &history);
     save_first=prefs->SaveBeforeFilterSel;
   } else {
-    dlg=new HistBox(this, _("Insert output of command"), _("Command:"), "InsertOutput");
+    dlg=new HistBox(this, _("Insert output of command"), _("Command:"), "InsertOutput", &history);
     save_first=prefs->SaveBeforeInsCmd;
   }
   dlg->setNumColumns(48);
@@ -835,7 +844,7 @@ void TopWindowBase::ShowFilterDialog(bool is_filter)
 void TopWindowBase::ShowCommandDialog()
 {
   SciDoc *sci=FocusedDoc();
-  HistBox dlg(this, _("Run command"), _("Command:"), "Commands");
+  HistBox dlg(this, _("Run command"), _("Command:"), "Commands", &history);
   dlg.setNumColumns(48);
   if ( dlg.execute(PLACEMENT_OWNER) ) {
     FXString cmd=dlg.getText();
@@ -1228,11 +1237,6 @@ void TopWindowBase::ParseCommands(FXString &commands)
                 fh.readBlock((void*)(session_data.text()),fh.size());
                 fh.close();
                 ParseCommands(session_data);
-                if (!prefs->LastFocused.empty()) {
-                  if (FXStat::isFile(prefs->LastFocused)) {
-                    IsFileOpen(prefs->LastFocused,true);
-                  }
-                }
               }
             }
             break;

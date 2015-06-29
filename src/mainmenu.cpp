@@ -54,10 +54,11 @@ static const char*usersnipflags[]={
 };
 
 
-MainMenu::MainMenu(FXComposite* p, MenuMgr*mmgr):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
+MainMenu::MainMenu(FXComposite* p, MenuMgr*mmgr, FXRegistry*r):FXMenuBar(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X)
 {
   tw=(TopWindow*)p;
   mnumgr=mmgr;
+  reg=r;
   prefs=SettingsBase::instance();
   CreateMenus();
   new FXHorizontalSeparator(p,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|SEPARATOR_GROOVE);
@@ -282,7 +283,7 @@ void MainMenu::CreateMenus()
   MkMnuCmd(filemenu,ID_NEW);
   MkMnuCmd(filemenu,ID_OPEN_FILES);
   openselmenu=MkMnuCmd(filemenu,ID_OPEN_SELECTED);
-  recent_files=new RecentFilesMenu(filemenu, _("Open pre&vious"), "RecentFiles", tw, TW::ID_OPEN_PREVIOUS);
+  recent_files=new RecentFilesMenu(filemenu, _("Open pre&vious"), "RecentFiles", reg, tw, TW::ID_OPEN_PREVIOUS);
 
   new FXMenuSeparator(filemenu, 0);
   MkMnuCmd(filemenu,ID_SAVE);

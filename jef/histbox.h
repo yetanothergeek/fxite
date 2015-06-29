@@ -87,7 +87,7 @@ private:
   RegHistory*hist;
   HistoryTextField*slave;
 public:
-  HistoryTextField(FXComposite *p, FXint ncols, const FXString &regname, const FXchar prefixes[2],
+  HistoryTextField(FXComposite *p, FXint ncols, const FXString &regname, const FXchar prefixes[2], FXRegistry*r=NULL,
     FXObject *tgt=NULL, FXSelector sel=0, FXuint opts=TEXTFIELD_NORMAL,
       FXint x=0, FXint y=0, FXint w=0, FXint h=0, FXint
         pl=DEFAULT_PAD, FXint pr=DEFAULT_PAD, FXint pt=DEFAULT_PAD, FXint pb=DEFAULT_PAD);
@@ -120,7 +120,7 @@ protected:
   HistBox(){}
 private:
 public:
-  HistBox(FXWindow* p, const FXString& caption, const FXString& label, const FXString &regname);
+  HistBox(FXWindow* p, const FXString&caption, const FXString&label, const FXString&regname, FXRegistry*r=NULL);
   virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
 };
 

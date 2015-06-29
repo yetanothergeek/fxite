@@ -398,9 +398,15 @@ void AppClass::init(int& argc, char** argv, bool connect)
     if (c==255) { break; }
   }
   server_name.lower();
+
   sessionfile=configdir+"sessions"+PATHSEP;
   CreatePathOrDie(sessionfile);
   sessionfile.append(sock_name);
+
+  historyfile=configdir+"history"+PATHSEP;
+  CreatePathOrDie(historyfile);
+  historyfile.append(sock_name);
+
   settingsfile=configdir+"settings";
 #ifdef WIN32
   sock_name.prepend(FXSystem::currentUserName()+"."APP_NAME".");

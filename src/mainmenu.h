@@ -115,11 +115,12 @@ private:
   FXMenuCheck* wordwrap_chk;
   FXMenuCheck* invert_chk;
   MenuMgr*mnumgr;
+  FXRegistry*reg;
   static void SetMenuEnabled(FXMenuCommand*mnu, bool enabled);
   void EnableTagMenus(bool enabled);
 
 public:
-  MainMenu(FXComposite* p, MenuMgr* mmgr);
+  MainMenu(FXComposite* p, MenuMgr* mmgr, FXRegistry*r);
   ~MainMenu();
   void Recording(bool recording, bool recorded);
   void RescanUserMenus();

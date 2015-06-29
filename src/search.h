@@ -74,6 +74,7 @@ private:
   bool repl_ready;
   SearchDialogStyle gui_style;
   FXObjectList hist_queue;
+  FXRegistry*reg;
   FXuint NextSearch(FXuint code);
   FXuint NextReplace(FXuint code, bool forward);
   FXString replacestring;
@@ -103,7 +104,7 @@ public:
   bool GoToSelected();
   bool ShowGoToDialog();
   FXWindow*FindDialog() { return (FXWindow*)find_gui; }
-  SearchDialogs(FXComposite*p, FXObject*trg=NULL, FXSelector sel=0);
+  SearchDialogs(FXComposite*p, FXRegistry*r, FXObject*trg=NULL, FXSelector sel=0);
   void setSelector(FXSelector sel) { message=sel; }
   void setTarget(FXObject*trg) { target=trg; }
   virtual ~SearchDialogs();

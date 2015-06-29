@@ -114,7 +114,7 @@ private:
   FXSelector message;
   void EnableSearch();
 public:
-  SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only, bool floating);
+  SciReplGui(FXComposite*p, FXRegistry*r, FXObject*tgt, FXSelector sel, bool find_only, bool floating);
   ~SciReplGui() { target=NULL; stop(DONE); }
   void stop(FXuint stopval);
   long onSciOpts(FXObject*o, FXSelector sel, void*p);
@@ -195,7 +195,7 @@ static const char close_icon[] =
 ;
 
 
-SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_only, bool floating):FXMatrix(p,2)
+SciReplGui::SciReplGui(FXComposite*p, FXRegistry*r, FXObject*tgt, FXSelector sel, bool find_only, bool floating):FXMatrix(p,2)
 {
   sciflags=0;
   target=tgt;
@@ -212,12 +212,12 @@ SciReplGui::SciReplGui(FXComposite*p, FXObject*tgt, FXSelector sel, bool find_on
   SetPad(txt_fields,0);
 
   srch_lab=new FXLabel(txt_fields, _("Se&arch for:"));
-  srch_hist=new HistoryTextField(txt_fields,48,group,"SM",this,ID_SRCH_HIST,textopts);
+  srch_hist=new HistoryTextField(txt_fields,48,group,"SM",r,this,ID_SRCH_HIST,textopts);
   if (find_only) {
     repl_hist=NULL;
   } else {
     repl_lab=new FXLabel(txt_fields, _("Replace &with:"));
-    repl_hist=new HistoryTextField(txt_fields,48,group,"R",this,ID_REPL_HIST,textopts);
+    repl_hist=new HistoryTextField(txt_fields,48,group,"R",r,this,ID_REPL_HIST,textopts);
   }
 
   SetPad(btn_ctrls,0);
@@ -598,7 +598,7 @@ FXDEFMAP(SearchDialogs) SearchDialogsMap[] = {
 FXIMPLEMENT(SearchDialogs, FXObject, SearchDialogsMap, ARRAYNUMBER(SearchDialogsMap));
 
 
-SearchDialogs::SearchDialogs(FXComposite*p, FXObject*trg, FXSelector sel) {
+SearchDialogs::SearchDialogs(FXComposite*p, FXRegistry*r, FXObject*trg, FXSelector sel) {
   defaultsearchmode=0;
   searchdirn=SCI_SEARCHNEXT;
   searchstring=FXString::null;
@@ -611,6 +611,7 @@ SearchDialogs::SearchDialogs(FXComposite*p, FXObject*trg, FXSelector sel) {
   srchpan=NULL;
   repl_gui=NULL;
   find_gui=NULL;
+  reg=r;
 }
 
 
@@ -645,7 +646,7 @@ SearchDialogs::~SearchDialogs()
   repl_gui=NULL;
   if (hist_queue.no()) {
     if (!find_gui) {
-      find_gui=new SciReplGui(container, this, ID_SEARCH, true, container==srchdlg);
+      find_gui=new SciReplGui(container, reg, this, ID_SEARCH, true, container==srchdlg);
     }
     SaveHistoryQueue();
   }
@@ -707,7 +708,7 @@ void SearchDialogs::ShowFindDialog()
   delete repl_gui;
   repl_gui=NULL;
   if (!find_gui) {
-    find_gui=new SciReplGui(container, this, ID_SEARCH, true, container==srchdlg);
+    find_gui=new SciReplGui(container, reg, this, ID_SEARCH, true, container==srchdlg);
     SaveHistoryQueue();
     container->create();
     if (srchdlg) {
@@ -735,7 +736,7 @@ void SearchDialogs::ShowReplaceDialog()
   delete find_gui;
   find_gui=NULL;
   if (!repl_gui) {
-    repl_gui=new SciReplGui(container, this, ID_SEARCH, false, container==srchdlg);
+    repl_gui=new SciReplGui(container, reg, this, ID_SEARCH, false, container==srchdlg);
     container->create();
     if (srchdlg) {
       srchdlg->setTitle(_("Replace"));

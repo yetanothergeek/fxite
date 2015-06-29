@@ -41,6 +41,7 @@ private:
   FXString commands;
   FXString configdir;
   FXString sessionfile;
+  FXString historyfile;
   FXString settingsfile;
 public:
   enum{
@@ -56,6 +57,7 @@ public:
   FXString &Commands() { return commands; }
   const FXString &ConfigDir() { return configdir; }
   const FXString &SessionFile() { return sessionfile; }
+  const FXString &HistoryFile() { return historyfile; }
   const FXString &SettingsFile() { return settingsfile; }
   const FXString &ServerName() { return server_name; }
   const FXString &Connector() { return sock_name; }

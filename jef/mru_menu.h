@@ -27,8 +27,8 @@ class RecentFilesMenu: public FXMenuPane {
   protected:
     FXString group;
     FXMenuCascade*casc;
-    FXApp*app;
     bool created;
+    FXRegistry*reg;
     void add_item(const FXString &txt, bool prepended);
     void append(const FXString &txt);
     FXMenuCommand*find(const FXString &txt);
@@ -38,7 +38,7 @@ class RecentFilesMenu: public FXMenuPane {
       ID_ITEM_CLICK=FXMenuPane::ID_LAST,
       ID_LAST
     };
-    RecentFilesMenu(FXWindow *p, const FXString &caption, const FXString &groupname, FXObject *tgt, FXSelector sel);
+    RecentFilesMenu(FXWindow *p, const FXString &caption, const FXString &groupname, FXRegistry*r, FXObject *tgt, FXSelector sel);
     ~RecentFilesMenu();
     virtual void create();
     void prepend(const FXString &txt);

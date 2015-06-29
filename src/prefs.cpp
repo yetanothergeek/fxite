@@ -704,7 +704,6 @@ static const char* geom_keys[] = {
   "Height",
   "OutputPaneHeight",
   "placement",
-  "LastFocused",
   "TabTitleMaxWidth",
   NULL
 };
@@ -925,7 +924,7 @@ Settings::Settings(FXMainWindow*w, const FXString &configdir, MenuMgr*mmgr):Sett
   LIMIT_RANGE(Height,120,Height);
   ReadInt(Maximize,false);
   ReadIntRng(TabTitleMaxWidth,ScreenWidth/6,0,ScreenWidth);
-  LastFocused=reg->readStringEntry("LastFocused",FXPath::title(TopWinPub::Connector()).text(),"");
+  reg->deleteSection("LastFocused");
   ReadInt(FontSize,120);
   ReadIntRng(FontAscent,2,0,16);
   ReadIntRng(FontDescent,0,0,16);
@@ -1078,7 +1077,6 @@ Settings::~Settings()
   WriteInt(Width);
   WriteInt(Height);
   WriteInt(Maximize);
-  reg->writeStringEntry("LastFocused",FXPath::title(TopWinPub::Connector()).text(),LastFocused.text());
   WriteInt(FontSize);
   WriteInt(FontAscent);
   WriteInt(FontDescent);

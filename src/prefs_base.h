@@ -97,7 +97,6 @@ public:
   FXint MaxFiles;
   FXint AutosaveInterval;
   FXint DefaultFileFormat;
-  FXString LastFocused;
   FXint ScreenWidth;
   FXint ScreenHeight;
   FXint TabTitleMaxWidth;

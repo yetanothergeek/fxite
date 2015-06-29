@@ -201,3 +201,34 @@ void MigrateTheme(FXRegistry*r)
   r->deleteSection(old_sect);
 }
 
+
+
+static void MoveSection(FXRegistry*from, FXRegistry*to, const FXString&sect)
+{
+  if (!from->existingSection(sect.text())) { return; }
+#ifdef FOX_1_7_45_OR_NEWER
+  const FXStringDictionary *dict=&(from->at(sect));
+#else
+  const FXStringDict *dict=from->find(sect.text());
+#endif
+  for (FXint i=0; i<dict->no(); i++) {
+    if (!dict->empty(i)) {
+      const FXString k=dict->key(i);
+      const FXString v=dict->data(i);
+      to->writeStringEntry(sect.text(),k.text(),v.text());
+    }
+  }
+  from->deleteSection(sect.text());
+}
+
+
+void MigrateHistory(FXRegistry*from, FXRegistry*to)
+{
+  MoveSection(from,to,"Commands");
+  MoveSection(from,to,"InsertOutput");
+  MoveSection(from,to,"Filters");
+  MoveSection(from,to,"RecentFiles");
+  MoveSection(from,to,"Search");
+  MoveSection(from,to,"Replace");
+}
+

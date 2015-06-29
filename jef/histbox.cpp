@@ -151,7 +151,7 @@ private:
   FXchar spfx; // prefix for strings
   FXchar ipfx; // prefix for modes
   FXint current;
-  FXApp* app;
+  FXRegistry*reg;
   FXint* modep; // If non-null, we read from this on append() and write to it on text()
   FXchar keybuf[8];
   const FXchar*name(FXchar pfx, FXchar key ) {
@@ -170,7 +170,7 @@ protected:
   void setModeVar(FXint *modevar) { modep=modevar; }
   FXint*getModeVar() { return modep; }
 public:
-  RegHistory(FXApp *a, const char* groupname, FXchar text_prefix, FXchar mode_prefix='\0');
+  RegHistory(FXRegistry*r, const char*groupname, FXchar text_prefix, FXchar mode_prefix='\0');
   virtual ~RegHistory();
 };
 
@@ -179,10 +179,10 @@ public:
 RegHistory::~RegHistory()
 {
   for (FXint i=0; (i<numents)&& entries[i].text; i++) {
-    app->reg().writeStringEntry(group,sname(i),entries[i].text);
+    reg->writeStringEntry(group,sname(i),entries[i].text);
     free(entries[i].text);
     if (ipfx&&(entries[i].mode>=0)) {
-      app->reg().writeIntEntry(group,iname(i),entries[i].mode);
+      reg->writeIntEntry(group,iname(i),entries[i].mode);
     }
   }
   free(group);
@@ -221,29 +221,29 @@ const FXchar*RegHistory::text()
 
 
 
-RegHistory::RegHistory(FXApp*a, const char* groupname, FXchar text_prefix, FXchar mode_prefix)
+RegHistory::RegHistory(FXRegistry*r, const char* groupname, FXchar text_prefix, FXchar mode_prefix)
 {
   FXASSERT(groupname!=NULL);
-  FXASSERT(a!=NULL);
+  FXASSERT(r!=NULL);
   FXASSERT(mode_prefix!=text_prefix);
   FXASSERT((text_prefix>='A')&&(text_prefix<='Z'));
   FXASSERT( ((mode_prefix>='A')&&(mode_prefix<='Z')) || (mode_prefix=='\0') );
   modep=NULL;
   group=strdup(groupname);
-  app=a;
+  reg=r;
   current=-1;
   spfx=text_prefix;
   ipfx=mode_prefix;
   memset(&entries, 0, sizeof(entries));
   numents=(sizeof(entries)/sizeof(Entry))-1;
   for (FXint i=0; i<numents; i++) {
-    const FXchar*tmp=app->reg().readStringEntry(group,sname(i),NULL);
+    const FXchar*tmp=reg->readStringEntry(group,sname(i),NULL);
     if (tmp) {
       entries[i].text=strdup(tmp);
-      app->reg().deleteEntry(group,sname(i));
+      reg->deleteEntry(group,sname(i));
       if (ipfx) {
-        entries[i].mode=app->reg().readIntEntry(group,iname(i),-1);
-        app->reg().deleteEntry(group,iname(i));
+        entries[i].mode=reg->readIntEntry(group,iname(i),-1);
+        reg->deleteEntry(group,iname(i));
       }
     } else {
       break;
@@ -425,12 +425,12 @@ void HistoryTextField::show()
 
 
 HistoryTextField::HistoryTextField(FXComposite *p,
-    FXint ncols, const FXString &regname, const FXchar prefixes[2], FXObject *tgt, FXSelector sel,
+    FXint ncols, const FXString &regname, const FXchar prefixes[2], FXRegistry*r, FXObject *tgt, FXSelector sel,
     FXuint opts, FXint x, FXint y, FXint w, FXint h, FXint pl, FXint pr, FXint pt, FXint pb
 ) : ClipTextField(p,ncols,this,ID_HIST_KEY,opts,x,y,w,h,pl,pr,pt,pb)
 {
   slave=NULL;
-  hist=new RegHistory(getApp(), regname.text(), prefixes[0], prefixes[0]?prefixes[1]:0);
+  hist=new RegHistory(r, regname.text(), prefixes[0], prefixes[0]?prefixes[1]:0);
   hframe= new FXHorizontalFrame(p,LAYOUT_TOP|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0, 0,0);
   if (tgt&&sel) {
     hframe->setTarget(tgt);
@@ -467,12 +467,12 @@ FXuint HistBox::execute(FXuint placement)
 
 
 HistBox::HistBox(FXWindow* p,
-  const FXString& caption, const FXString& label, const FXString &regname):FXInputDialog(p,caption,label)
+  const FXString& caption, const FXString& label, const FXString &regname, FXRegistry*r):FXInputDialog(p,caption,label)
 {
   FXuint textopts=TEXTFIELD_ENTER_ONLY|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X;
   FXComposite*c=(FXComposite*)input->getParent();
   delete input;
-  input=new HistoryTextField(c,20,regname,"H",this,ID_ACCEPT,textopts,0,0,0,0, 8,8,4,4);
+  input=new HistoryTextField(c,20,regname,"H",r,this,ID_ACCEPT,textopts,0,0,0,0, 8,8,4,4);
 }
 
 

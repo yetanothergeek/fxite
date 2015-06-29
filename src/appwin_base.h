@@ -78,6 +78,7 @@ protected:
   FXString save_hook;
   FXString bookmarked_file;
   DocTab* bookmarked_tab;
+  FXRegistry history;
   long bookmarked_pos;
   bool skipfocus;
   void Closing(bool is_closing);
@@ -101,6 +102,7 @@ protected:
   bool SaveAll(bool break_on_fail);
   bool CloseAll(bool close_last);
   const FXString &SessionFile();
+  const FXString &HistoryFile();
   bool SetLanguage(FXMenuRadio* mnu);
   void SetBookmark();
   void EnableUserFilters(bool enabled);
